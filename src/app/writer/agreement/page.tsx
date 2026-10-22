@@ -1,0 +1,84 @@
+import React from 'react';
+import Link from 'next/link';
+import { ShieldCheck, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { UrduText } from '@/components/urdu/UrduText';
+
+export default function WriterAgreementPage() {
+  return (
+    <div className="min-h-screen bg-stone-950 text-stone-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto space-y-8 rounded-2xl border border-stone-800 bg-stone-900/60 p-8 md:p-12 backdrop-blur-xl shadow-2xl">
+        <div className="border-b border-stone-800 pb-6">
+          <Link
+            href="/become-a-writer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-500 hover:text-amber-400 mb-4 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to application</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="h-8 w-8 text-amber-500" />
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                Writer Platform Agreement
+              </h1>
+              <UrduText size="sm" className="text-amber-400 mt-1">
+                مصنفین کے لیے ضابطہ اخلاق اور معاہدہ شراکت
+              </UrduText>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6 text-sm text-stone-300 leading-relaxed">
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              1. Direct Reader-to-Writer Payout Model
+            </h2>
+            <p>
+              UNB Premium connects Urdu fiction authors directly with verified readers. Readers deposit payments directly to your provided Pakistani bank or mobile wallet accounts (JazzCash, EasyPaisa, Raast). You receive 100% of reader payments directly upon deposit verification.
+            </p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              2. Platform Commission & Accrual Threshold
+            </h2>
+            <p>
+              The platform records an automated 20% platform commission (or agreed custom rate) on each verified sale. You agree to settle accrued commissions with the platform once your balance reaches the unpaid limit of PKR 5,000. Orders remain active and uninterrupted while within this limit.
+            </p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              3. Copyright & Original Authorship
+            </h2>
+            <p>
+              You warrant that all published Urdu stories, serialized novels, and literary content submitted under your pen name are your original intellectual property. Plagiarism, unlicensed adaptations, or copyright infringement will result in immediate suspension and entitlement revocation.
+            </p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              4. Verification Obligations
+            </h2>
+            <p>
+              You agree to inspect bank receipts submitted by readers in good faith within 24–48 hours. Falsely confirming unreceived funds or unfairly rejecting valid reader deposits constitutes a breach of platform integrity and may trigger administrative dispute intervention.
+            </p>
+          </section>
+        </div>
+
+        <div className="pt-6 border-t border-stone-800 text-center">
+          <Link
+            href="/become-a-writer"
+            className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/20"
+          >
+            <span>I Understand & Agree</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
