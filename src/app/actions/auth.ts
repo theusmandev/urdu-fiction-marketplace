@@ -9,6 +9,7 @@ import {
   resetPasswordSchema,
 } from '@/lib/auth/schemas';
 import { getSafeRedirectUrl } from '@/lib/auth/safe-redirect';
+import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
 
 export interface AuthActionResult {
   success?: boolean;
@@ -142,7 +143,14 @@ export async function loginUser(
     };
   }
 
-  const safeDestination = getSafeRedirectUrl(nextParam, '/');
+  const { data: writerProfile } = await supabase
+    .from('writer_profiles')
+    .select('status')
+    .eq('id', data.user.id)
+    .maybeSingle();
+
+  const roleDashboard = getRoleDashboard(profile?.role, writerProfile?.status);
+  const safeDestination = getSafeRedirectUrl(nextParam, roleDashboard);
   return {
     success: true,
     redirectTo: safeDestination,

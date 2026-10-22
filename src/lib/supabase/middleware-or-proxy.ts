@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import type { Database } from '@/types/database';
+import type { ProfileRow, WriterProfileRow } from '@/types/database';
+import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -14,7 +15,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  const supabase = createServerClient<Database>(
+  const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,
     {
@@ -65,17 +66,45 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Auth pages: Redirect authenticated users to home unless handling reset-password token
+  // Auth pages: Redirect authenticated users to their role dashboard unless handling a valid internal target
   const authRoutes = ['/login', '/register', '/forgot-password'];
   if (user && authRoutes.includes(pathname)) {
     const nextParam = request.nextUrl.searchParams.get('next');
     const url = request.nextUrl.clone();
     url.search = '';
-    // Allow relative internal redirects
-    if (nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//')) {
+
+    // Allow relative internal redirects if not pointing to home or another auth route
+    if (
+      nextParam &&
+      nextParam.startsWith('/') &&
+      !nextParam.startsWith('//') &&
+      nextParam !== '/' &&
+      !authRoutes.includes(nextParam)
+    ) {
       url.pathname = nextParam;
     } else {
-      url.pathname = '/';
+      // Authoritatively resolve user's role and writer status via Supabase
+      const { data: profile } = (await supabase
+        .from('profiles')
+        .select('role, is_active')
+        .eq('id', user.id)
+        .maybeSingle()) as { data: Pick<ProfileRow, 'role' | 'is_active'> | null };
+
+      if (profile && !profile.is_active) {
+        await supabase.auth.signOut();
+        const errorUrl = request.nextUrl.clone();
+        errorUrl.pathname = '/login';
+        errorUrl.searchParams.set('error', 'account_deactivated');
+        return NextResponse.redirect(errorUrl);
+      }
+
+      const { data: writerProfile } = (await supabase
+        .from('writer_profiles')
+        .select('status')
+        .eq('id', user.id)
+        .maybeSingle()) as { data: Pick<WriterProfileRow, 'status'> | null };
+
+      url.pathname = getRoleDashboard(profile?.role, writerProfile?.status);
     }
     return NextResponse.redirect(url);
   }
