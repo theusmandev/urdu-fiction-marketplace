@@ -212,16 +212,19 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Overdue Orders */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
+        <Link
+          href="/admin/orders?stuck=true"
+          className="bg-slate-950/50 border border-slate-800 hover:border-yellow-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
           <div className="flex items-center justify-between text-slate-400 text-xs">
             <span>Delayed Verif.</span>
-            <Clock className="w-4 h-4 text-yellow-400" />
+            <Clock className="w-4 h-4 text-yellow-400 group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-2xl font-bold text-yellow-400 font-mono">
             {overdueOrdersCount ?? 0}
           </div>
           <p className="text-[10px] text-slate-500">&gt; 24h unverified</p>
-        </div>
+        </Link>
 
         {/* Commission Capped Writers */}
         <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
@@ -392,9 +395,13 @@ export default async function AdminDashboardPage() {
                 Delayed Writer Payment Verifications (&gt;24h)
               </h2>
             </div>
-            <span className="text-xs font-mono text-yellow-400">
-              {overdueOrdersCount ?? 0} Flagged
-            </span>
+            <Link
+              href="/admin/orders?stuck=true"
+              className="text-xs text-yellow-400 hover:underline flex items-center gap-1 font-mono"
+            >
+              <span>{overdueOrdersCount ?? 0} Flagged</span>
+              <ChevronRight className="w-3 h-3" />
+            </Link>
           </div>
 
           {!overdueOrders || overdueOrders.length === 0 ? (
@@ -406,7 +413,7 @@ export default async function AdminDashboardPage() {
               {overdueOrders.map((ord) => {
                 const wp = Array.isArray(ord.writer_profiles) ? ord.writer_profiles[0] : ord.writer_profiles;
                 return (
-                  <div key={ord.id} className="py-2.5 flex items-center justify-between text-xs">
+                  <div key={ord.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                     <div>
                       <div className="font-mono text-white font-semibold">
                         {ord.order_number} • PKR {ord.amount_pkr}
@@ -415,9 +422,17 @@ export default async function AdminDashboardPage() {
                         Novel: {ord.novel_title_snapshot} • Writer: {wp?.pen_name_english || 'Writer'}
                       </div>
                     </div>
-                    <span className="text-[10px] text-yellow-400 font-mono">
-                      {new Date(ord.created_at).toLocaleDateString()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-yellow-400 font-mono hidden sm:inline">
+                        {new Date(ord.created_at).toLocaleDateString()}
+                      </span>
+                      <Link
+                        href={`/admin/orders/${ord.id}`}
+                        className="text-xs px-2.5 py-1 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 transition-colors"
+                      >
+                        Inspect
+                      </Link>
+                    </div>
                   </div>
                 );
               })}
