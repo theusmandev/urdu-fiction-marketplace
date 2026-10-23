@@ -86,6 +86,8 @@ export interface PlatformSettingsRow {
   chapter_read_window_minutes: number;
   invoice_due_days: number;
   overdue_grace_days: number;
+  min_dispute_wait_hours: number;
+  verification_reminder_hours: number;
   support_email: string;
   updated_at: string;
 }
@@ -671,6 +673,204 @@ export interface DisputeRow {
   updated_at: string;
 }
 
+export interface DisputeMessageRow {
+  id: string;
+  dispute_id: string;
+  author_id: string;
+  author_role: 'reader' | 'writer' | 'admin';
+  body: string;
+  attachment_path: string | null;
+  created_at: string;
+}
+
+export interface RefundRequestRow {
+  id: string;
+  order_id: string;
+  requested_by: string;
+  requester_role: 'writer' | 'reader';
+  reason: string;
+  evidence_note: string | null;
+  evidence_path: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  admin_note: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupportRequestRow {
+  id: string;
+  user_id: string;
+  category: 'order' | 'payment' | 'account' | 'content' | 'other';
+  order_id: string | null;
+  subject: string;
+  body: string;
+  status: 'open' | 'answered' | 'closed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupportMessageRow {
+  id: string;
+  request_id: string;
+  author_id: string;
+  author_role: 'reader' | 'writer' | 'admin';
+  body: string;
+  created_at: string;
+}
+
+export interface NotificationPreferencesRow {
+  user_id: string;
+  email_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EmailOutboxRow {
+  id: string;
+  user_id: string;
+  template: string;
+  subject: string;
+  body_text: string;
+  status: 'pending' | 'sent' | 'failed' | 'skipped';
+  attempts: number;
+  last_error: string | null;
+  dedupe_key: string | null;
+  created_at: string;
+  sent_at: string | null;
+}
+
+export interface DisputeListItem {
+  dispute_id: string;
+  order_id: string;
+  order_number: string;
+  novel_title: string;
+  amount_pkr: number;
+  status: DisputeStatus;
+  reason: string;
+  resolution_note: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  is_opened_by_me: boolean;
+  other_party_name: string;
+  messages_count: number;
+  last_message_at: string | null;
+  writer_pen_name?: string;
+  reader_name?: string;
+  is_stuck?: boolean;
+}
+
+export interface DisputeMessageItem {
+  id: string;
+  author_id: string;
+  author_role: 'reader' | 'writer' | 'admin';
+  author_name: string;
+  body: string;
+  attachment_path: string | null;
+  created_at: string;
+  is_by_me: boolean;
+}
+
+export interface DisputeDetailPayload {
+  dispute: {
+    id: string;
+    status: DisputeStatus;
+    reason: string;
+    resolution_note: string | null;
+    admin_resolution_notes: string | null;
+    resolved_at: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+  order: {
+    id: string;
+    order_number: string;
+    novel_title: string;
+    amount_pkr: number;
+    status: OrderStatus;
+    reader_display_name: string;
+    writer_pen_name: string;
+    writer_pen_name_urdu: string;
+    created_at: string;
+    verified_at: string | null;
+  };
+  messages: DisputeMessageItem[];
+  submissions: Array<{
+    id: string;
+    transaction_reference_tid: string;
+    screenshot_url: string;
+    paid_amount_claimed_pkr: number | null;
+    sender_account_name: string | null;
+    reader_note: string | null;
+    reviewer_status: string;
+    reviewer_note: string | null;
+    created_at: string;
+  }>;
+  caller_role: 'reader' | 'writer' | 'admin';
+}
+
+export interface RefundRequestItem {
+  id: string;
+  order_id: string;
+  order_number: string;
+  novel_title: string;
+  amount_pkr: number;
+  writer_pen_name: string;
+  reader_name: string;
+  requested_by_role: 'writer' | 'reader';
+  reason: string;
+  evidence_note: string | null;
+  evidence_path: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  admin_note: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+}
+
+export interface SupportRequestListItem {
+  id: string;
+  category: 'order' | 'payment' | 'account' | 'content' | 'other';
+  subject: string;
+  status: 'open' | 'answered' | 'closed';
+  user_name?: string;
+  order_number?: string | null;
+  created_at: string;
+  updated_at: string;
+  messages_count: number;
+  last_message_at?: string;
+}
+
+export interface SupportRequestDetailPayload {
+  request: {
+    id: string;
+    category: 'order' | 'payment' | 'account' | 'content' | 'other';
+    subject: string;
+    status: 'open' | 'answered' | 'closed';
+    order_id: string | null;
+    order_number: string | null;
+    user_name: string;
+    created_at: string;
+    updated_at: string;
+  };
+  messages: Array<{
+    id: string;
+    author_id: string;
+    author_role: 'reader' | 'writer' | 'admin';
+    author_name: string;
+    body: string;
+    created_at: string;
+    is_by_me: boolean;
+  }>;
+}
+
+export interface EmailOutboxStats {
+  pending_count: number;
+  sent_count: number;
+  failed_count: number;
+  skipped_count: number;
+}
+
 export interface NotificationRow {
   id: string;
   user_id: string;
@@ -1163,6 +1363,96 @@ export interface Database {
         Update: Partial<CommissionPaymentReportRow>;
         Relationships: [];
       };
+      dispute_messages: {
+        Row: DisputeMessageRow;
+        Insert: {
+          id?: string;
+          dispute_id: string;
+          author_id: string;
+          author_role: 'reader' | 'writer' | 'admin';
+          body: string;
+          attachment_path?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<DisputeMessageRow>;
+        Relationships: [];
+      };
+      refund_requests: {
+        Row: RefundRequestRow;
+        Insert: {
+          id?: string;
+          order_id: string;
+          requested_by: string;
+          requester_role: 'reader' | 'writer';
+          reason: string;
+          evidence_note?: string | null;
+          evidence_path?: string | null;
+          status?: 'pending' | 'approved' | 'rejected';
+          admin_note?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<RefundRequestRow>;
+        Relationships: [];
+      };
+      support_requests: {
+        Row: SupportRequestRow;
+        Insert: {
+          id?: string;
+          user_id: string;
+          category: 'order' | 'payment' | 'account' | 'content' | 'other';
+          order_id?: string | null;
+          subject: string;
+          body: string;
+          status?: 'open' | 'answered' | 'closed';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<SupportRequestRow>;
+        Relationships: [];
+      };
+      support_messages: {
+        Row: SupportMessageRow;
+        Insert: {
+          id?: string;
+          request_id: string;
+          author_id: string;
+          author_role: 'reader' | 'writer' | 'admin';
+          body: string;
+          created_at?: string;
+        };
+        Update: Partial<SupportMessageRow>;
+        Relationships: [];
+      };
+      notification_preferences: {
+        Row: NotificationPreferencesRow;
+        Insert: {
+          user_id: string;
+          email_enabled?: boolean;
+          updated_at?: string;
+        };
+        Update: Partial<NotificationPreferencesRow>;
+        Relationships: [];
+      };
+      email_outbox: {
+        Row: EmailOutboxRow;
+        Insert: {
+          id?: string;
+          user_id: string;
+          template: string;
+          subject: string;
+          body_text: string;
+          status?: 'pending' | 'sent' | 'failed' | 'skipped';
+          attempts?: number;
+          last_error?: string | null;
+          dedupe_key?: string | null;
+          created_at?: string;
+          sent_at?: string | null;
+        };
+        Update: Partial<EmailOutboxRow>;
+        Relationships: [];
+      };
     };
     Views: {
       public_novels: {
@@ -1304,6 +1594,7 @@ export interface Database {
         Returns: {
           success: boolean;
           dispute_id: string;
+          order_id: string;
           status: string;
         };
       };
@@ -1809,6 +2100,249 @@ export interface Database {
         Returns: {
           total_count: number;
           reports: AdminCommissionReportItem[];
+        };
+      };
+      add_dispute_message: {
+        Args: {
+          p_dispute_id: string;
+          p_body: string;
+          p_attachment_path?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          message_id: string;
+          dispute_id: string;
+          author_role: string;
+          created_at: string;
+        };
+      };
+      resolve_dispute_for_reader_verify: {
+        Args: {
+          p_dispute_id: string;
+          p_note: string;
+        };
+        Returns: {
+          success: boolean;
+          dispute_id: string;
+          order_id: string;
+          outcome: string;
+        };
+      };
+      resolve_dispute_refund: {
+        Args: {
+          p_dispute_id: string;
+          p_note: string;
+        };
+        Returns: {
+          success: boolean;
+          dispute_id: string;
+          order_id: string;
+          outcome: string;
+        };
+      };
+      resolve_dispute_for_writer: {
+        Args: {
+          p_dispute_id: string;
+          p_note: string;
+        };
+        Returns: {
+          success: boolean;
+          dispute_id: string;
+          order_id: string;
+          outcome: string;
+        };
+      };
+      close_dispute: {
+        Args: {
+          p_dispute_id: string;
+          p_note: string;
+        };
+        Returns: {
+          success: boolean;
+          dispute_id: string;
+          status: string;
+        };
+      };
+      get_my_disputes: {
+        Args: Record<string, never>;
+        Returns: DisputeListItem[];
+      };
+      get_dispute: {
+        Args: {
+          p_dispute_id: string;
+        };
+        Returns: DisputeDetailPayload;
+      };
+      admin_list_disputes: {
+        Args: {
+          p_status?: string | null;
+          p_search?: string | null;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          total_count: number;
+          disputes: DisputeListItem[];
+        };
+      };
+      request_refund: {
+        Args: {
+          p_order_id: string;
+          p_reason: string;
+          p_evidence_note?: string | null;
+          p_evidence_path?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          request_id: string;
+          status: string;
+        };
+      };
+      approve_refund_request: {
+        Args: {
+          p_request_id: string;
+          p_note: string;
+        };
+        Returns: {
+          success: boolean;
+          request_id: string;
+          order_id: string;
+          status: string;
+        };
+      };
+      reject_refund_request: {
+        Args: {
+          p_request_id: string;
+          p_note: string;
+        };
+        Returns: {
+          success: boolean;
+          request_id: string;
+          status: string;
+        };
+      };
+      admin_list_refund_requests: {
+        Args: {
+          p_status?: string | null;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          total_count: number;
+          requests: RefundRequestItem[];
+        };
+      };
+      create_support_request: {
+        Args: {
+          p_category: string;
+          p_subject: string;
+          p_body: string;
+          p_order_id?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          request_id: string;
+        };
+      };
+      add_support_message: {
+        Args: {
+          p_request_id: string;
+          p_body: string;
+        };
+        Returns: {
+          success: boolean;
+          message_id: string;
+        };
+      };
+      close_support_request: {
+        Args: {
+          p_request_id: string;
+        };
+        Returns: {
+          success: boolean;
+          request_id: string;
+          status: string;
+        };
+      };
+      get_my_support_requests: {
+        Args: Record<string, never>;
+        Returns: SupportRequestListItem[];
+      };
+      get_support_request: {
+        Args: {
+          p_request_id: string;
+        };
+        Returns: SupportRequestDetailPayload;
+      };
+      admin_list_support_requests: {
+        Args: {
+          p_status?: string | null;
+          p_category?: string | null;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          total_count: number;
+          requests: SupportRequestListItem[];
+        };
+      };
+      run_scheduled_reminders: {
+        Args: Record<string, never>;
+        Returns: {
+          success: boolean;
+          enqueued_reminders: number;
+        };
+      };
+      claim_pending_emails_for_sending: {
+        Args: {
+          p_batch_size?: number;
+        };
+        Returns: Array<{
+          id: string;
+          user_id: string;
+          recipient_email: string;
+          template: string;
+          subject: string;
+          body_text: string;
+          attempts: number;
+        }>;
+      };
+      record_email_delivery_result: {
+        Args: {
+          p_email_id: string;
+          p_success: boolean;
+          p_error?: string | null;
+        };
+        Returns: {
+          success: boolean;
+        };
+      };
+      get_email_outbox_stats: {
+        Args: Record<string, never>;
+        Returns: EmailOutboxStats;
+      };
+      retry_failed_emails: {
+        Args: {
+          p_max_retry?: number;
+        };
+        Returns: {
+          success: boolean;
+          retried_count: number;
+        };
+      };
+      get_my_notification_preferences: {
+        Args: Record<string, never>;
+        Returns: {
+          email_enabled: boolean;
+        };
+      };
+      update_notification_preferences: {
+        Args: {
+          p_email_enabled: boolean;
+        };
+        Returns: {
+          success: boolean;
+          email_enabled: boolean;
         };
       };
     };
