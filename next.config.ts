@@ -64,6 +64,19 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: '/read/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'private, no-store, must-revalidate',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ];
   },
 };
