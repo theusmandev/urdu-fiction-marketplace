@@ -9,7 +9,7 @@ import {
   getPublicNovelBySlug,
   getPublicNovelChapters,
 } from "@/lib/supabase/public";
-import { formatPKR } from "@/lib/utils";
+import { formatPKR, resolveCoverUrl } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import {
   BookOpen,
@@ -190,9 +190,9 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10 pointer-events-none" />
               <div className="absolute inset-y-0 left-4 w-px bg-white/20 z-10 pointer-events-none" />
 
-              {novel.cover_url ? (
+              {resolveCoverUrl(novel.cover_url) ? (
                 <Image
-                  src={novel.cover_url}
+                  src={resolveCoverUrl(novel.cover_url)!}
                   alt={novel.title_english || novel.title_urdu}
                   fill
                   priority
