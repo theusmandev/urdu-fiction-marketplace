@@ -61,38 +61,49 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Database verification: Look up the order
-  const { data: order, error: orderError } = await supabase
+  // Database verification: Look up in orders, or in commission_invoices
+  const { data: order } = await supabase
     .from('orders')
     .select('id, reader_id, writer_id')
     .eq('id', orderId)
     .maybeSingle();
 
-  if (orderError || !order) {
-    return NextResponse.json(
-      { error: 'Associated order not found.' },
-      { status: 404 }
-    );
+  let isAuthorized = false;
+
+  if (order) {
+    if (order.reader_id === user.id || order.writer_id === user.id) {
+      isAuthorized = true;
+    }
+  } else {
+    // Check if this identifier is a commission invoice
+    const { data: invoice } = await supabase
+      .from('commission_invoices')
+      .select('id, writer_id')
+      .eq('id', orderId)
+      .maybeSingle();
+
+    if (invoice && invoice.writer_id === user.id) {
+      isAuthorized = true;
+    }
   }
 
-  const isReader = order.reader_id === user.id;
-  const isWriter = order.writer_id === user.id;
-
-  let isAdmin = false;
-  if (!isReader && !isWriter) {
+  // If not direct owner/reader/writer, check if caller is an admin
+  if (!isAuthorized) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
 
-    isAdmin = profile?.role === 'admin';
+    if (profile?.role === 'admin') {
+      isAuthorized = true;
+    }
   }
 
   // Strict multi-tenant isolation guard
-  if (!isReader && !isWriter && !isAdmin) {
+  if (!isAuthorized) {
     return NextResponse.json(
-      { error: 'Forbidden: You do not have permission to view payment receipts for this order.' },
+      { error: 'Forbidden: You do not have permission to view payment receipts for this record.' },
       { status: 403 }
     );
   }
