@@ -3,15 +3,9 @@
 -- Step 5.1 Architecture & Security Definer Hardening
 -- =============================================================================
 
--- 1. ENUM EXTENSIONS (commission_invoice_status)
--- Idempotently add 'partially_paid' and 'void' statuses to commission_invoice_status enum
-DO $$
-BEGIN
-    ALTER TYPE public.commission_invoice_status ADD VALUE IF NOT EXISTS 'partially_paid';
-    ALTER TYPE public.commission_invoice_status ADD VALUE IF NOT EXISTS 'void';
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
+-- Note: Enum extensions ('partially_paid', 'void') are migrated separately in
+-- 0017_a_commission_enum_values.sql so that new enum values are committed
+-- before being referenced in table definitions, RPCs, or policies (PostgreSQL 55P04).
 
 -- 2. SCHEMA ADDITIONS ON EXISTING TABLES
 

@@ -160,7 +160,7 @@ The audit was conducted prior to authoring Migration `0017_commission_and_statem
    - `public.commission_payment_reports`
    - `public.platform_payment_methods`
 2. **Schema Enhancements**:
-   - Add enum values `'partially_paid'` and `'void'` to `commission_invoice_status`.
+   - Add enum values `'partially_paid'` and `'void'` to `commission_invoice_status` via preceding standalone migration `0017_a_commission_enum_values.sql` (to satisfy PostgreSQL Error 55P04 requirement that new enum values be committed before use).
    - Add `due_date`, `voided_at`, `voided_by`, `void_reason` to `commission_invoices`.
    - Add `invoice_due_days` and `overdue_grace_days` to `platform_settings`.
 3. **Hardened RPCs**:

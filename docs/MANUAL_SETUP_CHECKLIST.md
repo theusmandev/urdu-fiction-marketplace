@@ -275,9 +275,20 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm both columns and all 5 RPCs exist.
   - Execute automated test suite: `supabase/tests/09_reader_access_tests.sql`.
 
-### 17. `supabase/migrations/0017_commission_and_statements.sql` [SALES LEDGER, COMMISSION INVOICES, SETTLEMENT & STATEMENTS]
+### 17a. `supabase/migrations/0017_a_commission_enum_values.sql` [COMMISSION ENUM VALUES EXTENSION]
+- **Purpose**: Extends `commission_invoice_status` enum with `'partially_paid'` and `'void'` values.
+  > [!IMPORTANT]
+  > **PostgreSQL Error 55P04 Invariant**: New enum values added via `ALTER TYPE ... ADD VALUE` must be committed in their own separate transaction before they can be referenced in tables, columns, RPCs, or policies. Run `0017_a_commission_enum_values.sql` first as a standalone SQL Editor execution and click **Run**.
+- **Action**: Paste contents of `supabase/migrations/0017_a_commission_enum_values.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT enumlabel FROM pg_enum WHERE enumtypid = 'public.commission_invoice_status'::regtype;
+    ```
+    Confirm both `'partially_paid'` and `'void'` appear in the results.
+
+### 17b. `supabase/migrations/0017_commission_and_statements.sql` [SALES LEDGER, COMMISSION INVOICES, SETTLEMENT & STATEMENTS]
 - **Purpose**: Implements Step 5.1 sales ledger audit fixes, lines-based commission invoicing, admin settlement confirmation, and auditable financial statements:
-  - Enum `commission_invoice_status`: Adds `'partially_paid'` and `'void'` values.
   - Table `platform_settings`: Adds `invoice_due_days integer NOT NULL DEFAULT 7` (range 1-90) and `overdue_grace_days integer NOT NULL DEFAULT 3` (range 0-60).
   - Table `commission_invoices`: Adds `due_date`, `voided_at`, `voided_by`, `void_reason`. Invoices are voided, never deleted.
   - Table `commission_invoice_lines`: `(id, invoice_id, ledger_entry_id, commission_pkr, is_voided, created_at)` with partial unique index `(ledger_entry_id) WHERE (is_voided = false)`. Prevents double-invoicing while never mutating `sales_ledger`.
@@ -293,7 +304,7 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   - RPC `apply_overdue_rules(p_apply)`: Identifies writers with invoices overdue beyond grace days; pauses orders only when admin explicitly confirms with `p_apply = true`.
   - RPC `reconcile_writer_unpaid_commission(p_writer_id)`: Reconciles balance; pauses/unpauses orders; generates de-duplicated warnings at 80% and 100% threshold crossings.
   - Writer & Admin Inspection RPCs: `get_my_sales_summary`, `get_my_ledger`, `get_my_invoices`, `get_my_invoice`, `get_platform_payment_instructions`, `admin_commission_overview`, `admin_list_invoices`, `admin_get_invoice`, `admin_list_commission_reports`.
-- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Action**: Paste contents of `supabase/migrations/0017_commission_and_statements.sql` into the Supabase SQL Editor (after 17a has committed) and click **Run**.
 - **Verification**:
   - Run:
     ```sql

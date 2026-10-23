@@ -19,6 +19,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
      - `0004_rls_policies.sql`
      - `0005_seed_genres_and_settings.sql`
    - Migrations are executed manually by developers in the Supabase SQL Editor. Every statement must be idempotent (`CREATE TABLE IF NOT EXISTS`, `DO $$ BEGIN ... END $$`, etc.).
+   - **PostgreSQL Enum Additions Invariant**: Any new enum value added via `ALTER TYPE ... ADD VALUE` MUST be isolated into its own preceding migration file (e.g. `0017_a_commission_enum_values.sql`). NEVER add and use an enum value in the same file or transaction. PostgreSQL (Error 55P04) strictly requires new enum values to be committed in a standalone transaction before they can be referenced in tables, columns, RPCs, views, or policies.
 2. **Database Types (`src/types/database.ts`)**:
    - Strict TypeScript interfaces and types mirroring every PostgreSQL table, enum, view, and RPC function payload.
 3. **Manual Setup Documentation (`docs/MANUAL_SETUP_CHECKLIST.md`)**:
