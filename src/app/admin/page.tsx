@@ -32,12 +32,20 @@ export default async function AdminDashboardPage() {
     { count: openDisputesCount },
     { count: totalUsersCount },
     { count: publishedNovelsCount },
+    { count: pendingReportsCount },
+    { count: overdueInvoicesCount },
   ] = await Promise.all([
     supabase.from('writer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending_approval'),
     supabase.from('novels').select('id', { count: 'exact', head: true }).eq('status', 'under_review'),
     supabase.from('disputes').select('id', { count: 'exact', head: true }).in('status', ['open', 'under_review']),
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
     supabase.from('novels').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+    supabase.from('commission_payment_reports').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase
+      .from('commission_invoices')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['invoiced', 'partially_paid', 'payment_reported'])
+      .lt('due_date', new Date().toISOString()),
   ]);
 
   // 2. Fetch queue items
@@ -251,6 +259,54 @@ export default async function AdminDashboardPage() {
             {totalUsersCount ?? 0}
           </div>
           <p className="text-[10px] text-slate-500">{publishedNovelsCount ?? 0} novels live</p>
+        </Link>
+      </div>
+
+      {/* Commission Operations Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Reports Awaiting Confirmation */}
+        <Link
+          href="/admin/commission/reports"
+          className="bg-slate-950/50 border border-slate-800 hover:border-amber-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Reports Awaiting Confirmation</span>
+            <Clock className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl font-bold text-amber-400 font-mono">
+            {pendingReportsCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Author payment receipts to verify</p>
+        </Link>
+
+        {/* Overdue Invoices */}
+        <Link
+          href="/admin/invoices"
+          className="bg-slate-950/50 border border-slate-800 hover:border-rose-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Overdue Invoices</span>
+            <AlertTriangle className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl font-bold text-rose-400 font-mono">
+            {overdueInvoicesCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Unsettled past due date</p>
+        </Link>
+
+        {/* Writers Over 80% Limit */}
+        <Link
+          href="/admin/commission"
+          className="bg-slate-950/50 border border-slate-800 hover:border-purple-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Writers Over 80% of Limit</span>
+            <Flame className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl font-bold text-purple-400 font-mono">
+            {atRiskWriters.length}
+          </div>
+          <p className="text-[10px] text-slate-500">Threshold alert or paused</p>
         </Link>
       </div>
 

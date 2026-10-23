@@ -13,12 +13,16 @@ import {
   Activity,
   LayoutDashboard,
   ShoppingBag,
+  Receipt,
+  DollarSign,
 } from 'lucide-react';
 import { logoutUser } from '@/app/actions/auth';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+  { href: '/admin/commission', label: 'Commission', icon: DollarSign },
+  { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
   { href: '/admin/writers', label: 'Writers', icon: Feather },
   { href: '/admin/novels', label: 'Novels', icon: BookOpen },
   { href: '/admin/genres', label: 'Genres', icon: Tags },
