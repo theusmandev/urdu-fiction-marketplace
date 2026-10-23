@@ -8,7 +8,7 @@ import {
   type CatalogSearchParams,
   buildCatalogUrl,
 } from "@/lib/catalog/params";
-import { Search, X, Sparkles } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 interface CatalogFiltersProps {
   initialParams: CatalogSearchParams;
@@ -67,11 +67,6 @@ export function CatalogFilters({
     applyFilters({ sort: nextSort });
   };
 
-  const handleFreeToggle = () => {
-    const nextFree = !freeOnly;
-    setFreeOnly(nextFree);
-    applyFilters({ freeOnly: nextFree });
-  };
 
   const handleReset = () => {
     setQ("");
@@ -129,20 +124,6 @@ export function CatalogFilters({
             <option value="price_asc">Price: Low to High / کم ترین قیمت</option>
             <option value="price_desc">Price: High to Low / زیادہ ترین قیمت</option>
           </select>
-
-          {/* Free Only Toggle */}
-          <button
-            type="button"
-            onClick={handleFreeToggle}
-            className={`inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-              freeOnly
-                ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                : "bg-ivory/80 text-secondary border-border hover:bg-ivory hover:text-navy"
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Free Only</span>
-          </button>
 
           {/* Clear Filters Button */}
           {hasActiveFilters && (

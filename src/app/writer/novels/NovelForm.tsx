@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { createNovelAction, updateNovelAction } from '@/app/actions/writer';
 import type { GenreRow } from '@/types/database';
-import type { NovelFormInput } from '@/lib/writer/schemas';
+import { type NovelFormInput, createNovelFormSchema } from '@/lib/writer/schemas';
 import {
   BookOpen,
   Save,
@@ -22,6 +22,8 @@ interface NovelFormProps {
   userId: string;
   commissionRate: number;
   availableGenres: GenreRow[];
+  minPrice?: number;
+  maxPrice?: number;
   initialData?: {
     id: string;
     title_urdu: string;
@@ -42,6 +44,8 @@ export function NovelForm({
   userId,
   commissionRate,
   availableGenres,
+  minPrice = 50,
+  maxPrice = 5000,
   initialData,
 }: NovelFormProps) {
   const router = useRouter();
@@ -54,7 +58,7 @@ export function NovelForm({
     description_urdu: initialData?.description_urdu || '',
     cover_url: initialData?.cover_url || null,
     cover_public_id: initialData?.cover_public_id || null,
-    price_pkr: initialData?.price_pkr ?? 0,
+    price_pkr: initialData?.price_pkr ?? minPrice,
     language: initialData?.language || 'ur',
     genre_ids: initialData?.genre_ids || [],
     rights_declaration_accepted: initialData?.rights_declaration_accepted ?? false,
@@ -113,9 +117,10 @@ export function NovelForm({
 
   // Commission calculations
   const price = Number(formData.price_pkr) || 0;
+  const isPriceValid = price >= minPrice && price <= maxPrice && Number.isInteger(price);
   const platformRate = commissionRate || 20;
-  const estimatedCommission = Math.round(price * (platformRate / 100));
-  const estimatedWriterNet = price - estimatedCommission;
+  const estimatedCommission = isPriceValid ? Math.round(price * (platformRate / 100)) : 0;
+  const estimatedWriterNet = isPriceValid ? price - estimatedCommission : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +128,16 @@ export function NovelForm({
     setErrorMessage(null);
     setSuccessMessage(null);
     setFieldErrors({});
+
+    // Client-side validation against dynamic platform settings bounds
+    const schema = createNovelFormSchema({ minPrice, maxPrice });
+    const parsed = schema.safeParse(formData);
+    if (!parsed.success) {
+      setIsSubmitting(false);
+      setErrorMessage('Please correct the highlighted form errors.');
+      setFieldErrors(parsed.error.flatten().fieldErrors);
+      return;
+    }
 
     if (isEditing && initialData?.id) {
       const res = await updateNovelAction(initialData.id, formData);
@@ -402,7 +417,7 @@ export function NovelForm({
             4. Pricing & Author Payout
           </h2>
           <p className="text-xs text-secondary mt-0.5">
-            Set the purchase price in Pakistani Rupees (PKR). Free novels should be set to 0.
+            Set the purchase price in Pakistani Rupees (PKR). Minimum PKR {minPrice}. Readers can try your free preview chapters before buying.
           </p>
         </div>
 
@@ -418,12 +433,12 @@ export function NovelForm({
               </span>
               <input
                 type="number"
-                min="0"
-                max="5000"
-                step="10"
+                min={minPrice}
+                max={maxPrice}
+                step="1"
                 value={formData.price_pkr}
                 onChange={(e) => handleChange('price_pkr', Number(e.target.value))}
-                className="w-full pl-14 pr-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-bold text-base focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full pl-14 pr-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-bold text-base focus:outline-none focus:ring-2 focus:ring-accent font-mono"
                 required
               />
             </div>
@@ -431,7 +446,7 @@ export function NovelForm({
               <p className="text-xs text-rose-600">{fieldErrors.price_pkr[0]}</p>
             )}
             <p className="text-[11px] text-secondary">
-              Maximum allowed novel price: PKR 5,000.
+              Minimum PKR {minPrice}. Maximum allowed novel price: PKR {maxPrice.toLocaleString()}. Whole rupees only. Readers can try your free preview chapters before buying.
             </p>
           </div>
 
@@ -444,28 +459,37 @@ export function NovelForm({
               </span>
             </div>
 
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between text-secondary">
-                <span>Gross Reader Payment:</span>
-                <span className="font-mono font-bold text-main">
-                  PKR {price.toLocaleString()}
-                </span>
-              </div>
+            {isPriceValid ? (
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between text-secondary">
+                  <span>Gross Reader Payment:</span>
+                  <span className="font-mono font-bold text-main">
+                    PKR {price.toLocaleString()}
+                  </span>
+                </div>
 
-              <div className="flex items-center justify-between text-emerald-800 font-semibold border-t border-border pt-1.5">
-                <span>Author Net Retention ({100 - platformRate}%):</span>
-                <span className="font-mono text-sm">
-                  PKR {estimatedWriterNet.toLocaleString()}
-                </span>
-              </div>
+                <div className="flex items-center justify-between text-emerald-800 font-semibold border-t border-border pt-1.5">
+                  <span>Author Net Retention ({100 - platformRate}%):</span>
+                  <span className="font-mono text-sm">
+                    PKR {estimatedWriterNet.toLocaleString()}
+                  </span>
+                </div>
 
-              <div className="flex items-center justify-between text-secondary text-[11px]">
-                <span>Platform Commission ({platformRate}%):</span>
-                <span className="font-mono">
-                  PKR {estimatedCommission.toLocaleString()}
-                </span>
+                <div className="flex items-center justify-between text-secondary text-[11px]">
+                  <span>Platform Commission ({platformRate}%):</span>
+                  <span className="font-mono">
+                    PKR {estimatedCommission.toLocaleString()}
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 space-y-1">
+                <p className="font-semibold">Enter a valid novel price</p>
+                <p className="text-[11px] text-amber-800">
+                  Price must be a whole rupee amount between PKR {minPrice} and PKR {maxPrice.toLocaleString()} to calculate author payout.
+                </p>
+              </div>
+            )}
 
             <p className="text-[10px] text-secondary leading-tight pt-1">
               Note: Changing the price of a published novel only affects new reader orders. Past verified purchases will not be affected.

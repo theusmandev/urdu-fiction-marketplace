@@ -25,11 +25,18 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
     notFound();
   }
 
-  // 2. Fetch available genres
-  const { data: genres } = await supabase
-    .from('genres')
-    .select('*')
-    .order('display_order', { ascending: true });
+  // 2. Fetch available genres and platform settings
+  const [{ data: genres }, { data: settings }] = await Promise.all([
+    supabase
+      .from('genres')
+      .select('*')
+      .order('display_order', { ascending: true }),
+    supabase
+      .from('platform_settings')
+      .select('min_novel_price_pkr, max_novel_price_pkr')
+      .eq('id', 1)
+      .maybeSingle(),
+  ]);
 
   // 3. Fetch linked genres for this novel
   const { data: linkedGenres } = await supabase
@@ -40,6 +47,8 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
   const linkedGenreIds = (linkedGenres || []).map((g) => g.genre_id);
   const availableGenres = (genres as GenreRow[]) || [];
   const commissionRate = writerProfile.custom_commission_rate ?? 20;
+  const minPrice = settings?.min_novel_price_pkr ?? 50;
+  const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
 
   return (
     <div className="py-2">
@@ -47,6 +56,8 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
         userId={user.id}
         commissionRate={commissionRate}
         availableGenres={availableGenres}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
         initialData={{
           id: novel.id,
           title_urdu: novel.title_urdu,

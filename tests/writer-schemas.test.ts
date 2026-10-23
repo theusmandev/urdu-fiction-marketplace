@@ -6,6 +6,7 @@ import {
   validatePkIban,
   maskAccountNumber,
   novelFormSchema,
+  createNovelFormSchema,
   chapterFormSchema,
 } from '../src/lib/writer/schemas.ts';
 
@@ -77,6 +78,76 @@ describe('Novel and Chapter Form Schemas', () => {
       rights_declaration_accepted: true,
     });
     assert.equal(validNovel.success, true);
+  });
+
+  test('rejects novel with price below 50 PKR (no free novels)', () => {
+    const freeNovel = novelFormSchema.safeParse({
+      title_urdu: 'روشنی کا سفر',
+      title_english: 'Journey of Light',
+      synopsis_urdu: 'یہ کہانی اندھیروں میں امید کے چراغ جلانے والے ایک نوجوان کی ہے۔',
+      price_pkr: 0,
+      genre_ids: ['a0000000-0000-4000-8000-000000000001'],
+      rights_declaration_accepted: true,
+    });
+    assert.equal(freeNovel.success, false);
+
+    const cheapNovel = novelFormSchema.safeParse({
+      title_urdu: 'روشنی کا سفر',
+      title_english: 'Journey of Light',
+      synopsis_urdu: 'یہ کہانی اندھیروں میں امید کے چراغ جلانے والے ایک نوجوان کی ہے۔',
+      price_pkr: 49,
+      genre_ids: ['a0000000-0000-4000-8000-000000000001'],
+      rights_declaration_accepted: true,
+    });
+    assert.equal(cheapNovel.success, false);
+  });
+
+  test('accepts novel with exactly minimum price of 50 PKR', () => {
+    const minNovel = novelFormSchema.safeParse({
+      title_urdu: 'روشنی کا سفر',
+      title_english: 'Journey of Light',
+      synopsis_urdu: 'یہ کہانی اندھیروں میں امید کے چراغ جلانے والے ایک نوجوان کی ہے۔',
+      price_pkr: 50,
+      genre_ids: ['a0000000-0000-4000-8000-000000000001'],
+      rights_declaration_accepted: true,
+    });
+    assert.equal(minNovel.success, true);
+  });
+
+  test('rejects fractional paise price amounts', () => {
+    const fractionalNovel = novelFormSchema.safeParse({
+      title_urdu: 'روشنی کا سفر',
+      title_english: 'Journey of Light',
+      synopsis_urdu: 'یہ کہانی اندھیروں میں امید کے چراغ جلانے والے ایک نوجوان کی ہے۔',
+      price_pkr: 49.5,
+      genre_ids: ['a0000000-0000-4000-8000-000000000001'],
+      rights_declaration_accepted: true,
+    });
+    assert.equal(fractionalNovel.success, false);
+  });
+
+  test('createNovelFormSchema supports dynamic bounds from platform settings', () => {
+    const customSchema = createNovelFormSchema({ minPrice: 100, maxPrice: 1000 });
+
+    const belowCustom = customSchema.safeParse({
+      title_urdu: 'روشنی کا سفر',
+      title_english: 'Journey of Light',
+      synopsis_urdu: 'یہ کہانی اندھیروں میں امید کے چراغ جلانے والے ایک نوجوان کی ہے۔',
+      price_pkr: 75,
+      genre_ids: ['a0000000-0000-4000-8000-000000000001'],
+      rights_declaration_accepted: true,
+    });
+    assert.equal(belowCustom.success, false);
+
+    const validCustom = customSchema.safeParse({
+      title_urdu: 'روشنی کا سفر',
+      title_english: 'Journey of Light',
+      synopsis_urdu: 'یہ کہانی اندھیروں میں امید کے چراغ جلانے والے ایک نوجوان کی ہے۔',
+      price_pkr: 250,
+      genre_ids: ['a0000000-0000-4000-8000-000000000001'],
+      rights_declaration_accepted: true,
+    });
+    assert.equal(validCustom.success, true);
   });
 
   test('rejects novel with price exceeding 5000 PKR', () => {

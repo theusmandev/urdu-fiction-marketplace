@@ -235,10 +235,15 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               <div className="flex items-baseline justify-between">
                 <span className="text-xs text-secondary">Price / قیمت:</span>
                 <div>
-                  {novel.price_pkr === 0 ? (
-                    <span className="text-xl font-bold text-emerald-600">
-                      Free / مفت
-                    </span>
+                  {novel.price_pkr < 50 ? (
+                    <div className="text-right">
+                      <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 block mb-0.5">
+                        Unavailable
+                      </span>
+                      <span className="font-serif text-sm text-secondary/60 line-through">
+                        {formatPKR(novel.price_pkr)}
+                      </span>
+                    </div>
                   ) : (
                     <span className="font-serif text-2xl font-bold text-navy">
                       {formatPKR(novel.price_pkr)}

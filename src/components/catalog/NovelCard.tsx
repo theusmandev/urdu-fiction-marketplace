@@ -12,8 +12,6 @@ interface NovelCardProps {
 }
 
 export function NovelCard({ novel, priority = false }: NovelCardProps) {
-  const isFree = novel.price_pkr === 0;
-
   return (
     <article
       itemScope
@@ -149,9 +147,9 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
           </div>
 
           <div>
-            {isFree ? (
-              <span className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                Free / مفت
+            {novel.price_pkr < 50 ? (
+              <span className="font-serif text-xs font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                Unavailable
               </span>
             ) : (
               <span className="font-serif text-base font-bold text-navy">

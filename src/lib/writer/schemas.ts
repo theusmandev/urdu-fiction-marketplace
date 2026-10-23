@@ -132,41 +132,48 @@ export type PaymentMethodInput = z.infer<typeof paymentMethodSchema>;
 /**
  * Novel creation & update schema
  */
-export const novelFormSchema = z.object({
-  title_urdu: z
-    .string()
-    .trim()
-    .min(2, 'Urdu title is required (at least 2 characters).')
-    .max(200, 'Urdu title cannot exceed 200 characters.'),
-  title_english: z
-    .string()
-    .trim()
-    .min(2, 'English title is required (at least 2 characters).')
-    .max(200, 'English title cannot exceed 200 characters.'),
-  synopsis_urdu: z
-    .string()
-    .trim()
-    .min(10, 'Urdu synopsis must be at least 10 characters.')
-    .max(3000, 'Urdu synopsis cannot exceed 3,000 characters.'),
-  description_urdu: z
-    .string()
-    .trim()
-    .max(10000, 'Detailed description cannot exceed 10,000 characters.')
-    .optional()
-    .or(z.literal('')),
-  cover_url: z.string().url('Invalid cover image URL.').nullable().optional().or(z.literal('')),
-  cover_public_id: z.string().optional().nullable().or(z.literal('')),
-  price_pkr: z.coerce
-    .number()
-    .int('Price must be an integer.')
-    .min(0, 'Price cannot be negative.')
-    .max(5000, 'Price cannot exceed PKR 5,000.'),
-  language: z.string().default('ur'),
-  genre_ids: z.array(z.string().uuid('Invalid genre ID.')).min(1, 'Please select at least one genre.'),
-  rights_declaration_accepted: z.boolean().refine((val) => val === true, {
-    message: 'You must declare that you hold full copyright/distribution rights.',
-  }),
-});
+export function createNovelFormSchema(bounds?: { minPrice?: number; maxPrice?: number }) {
+  const minPrice = bounds?.minPrice ?? 50;
+  const maxPrice = bounds?.maxPrice ?? 5000;
+
+  return z.object({
+    title_urdu: z
+      .string()
+      .trim()
+      .min(2, 'Urdu title is required (at least 2 characters).')
+      .max(200, 'Urdu title cannot exceed 200 characters.'),
+    title_english: z
+      .string()
+      .trim()
+      .min(2, 'English title is required (at least 2 characters).')
+      .max(200, 'English title cannot exceed 200 characters.'),
+    synopsis_urdu: z
+      .string()
+      .trim()
+      .min(10, 'Urdu synopsis must be at least 10 characters.')
+      .max(3000, 'Urdu synopsis cannot exceed 3,000 characters.'),
+    description_urdu: z
+      .string()
+      .trim()
+      .max(10000, 'Detailed description cannot exceed 10,000 characters.')
+      .optional()
+      .or(z.literal('')),
+    cover_url: z.string().url('Invalid cover image URL.').nullable().optional().or(z.literal('')),
+    cover_public_id: z.string().optional().nullable().or(z.literal('')),
+    price_pkr: z.coerce
+      .number()
+      .int('Price must be a whole rupee amount without paise.')
+      .min(minPrice, `Price must be at least PKR ${minPrice}.`)
+      .max(maxPrice, `Price cannot exceed PKR ${maxPrice.toLocaleString()}.`),
+    language: z.string().default('ur'),
+    genre_ids: z.array(z.string().uuid('Invalid genre ID.')).min(1, 'Please select at least one genre.'),
+    rights_declaration_accepted: z.boolean().refine((val) => val === true, {
+      message: 'You must declare that you hold full copyright/distribution rights.',
+    }),
+  });
+}
+
+export const novelFormSchema = createNovelFormSchema();
 
 export type NovelFormInput = z.infer<typeof novelFormSchema>;
 
