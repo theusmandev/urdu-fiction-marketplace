@@ -15,6 +15,7 @@ import {
   formatOrderStatusTimeline,
   type OrderStatusDetails,
 } from '@/lib/checkout/schemas';
+import { calculateDisputeWaitStatus } from '@/lib/disputes/status-meta';
 import type { OrderStatus } from '@/types/database';
 import {
   Copy,
@@ -77,6 +78,7 @@ interface OrderDetailViewProps {
     resolved_at: string | null;
   }>;
   disputeWindowDays: number;
+  minDisputeWaitHours?: number;
   currentTimestamp?: number;
 }
 
@@ -204,6 +206,7 @@ export function OrderDetailView({
   submissions,
   disputes,
   disputeWindowDays,
+  minDisputeWaitHours = 24,
   currentTimestamp = 0,
 }: OrderDetailViewProps) {
   const router = useRouter();
@@ -233,11 +236,10 @@ export function OrderDetailView({
   const bankName = (instructions.bank_name as string) || '';
   const instructionsNote = (instructions.instructions_note as string) || '';
 
-  // Time check for 24 hours since submission
-  const isSubmissionOlderThan24h =
-    latestSubmission &&
-    currentTimestamp > 0 &&
-    currentTimestamp - new Date(latestSubmission.created_at).getTime() > 24 * 60 * 60 * 1000;
+  // Dispute cooldown wait check for payment_submitted orders
+  const waitStatus = latestSubmission
+    ? calculateDisputeWaitStatus(latestSubmission.created_at, minDisputeWaitHours)
+    : { canDispute: true, remainingHours: 0, remainingMinutes: 0 };
 
   // Time check for dispute window (from updated_at or created_at)
   const isInsideDisputeWindow =
@@ -680,18 +682,31 @@ export function OrderDetailView({
               <div className="space-y-1">
                 <p className="font-semibold text-blue-200">The author has been notified</p>
                 <p className="text-[11px] text-stone-400">
-                  Verification usually occurs within a few hours. If the author does not respond within 24
-                  hours, you can raise an administrative dispute.
+                  Verification usually occurs within a few hours. If the author does not respond within {minDisputeWaitHours} hours, you can raise an administrative dispute.
+                  {!waitStatus.canDispute && (
+                    <span className="block text-amber-400 mt-1">
+                      Cooldown active: Dispute option available in {waitStatus.remainingHours}h {waitStatus.remainingMinutes}m.
+                    </span>
+                  )}
                 </p>
               </div>
 
-              {isSubmissionOlderThan24h && (
+              {waitStatus.canDispute ? (
                 <button
                   type="button"
                   onClick={() => setShowDisputeModal(true)}
                   className="px-4 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:text-white bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 transition-colors shrink-0"
                 >
                   Raise a Dispute
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  title={`Cooldown active. Available in ${waitStatus.remainingHours}h ${waitStatus.remainingMinutes}m.`}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-500 bg-stone-900 border border-stone-800 opacity-60 cursor-not-allowed shrink-0"
+                >
+                  Dispute in {waitStatus.remainingHours}h {waitStatus.remainingMinutes}m
                 </button>
               )}
             </div>
@@ -761,9 +776,18 @@ export function OrderDetailView({
               records and banking statements are being evaluated.
             </p>
             {disputes.length > 0 && (
-              <div className="bg-stone-950/60 p-3 rounded-xl border border-purple-500/20 text-[11px] space-y-1">
+              <div className="bg-stone-950/60 p-3 rounded-xl border border-purple-500/20 text-[11px] space-y-2">
                 <span className="text-stone-400 block font-semibold">Dispute Details</span>
                 <p className="text-stone-200 font-mono">&quot;{disputes[0].reason}&quot;</p>
+                <div className="pt-1">
+                  <Link
+                    href={`/disputes/${disputes[0].id}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-200 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 transition-colors"
+                  >
+                    <span>Open Dispute Thread & Evidence / گفتگو دیکھیں</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
             )}
           </div>

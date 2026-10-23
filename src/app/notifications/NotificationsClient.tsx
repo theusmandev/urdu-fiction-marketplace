@@ -15,6 +15,12 @@ import {
   AlertCircle,
   Loader2,
   Inbox,
+  Scale,
+  RotateCcw,
+  Receipt,
+  LifeBuoy,
+  CheckCircle2,
+  MessageSquare,
 } from 'lucide-react';
 
 interface NotificationItem {
@@ -34,6 +40,27 @@ interface NotificationsClientProps {
   initialNotifications: NotificationItem[];
 }
 
+function resolveNotificationLink(item: NotificationItem): string | null {
+  if (item.link) return item.link;
+  const refs = (item.entity_refs as Record<string, unknown>) || {};
+  if (refs.dispute_id) {
+    return `/disputes/${refs.dispute_id}`;
+  }
+  if (refs.order_number) {
+    return `/orders/${refs.order_number}`;
+  }
+  if (refs.order_id) {
+    return `/orders/${refs.order_id}`;
+  }
+  if (refs.invoice_id) {
+    return `/writer/invoices`;
+  }
+  if (refs.support_id || refs.request_id) {
+    return `/support/${refs.support_id || refs.request_id}`;
+  }
+  return null;
+}
+
 function getNotificationIcon(type: string) {
   switch (type) {
     case 'order_payment_submitted':
@@ -44,7 +71,23 @@ function getNotificationIcon(type: string) {
       return <AlertCircle className="w-4 h-4 text-rose-400" />;
     case 'dispute_opened':
     case 'dispute_resolved':
-      return <AlertCircle className="w-4 h-4 text-purple-400" />;
+    case 'stagnant_dispute_alert':
+      return <Scale className="w-4 h-4 text-amber-400" />;
+    case 'dispute_message':
+      return <MessageSquare className="w-4 h-4 text-sky-400" />;
+    case 'refund_requested':
+    case 'refund_approved':
+    case 'refund_rejected':
+      return <RotateCcw className="w-4 h-4 text-sky-400" />;
+    case 'invoice_due_reminder':
+    case 'invoice_overdue':
+      return <Receipt className="w-4 h-4 text-rose-400" />;
+    case 'support_reply':
+    case 'support_ticket_closed':
+      return <LifeBuoy className="w-4 h-4 text-purple-400" />;
+    case 'writer_application_approved':
+    case 'novel_approved':
+      return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
     default:
       return <Bell className="w-4 h-4 text-amber-500" />;
   }
@@ -160,18 +203,21 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
                       <Clock className="w-3 h-3" />
                       {new Date(item.created_at).toLocaleString()}
                     </span>
-                    {item.link && (
-                      <Link
-                        href={item.link}
-                        onClick={() => {
-                          if (!item.is_read) handleMarkOneRead(item.id);
-                        }}
-                        className="text-amber-400 hover:text-amber-300 font-semibold inline-flex items-center gap-1 underline"
-                      >
-                        <span>View Details</span>
-                        <ExternalLink className="w-2.5 h-2.5" />
-                      </Link>
-                    )}
+                    {(() => {
+                      const resolvedLink = resolveNotificationLink(item);
+                      return resolvedLink ? (
+                        <Link
+                          href={resolvedLink}
+                          onClick={() => {
+                            if (!item.is_read) handleMarkOneRead(item.id);
+                          }}
+                          className="text-amber-400 hover:text-amber-300 font-semibold inline-flex items-center gap-1 underline"
+                        >
+                          <span>View Details</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </Link>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               </div>

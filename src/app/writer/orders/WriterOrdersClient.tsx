@@ -9,6 +9,8 @@ import {
   verifyOrderPaymentAction,
   rejectOrderPaymentAction,
 } from '@/app/actions/writer-orders';
+import { requestRefundAction } from '@/app/actions/refunds';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import type { OrderStatus } from '@/types/database';
 import {
   Receipt,
@@ -54,6 +56,8 @@ export interface WriterOrderCardData {
   createdAt: string;
   updatedAt: string;
   submissions: WriterOrderSubmission[];
+  hasPendingRefund?: boolean;
+  pendingRefundReason?: string | null;
 }
 
 interface WriterOrdersClientProps {
@@ -200,6 +204,13 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
   } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [rejectError, setRejectError] = useState<string | null>(null);
+
+  // Refund Modal state
+  const [refundTarget, setRefundTarget] = useState<WriterOrderCardData | null>(null);
+  const [refundReason, setRefundReason] = useState('');
+  const [refundEvidenceNote, setRefundEvidenceNote] = useState('');
+  const [refundEvidencePath, setRefundEvidencePath] = useState<string | null>(null);
+  const [refundError, setRefundError] = useState<string | null>(null);
 
   // Filter tabs
   const awaitingOrders = orders.filter((o) => o.status === 'payment_submitted');
@@ -574,13 +585,47 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                     )}
 
                     {order.status === 'verified' && (
-                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-1">
-                        <div className="flex items-center gap-1 font-bold text-emerald-900">
-                          <Check className="w-4 h-4" />
-                          <span>Verified & Access Active</span>
+                      <div className="space-y-2">
+                        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-1">
+                          <div className="flex items-center gap-1 font-bold text-emerald-900">
+                            <Check className="w-4 h-4" />
+                            <span>Verified & Access Active</span>
+                          </div>
+                          <p className="text-[11px]">
+                            Verified on {new Date(order.updatedAt).toLocaleDateString()}.
+                          </p>
                         </div>
-                        <p className="text-[11px]">
-                          Verified on {new Date(order.updatedAt).toLocaleDateString()}.
+
+                        {order.hasPendingRefund ? (
+                          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 space-y-1">
+                            <span className="font-bold block">Refund Request Under Review</span>
+                            <p className="text-[10px] text-amber-800">
+                              Administrators are verifying your off-platform refund.
+                            </p>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRefundTarget(order);
+                              setRefundReason('');
+                              setRefundEvidenceNote('');
+                              setRefundEvidencePath(null);
+                              setRefundError(null);
+                            }}
+                            className="w-full text-center px-3 py-1.5 rounded-lg border border-border bg-white hover:bg-ivory text-secondary hover:text-navy text-[11px] font-semibold transition-colors cursor-pointer"
+                          >
+                            Record Off-Platform Refund
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {order.status === 'refunded_adjusted' && (
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 space-y-1">
+                        <span className="font-bold block">Refund Adjusted</span>
+                        <p className="text-[11px] text-purple-700">
+                          Sale reversed: Negative commission line recorded in ledger & access revoked.
                         </p>
                       </div>
                     )}
@@ -734,6 +779,128 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                 className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-rose-600 hover:bg-rose-500 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
               >
                 {isPending ? 'Rejecting...' : 'Reject Payment Proof'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: RECORD OFF-PLATFORM REFUND REQUEST                                  */}
+      {/* ========================================================================= */}
+      {refundTarget && (
+        <div className="fixed inset-0 z-50 bg-navy/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-lg w-full bg-surface border border-border rounded-2xl p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-sm font-serif font-bold text-navy flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-amber-600" />
+                <span>Record Off-Platform Refund (Order #{refundTarget.orderNumber})</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setRefundTarget(null)}
+                className="text-secondary hover:text-navy cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1.5 leading-relaxed">
+              <span className="font-bold block">Important Notice:</span>
+              <p>
+                You are declaring that you have returned PKR {refundTarget.amountPkr} directly to the reader
+                outside the platform (e.g. via JazzCash, EasyPaisa, or Raast).
+              </p>
+              <p className="text-[11px] text-amber-800">
+                After an administrator reviews and approves this request, a negative adjustment row will be
+                appended to your sales ledger (reducing your commission balance) and the reader&apos;s library
+                access will be revoked.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-navy block">
+                Reason for Refund <span className="text-rose-600">*</span>
+              </label>
+              <textarea
+                rows={2}
+                required
+                maxLength={500}
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="e.g. Reader requested cancellation; transferred back full amount."
+                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-navy block">
+                Evidence Note / Return TID
+              </label>
+              <input
+                type="text"
+                maxLength={200}
+                value={refundEvidenceNote}
+                onChange={(e) => setRefundEvidenceNote(e.target.value)}
+                placeholder="e.g. Transferred via EasyPaisa TID: 11223344"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-navy block">
+                Optional Refund Transfer Screenshot
+              </label>
+              <ImageUploader
+                bucket="payment-proofs"
+                preset="payment-screenshot"
+                folder={refundTarget.id}
+                value={refundEvidencePath}
+                onChange={(path) => setRefundEvidencePath(path)}
+                disabled={isPending}
+                helperText="Upload refund receipt screenshot for admin verification."
+              />
+            </div>
+
+            {refundError && (
+              <p className="text-xs text-rose-600 font-semibold">{refundError}</p>
+            )}
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setRefundTarget(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!refundReason.trim()) {
+                    setRefundError('A reason for the refund is required.');
+                    return;
+                  }
+                  setRefundError(null);
+                  startTransition(async () => {
+                    const res = await requestRefundAction(
+                      refundTarget.id,
+                      refundReason,
+                      refundEvidenceNote,
+                      refundEvidencePath
+                    );
+                    if (!res.success) {
+                      setRefundError(res.error || 'Failed to submit refund request.');
+                    } else {
+                      setRefundTarget(null);
+                      router.refresh();
+                    }
+                  });
+                }}
+                disabled={isPending || !refundReason.trim()}
+                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-amber-600 hover:bg-amber-500 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+              >
+                {isPending ? 'Submitting...' : 'Submit Refund Request'}
               </button>
             </div>
           </div>

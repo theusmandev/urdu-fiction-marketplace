@@ -81,14 +81,15 @@ export default async function OrderPage({ params }: OrderPageProps) {
     .eq('order_id', order.id)
     .order('created_at', { ascending: false });
 
-  // 4. Fetch dispute window from platform settings
+  // 4. Fetch dispute window and wait hours from platform settings
   const { data: settings } = await supabase
     .from('platform_settings')
-    .select('dispute_window_days')
+    .select('dispute_window_days, min_dispute_wait_hours')
     .eq('id', 1)
     .maybeSingle();
 
   const disputeWindowDays = settings?.dispute_window_days ?? 30;
+  const minDisputeWaitHours = settings?.min_dispute_wait_hours ?? 24;
 
   const novel = Array.isArray(order.novels) ? order.novels[0] : order.novels;
   const writer = Array.isArray(order.writer) ? order.writer[0] : order.writer;
@@ -122,6 +123,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
           submissions={submissions || []}
           disputes={disputes || []}
           disputeWindowDays={disputeWindowDays}
+          minDisputeWaitHours={minDisputeWaitHours}
           // eslint-disable-next-line react-hooks/purity
           currentTimestamp={Date.now()}
         />

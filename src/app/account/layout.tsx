@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth/requireRole';
-import { User, BookOpen, ShoppingBag, Feather, ShieldAlert, LogOut } from 'lucide-react';
+import { User, BookOpen, ShoppingBag, Feather, ShieldAlert, LogOut, Mail } from 'lucide-react';
 import { logoutUser } from '@/app/actions/auth';
 
 
@@ -50,6 +50,13 @@ export default async function AccountLayout({
                 >
                   <User className="h-4 w-4 text-amber-500" />
                   <span>Profile Settings</span>
+                </Link>
+                <Link
+                  href="/account/notifications"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-stone-300 hover:bg-stone-800 hover:text-white transition-colors"
+                >
+                  <Mail className="h-4 w-4 text-amber-500" />
+                  <span>Email Preferences</span>
                 </Link>
                 <Link
                   href="/library"

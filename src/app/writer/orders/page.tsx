@@ -44,6 +44,12 @@ export default async function WriterOrdersPage() {
         reviewer_note,
         is_duplicate_tid_flagged,
         created_at
+      ),
+      refund_requests (
+        id,
+        status,
+        reason,
+        created_at
       )
     `)
     .eq('writer_id', user.id)
@@ -53,6 +59,8 @@ export default async function WriterOrdersPage() {
   const formattedOrders: WriterOrderCardData[] = (orders || []).map((o) => {
     const novel = Array.isArray(o.novels) ? o.novels[0] : o.novels;
     const reader = Array.isArray(o.reader) ? o.reader[0] : o.reader;
+    const refundRequests = Array.isArray(o.refund_requests) ? o.refund_requests : [];
+    const pendingRefund = refundRequests.find((r: { status: string }) => r.status === 'pending');
     const submissions = Array.isArray(o.payment_submissions)
       ? [...o.payment_submissions].sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -87,6 +95,8 @@ export default async function WriterOrdersPage() {
         isDuplicateTidFlagged: Boolean(s.is_duplicate_tid_flagged),
         createdAt: s.created_at,
       })),
+      hasPendingRefund: Boolean(pendingRefund),
+      pendingRefundReason: (pendingRefund as { reason?: string })?.reason || null,
     };
   });
 
