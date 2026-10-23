@@ -130,12 +130,20 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
             </button>
           )}
 
+          <Link
+            href={`/orders/${order.order_number}`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-1.5 text-xs font-semibold text-amber-400 transition-colors"
+          >
+            <span>View Order</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+
           {order.status === 'verified' && (
             <Link
-              href={`/novels/${order.novel_id}`}
+              href={`/orders/${order.order_number}`}
               className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/90 hover:bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors"
             >
-              <span>Read Novel</span>
+              <span>Access Novel</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           )}
