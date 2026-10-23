@@ -28,6 +28,8 @@ interface PlatformSettingsFormProps {
     chapter_read_window_minutes?: number;
     invoice_due_days?: number;
     overdue_grace_days?: number;
+    min_dispute_wait_hours?: number;
+    verification_reminder_hours?: number;
     supportEmail?: string;
     support_email: string;
     updated_at: string;
@@ -69,6 +71,12 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
   );
   const [overdueGraceDays, setOverdueGraceDays] = useState(
     (initialSettings.overdue_grace_days ?? 3).toString()
+  );
+  const [minDisputeWaitHours, setMinDisputeWaitHours] = useState(
+    (initialSettings.min_dispute_wait_hours ?? 24).toString()
+  );
+  const [verificationReminderHours, setVerificationReminderHours] = useState(
+    (initialSettings.verification_reminder_hours ?? 12).toString()
   );
   const [supportEmail, setSupportEmail] = useState(initialSettings.support_email);
 
@@ -143,6 +151,8 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
 
     const parsedInvoiceDueDays = Number(invoiceDueDays);
     const parsedOverdueGraceDays = Number(overdueGraceDays);
+    const parsedMinDisputeWaitHours = Number(minDisputeWaitHours);
+    const parsedVerificationReminderHours = Number(verificationReminderHours);
 
     if (isNaN(parsedInvoiceDueDays) || parsedInvoiceDueDays < 1 || parsedInvoiceDueDays > 90) {
       setError('Invoice due days must be a whole number between 1 and 90 days.');
@@ -152,6 +162,18 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
 
     if (isNaN(parsedOverdueGraceDays) || parsedOverdueGraceDays < 0 || parsedOverdueGraceDays > 60) {
       setError('Overdue grace days must be a whole number between 0 and 60 days.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedMinDisputeWaitHours) || parsedMinDisputeWaitHours < 0 || parsedMinDisputeWaitHours > 168) {
+      setError('Min dispute wait hours must be a whole number between 0 and 168 hours.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedVerificationReminderHours) || parsedVerificationReminderHours < 1 || parsedVerificationReminderHours > 168) {
+      setError('Verification reminder hours must be a whole number between 1 and 168 hours.');
       setLoading(false);
       return;
     }
@@ -174,6 +196,8 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         chapterReadWindowMinutes: parsedWindowMinutes,
         invoiceDueDays: parsedInvoiceDueDays,
         overdueGraceDays: parsedOverdueGraceDays,
+        minDisputeWaitHours: parsedMinDisputeWaitHours,
+        verificationReminderHours: parsedVerificationReminderHours,
         supportEmail: supportEmail.trim(),
       });
 
@@ -491,6 +515,52 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={overdueGraceDays}
             onChange={(e) => setOverdueGraceDays(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
+        </div>
+
+        {/* Min Dispute Wait Hours */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-400" />
+              <span>Min Dispute Wait Hours</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">0 – 168 hrs (Default: 24)</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Mandatory cooldown hours readers must wait after submitting payment before opening a formal dispute.
+          </p>
+          <input
+            type="number"
+            min="0"
+            max="168"
+            required
+            value={minDisputeWaitHours}
+            onChange={(e) => setMinDisputeWaitHours(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
+        </div>
+
+        {/* Verification Reminder Hours */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-400" />
+              <span>Verification Reminder Hours</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">1 – 168 hrs (Default: 12)</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Hours after payment submission before the first automated reminder is dispatched to the author.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="168"
+            required
+            value={verificationReminderHours}
+            onChange={(e) => setVerificationReminderHours(e.target.value)}
             className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
           />
         </div>

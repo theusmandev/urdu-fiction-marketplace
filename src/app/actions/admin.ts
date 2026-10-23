@@ -371,6 +371,8 @@ export async function adminUpdatePlatformSettingsAction(formData: {
   chapterReadWindowMinutes?: number;
   invoiceDueDays?: number;
   overdueGraceDays?: number;
+  minDisputeWaitHours?: number;
+  verificationReminderHours?: number;
   supportEmail: string;
 }): Promise<ActionResult> {
   await requireRole('admin', '/admin');
@@ -392,6 +394,8 @@ export async function adminUpdatePlatformSettingsAction(formData: {
     p_chapter_read_window_minutes: parsed.data.chapterReadWindowMinutes,
     p_invoice_due_days: parsed.data.invoiceDueDays,
     p_overdue_grace_days: parsed.data.overdueGraceDays,
+    p_min_dispute_wait_hours: parsed.data.minDisputeWaitHours,
+    p_verification_reminder_hours: parsed.data.verificationReminderHours,
   });
 
   if (error) {

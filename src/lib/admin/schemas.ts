@@ -100,6 +100,18 @@ export const platformSettingsSchema = z
       .min(0, 'Overdue grace days cannot be negative')
       .max(60, 'Overdue grace days cannot exceed 60 days')
       .default(3),
+    minDisputeWaitHours: z.coerce
+      .number()
+      .int('Min dispute wait hours must be a whole number')
+      .min(0, 'Min dispute wait hours must be between 0 and 168')
+      .max(168, 'Min dispute wait hours cannot exceed 168 hours')
+      .default(24),
+    verificationReminderHours: z.coerce
+      .number()
+      .int('Verification reminder hours must be a whole number')
+      .min(1, 'Verification reminder hours must be between 1 and 168')
+      .max(168, 'Verification reminder hours cannot exceed 168 hours')
+      .default(12),
     supportEmail: z.string().trim().email('Please enter a valid support email address'),
   })
   .refine((data) => data.minNovelPricePkr <= data.maxNovelPricePkr, {

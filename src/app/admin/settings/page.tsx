@@ -29,6 +29,8 @@ export default async function AdminSettingsPage() {
         chapter_read_window_minutes,
         invoice_due_days,
         overdue_grace_days,
+        min_dispute_wait_hours,
+        verification_reminder_hours,
         support_email,
         updated_at
       `)
@@ -51,6 +53,8 @@ export default async function AdminSettingsPage() {
     chapter_read_window_minutes: 10,
     invoice_due_days: 7,
     overdue_grace_days: 3,
+    min_dispute_wait_hours: 24,
+    verification_reminder_hours: 12,
     support_email: 'support@unbpremium.pk',
     updated_at: new Date().toISOString(),
   };
