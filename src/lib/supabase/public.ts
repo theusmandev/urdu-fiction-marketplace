@@ -168,9 +168,14 @@ export async function getPublicNovelChapters(
       p_novel_slug: novelSlug,
     });
 
-    if (error || !data) return [];
+    if (error) {
+      console.error("[getPublicNovelChapters] RPC get_public_novel_chapters error:", error);
+      return [];
+    }
+    if (!data) return [];
     return data as PublicNovelChapterMeta[];
-  } catch {
+  } catch (err) {
+    console.error("[getPublicNovelChapters] Caught unexpected error:", err);
     return [];
   }
 }
