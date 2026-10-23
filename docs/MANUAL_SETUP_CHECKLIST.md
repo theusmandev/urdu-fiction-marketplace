@@ -275,6 +275,33 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm both columns and all 5 RPCs exist.
   - Execute automated test suite: `supabase/tests/09_reader_access_tests.sql`.
 
+### 17. `supabase/migrations/0017_commission_and_statements.sql` [SALES LEDGER, COMMISSION INVOICES, SETTLEMENT & STATEMENTS]
+- **Purpose**: Implements Step 5.1 sales ledger audit fixes, lines-based commission invoicing, admin settlement confirmation, and auditable financial statements:
+  - Enum `commission_invoice_status`: Adds `'partially_paid'` and `'void'` values.
+  - Table `platform_settings`: Adds `invoice_due_days integer NOT NULL DEFAULT 7` (range 1-90) and `overdue_grace_days integer NOT NULL DEFAULT 3` (range 0-60).
+  - Table `commission_invoices`: Adds `due_date`, `voided_at`, `voided_by`, `void_reason`. Invoices are voided, never deleted.
+  - Table `commission_invoice_lines`: `(id, invoice_id, ledger_entry_id, commission_pkr, is_voided, created_at)` with partial unique index `(ledger_entry_id) WHERE (is_voided = false)`. Prevents double-invoicing while never mutating `sales_ledger`.
+  - Table `platform_payment_methods`: `(id, method_type, account_title, account_number_or_iban, bank_name, instructions_note, is_active)` managed by admin RPCs; readable only by writers who currently have an open invoice and by admins.
+  - Table `commission_payment_reports`: `(id, invoice_id, writer_id, amount_pkr, transaction_reference, screenshot_path, writer_note, status, admin_note, reviewed_by, reviewed_at, created_at)` with TID format checks and duplicate TID detection across reports.
+  - RPC `update_platform_settings(...)`: Updated to accept and audit-log 11 settings parameters.
+  - RPC `preview_commission_invoice(...)` & `generate_commission_invoice(...)`: Takes uninvoiced ledger entries in the Asia/Karachi time period, atomically inserts invoice + lines, refuses total <= 0, sets due date, notifies writer.
+  - RPC `void_commission_invoice(...)`: Voids invoice if no confirmed payments exist, frees lines for re-invoicing, audit logs.
+  - RPC `report_commission_payment(...)`: The invoiced writer only; screenshot path must start with `<invoice_id>/`; creates PENDING report; moves invoice status to `payment_reported`; does NOT touch balances.
+  - RPC `confirm_commission_settlement(...)`: Admin only; writes `commission_payments` row; updates `amount_settled` and status; reconciles balance; checks against overpayment.
+  - RPC `reject_commission_report(...)`: Admin only; rejects claim with mandatory reason; notifies writer; returns invoice to invoiced.
+  - RPC `record_commission_adjustment(...)`: Admin only; inserts `manual_correction` in `sales_ledger` (gross 0, platform_commission = +/- amount, writer_net = -/+ amount); never mutates historical ledger.
+  - RPC `apply_overdue_rules(p_apply)`: Identifies writers with invoices overdue beyond grace days; pauses orders only when admin explicitly confirms with `p_apply = true`.
+  - RPC `reconcile_writer_unpaid_commission(p_writer_id)`: Reconciles balance; pauses/unpauses orders; generates de-duplicated warnings at 80% and 100% threshold crossings.
+  - Writer & Admin Inspection RPCs: `get_my_sales_summary`, `get_my_ledger`, `get_my_invoices`, `get_my_invoice`, `get_platform_payment_instructions`, `admin_commission_overview`, `admin_list_invoices`, `admin_get_invoice`, `admin_list_commission_reports`.
+- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('commission_invoice_lines', 'platform_payment_methods', 'commission_payment_reports');
+    SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_name IN ('preview_commission_invoice', 'generate_commission_invoice', 'confirm_commission_settlement', 'report_commission_payment', 'record_commission_adjustment', 'apply_overdue_rules');
+    ```
+    Confirm all 3 tables and RPCs exist.
+  - Execute automated test suite: `supabase/tests/10_commission_tests.sql`.
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 

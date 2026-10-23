@@ -53,7 +53,9 @@ export type CommissionInvoiceStatus =
   | "open"
   | "invoiced"
   | "payment_reported"
+  | "partially_paid"
   | "settled"
+  | "void"
   | "disputed";
 
 export type DisputeStatus =
@@ -82,6 +84,8 @@ export interface PlatformSettingsRow {
   max_orders_per_hour: number;
   max_chapter_reads_per_window: number;
   chapter_read_window_minutes: number;
+  invoice_due_days: number;
+  overdue_grace_days: number;
   support_email: string;
   updated_at: string;
 }
@@ -451,11 +455,191 @@ export interface CommissionInvoiceRow {
   total_commission_owed_pkr: number;
   amount_settled_pkr: number;
   status: CommissionInvoiceStatus;
+  due_date: string | null;
+  voided_at: string | null;
+  voided_by: string | null;
+  void_reason: string | null;
   writer_reported_tid: string | null;
   writer_reported_screenshot_url: string | null;
   settled_by_admin_id: string | null;
   settled_at: string | null;
   created_at: string;
+}
+
+export interface CommissionInvoiceLineRow {
+  id: string;
+  invoice_id: string;
+  ledger_entry_id: string;
+  commission_pkr: number;
+  is_voided: boolean;
+  created_at: string;
+}
+
+export interface PlatformPaymentMethodRow {
+  id: string;
+  method_type: 'jazzcash' | 'easypaisa' | 'raast' | 'bank_transfer';
+  account_title: string;
+  account_number_or_iban: string;
+  bank_name: string | null;
+  instructions_note: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommissionPaymentReportRow {
+  id: string;
+  invoice_id: string;
+  writer_id: string;
+  amount_pkr: number;
+  transaction_reference: string;
+  normalized_tid: string;
+  screenshot_path: string;
+  writer_note: string | null;
+  status: 'pending' | 'confirmed' | 'rejected';
+  is_duplicate_tid: boolean;
+  admin_note: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+}
+
+export interface WriterSalesSummary {
+  writer_id: string;
+  pen_name_english: string;
+  pen_name_urdu: string;
+  sales_count: number;
+  total_gross_pkr: number;
+  total_commission_pkr: number;
+  total_net_pkr: number;
+  refunds_count: number;
+  refunds_amount_pkr: number;
+  unpaid_commission_balance_pkr: number;
+  unpaid_commission_limit_pkr: number;
+  is_orders_paused: boolean;
+}
+
+export interface WriterLedgerEntry {
+  id: string;
+  order_id: string | null;
+  order_number: string | null;
+  novel_title: string;
+  reader_display_name: string;
+  entry_type: LedgerEntryType;
+  gross_amount_pkr: number;
+  commission_rate: number;
+  platform_commission_pkr: number;
+  writer_net_pkr: number;
+  invoice_number: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface WriterInvoiceSummary {
+  id: string;
+  invoice_number: string;
+  period_start: string;
+  period_end: string;
+  total_sales_count: number;
+  total_gross_pkr: number;
+  total_commission_owed_pkr: number;
+  amount_settled_pkr: number;
+  remaining_owed_pkr: number;
+  status: CommissionInvoiceStatus;
+  due_date: string | null;
+  is_overdue: boolean;
+  reported_count?: number;
+  created_at: string;
+}
+
+export interface WriterInvoiceDetail extends WriterInvoiceSummary {
+  voided_at: string | null;
+  void_reason: string | null;
+  lines: Array<{
+    id: string;
+    ledger_entry_id: string;
+    order_number: string | null;
+    novel_title: string;
+    reader_display_name?: string | null;
+    entry_type: LedgerEntryType;
+    gross_amount_pkr: number;
+    commission_rate: number;
+    commission_pkr: number;
+    writer_net_pkr: number;
+    created_at: string;
+  }>;
+  payments: Array<{
+    id: string;
+    amount_pkr: number;
+    transaction_reference: string;
+    confirmed_at: string;
+    notes: string | null;
+  }>;
+  reports: Array<{
+    id: string;
+    amount_pkr: number;
+    transaction_reference: string;
+    screenshot_path: string;
+    writer_note: string | null;
+    status: 'pending' | 'confirmed' | 'rejected';
+    is_duplicate_tid: boolean;
+    admin_note: string | null;
+    created_at: string;
+    reviewed_at: string | null;
+  }>;
+}
+
+export interface AdminWriterCommissionOverview {
+  writer_id: string;
+  pen_name_english: string;
+  pen_name_urdu: string;
+  username: string | null;
+  custom_commission_rate: number | null;
+  unpaid_commission_balance_pkr: number;
+  unpaid_commission_limit_pkr: number;
+  percent_of_limit: number;
+  is_orders_paused: boolean;
+  total_accrued_pkr: number;
+  total_settled_pkr: number;
+  pending_reports_count: number;
+  overdue_invoices_count: number;
+}
+
+export interface AdminCommissionReportItem {
+  id: string;
+  invoice_id: string;
+  invoice_number: string;
+  writer_id: string;
+  writer_pen_name: string;
+  writer_username: string | null;
+  amount_pkr: number;
+  transaction_reference: string;
+  screenshot_path: string;
+  writer_note: string | null;
+  status: 'pending' | 'confirmed' | 'rejected';
+  is_duplicate_tid: boolean;
+  admin_note: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+}
+
+export interface AdminOverdueRulesResult {
+  applied: boolean;
+  grace_days: number;
+  overdue_invoices_count: number;
+  overdue_invoices: Array<{
+    invoice_id: string;
+    invoice_number: string;
+    writer_id: string;
+    writer_pen_name: string;
+    total_commission_owed_pkr: number;
+    amount_settled_pkr: number;
+    remaining_owed_pkr: number;
+    due_date: string;
+    grace_cutoff: string;
+    days_past_grace: number;
+    status: string;
+  }>;
 }
 
 export interface CommissionPaymentRow {
@@ -929,6 +1113,56 @@ export interface Database {
         Update: Partial<ChapterReadsRow>;
         Relationships: [];
       };
+      commission_invoice_lines: {
+        Row: CommissionInvoiceLineRow;
+        Insert: {
+          id?: string;
+          invoice_id: string;
+          ledger_entry_id: string;
+          commission_pkr: number;
+          is_voided?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<CommissionInvoiceLineRow>;
+        Relationships: [];
+      };
+      platform_payment_methods: {
+        Row: PlatformPaymentMethodRow;
+        Insert: {
+          id?: string;
+          method_type: 'jazzcash' | 'easypaisa' | 'raast' | 'bank_transfer';
+          account_title: string;
+          account_number_or_iban: string;
+          bank_name?: string | null;
+          instructions_note?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<PlatformPaymentMethodRow>;
+        Relationships: [];
+      };
+      commission_payment_reports: {
+        Row: CommissionPaymentReportRow;
+        Insert: {
+          id?: string;
+          invoice_id: string;
+          writer_id: string;
+          amount_pkr: number;
+          transaction_reference: string;
+          normalized_tid: string;
+          screenshot_path: string;
+          writer_note?: string | null;
+          status?: 'pending' | 'confirmed' | 'rejected';
+          is_duplicate_tid?: boolean;
+          admin_note?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<CommissionPaymentReportRow>;
+        Relationships: [];
+      };
     };
     Views: {
       public_novels: {
@@ -1060,33 +1294,6 @@ export interface Database {
           invoice_number: string;
           total_sales_count: number;
           total_commission_owed_pkr: number;
-        };
-      };
-      report_commission_payment: {
-        Args: {
-          p_invoice_id: string;
-          p_tid: string;
-          p_screenshot_path: string;
-          p_amount_pkr: number;
-        };
-        Returns: {
-          success: boolean;
-          invoice_id: string;
-          status: string;
-        };
-      };
-      confirm_commission_settlement: {
-        Args: {
-          p_invoice_id: string;
-          p_amount_pkr: number;
-          p_admin_note?: string | null;
-        };
-        Returns: {
-          success: boolean;
-          invoice_id: string;
-          amount_settled: number;
-          writer_unpaid_balance: number;
-          is_orders_paused_for_commission: boolean;
         };
       };
       open_dispute: {
@@ -1425,6 +1632,184 @@ export interface Database {
           p_order_id: string;
         };
         Returns: AdminOrderDetailResponse;
+      };
+      preview_commission_invoice: {
+        Args: {
+          p_writer_id: string;
+          p_period_start: string;
+          p_period_end: string;
+        };
+        Returns: {
+          writer_id: string;
+          period_start: string;
+          period_end: string;
+          sales_count: number;
+          refunds_count: number;
+          total_entries_count: number;
+          total_gross_pkr: number;
+          total_commission_owed_pkr: number;
+          total_writer_net_pkr: number;
+          can_generate_invoice: boolean;
+          lines: Json[];
+        };
+      };
+      void_commission_invoice: {
+        Args: {
+          p_invoice_id: string;
+          p_reason: string;
+        };
+        Returns: {
+          success: boolean;
+          invoice_id: string;
+        };
+      };
+      report_commission_payment: {
+        Args: {
+          p_invoice_id: string;
+          p_amount_pkr: number;
+          p_tid: string;
+          p_screenshot_path: string;
+          p_writer_note?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          report_id: string;
+          status: string;
+          is_duplicate_tid: boolean;
+        };
+      };
+      confirm_commission_settlement: {
+        Args: {
+          p_invoice_id: string;
+          p_amount_pkr: number;
+          p_report_id?: string | null;
+          p_admin_note?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          invoice_id: string;
+          payment_id: string;
+          amount_confirmed_pkr: number;
+          total_settled_pkr: number;
+          invoice_status: CommissionInvoiceStatus;
+          writer_unpaid_balance_pkr: number;
+          is_orders_paused: boolean;
+        };
+      };
+      reject_commission_report: {
+        Args: {
+          p_report_id: string;
+          p_reason: string;
+        };
+        Returns: {
+          success: boolean;
+          report_id: string;
+        };
+      };
+      record_commission_adjustment: {
+        Args: {
+          p_writer_id: string;
+          p_amount_pkr: number;
+          p_reason: string;
+        };
+        Returns: {
+          success: boolean;
+          ledger_id: string;
+          adjustment_amount_pkr: number;
+          new_unpaid_balance_pkr: number;
+          is_orders_paused: boolean;
+        };
+      };
+      apply_overdue_rules: {
+        Args: {
+          p_apply?: boolean;
+        };
+        Returns: AdminOverdueRulesResult;
+      };
+      upsert_platform_payment_method: {
+        Args: {
+          p_id?: string | null;
+          p_method_type: string;
+          p_account_title: string;
+          p_account_number_or_iban: string;
+          p_bank_name?: string | null;
+          p_instructions_note?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          id: string;
+        };
+      };
+      deactivate_platform_payment_method: {
+        Args: {
+          p_id: string;
+        };
+        Returns: {
+          success: boolean;
+          id: string;
+        };
+      };
+      get_platform_payment_instructions: {
+        Args: Record<string, never>;
+        Returns: PlatformPaymentMethodRow[];
+      };
+      get_my_sales_summary: {
+        Args: {
+          p_from?: string | null;
+          p_to?: string | null;
+        };
+        Returns: WriterSalesSummary;
+      };
+      get_my_ledger: {
+        Args: {
+          p_from?: string | null;
+          p_to?: string | null;
+          p_entry_type?: string | null;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          total_count: number;
+          entries: WriterLedgerEntry[];
+        };
+      };
+      get_my_invoices: {
+        Args: Record<string, never>;
+        Returns: WriterInvoiceSummary[];
+      };
+      get_my_invoice: {
+        Args: {
+          p_invoice_id: string;
+        };
+        Returns: WriterInvoiceDetail;
+      };
+      admin_commission_overview: {
+        Args: Record<string, never>;
+        Returns: AdminWriterCommissionOverview[];
+      };
+      admin_list_invoices: {
+        Args: {
+          p_status?: string | null;
+          p_search?: string | null;
+          p_only_overdue?: boolean;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          total_count: number;
+          invoices: WriterInvoiceSummary[];
+        };
+      };
+      admin_list_commission_reports: {
+        Args: {
+          p_status?: string | null;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          total_count: number;
+          reports: AdminCommissionReportItem[];
+        };
       };
     };
     Enums: {

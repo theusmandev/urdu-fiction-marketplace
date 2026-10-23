@@ -377,4 +377,31 @@ In your local Supabase database or the Supabase SQL Editor:
 | **RDR-13** | Admin Order Privacy: Email Exclusion | Admin | Reader privacy invariant | `admin_list_orders` and `admin_get_order` return reader `display_name` and `@username`, but strictly omit reader `email` in JSON response. |
 | **RDR-14** | `admin_force_verify` & Direct Chapter SELECT | Admin, Reader | Financial ledger integrity & RLS | `admin_force_verify` verifies order and creates entitlement once; second call is rejected (`Order cannot be force-verified...`). Direct `SELECT` on `chapters` by non-entitled reader returns 0 rows. |
 
+---
+
+## 11. Step 5.1 Sales Ledger, Commission Invoices, Settlement & Statements Matrix (Test Suite 10)
+
+**Test Suite Path**: `supabase/tests/10_commission_tests.sql`
+
+| Scenario ID | Tested Operation / RPC | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **COM-01** | Ledger Balance CHECK Constraint | Writer, Reader | Immutable financial ledger constraint | Verified sale creates exactly one ledger row with `gross_amount_pkr = platform_commission_pkr + writer_net_pkr`. Any manual manipulation violating this invariant is rejected by database constraint. |
+| **COM-02** | Lines-Based Invoice Generation | Admin | Table `commission_invoice_lines` | Invoicing works without mutating `sales_ledger`. Atomically creates `commission_invoices` and `commission_invoice_lines` rows while leaving `sales_ledger` untouched. |
+| **COM-03** | Prevent Double-Invoicing (Partial Unique Index) | Admin | Partial unique index on `(ledger_entry_id) WHERE (is_voided = false)` | Attempting to generate a second invoice containing an already-invoiced ledger entry is rejected. Ledger entries cannot be billed twice. |
+| **COM-04** | Negative Refunds Deduct Commission | Admin | Refund adjustment billing | A refund adjustment ledger entry (`platform_commission_pkr < 0`) reduces the total commission amount billed on the subsequent invoice. |
+| **COM-05** | Invoice Preview Matches Real Generation | Admin | RPC `preview_commission_invoice` | `preview_commission_invoice` returns the exact same line count, gross volume, and commission total as the subsequent `generate_commission_invoice` call without writing any rows. |
+| **COM-06** | Writer Invoicing Authorization Block | Writer | Administrative role boundary | A writer attempting to execute `generate_commission_invoice`, `preview_commission_invoice`, or `void_commission_invoice` is rejected with access denied exception. |
+| **COM-07** | Payment Report State Isolation | Writer | Claim vs Settlement separation | Calling `report_commission_payment` creates a `pending` report and moves invoice to `payment_reported`, but does NOT touch `amount_settled_pkr` or writer's balance. |
+| **COM-08** | Admin Settlement Confirmation | Admin | RPC `confirm_commission_settlement` | Admin confirming payment creates an immutable `commission_payments` row, marks report `confirmed`, increments `amount_settled_pkr`, moves status to `settled`, and reduces outstanding balance. |
+| **COM-09** | Overpayment Rejection | Admin | Financial balance bounds | Attempting to confirm a settlement amount greater than the remaining invoice balance is rejected with exception (`Settlement amount cannot exceed remaining invoice balance`). |
+| **COM-10** | Double Confirmation Rejection | Admin | Settle bounds | Confirming settlement against an already-settled invoice is rejected with exception. |
+| **COM-11** | Partial Payment Support | Admin | State `partially_paid` | Confirming an amount less than the remaining invoice balance leaves invoice in `partially_paid` status. |
+| **COM-12** | Void Invoice Frees Line Items | Admin | Delete-free voiding | Voiding an invoice (allowed only when no confirmed payments exist) sets `is_voided = true` on lines, releasing them for subsequent re-invoicing. |
+| **COM-13** | Manual Adjustment Balance CHECK | Admin | RPC `record_commission_adjustment` | Inserting a manual correction sets gross = 0, commission = +/- amount, and writer_net = -/+ amount, maintaining `gross = commission + net` constraint while adjusting writer balance. |
+| **COM-14** | Threshold Exceeded Pauses Orders | System / Admin | Auto-pause at threshold | When outstanding commission reaches or exceeds `unpaid_commission_limit_pkr`, `is_orders_paused_for_commission` becomes `true`. Subsequent settlement unpauses orders. |
+| **COM-15** | De-duplicated 80% & 100% Notifications | System | Notification threshold tracking | Crossing 80% and 100% limits triggers warning notifications once per crossing, without spamming on subsequent balance reconciliations. |
+| **COM-16** | Multi-Tenant Writer Privacy Isolation | Writer A, Writer B | Financial multi-tenant isolation | Writer A calling `get_my_sales_summary`, `get_my_ledger`, or `get_my_invoices` returns only Writer A's rows. Writer B's data is never visible. Direct access to other writers' balances is blocked. |
+| **COM-17** | Platform Payment Instructions Gating | Writer | Access gate for instructions | `get_platform_payment_instructions` returns platform accounts only if writer has an open (`invoiced`, `partially_paid`, `payment_reported`) invoice. Writers without open invoices receive 0 rows. |
+| **COM-18** | Duplicate TID Flagging on Reports | Writer | Audit integrity | Submitting a commission payment report with a TID previously used flags `is_duplicate_tid = true` for administrator inspection. |
+
 
