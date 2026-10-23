@@ -26,6 +26,9 @@ interface PlatformSettingsFormProps {
     max_orders_per_hour?: number;
     max_chapter_reads_per_window?: number;
     chapter_read_window_minutes?: number;
+    invoice_due_days?: number;
+    overdue_grace_days?: number;
+    supportEmail?: string;
     support_email: string;
     updated_at: string;
   };
@@ -60,6 +63,12 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
   );
   const [chapterReadWindow, setChapterReadWindow] = useState(
     (initialSettings.chapter_read_window_minutes ?? 10).toString()
+  );
+  const [invoiceDueDays, setInvoiceDueDays] = useState(
+    (initialSettings.invoice_due_days ?? 7).toString()
+  );
+  const [overdueGraceDays, setOverdueGraceDays] = useState(
+    (initialSettings.overdue_grace_days ?? 3).toString()
   );
   const [supportEmail, setSupportEmail] = useState(initialSettings.support_email);
 
@@ -132,6 +141,21 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       return;
     }
 
+    const parsedInvoiceDueDays = Number(invoiceDueDays);
+    const parsedOverdueGraceDays = Number(overdueGraceDays);
+
+    if (isNaN(parsedInvoiceDueDays) || parsedInvoiceDueDays < 1 || parsedInvoiceDueDays > 90) {
+      setError('Invoice due days must be a whole number between 1 and 90 days.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedOverdueGraceDays) || parsedOverdueGraceDays < 0 || parsedOverdueGraceDays > 60) {
+      setError('Overdue grace days must be a whole number between 0 and 60 days.');
+      setLoading(false);
+      return;
+    }
+
     if (!supportEmail || !supportEmail.includes('@')) {
       setError('Please provide a valid support email address.');
       setLoading(false);
@@ -148,6 +172,8 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         maxOrdersPerHour: parsedOrdersPerHour,
         maxChapterReadsPerWindow: parsedChapterReads,
         chapterReadWindowMinutes: parsedWindowMinutes,
+        invoiceDueDays: parsedInvoiceDueDays,
+        overdueGraceDays: parsedOverdueGraceDays,
         supportEmail: supportEmail.trim(),
       });
 
@@ -419,6 +445,52 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={chapterReadWindow}
             onChange={(e) => setChapterReadWindow(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
+        </div>
+
+        {/* Invoice Due Days */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-400" />
+              <span>Invoice Due Days</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">1 – 90 days (Default: 7)</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Standard number of days from issuance until an author commission invoice becomes due.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="90"
+            required
+            value={invoiceDueDays}
+            onChange={(e) => setInvoiceDueDays(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
+        </div>
+
+        {/* Overdue Grace Days */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-400" />
+              <span>Overdue Grace Days</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">0 – 60 days (Default: 3)</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Grace period days permitted past due date before overdue rules allow administrators to pause new orders.
+          </p>
+          <input
+            type="number"
+            min="0"
+            max="60"
+            required
+            value={overdueGraceDays}
+            onChange={(e) => setOverdueGraceDays(e.target.value)}
             className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
           />
         </div>

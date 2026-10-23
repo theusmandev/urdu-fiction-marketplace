@@ -88,6 +88,18 @@ export const platformSettingsSchema = z
       .min(1, 'Window minutes must be at least 1')
       .max(1440, 'Window minutes cannot exceed 1440')
       .default(10),
+    invoiceDueDays: z.coerce
+      .number()
+      .int('Invoice due days must be a whole number')
+      .min(1, 'Invoice due days must be at least 1 day')
+      .max(90, 'Invoice due days cannot exceed 90 days')
+      .default(7),
+    overdueGraceDays: z.coerce
+      .number()
+      .int('Overdue grace days must be a whole number')
+      .min(0, 'Overdue grace days cannot be negative')
+      .max(60, 'Overdue grace days cannot exceed 60 days')
+      .default(3),
     supportEmail: z.string().trim().email('Please enter a valid support email address'),
   })
   .refine((data) => data.minNovelPricePkr <= data.maxNovelPricePkr, {

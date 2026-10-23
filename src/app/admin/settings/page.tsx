@@ -2,28 +2,43 @@ import React from 'react';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
+import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
 import { Settings } from 'lucide-react';
+import type { PlatformPaymentMethodRow } from '@/types/database';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminSettingsPage() {
   await requireRole('admin', '/admin');
   const supabase = await createServerClient();
 
-  const { data: settings } = await supabase
-    .from('platform_settings')
-    .select(`
-      default_commission_rate,
-      default_unpaid_commission_limit,
-      dispute_window_days,
-      min_novel_price_pkr,
-      max_novel_price_pkr,
-      max_orders_per_hour,
-      max_chapter_reads_per_window,
-      chapter_read_window_minutes,
-      support_email,
-      updated_at
-    `)
-    .eq('id', 1)
-    .single();
+  const [
+    { data: settings },
+    { data: paymentMethodsData },
+  ] = await Promise.all([
+    supabase
+      .from('platform_settings')
+      .select(`
+        default_commission_rate,
+        default_unpaid_commission_limit,
+        dispute_window_days,
+        min_novel_price_pkr,
+        max_novel_price_pkr,
+        max_orders_per_hour,
+        max_chapter_reads_per_window,
+        chapter_read_window_minutes,
+        invoice_due_days,
+        overdue_grace_days,
+        support_email,
+        updated_at
+      `)
+      .eq('id', 1)
+      .single(),
+    supabase
+      .from('platform_payment_methods')
+      .select('*')
+      .order('created_at', { ascending: true }),
+  ]);
 
   const fallbackSettings = {
     default_commission_rate: 20.0,
@@ -34,14 +49,17 @@ export default async function AdminSettingsPage() {
     max_orders_per_hour: 5,
     max_chapter_reads_per_window: 20,
     chapter_read_window_minutes: 10,
+    invoice_due_days: 7,
+    overdue_grace_days: 3,
     support_email: 'support@unbpremium.pk',
     updated_at: new Date().toISOString(),
   };
 
   const currentSettings = settings || fallbackSettings;
+  const paymentMethods = (paymentMethodsData as PlatformPaymentMethodRow[]) || [];
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -58,6 +76,9 @@ export default async function AdminSettingsPage() {
       </div>
 
       <PlatformSettingsForm initialSettings={currentSettings} />
+
+      <PlatformPaymentMethodsManager initialMethods={paymentMethods} />
     </div>
   );
 }
+

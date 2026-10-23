@@ -369,6 +369,8 @@ export async function adminUpdatePlatformSettingsAction(formData: {
   maxOrdersPerHour?: number;
   maxChapterReadsPerWindow?: number;
   chapterReadWindowMinutes?: number;
+  invoiceDueDays?: number;
+  overdueGraceDays?: number;
   supportEmail: string;
 }): Promise<ActionResult> {
   await requireRole('admin', '/admin');
@@ -388,6 +390,8 @@ export async function adminUpdatePlatformSettingsAction(formData: {
     p_max_orders_per_hour: parsed.data.maxOrdersPerHour,
     p_max_chapter_reads_per_window: parsed.data.maxChapterReadsPerWindow,
     p_chapter_read_window_minutes: parsed.data.chapterReadWindowMinutes,
+    p_invoice_due_days: parsed.data.invoiceDueDays,
+    p_overdue_grace_days: parsed.data.overdueGraceDays,
   });
 
   if (error) {
