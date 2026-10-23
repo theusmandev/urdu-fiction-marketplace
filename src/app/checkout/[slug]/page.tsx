@@ -1,0 +1,86 @@
+'use server';
+
+import React from 'react';
+import { notFound, redirect } from 'next/navigation';
+import { requireAuth } from '@/lib/auth/requireRole';
+import { createClient } from '@/lib/supabase/server';
+import { CheckoutForm } from './CheckoutForm';
+import type { CheckoutOptionsResponse } from '@/types/database';
+
+interface CheckoutPageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+export default async function CheckoutPage({ params }: CheckoutPageProps) {
+  const { slug } = await params;
+  const { user } = await requireAuth(`/checkout/${slug}`);
+  const supabase = await createClient();
+
+  // 1. Fetch novel by slug
+  const { data: novel, error: novelError } = await supabase
+    .from('novels')
+    .select('id, title_english, title_urdu, slug, status, price_pkr, writer_id')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if (novelError || !novel || novel.status !== 'published') {
+    notFound();
+  }
+
+  // 2. Author check
+  if (novel.writer_id === user.id) {
+    redirect(`/novels/${slug}?error=self_purchase`);
+  }
+
+  // 3. Call get_checkout_options RPC
+  const { data: checkoutData, error: checkoutError } = await supabase.rpc(
+    'get_checkout_options',
+    {
+      p_novel_id: novel.id,
+    }
+  );
+
+  if (checkoutError) {
+    const msg = checkoutError.message.toLowerCase();
+    if (msg.includes('already hold an active purchase entitlement')) {
+      redirect(`/novels/${slug}?notice=already_owned`);
+    }
+    if (msg.includes('authors cannot purchase their own novels')) {
+      redirect(`/novels/${slug}?error=self_purchase`);
+    }
+    // Render error state if unable to proceed
+    return (
+      <div className="min-h-screen bg-stone-950 text-stone-100 py-16 px-4 sm:px-6">
+        <div className="max-w-xl mx-auto text-center space-y-4 bg-stone-900 border border-stone-800 p-8 rounded-2xl shadow-xl">
+          <h1 className="text-xl font-bold text-rose-400">Checkout Unavailable</h1>
+          <p className="text-sm text-stone-300">{checkoutError.message}</p>
+          <div className="pt-4">
+            <a
+              href={`/novels/${slug}`}
+              className="inline-flex items-center px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-sm font-semibold text-white transition-colors"
+            >
+              Return to Novel Details
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const options = checkoutData as unknown as CheckoutOptionsResponse;
+
+  // 4. If reader already has an open order, redirect to that order
+  if (options.existing_order_number) {
+    redirect(`/orders/${options.existing_order_number}?notice=existing_order`);
+  }
+
+  return (
+    <div className="min-h-screen bg-stone-950 text-stone-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <CheckoutForm options={options} />
+      </div>
+    </div>
+  );
+}
