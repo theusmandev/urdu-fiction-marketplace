@@ -211,6 +211,7 @@ export interface AdminOrderDetailResponse {
     reader_note: string | null;
     screenshot_path: string;
     is_duplicate_tid: boolean;
+    is_duplicate_tid_flagged?: boolean;
     reviewer_status: string;
     reviewer_note: string | null;
     reviewed_by: string | null;
@@ -232,6 +233,7 @@ export interface AdminOrderDetailResponse {
     gross_amount_pkr: number;
     platform_commission_pkr: number;
     writer_payout_pkr: number;
+    writer_net_pkr?: number;
     is_reconciled: boolean;
     created_at: string;
   }>;
@@ -251,6 +253,7 @@ export interface CheckoutNovelSummary {
   slug: string;
   price_pkr: number;
   cover_image_url: string | null;
+  cover_url?: string | null;
   writer_id: string;
   writer_pen_name: string;
 }
