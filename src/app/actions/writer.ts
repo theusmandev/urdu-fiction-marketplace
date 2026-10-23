@@ -7,7 +7,7 @@ import { cleanUrduText } from '@/lib/text/clean-urdu';
 import {
   writerProfileSchema,
   paymentMethodSchema,
-  novelFormSchema,
+  createNovelFormSchema,
   chapterFormSchema,
   type WriterProfileInput,
   type PaymentMethodInput,
@@ -159,7 +159,19 @@ export async function createNovelAction(
 ): Promise<ActionResponse<{ novel_id: string; slug: string }>> {
   try {
     await requireWriter('/writer/novels/new');
-    const parsed = novelFormSchema.safeParse(data);
+    const supabase = await createClient();
+
+    // Fetch dynamic bounds from platform_settings
+    const { data: settings } = await supabase
+      .from('platform_settings')
+      .select('min_novel_price_pkr, max_novel_price_pkr')
+      .eq('id', 1)
+      .maybeSingle();
+
+    const minPrice = settings?.min_novel_price_pkr ?? 50;
+    const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
+    const schema = createNovelFormSchema({ minPrice, maxPrice });
+    const parsed = schema.safeParse(data);
 
     if (!parsed.success) {
       return {
@@ -170,7 +182,6 @@ export async function createNovelAction(
     }
 
     const val = parsed.data;
-    const supabase = await createClient();
 
     const { data: rpcData, error } = await supabase.rpc('create_novel', {
       p_title_urdu: cleanUrduText(val.title_urdu),
@@ -209,7 +220,19 @@ export async function updateNovelAction(
 ): Promise<ActionResponse<{ novel_id: string }>> {
   try {
     await requireWriter(`/writer/novels/${novelId}/edit`);
-    const parsed = novelFormSchema.safeParse(data);
+    const supabase = await createClient();
+
+    // Fetch dynamic bounds from platform_settings
+    const { data: settings } = await supabase
+      .from('platform_settings')
+      .select('min_novel_price_pkr, max_novel_price_pkr')
+      .eq('id', 1)
+      .maybeSingle();
+
+    const minPrice = settings?.min_novel_price_pkr ?? 50;
+    const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
+    const schema = createNovelFormSchema({ minPrice, maxPrice });
+    const parsed = schema.safeParse(data);
 
     if (!parsed.success) {
       return {
@@ -220,7 +243,6 @@ export async function updateNovelAction(
     }
 
     const val = parsed.data;
-    const supabase = await createClient();
 
     const { data: rpcData, error } = await supabase.rpc('update_novel', {
       p_novel_id: novelId,
