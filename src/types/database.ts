@@ -77,9 +77,191 @@ export interface PlatformSettingsRow {
   default_commission_rate: number;
   default_unpaid_commission_limit: number;
   dispute_window_days: number;
+  min_novel_price_pkr: number;
   max_novel_price_pkr?: number;
+  max_orders_per_hour: number;
+  max_chapter_reads_per_window: number;
+  chapter_read_window_minutes: number;
   support_email: string;
   updated_at: string;
+}
+
+export interface ChapterReadsRow {
+  id: string;
+  reader_id: string;
+  chapter_id: string;
+  novel_id: string;
+  read_at: string;
+}
+
+export interface ChapterReaderPayload {
+  novel_id: string;
+  novel_title: string;
+  novel_title_urdu: string;
+  novel_title_english: string;
+  novel_slug: string;
+  total_chapters: number;
+  chapter_number: number;
+  chapter_title: string;
+  chapter_title_english: string | null;
+  content_urdu: string;
+  word_count: number;
+  previous_chapter_number: number | null;
+  next_chapter_number: number | null;
+  access_reason: 'free_preview' | 'entitled' | 'owner' | 'admin';
+  watermark_code: string | null;
+  reader_progress: number | null;
+}
+
+export interface LibraryItem {
+  novel_id: string;
+  novel_slug: string;
+  title_urdu: string;
+  title_english: string;
+  cover_url: string | null;
+  writer_pen_name: string;
+  writer_pen_name_urdu: string | null;
+  writer_pen_name_english: string | null;
+  writer_username: string | null;
+  total_chapters: number;
+  last_chapter_number: number | null;
+  order_number: string | null;
+  granted_at: string;
+  is_temporarily_unavailable: boolean;
+}
+
+export interface AdminOrderItemSummary {
+  id: string;
+  order_number: string;
+  status: OrderStatus;
+  amount_pkr: number;
+  currency: string;
+  created_at: string;
+  updated_at: string;
+  verified_at: string | null;
+  is_stuck: boolean;
+  reader_id: string;
+  reader_display_name: string;
+  reader_username: string | null;
+  writer_id: string;
+  writer_pen_name: string;
+  novel_id: string;
+  novel_title: string;
+  novel_slug: string;
+  payment_method_type: string;
+  has_duplicate_submission: boolean;
+}
+
+export interface AdminOrdersListResponse {
+  orders: AdminOrderItemSummary[];
+  total_count: number;
+  limit: number;
+  offset: number;
+}
+
+export interface AdminOrderDetailResponse {
+  order: {
+    id: string;
+    order_number: string;
+    status: OrderStatus;
+    amount_pkr: number;
+    currency: string;
+    applied_commission_rate: number | null;
+    calculated_commission_pkr: number | null;
+    calculated_writer_share_pkr: number | null;
+    payment_instructions_snapshot: Json;
+    novel_title_snapshot: string;
+    created_at: string;
+    updated_at: string;
+    verified_at: string | null;
+    cancelled_at: string | null;
+    cancellation_reason: string | null;
+    is_stuck: boolean;
+  };
+  reader: {
+    id: string;
+    display_name: string;
+    username: string | null;
+  };
+  writer: {
+    id: string;
+    pen_name: string;
+    pen_name_english: string | null;
+    pen_name_urdu: string | null;
+  };
+  novel: {
+    id: string;
+    slug: string;
+    title_english: string;
+    title_urdu: string;
+    cover_url: string | null;
+    status: NovelStatus;
+  };
+  submissions: Array<{
+    id: string;
+    transaction_reference_tid: string;
+    paid_amount_claimed_pkr: number;
+    sender_account_name: string | null;
+    reader_note: string | null;
+    screenshot_path: string;
+    is_duplicate_tid: boolean;
+    reviewer_status: string;
+    reviewer_note: string | null;
+    reviewed_by: string | null;
+    reviewed_at: string | null;
+    created_at: string;
+  }>;
+  disputes: Array<{
+    id: string;
+    reason: string;
+    status: DisputeStatus;
+    resolution_note: string | null;
+    admin_resolution_notes: string | null;
+    created_at: string;
+    resolved_at: string | null;
+  }>;
+  ledger: Array<{
+    id: string;
+    entry_type: LedgerEntryType;
+    gross_amount_pkr: number;
+    platform_commission_pkr: number;
+    writer_payout_pkr: number;
+    is_reconciled: boolean;
+    created_at: string;
+  }>;
+  entitlement: {
+    id: string;
+    granted_at: string;
+    is_revoked: boolean;
+    revoked_at: string | null;
+    revoked_reason: string | null;
+  } | null;
+}
+
+export interface CheckoutNovelSummary {
+  id: string;
+  title_english: string;
+  title_urdu: string;
+  slug: string;
+  price_pkr: number;
+  cover_image_url: string | null;
+  writer_id: string;
+  writer_pen_name: string;
+}
+
+export interface CheckoutPaymentMethod {
+  id: string;
+  method_type: PaymentMethodType;
+  bank_name: string | null;
+  account_title: string;
+  masked_account: string;
+  instructions_note: string | null;
+}
+
+export interface CheckoutOptionsResponse {
+  novel: CheckoutNovelSummary;
+  payment_methods: CheckoutPaymentMethod[];
+  existing_order_number: string | null;
 }
 
 export interface ProfileRow {
@@ -735,6 +917,18 @@ export interface Database {
         Update: Partial<AuditLogRow>;
         Relationships: [];
       };
+      chapter_reads: {
+        Row: ChapterReadsRow;
+        Insert: {
+          id?: string;
+          reader_id: string;
+          chapter_id: string;
+          novel_id: string;
+          read_at?: string;
+        };
+        Update: Partial<ChapterReadsRow>;
+        Relationships: [];
+      };
     };
     Views: {
       public_novels: {
@@ -982,16 +1176,15 @@ export interface Database {
           p_default_commission_rate: number;
           p_default_unpaid_commission_limit: number;
           p_dispute_window_days: number;
+          p_min_novel_price_pkr: number;
           p_max_novel_price_pkr: number;
           p_support_email: string;
+          p_max_orders_per_hour?: number;
+          p_max_chapter_reads_per_window?: number;
+          p_chapter_read_window_minutes?: number;
         };
         Returns: {
           success: boolean;
-          default_commission_rate: number;
-          default_unpaid_commission_limit: number;
-          dispute_window_days: number;
-          max_novel_price_pkr: number;
-          support_email: string;
         };
       };
       set_writer_commission_terms: {
@@ -1178,6 +1371,60 @@ export interface Database {
           p_offset?: number | null;
         };
         Returns: PublicNovelSearchResult[];
+      };
+      get_checkout_options: {
+        Args: {
+          p_novel_id: string;
+        };
+        Returns: CheckoutOptionsResponse;
+      };
+      get_my_unread_notification_count: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      mark_notifications_as_read: {
+        Args: {
+          p_notification_ids?: string[] | null;
+        };
+        Returns: number;
+      };
+      get_chapter_for_reader: {
+        Args: {
+          p_novel_slug: string;
+          p_chapter_number: number;
+        };
+        Returns: ChapterReaderPayload;
+      };
+      upsert_reading_progress: {
+        Args: {
+          p_novel_id: string;
+          p_chapter_number: number;
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+          last_chapter_number: number;
+        };
+      };
+      get_my_library: {
+        Args: Record<string, never>;
+        Returns: LibraryItem[];
+      };
+      admin_list_orders: {
+        Args: {
+          p_status?: string | null;
+          p_search?: string | null;
+          p_only_stuck?: boolean;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: AdminOrdersListResponse;
+      };
+      admin_get_order: {
+        Args: {
+          p_order_id: string;
+        };
+        Returns: AdminOrderDetailResponse;
       };
     };
     Enums: {
