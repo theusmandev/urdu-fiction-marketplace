@@ -104,7 +104,7 @@ const statusMap: Record<string, StatusMeta> = {
     icon: PauseCircle,
   },
 
-  // Commission Ledger
+  // Commission Ledger & Invoices
   commission_unpaid: {
     labelEn: "Commission Accruing",
     labelUrdu: "کمیشن واجب الادا",
@@ -122,6 +122,76 @@ const statusMap: Record<string, StatusMeta> = {
     labelUrdu: "حد سے متجاوز",
     classes: "bg-rose-100 text-rose-900 border-rose-300 font-semibold",
     icon: AlertCircle,
+  },
+  invoiced: {
+    labelEn: "Invoiced",
+    labelUrdu: "انوائس جاری شدہ",
+    classes: "bg-blue-50 text-blue-800 border-blue-200",
+    icon: FileText,
+  },
+  payment_reported: {
+    labelEn: "Payment Reported",
+    labelUrdu: "ادائیگی ارسال کردہ",
+    classes: "bg-purple-50 text-purple-800 border-purple-200",
+    icon: Clock,
+  },
+  partially_paid: {
+    labelEn: "Partially Paid",
+    labelUrdu: "جزوی ادا شدہ",
+    classes: "bg-amber-50 text-amber-800 border-amber-200",
+    icon: AlertCircle,
+  },
+  settled: {
+    labelEn: "Settled",
+    labelUrdu: "مکمل ادا شدہ",
+    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    icon: CheckCircle2,
+  },
+  void: {
+    labelEn: "Voided",
+    labelUrdu: "منسوخ شدہ",
+    classes: "bg-slate-100 text-slate-600 border-slate-300 line-through",
+    icon: XCircle,
+  },
+
+  // Payment Reports
+  report_pending: {
+    labelEn: "Pending Review",
+    labelUrdu: "زیرِ جائزہ",
+    classes: "bg-amber-50 text-amber-800 border-amber-200",
+    icon: Clock,
+  },
+  report_confirmed: {
+    labelEn: "Confirmed",
+    labelUrdu: "تصدیق شدہ",
+    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    icon: CheckCircle2,
+  },
+  report_rejected: {
+    labelEn: "Rejected",
+    labelUrdu: "مسترد",
+    classes: "bg-rose-50 text-rose-800 border-rose-200",
+    icon: XCircle,
+  },
+
+  // Sales Ledger Entry Types
+  sale_verified: {
+    labelEn: "Sale Verified",
+    labelUrdu: "فروخت تصدیق شدہ",
+    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    icon: CheckCircle2,
+  },
+  refund_adjustment: {
+    labelEn: "Refund Adjustment",
+    labelUrdu: "رقم واپسی ایڈجسٹمنٹ",
+    classes: "bg-rose-50 text-rose-800 border-rose-200",
+    icon: AlertCircle,
+  },
+  manual_correction: {
+    labelEn: "Manual Correction",
+    labelUrdu: "دستی درستگی",
+    classes: "bg-indigo-50 text-indigo-800 border-indigo-200",
+    icon: FileText,
   },
 };
 
