@@ -331,6 +331,80 @@ export interface AuditLogRow {
   created_at: string;
 }
 
+export interface PublicGenreItem {
+  id: string;
+  slug: string;
+  name_urdu: string;
+  name_english: string;
+  display_order: number;
+}
+
+export interface PublicNovel {
+  id: string;
+  slug: string;
+  title_urdu: string;
+  title_english: string;
+  synopsis_urdu: string;
+  description_urdu: string | null;
+  cover_url: string | null;
+  price_pkr: number;
+  currency: string;
+  language: string;
+  total_chapters: number;
+  is_featured: boolean;
+  published_at: string;
+  writer_id: string;
+  writer_username: string | null;
+  writer_pen_name_urdu: string;
+  writer_pen_name_english: string;
+  writer_avatar_url: string | null;
+  genres: PublicGenreItem[];
+}
+
+export interface PublicWriter {
+  id: string;
+  username: string | null;
+  pen_name_urdu: string;
+  pen_name_english: string;
+  bio_urdu: string | null;
+  bio_english: string | null;
+  avatar_url: string | null;
+  published_novels_count: number;
+}
+
+export interface PublicGenre {
+  id: string;
+  slug: string;
+  name_english: string;
+  name_urdu: string;
+  display_order: number;
+  published_novels_count: number;
+}
+
+export interface PublicFreePreviewChapter {
+  id: string;
+  novel_id: string;
+  novel_slug: string;
+  chapter_number: number;
+  title_urdu: string;
+  content_urdu: string;
+  word_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PublicNovelChapterMeta {
+  id: string;
+  chapter_number: number;
+  title_urdu: string;
+  word_count: number;
+  is_free_preview: boolean;
+}
+
+export interface PublicNovelSearchResult extends PublicNovel {
+  total_count: number;
+}
+
 // ----------------------------------------------------------------------
 // 3. COMPLETE SUPABASE DATABASE TYPE DEFINITION
 // ----------------------------------------------------------------------
@@ -662,7 +736,24 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: Record<string, never>;
+    Views: {
+      public_novels: {
+        Row: PublicNovel;
+        Relationships: [];
+      };
+      public_writers: {
+        Row: PublicWriter;
+        Relationships: [];
+      };
+      public_genres: {
+        Row: PublicGenre;
+        Relationships: [];
+      };
+      public_free_preview_chapters: {
+        Row: PublicFreePreviewChapter;
+        Relationships: [];
+      };
+    };
     Functions: {
       is_admin: {
         Args: Record<string, never>;
@@ -1071,6 +1162,22 @@ export interface Database {
           p_novel_id: string;
         };
         Returns: string;
+      };
+      get_public_novel_chapters: {
+        Args: {
+          p_novel_slug: string;
+        };
+        Returns: PublicNovelChapterMeta[];
+      };
+      search_public_novels: {
+        Args: {
+          p_query?: string | null;
+          p_genre_slug?: string | null;
+          p_sort?: string | null;
+          p_limit?: number | null;
+          p_offset?: number | null;
+        };
+        Returns: PublicNovelSearchResult[];
       };
     };
     Enums: {

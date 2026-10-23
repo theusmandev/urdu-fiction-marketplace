@@ -297,5 +297,23 @@ In your local Supabase database or the Supabase SQL Editor:
 | **ADM-08** | `set_writer_commission_terms` | Admin | Future-sales scope & balance reconciliation | Updates custom commission rate and limit with mandatory reason. Past `sales_ledger` rows remain immutable. Calls `reconcile_writer_unpaid_commission` and writes audit log. |
 | **ADM-09** | Audit trail recording | Admin | Immutable `audit_logs` | Every successful administrative governance action records an append-only row in `public.audit_logs` capturing `actor_id`, `actor_role`, `action_type`, `entity_type`, `entity_id`, `previous_state`, and `new_state`. |
 
+---
+
+## 7. Step 2.1 Public Catalog & Safe Data Exposure Matrix (Test Suite 06)
+
+**Test Suite Path**: `supabase/tests/06_public_catalog_tests.sql`
+
+| Scenario ID | Tested Operation / Object | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **CAT-01** | `SELECT * FROM public_novels` | Anon, Authenticated | Published novels view filter | Anonymous visitors and authenticated users can only view novels with `status = 'published'`. `draft`, `under_review`, `rejected`, and `suspended` novels are completely omitted. |
+| **CAT-02** | Base Table Direct Access Denied | Anon | Base table privilege revocation | Direct `SELECT` by anonymous visitors on base tables `profiles`, `writer_profiles`, `writer_payment_methods`, `orders`, `commission_invoices`, and `sales_ledger` is strictly denied with permission exception (`42501`). |
+| **CAT-03** | Sensitive Columns Omitted from Views | Anon | Public view column projection | `public_novels` strictly excludes `moderation_reason`, `rights_declaration_accepted`, `rights_declaration_timestamp`, `created_at`, `updated_at`. Private internal fields cannot be accessed. |
+| **CAT-04** | Author Privacy in Public Views | Anon | Author privacy boundary | `public_writers` strictly excludes internal fields: `writer_profiles.status`, `rejection_reason`, `terms_accepted_at`, `custom_commission_rate`, `unpaid_commission_balance_pkr`, and user `email`. |
+| **CAT-05** | Free Preview Isolation in View | Anon | Content protection boundary | `public_free_preview_chapters` exposes only chapters with `is_free_preview = true` AND `is_published = true` belonging to published novels. Paid chapters return `0` rows. |
+| **CAT-06** | Table of Contents Content Isolation | Anon | RPC `get_public_novel_chapters` | Returns ordered chapter titles, chapter numbers, and boolean `is_free_preview` / `is_locked` flags for published novels. Chapter body content (`content`) is strictly omitted. |
+| **CAT-07** | Search Wildcard Escaping | Anon | RPC `search_public_novels` | Search strings containing SQL wildcard characters (`%`, `_`, `\`) are escaped automatically. Matching is case-insensitive across Urdu and English titles, synopsis, and pen names. Suspended or draft novels never appear in search results. |
+| **CAT-08** | Instant Catalog Reactivity on Suspension | Anon, Admin | Catalog synchronization | When an administrator calls `suspend_novel`, the novel immediately vanishes from `public_novels` and `search_public_novels`. When unsuspended, it reappears immediately. |
+
+
 
 

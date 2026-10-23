@@ -160,6 +160,26 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm all 10 RPCs exist with `prosecdef = true`.
   - Execute automated test suite: `supabase/tests/05_admin_controls_tests.sql`.
 
+### 13. `supabase/migrations/0013_public_catalog.sql` [PUBLIC CATALOG & DISCOVERY]
+- **Purpose**: Completes Step 2.1 public marketplace discovery and safe data exposure:
+  - Provisions `pg_trgm` extension (if not already enabled) and GIN trigram indexes for high-performance fuzzy Urdu and English search.
+  - Provisions B-tree composite indexes on `novels(status, published_at DESC)` and `novels(status, price_pkr ASC)`.
+  - Implements safe public view `public.public_novels`: strictly exposes published works with an explicit column allowlist (excluding moderation reasons, rights declarations, commissions, emails, and payment accounts).
+  - Implements safe public view `public.public_writers`: exposes approved authors with $\ge 1$ published novel, pen names, biographies, and published counts.
+  - Implements safe public view `public.public_genres`: exposes active genres with real published novel counts.
+  - Implements safe public view `public.public_free_preview_chapters`: strictly filters chapters with `is_free_preview = true` and `is_published = true` belonging to published novels. Paid chapters and drafts remain unreadable.
+  - Implements table-of-contents RPC `public.get_public_novel_chapters(p_novel_slug)` returning ordered chapter titles, sequence numbers, and lock flags without chapter body content.
+  - Implements search RPC `public.search_public_novels(p_query, p_genre_slug, p_sort, p_limit, p_offset)` with wildcard escaping (`\`, `%`, `_`), multi-field matching (Urdu/English title, synopsis, author pen names), and sorting (`newest`, `price_low_high`, `price_high_low`, `featured`).
+  - Strict security privileges: Grants `SELECT` on public views and `EXECUTE` on catalog RPCs to `anon` and `authenticated`; preserves explicit `REVOKE` on base tables for `anon`.
+- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT table_name FROM information_schema.views WHERE table_schema = 'public' AND table_name IN ('public_novels', 'public_writers', 'public_genres', 'public_free_preview_chapters');
+    ```
+    Confirm all 4 public views exist.
+  - Execute automated test suite: `supabase/tests/06_public_catalog_tests.sql`.
+
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
