@@ -1,447 +1,309 @@
 import React from "react";
 import Link from "next/link";
-import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
-import { NovelCard, NovelSummary } from "@/components/home/novel-card";
-import { 
-  BookMarked, 
-  Feather, 
-  ShieldCheck, 
-  ArrowRight, 
-  CheckCircle2, 
-  Smartphone, 
-  Send, 
-  KeyRound, 
+import { NovelCard } from "@/components/catalog/NovelCard";
+import {
+  getFeaturedNovels,
+  getNewestNovels,
+  getPublicGenres,
+} from "@/lib/supabase/public";
+import {
+  BookMarked,
+  Feather,
+  ShieldCheck,
+  ArrowRight,
   Sparkles,
-  Award
+  Smartphone,
+  CheckCircle2,
+  BookOpen,
 } from "lucide-react";
 
-// Initial realistic Urdu fiction literary showcase
-const FEATURED_NOVELS: NovelSummary[] = [
-  {
-    id: "dasht-e-wafa",
-    slug: "dasht-e-wafa",
-    titleUrdu: "دشتِ وفا کے مسافر",
-    titleEn: "Dasht-e-Wafa Ke Musafir",
-    authorNameUrdu: "زینب بتول",
-    authorNameEn: "Zainab Batool",
-    synopsisUrdu: "محبت، وفا اور خاندانی انا کے پس منظر میں لکھی گئی ایک پرتاثیر معاشرتی داستان، جو روایتی قدروں اور جدید سوچ کے درمیان کشمکش کو اجاگر کرتی ہے۔",
-    genreEn: "Social & Romantic",
-    genreUrdu: "معاشرتی و رومانی",
-    pricePKR: 450,
-    totalChapters: 24,
-    rating: 4.9,
-    hasFreePreview: true,
-    coverGradient: "bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#312E81]",
-  },
-  {
-    id: "lahore-ka-khooni",
-    slug: "lahore-ka-khooni",
-    titleUrdu: "شاہی قلعے کا پراسرار قیدی",
-    titleEn: "Shahi Qile Ka Pur-Israr Qaidi",
-    authorNameUrdu: "طارق اسماعیل",
-    authorNameEn: "Tariq Ismail",
-    synopsisUrdu: "پرانے لاہور کی تاریک گلیوں اور تاریخی تہہ خانوں میں چھپے ایک صدی پرانے راز اور پراسرار قتل کی سراغ رسانی پر مبنی ایک شاندار سسپنس تھرلر۔",
-    genreEn: "Mystery & Crime Thriller",
-    genreUrdu: "پراسرار و سسپنس تھرلر",
-    pricePKR: 550,
-    totalChapters: 30,
-    rating: 4.8,
-    hasFreePreview: true,
-    coverGradient: "bg-gradient-to-br from-[#1C1917] via-[#292524] to-[#451A03]",
-  },
-  {
-    id: "gard-e-safarnama",
-    slug: "gard-e-safarnama",
-    titleUrdu: "اندلس کی آخری صدا",
-    titleEn: "Andalus Ki Aakhri Sada",
-    authorNameUrdu: "حماد مرزا",
-    authorNameEn: "Hammad Mirza",
-    synopsisUrdu: "سقوطِ غرناطہ کے بعد ایک مسلم دانشور اور خطاط کی داستانِ ہجرت، جہاں علم، عشق اور تاریخ کے اوراق ایک لازوال رومان میں تبدیل ہو جاتے ہیں۔",
-    genreEn: "Historical & Classical",
-    genreUrdu: "تاریخی و کلاسیکی",
-    pricePKR: 600,
-    totalChapters: 36,
-    rating: 5.0,
-    hasFreePreview: true,
-    coverGradient: "bg-gradient-to-br from-[#1B3B2B] via-[#0F291E] to-[#14532D]",
-  },
-  {
-    id: "khuwab-dar-khuwab",
-    slug: "khuwab-dar-khuwab",
-    titleUrdu: "خواب در خواب جلتی راتیں",
-    titleEn: "Khuwab Dar Khuwab Jalti Raatein",
-    authorNameUrdu: "فاطمہ رضوی",
-    authorNameEn: "Fatima Rizvi",
-    synopsisUrdu: "شہری تنہائی، روحانی کشمکش اور انسانی رشتوں کی نزاکتوں کو بیان کرتا ہوا جدید اردو فکشن کا ایک نادر شہکار۔",
-    genreEn: "Literary & Philosophical",
-    genreUrdu: "ادبی و فلسفیانہ",
-    pricePKR: 400,
-    totalChapters: 18,
-    rating: 4.7,
-    hasFreePreview: true,
-    coverGradient: "bg-gradient-to-br from-[#3B0764] via-[#2E1065] to-[#1E1B4B]",
-  },
-];
+export const revalidate = 120; // 2 minutes ISR revalidation
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [featuredNovels, newestNovels, genres] = await Promise.all([
+    getFeaturedNovels(6),
+    getNewestNovels(8),
+    getPublicGenres(),
+  ]);
+
   return (
-    <div className="flex flex-col">
-      
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-ivory-light via-ivory to-background py-16 sm:py-24 border-b border-border/60">
-        
-        {/* Subtle decorative background watermark */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none opacity-[0.03] text-navy font-urdu text-[16rem] whitespace-nowrap z-0">
-          اردو فکشن
-        </div>
+    <div className="flex flex-col min-h-screen">
+      {/* HERO SECTION */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-navy via-navy to-[#121c2e] text-white pt-16 pb-24 md:pt-24 md:pb-32">
+        {/* Subtle decorative geometric overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(#C5A880_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left Column: English Value Prop + CTAs */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              
-              {/* Trust Tag */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/15 border border-accent/30 text-navy text-xs font-medium">
-                <Sparkles className="w-3.5 h-3.5 text-accent" />
-                <span>Pakistan&apos;s Independent Urdu Fiction Marketplace</span>
-              </div>
-
-              {/* Urdu Master Headline */}
-              <div className="pt-2">
-                <UrduText
-                  as="h1"
-                  size="4xl"
-                  variant="title"
-                  className="text-navy font-bold leading-[2.4] text-center lg:text-right"
-                >
-                  خالص اردو ادب کا گہوارہ، براہِ راست مصنّفین کی سرپرستی
-                </UrduText>
-              </div>
-
-              {/* English Editorial Subheading */}
-              <p className="font-serif text-2xl sm:text-3xl text-navy/90 font-medium leading-snug">
-                Read Handcrafted Urdu Novels Directly from the Writers You Love.
-              </p>
-
-              {/* Value Proposition Paragraph */}
-              <p className="text-base text-secondary max-w-2xl leading-relaxed">
-                No subscription traps or automated payment gateway headaches. Pay authors directly into their personal JazzCash, EasyPaisa, or Pakistani Bank account. Upon payment verification, access complete novels forever in your private digital reader.
-              </p>
-
-              {/* Dual Action CTAs */}
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Link
-                  href="/novels"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-navy hover:bg-navy-light text-white font-medium text-sm transition-all shadow-md hover:shadow-lg"
-                >
-                  <BookMarked className="w-4 h-4 text-accent" />
-                  <span>Explore All Novels</span>
-                </Link>
-
-                <Link
-                  href="/writers/onboarding"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-white hover:bg-ivory border border-border text-navy font-medium text-sm transition-all shadow-sm hover:shadow"
-                >
-                  <Feather className="w-4 h-4 text-accent" />
-                  <span>Sell Your Novels (For Writers)</span>
-                </Link>
-              </div>
-
-              {/* Supported Direct Payment Badges */}
-              <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-2 text-xs text-secondary">
-                <span className="font-medium text-navy">Direct Payment:</span>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-border font-medium text-slate-800 shadow-xs">
-                  JazzCash
-                </span>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-border font-medium text-slate-800 shadow-xs">
-                  EasyPaisa
-                </span>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-border font-medium text-slate-800 shadow-xs">
-                  Raast SBP
-                </span>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-border font-medium text-slate-800 shadow-xs">
-                  Direct Bank IBAN
-                </span>
-              </div>
-
-            </div>
-
-            {/* Right Column: Hero Spotlight Card / Direct Verification Teaser */}
-            <div className="lg:col-span-5">
-              <div className="bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-book relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-2xl pointer-events-none" />
-                
-                <div className="flex items-center justify-between pb-4 border-b border-border/80">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-navy text-accent flex items-center justify-center">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="font-serif text-sm font-bold text-navy">
-                        Zero Middleman Guarantee
-                      </h3>
-                      <p className="text-[11px] text-secondary">
-                        Transparent Writer Verification
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-full border border-emerald-200">
-                    Writer-Direct
-                  </span>
-                </div>
-
-                <div className="py-4 space-y-3">
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-ivory/80 border border-border/60">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                    <div className="text-xs">
-                      <strong className="text-navy block font-semibold">
-                        Reader-to-Writer Direct Remittance
-                      </strong>
-                      <span className="text-secondary leading-normal">
-                        Money flows straight to the author&apos;s mobile wallet or bank account.
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-ivory/80 border border-border/60">
-                    <KeyRound className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                    <div className="text-xs">
-                      <strong className="text-navy block font-semibold">
-                        TID Receipt Protection
-                      </strong>
-                      <span className="text-secondary leading-normal">
-                        Authors match reader transaction references (TID) to prevent fraud and unlock novels smoothly.
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-ivory/80 border border-border/60">
-                    <Award className="w-5 h-5 text-navy shrink-0 mt-0.5" />
-                    <div className="text-xs">
-                      <strong className="text-navy block font-semibold">
-                        Fair Platform Commission ({siteConfig.defaultCommissionPercentage}%)
-                      </strong>
-                      <span className="text-secondary leading-normal">
-                        Platform charges only {siteConfig.defaultCommissionPercentage}% on verified sales, tracked in an immutable writer ledger.
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Callout quote in Nastaliq */}
-                <div className="mt-2 pt-3 border-t border-border/60">
-                  <UrduText size="sm" variant="quote" className="text-navy/85">
-                    &quot;قارئین کے تعاون سے ہی اردو ادب کا چراغ روشن رہ سکتا ہے۔&quot;
-                  </UrduText>
-                </div>
-
-              </div>
-            </div>
-
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          {/* Trust Badge */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/15 text-xs text-slate-200 shadow-inner">
+            <ShieldCheck className="w-4 h-4 text-accent" />
+            <span>100% Direct Reader-to-Writer Pakistani Payments</span>
           </div>
-        </div>
-      </section>
 
-
-      {/* 2. HOW DIRECT PAYMENT & VERIFICATION WORKS (4-STEP TRANSPARENT BANNER) */}
-      <section className="py-16 sm:py-20 bg-surface border-b border-border/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-accent font-sans">
-              Fair & Transparent Commerce
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy">
-              How Direct Payment Works
-            </h2>
-            <UrduText size="base" className="text-navy/80 text-center py-0">
-              چار آسان مراحل میں اپنے پسندیدہ ناول تک براہِ راست رسائی حاصل کریں
+          {/* Primary Headings with Urdu Nastaliq Elegance */}
+          <div className="space-y-4 max-w-4xl mx-auto">
+            <UrduText
+              as="h1"
+              size="4xl"
+              className="text-white drop-shadow-md leading-[2.2] py-2 md:text-5xl"
+            >
+              معیاری اردو فکشن اور ناولز کا مستند ادبی مرکز
             </UrduText>
-            <p className="text-sm text-secondary leading-relaxed">
-              We eliminated expensive corporate payment gateways. Readers transfer funds directly to authors via local Pakistani payment channels.
+            <p className="font-serif text-lg md:text-2xl text-slate-300 max-w-2xl mx-auto font-normal">
+              Direct-to-author fiction marketplace for Urdu lovers. Support
+              independent Pakistani novelists directly via JazzCash, EasyPaisa,
+              and Bank Transfer.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Step 1 */}
-            <div className="relative p-6 rounded-2xl bg-ivory/60 border border-border hover:border-accent/40 transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-navy text-accent flex items-center justify-center font-serif text-lg font-bold mb-4 shadow-sm">
-                  1
-                </div>
-                <h3 className="font-serif text-lg font-bold text-navy mb-1">
-                  Browse & Read Preview
-                </h3>
-                <UrduText size="sm" className="text-navy/70 mb-2 py-0">
-                  ناول منتخب کریں اور مفت نمونہ پڑھیں
-                </UrduText>
-                <p className="text-xs text-secondary leading-relaxed">
-                  Explore literary fiction, thrillers, and romance. Read the opening prologue and sample chapters free before buying.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-border/60 text-[11px] text-accent font-semibold flex items-center gap-1">
-                <span>Free Preview Available</span>
-              </div>
-            </div>
+          {/* Action CTAs */}
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+            <Link
+              href="/novels"
+              className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-light text-navy font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Browse Catalog / ناولز دریافت کریں</span>
+            </Link>
 
-            {/* Step 2 */}
-            <div className="relative p-6 rounded-2xl bg-ivory/60 border border-border hover:border-accent/40 transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-accent text-navy flex items-center justify-center font-serif text-lg font-bold mb-4 shadow-sm">
-                  2
-                </div>
-                <h3 className="font-serif text-lg font-bold text-navy mb-1">
-                  Direct Wallet / Bank Pay
-                </h3>
-                <UrduText size="sm" className="text-navy/70 mb-2 py-0">
-                  مصنف کے اکاؤنٹ میں رقم منتقل کریں
-                </UrduText>
-                <p className="text-xs text-secondary leading-relaxed">
-                  Send the exact book price directly to the author&apos;s verified JazzCash, EasyPaisa, Raast, or Bank IBAN.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-border/60 text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>Zero gateway processing cuts</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="relative p-6 rounded-2xl bg-ivory/60 border border-border hover:border-accent/40 transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-navy text-accent flex items-center justify-center font-serif text-lg font-bold mb-4 shadow-sm">
-                  3
-                </div>
-                <h3 className="font-serif text-lg font-bold text-navy mb-1">
-                  Submit TID & Screenshot
-                </h3>
-                <UrduText size="sm" className="text-navy/70 mb-2 py-0">
-                  ٹرانزیکشن آئی ڈی (TID) اور رسید اپ لوڈ کریں
-                </UrduText>
-                <p className="text-xs text-secondary leading-relaxed">
-                  Enter your payment TID (Transaction Reference) and upload the receipt screenshot on the checkout confirmation page.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-border/60 text-[11px] text-navy font-semibold flex items-center gap-1">
-                <Send className="w-3.5 h-3.5 text-accent" />
-                <span>Instant dispatch to writer</span>
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className="relative p-6 rounded-2xl bg-ivory/60 border border-border hover:border-accent/40 transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-serif text-lg font-bold mb-4 shadow-sm">
-                  4
-                </div>
-                <h3 className="font-serif text-lg font-bold text-navy mb-1">
-                  Writer Verifies & Unlocks
-                </h3>
-                <UrduText size="sm" className="text-navy/70 mb-2 py-0">
-                  تصدیق کے بعد فوری لائبریری رسائی
-                </UrduText>
-                <p className="text-xs text-secondary leading-relaxed">
-                  The writer checks their bank account, confirms receipt, and the complete novel is permanently added to your reader library.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-border/60 text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Lifetime library access</span>
-              </div>
-            </div>
-
+            <Link
+              href="/become-a-writer"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3.5 rounded-xl border border-white/20 transition-all text-sm"
+            >
+              <Feather className="w-4 h-4 text-accent" />
+              <span>Sell Your Novels / مصنف بنیں</span>
+            </Link>
           </div>
-
         </div>
       </section>
 
-
-      {/* 3. FEATURED NOVELS SHOWCASE */}
-      <section className="py-16 sm:py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 mb-10 pb-4 border-b border-border">
-            <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-accent font-sans">
-                Curated Collection
-              </span>
-              <h2 className="font-serif text-3xl font-bold text-navy">
-                Featured Urdu Novels
-              </h2>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <UrduText as="span" size="sm" className="text-secondary hidden sm:inline py-0">
-                منتخب اور مقبول ترین ناولز
-              </UrduText>
-              <Link
-                href="/novels"
-                className="inline-flex items-center gap-1 text-sm font-medium text-navy hover:text-accent transition-colors group"
-              >
-                <span>View Full Catalog</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
+      {/* HOW DIRECT PAYMENT WORKS (Honest & Transparent) */}
+      <section className="py-16 md:py-20 bg-ivory/50 border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+              Transparency & Security
+            </span>
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-navy">
+              How Direct Payment Works
+            </h2>
+            <UrduText size="base" className="text-secondary py-0">
+              براہ راست ادائیگی کا شفاف اور محفوظ طریقہ کار
+            </UrduText>
           </div>
 
-          {/* Grid of Novel Cards (Aspect Ratio 2:3, Realistic Urdu Typography) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {FEATURED_NOVELS.map((novel) => (
-              <NovelCard key={novel.id} novel={novel} />
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* 4. WRITER CALL-TO-ACTION BANNER */}
-      <section className="py-16 bg-navy text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-navy-light/60 border border-slate-700/80 rounded-3xl p-8 sm:p-12 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8">
-            
-            <div className="space-y-4 max-w-2xl text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent text-xs font-semibold">
-                <Feather className="w-3.5 h-3.5" />
-                <span>For Pakistani Novelists & Authors</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col items-center text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-accent/20 text-navy flex items-center justify-center font-bold">
+                <Smartphone className="w-6 h-6 text-accent" />
               </div>
-
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
-                Retain Your Royalties. Sell Directly to Readers.
-              </h2>
-
-              <UrduText size="lg" className="text-slate-300 py-1 leading-[2.4]">
-                اپنے ناولز کی فروخت پر مکمل اختیار پائیں اور رقم براہِ راست اپنے اکاؤنٹ میں وصول کریں۔
-              </UrduText>
-
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Connect directly with passionate Urdu readers across Pakistan and the global diaspora. Receive payments straight to your JazzCash, EasyPaisa, or Bank. We only track a transparent {siteConfig.defaultCommissionPercentage}% platform commission after you verify payment receipt.
+              <h3 className="font-serif text-lg font-bold text-navy">
+                1. Transfer to Author
+              </h3>
+              <p className="text-xs text-secondary leading-relaxed">
+                Send the exact novel price directly to the author&apos;s verified
+                JazzCash, EasyPaisa, Raast, or Bank IBAN. The platform never holds
+                your money.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 w-full sm:w-auto">
-              <Link
-                href="/writers/onboarding"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-accent hover:bg-accent-light text-navy font-semibold text-sm transition-all shadow-gold"
-              >
-                <span>Start Selling Novels</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/writers/guidelines"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-medium text-sm transition-all"
-              >
-                <span>Read Writer Guidelines</span>
-              </Link>
+            <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col items-center text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-navy text-accent flex items-center justify-center font-bold">
+                <CheckCircle2 className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-navy">
+                2. Submit TID & Receipt
+              </h3>
+              <p className="text-xs text-secondary leading-relaxed">
+                Provide your bank or wallet Transaction Reference (TID) and payment
+                screenshot. The writer is immediately notified to verify the deposit.
+              </p>
             </div>
 
+            <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col items-center text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold">
+                <Sparkles className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-navy">
+                3. Instant Access Unlocked
+              </h3>
+              <p className="text-xs text-secondary leading-relaxed">
+                Once the author confirms receipt in their account, your novel is
+                unlocked permanently in your personal library with complete Nastaliq
+                reading controls.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* FEATURED NOVELS SHOWCASE */}
+      <section className="py-16 md:py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4">
+            <div>
+              <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+                Curated Selection
+              </span>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold text-navy">
+                Featured Novels
+              </h2>
+            </div>
+            <Link
+              href="/novels?sort=featured"
+              className="text-xs font-semibold text-accent hover:text-accent-dark transition-colors inline-flex items-center gap-1"
+            >
+              <span>View all featured</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {featuredNovels.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredNovels.map((novel, idx) => (
+                <NovelCard key={novel.id} novel={novel} priority={idx < 3} />
+              ))}
+            </div>
+          ) : (
+            <div className="p-12 text-center bg-ivory/50 rounded-2xl border border-dashed border-border space-y-3">
+              <BookMarked className="w-10 h-10 text-secondary mx-auto" />
+              <p className="text-sm font-medium text-navy">
+                No featured novels yet
+              </p>
+              <UrduText size="sm" className="text-secondary py-0">
+                جلد ہی نئے اور منتخب ناولز شامل کیے جائیں گے۔
+              </UrduText>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* BROWSE BY GENRE */}
+      {genres.length > 0 && (
+        <section className="py-16 bg-ivory/40 border-y border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="text-center space-y-2">
+              <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+                Taxonomy & Themes
+              </span>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold text-navy">
+                Explore by Genre
+              </h2>
+              <UrduText size="base" className="text-secondary py-0">
+                اصنافِ ادب کے ذریعے ناولز کی تلاش
+              </UrduText>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {genres.map((genre) => (
+                <Link
+                  key={genre.id}
+                  href={`/genres/${genre.slug}`}
+                  className="group bg-surface hover:bg-navy p-4 rounded-xl border border-border hover:border-navy shadow-sm transition-all duration-200 flex flex-col items-center text-center space-y-1.5"
+                >
+                  <UrduText
+                    as="span"
+                    size="base"
+                    className="text-navy group-hover:text-accent font-bold py-0 leading-[2.2]"
+                  >
+                    {genre.name_urdu}
+                  </UrduText>
+                  <span className="text-xs font-medium text-secondary group-hover:text-slate-300">
+                    {genre.name_english}
+                  </span>
+                  <span className="text-[10px] bg-ivory group-hover:bg-white/10 text-secondary group-hover:text-slate-400 px-2 py-0.5 rounded-full mt-1">
+                    {genre.published_novels_count}{" "}
+                    {genre.published_novels_count === 1 ? "novel" : "novels"}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* NEWEST RELEASES */}
+      <section className="py-16 md:py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4">
+            <div>
+              <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+                Fresh Stories
+              </span>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold text-navy">
+                New Releases
+              </h2>
+            </div>
+            <Link
+              href="/novels?sort=newest"
+              className="text-xs font-semibold text-accent hover:text-accent-dark transition-colors inline-flex items-center gap-1"
+            >
+              <span>Explore all new releases</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {newestNovels.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newestNovels.map((novel) => (
+                <NovelCard key={novel.id} novel={novel} />
+              ))}
+            </div>
+          ) : (
+            <div className="p-12 text-center bg-ivory/50 rounded-2xl border border-dashed border-border space-y-3">
+              <BookMarked className="w-10 h-10 text-secondary mx-auto" />
+              <p className="text-sm font-medium text-navy">
+                No novels published yet
+              </p>
+              <UrduText size="sm" className="text-secondary py-0">
+                نئے ناولز جلد دستیاب ہوں گے۔
+              </UrduText>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* RECRUITMENT CALLOUT: SELL YOUR NOVELS */}
+      <section className="bg-navy text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-navy-light to-navy p-8 md:p-12 rounded-3xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
+            <div className="space-y-4 max-w-xl">
+              <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+                For Urdu Writers
+              </span>
+              <UrduText
+                as="h2"
+                size="3xl"
+                className="text-white leading-[2.2] py-0"
+              >
+                کیا آپ باصلاحیت افسانہ نگار یا ناول نگار ہیں؟
+              </UrduText>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Join UNB Premium as an author. Keep up to 80% of novel sales, receive
+                payments directly from readers to your Pakistani bank account or wallet,
+                and maintain 100% intellectual property rights.
+              </p>
+            </div>
+
+            <div className="shrink-0 flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/become-a-writer"
+                className="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-light text-navy font-semibold px-6 py-3.5 rounded-xl shadow-lg transition-all text-sm"
+              >
+                <Feather className="w-4 h-4" />
+                <span>Apply to Publish</span>
+              </Link>
+              <Link
+                href="/how-it-works"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3.5 rounded-xl border border-white/20 transition-all text-sm"
+              >
+                <span>Learn More</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
