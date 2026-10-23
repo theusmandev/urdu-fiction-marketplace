@@ -157,7 +157,10 @@ export default async function WriterDashboardPage() {
         </Link>
 
         {/* Accrued Commission */}
-        <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
+        <Link
+          href="/writer/commission"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+        >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Accrued Commission</span>
             <ShieldCheck className="w-4 h-4 text-navy" />
@@ -168,7 +171,7 @@ export default async function WriterDashboardPage() {
           <p className="text-[11px] text-secondary">
             Limit: PKR {Number(writerProfile.unpaid_commission_limit || 5000).toLocaleString()} ({commissionRate}% rate)
           </p>
-        </div>
+        </Link>
       </div>
 
       {/* Main Sections: Novels Preview & Verification Queue */}
