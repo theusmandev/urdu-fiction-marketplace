@@ -1,0 +1,55 @@
+import React from 'react';
+import { requireRole } from '@/lib/auth/requireRole';
+import { createServerClient } from '@/lib/supabase/server';
+import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
+import { Settings } from 'lucide-react';
+
+export default async function AdminSettingsPage() {
+  await requireRole('admin', '/admin');
+  const supabase = await createServerClient();
+
+  const { data: settings } = await supabase
+    .from('platform_settings')
+    .select(`
+      default_commission_rate,
+      default_unpaid_commission_limit,
+      dispute_window_days,
+      max_novel_price_pkr,
+      support_email,
+      updated_at
+    `)
+    .eq('id', 1)
+    .single();
+
+  const fallbackSettings = {
+    default_commission_rate: 20.0,
+    default_unpaid_commission_limit: 5000.0,
+    dispute_window_days: 3,
+    max_novel_price_pkr: 10000.0,
+    support_email: 'support@urdufiction.example.com',
+    updated_at: new Date().toISOString(),
+  };
+
+  const currentSettings = settings || fallbackSettings;
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+              <Settings className="w-3.5 h-3.5" />
+            </div>
+            <h1 className="text-xl font-bold text-white">Global Platform Configuration</h1>
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Configure default platform commission, author balance pause limits, dispute windows, and pricing ceilings.
+          </p>
+        </div>
+      </div>
+
+      <PlatformSettingsForm initialSettings={currentSettings} />
+    </div>
+  );
+}

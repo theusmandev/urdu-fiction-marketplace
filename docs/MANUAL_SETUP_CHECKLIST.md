@@ -124,7 +124,42 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm `dispute_window_days` is present.
   - Execute automated test suite: `supabase/tests/03_dispute_and_writer_status_tests.sql`.
 
----
+### 11. `supabase/migrations/0011_writer_content_hardening.sql` [WRITER CONTENT & MANUSCRIPT HARDENING]
+- **Purpose**: Completes Step 3.1 writer content hardening:
+  - `platform_settings`: Adds `max_novel_price_pkr numeric(10,2) NOT NULL DEFAULT 5000.00`.
+  - `novels`: Adds `BEFORE UPDATE` trigger `trg_protect_novel_columns` preventing non-admins from altering `status`, `is_featured`, `published_at`, `moderation_reason`, `writer_id`, `total_chapters`, or `slug` after publication.
+  - Enforces that novel content can only be modified while in `draft`, `rejected`, or `published` status (not `under_review` or `suspended`).
+  - Records an immutable audit log entry whenever the price of a published novel is updated.
+  - `chapters`: Trigger `trg_chapters_calculate_word_count` automatically counts words on insert/update; trigger `trg_chapters_sync_total_chapters` synchronizes `novels.total_chapters`.
+  - Trigger `trg_protect_chapter_deletion` strictly blocks hard-deleting chapters once a novel is submitted or published (requires unpublishing instead).
+  - Atomic RPCs: `create_novel`, `update_novel`, `submit_novel_for_review`, `withdraw_novel_submission`, `unpublish_own_novel`, `reorder_chapters`, and `generate_unique_novel_slug`.
+- **Action**: Paste contents into the SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('submit_novel_for_review', 'withdraw_novel_submission', 'unpublish_own_novel', 'create_novel', 'update_novel', 'reorder_chapters');
+    ```
+    Confirm all 6 RPCs exist with `prosecdef = true`.
+  - Execute automated test suite: `supabase/tests/04_writer_content_tests.sql`.
+
+### 12. `supabase/migrations/0012_admin_controls.sql` [ADMIN CONTROLS & GOVERNANCE]
+- **Purpose**: Completes Step 3.2 platform administrator governance:
+  - `genres`: Adds `is_active boolean NOT NULL DEFAULT true` and admin management policy for `novel_genres`.
+  - Novel Moderation RPCs: `suspend_novel(p_novel_id, p_reason)` (hides from catalog, pauses new orders, leaves entitlements intact, notifies writer), `unsuspend_novel(p_novel_id)`, `set_novel_featured(p_novel_id, p_featured)`, and `approve_novel(p_novel_id, p_checklist)`.
+  - Taxonomy Governance: `create_genre`, `update_genre`, `reorder_genres`, and `delete_genre` (strictly blocks deletion if linked to any novel in `novel_genres`; requires deactivation instead).
+  - Platform Settings RPC: `update_platform_settings(default_commission_rate, default_unpaid_commission_limit, dispute_window_days, max_novel_price_pkr, support_email)` validating bounded ranges and recording audit entries with prior and new values (notes that changes affect future sales only).
+  - Writer Commission Terms RPC: `set_writer_commission_terms(p_writer_id, p_custom_rate, p_unpaid_limit, p_reason)` with mandatory reason, audit trail, and automatic invocation of `reconcile_writer_unpaid_commission`.
+  - User Role & Status Governance: `admin_update_user_role_status(p_user_id, p_role, p_is_active, p_reason)` with self-demotion / self-deactivation protection, last-admin removal prevention, and blocking demoting approved writers with published works to readers.
+  - Security Definier hardening (`search_path = ''`), restricted to `public.is_admin()`, with privileges revoked from `PUBLIC`/`anon` and granted to `authenticated`.
+- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('suspend_novel', 'unsuspend_novel', 'set_novel_featured', 'create_genre', 'update_genre', 'reorder_genres', 'delete_genre', 'update_platform_settings', 'set_writer_commission_terms', 'admin_update_user_role_status');
+    ```
+    Confirm all 10 RPCs exist with `prosecdef = true`.
+  - Execute automated test suite: `supabase/tests/05_admin_controls_tests.sql`.
+
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 

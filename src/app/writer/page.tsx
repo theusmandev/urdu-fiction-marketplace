@@ -3,27 +3,29 @@ import Link from 'next/link';
 import { requireWriter } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   BookOpen,
   Receipt,
-  DollarSign,
   AlertTriangle,
   CheckCircle2,
   Clock,
   ArrowUpRight,
   ShieldCheck,
+  CreditCard,
+  Plus,
+  Layers,
 } from 'lucide-react';
-
 
 export default async function WriterDashboardPage() {
   const { user, writerProfile } = await requireWriter('/writer');
   const supabase = await createServerClient();
 
-  // Fetch real novel count from Supabase
+  // Fetch real novel count from Supabase using correct writer_id column
   const { count: novelCount } = await supabase
     .from('novels')
     .select('id', { count: 'exact', head: true })
-    .eq('author_id', user.id);
+    .eq('writer_id', user.id);
 
   // Fetch real count of orders awaiting writer verification
   const { count: pendingVerificationCount } = await supabase
@@ -32,8 +34,24 @@ export default async function WriterDashboardPage() {
     .eq('writer_id', user.id)
     .eq('status', 'payment_submitted');
 
+  // Fetch active payment methods count
+  const { count: paymentMethodsCount } = await supabase
+    .from('writer_payment_methods')
+    .select('id', { count: 'exact', head: true })
+    .eq('writer_id', user.id)
+    .eq('is_active', true);
+
+  // Fetch recent authored novels (up to 4)
+  const { data: recentNovels } = await supabase
+    .from('novels')
+    .select('id, slug, title_urdu, title_english, status, cover_url, price_pkr, total_chapters')
+    .eq('writer_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(4);
+
   const novelsTotal = novelCount ?? 0;
   const pendingOrdersTotal = pendingVerificationCount ?? 0;
+  const activePayoutsTotal = paymentMethodsCount ?? 0;
   const commissionRate = writerProfile.custom_commission_rate ?? 20;
 
   return (
@@ -57,12 +75,19 @@ export default async function WriterDashboardPage() {
           </UrduText>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Link
-            href="/writer/orders"
+            href="/writer/novels/new"
             className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-navy text-white hover:bg-navy-light shadow-sm"
           >
-            <Receipt className="w-4 h-4 mr-1.5" />
+            <Plus className="w-4 h-4 mr-1.5" />
+            New Novel
+          </Link>
+          <Link
+            href="/writer/orders"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-surface text-secondary hover:text-navy hover:bg-ivory shadow-sm"
+          >
+            <Receipt className="w-4 h-4 mr-1.5 text-accent" />
             Verification Queue ({pendingOrdersTotal})
           </Link>
         </div>
@@ -86,20 +111,26 @@ export default async function WriterDashboardPage() {
 
       {/* Real Statistics Grid (No Fake Data) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Published Novels */}
-        <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
+        {/* Authored Novels */}
+        <Link
+          href="/writer/novels"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+        >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Authored Novels</span>
             <BookOpen className="w-4 h-4 text-accent" />
           </div>
           <div className="text-2xl font-bold text-navy">{novelsTotal}</div>
           <p className="text-[11px] text-secondary">
-            {novelsTotal === 0 ? 'No novels created yet' : `${novelsTotal} novel(s) registered`}
+            {novelsTotal === 0 ? 'No novels created yet' : `${novelsTotal} manuscript(s) registered`}
           </p>
-        </div>
+        </Link>
 
         {/* Verification Queue */}
-        <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
+        <Link
+          href="/writer/orders"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+        >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Awaiting Verification</span>
             <Clock className="w-4 h-4 text-amber-600" />
@@ -108,46 +139,54 @@ export default async function WriterDashboardPage() {
           <p className="text-[11px] text-secondary">
             {pendingOrdersTotal === 0 ? 'Queue is clear' : `${pendingOrdersTotal} reader payment(s) to verify`}
           </p>
-        </div>
+        </Link>
 
-        {/* Platform Commission Rate */}
-        <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
+        {/* Payment Methods */}
+        <Link
+          href="/writer/payment-methods"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+        >
           <div className="flex items-center justify-between text-secondary">
-            <span className="text-xs font-semibold uppercase tracking-wider">Commission Rate</span>
-            <DollarSign className="w-4 h-4 text-navy" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Active Payouts</span>
+            <CreditCard className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-bold text-navy">{commissionRate}%</div>
+          <div className="text-2xl font-bold text-navy">{activePayoutsTotal}</div>
           <p className="text-[11px] text-secondary">
-            You retain {100 - commissionRate}% of reader payments
+            {activePayoutsTotal === 0 ? 'Add payout method' : `${activePayoutsTotal} active account(s)`}
           </p>
-        </div>
+        </Link>
 
         {/* Accrued Commission */}
         <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Accrued Commission</span>
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-navy" />
           </div>
           <div className="text-2xl font-bold text-navy">
             PKR {Number(writerProfile.current_unpaid_commission || 0).toLocaleString()}
           </div>
           <p className="text-[11px] text-secondary">
-            Limit: PKR {Number(writerProfile.unpaid_commission_limit || 5000).toLocaleString()}
+            Limit: PKR {Number(writerProfile.unpaid_commission_limit || 5000).toLocaleString()} ({commissionRate}% rate)
           </p>
         </div>
       </div>
 
-      {/* Clean Empty States & Overview Sections */}
+      {/* Main Sections: Novels Preview & Verification Queue */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Author Novels Card */}
         <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <h2 className="font-serif font-bold text-base text-navy">
-              Published Novels
+            <h2 className="font-serif font-bold text-base text-navy flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-accent" />
+              Authored Novels
             </h2>
-            <span className="text-xs text-secondary font-medium">
-              {novelsTotal} Total
-            </span>
+            <Link
+              href="/writer/novels"
+              className="text-xs text-accent hover:underline flex items-center gap-1 font-medium"
+            >
+              <span>View All ({novelsTotal})</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           {novelsTotal === 0 ? (
@@ -157,24 +196,81 @@ export default async function WriterDashboardPage() {
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-main">
-                  No novels published yet
+                  No novels created yet
                 </p>
                 <p className="text-xs text-secondary max-w-sm mx-auto">
-                  Novel manuscript submission, chapter drafting, and cover art uploads will unlock in Step 1.4.
+                  Create your first Urdu novel manuscript, add chapters, and submit for editorial publication.
                 </p>
               </div>
+              <Link
+                href="/writer/novels/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-light"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create Novel</span>
+              </Link>
             </div>
           ) : (
-            <p className="text-xs text-secondary">
-              Novels listing will display here.
-            </p>
+            <div className="divide-y divide-border">
+              {(recentNovels || []).map((novel) => (
+                <div
+                  key={novel.id}
+                  className="py-3 flex items-center justify-between gap-3 text-xs"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-14 rounded bg-ivory border border-border overflow-hidden shrink-0">
+                      {novel.cover_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={novel.cover_url}
+                          alt={novel.title_english}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                          <BookOpen className="w-4 h-4" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 space-y-0.5">
+                      <UrduText as="div" size="sm" className="font-bold text-navy truncate py-0" dir="rtl">
+                        {novel.title_urdu}
+                      </UrduText>
+                      <div className="text-[11px] text-secondary truncate">
+                        {novel.title_english}
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] text-secondary">
+                        <span className="flex items-center gap-1">
+                          <Layers className="w-3 h-3" />
+                          <span>{novel.total_chapters} ch.</span>
+                        </span>
+                        <span>&bull;</span>
+                        <span>{novel.price_pkr === 0 ? 'Free' : `PKR ${novel.price_pkr}`}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <StatusBadge status={novel.status} size="sm" />
+                    <Link
+                      href={`/writer/novels/${novel.id}/chapters`}
+                      className="px-2.5 py-1 rounded border border-border bg-ivory text-secondary hover:text-navy text-[11px] font-semibold"
+                    >
+                      Chapters
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
         {/* Verification Queue Preview */}
         <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <h2 className="font-serif font-bold text-base text-navy">
+            <h2 className="font-serif font-bold text-base text-navy flex items-center gap-2">
+              <Receipt className="w-4 h-4 text-accent" />
               Pending Reader Verifications
             </h2>
             <Link

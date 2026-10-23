@@ -103,6 +103,24 @@ export default async function WriterLayout({
                   Overview
                 </Link>
                 <Link
+                  href="/writer/novels"
+                  className="px-3 py-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-navy-light transition-colors"
+                >
+                  My Novels
+                </Link>
+                <Link
+                  href="/writer/payment-methods"
+                  className="px-3 py-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-navy-light transition-colors"
+                >
+                  Payment Methods
+                </Link>
+                <Link
+                  href="/writer/profile"
+                  className="px-3 py-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-navy-light transition-colors"
+                >
+                  Profile
+                </Link>
+                <Link
                   href="/writer/orders"
                   className="px-3 py-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-navy-light transition-colors"
                 >

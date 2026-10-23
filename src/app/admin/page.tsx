@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
@@ -6,61 +7,41 @@ import {
   Users,
   Feather,
   BookOpen,
-  Receipt,
-  ShieldCheck,
+  AlertTriangle,
   Clock,
   Activity,
   CheckCircle2,
+  ChevronRight,
+  Flame,
 } from 'lucide-react';
 
-interface PendingWriterItem {
-  id: string;
-  pen_name_english: string;
-  pen_name_urdu: string;
-  created_at: string;
-  status: string;
-  profiles?:
-    | {
-        full_name: string | null;
-        email: string;
-      }
-    | Array<{
-        full_name: string | null;
-        email: string;
-      }>
-    | null;
-}
-
-interface AuditLogItem {
-  id: string;
-  action: string;
-  actor_id: string | null;
-  target_table: string;
-  created_at: string;
+function getTwentyFourHoursAgoIso(): string {
+  const d = new Date();
+  d.setHours(d.getHours() - 24);
+  return d.toISOString();
 }
 
 export default async function AdminDashboardPage() {
-  const { profile } = await requireRole('admin', '/admin');
+  await requireRole('admin', '/admin');
   const supabase = await createServerClient();
 
-  // 1. Fetch real counts across core platform entities
+  // 1. Fetch real counts across queues
   const [
+    { count: pendingWritersCount },
+    { count: underReviewNovelsCount },
+    { count: openDisputesCount },
     { count: totalUsersCount },
-    { count: totalReadersCount },
-    { count: totalWritersCount },
-    { count: totalNovelsCount },
-    { count: totalOrdersCount },
-    { count: pendingOrdersCount },
+    { count: publishedNovelsCount },
   ] = await Promise.all([
+    supabase.from('writer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending_approval'),
+    supabase.from('novels').select('id', { count: 'exact', head: true }).eq('status', 'under_review'),
+    supabase.from('disputes').select('id', { count: 'exact', head: true }).in('status', ['open', 'under_review']),
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'reader'),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'writer'),
-    supabase.from('novels').select('id', { count: 'exact', head: true }),
-    supabase.from('orders').select('id', { count: 'exact', head: true }),
-    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'payment_submitted'),
+    supabase.from('novels').select('id', { count: 'exact', head: true }).eq('status', 'published'),
   ]);
 
-  // 2. Fetch pending writer applications
+  // 2. Fetch queue items
+  // 2a. Pending Writer Applications
   const { data: pendingWriters } = await supabase
     .from('writer_profiles')
     .select(`
@@ -76,121 +57,268 @@ export default async function AdminDashboardPage() {
     `)
     .eq('status', 'pending_approval')
     .order('created_at', { ascending: false })
-    .limit(10);
+    .limit(5);
 
-  // 3. Fetch recent security and financial audit events
+  // 2b. Novels Under Review
+  const { data: underReviewNovels } = await supabase
+    .from('novels')
+    .select(`
+      id,
+      title_urdu,
+      title_english,
+      price_pkr,
+      created_at,
+      status,
+      writer_profiles:writer_id (
+        pen_name_english,
+        pen_name_urdu
+      )
+    `)
+    .eq('status', 'under_review')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  // 2c. Overdue Orders (Awaiting writer verification > 24 hours)
+  const twentyFourHoursAgo = getTwentyFourHoursAgoIso();
+  const { data: overdueOrders, count: overdueOrdersCount } = await supabase
+    .from('orders')
+    .select(`
+      id,
+      order_number,
+      amount_pkr,
+      novel_title_snapshot,
+      created_at,
+      writer_profiles:writer_id (
+        pen_name_english
+      )
+    `, { count: 'exact' })
+    .eq('status', 'payment_submitted')
+    .lt('created_at', twentyFourHoursAgo)
+    .order('created_at', { ascending: true })
+    .limit(5);
+
+  // 2e. Writers Near/Over Commission Limit
+  const { data: cappedWriters } = await supabase
+    .from('writer_profiles')
+    .select(`
+      id,
+      pen_name_english,
+      pen_name_urdu,
+      current_unpaid_commission,
+      unpaid_commission_limit,
+      is_orders_paused_for_commission
+    `)
+    .or('is_orders_paused_for_commission.eq.true,current_unpaid_commission.gt.0')
+    .order('current_unpaid_commission', { ascending: false })
+    .limit(5);
+
+  // Filter writers near or over limit (>= 80% or paused)
+  const atRiskWriters = (cappedWriters || []).filter(
+    (w) =>
+      w.is_orders_paused_for_commission ||
+      (w.current_unpaid_commission &&
+        w.unpaid_commission_limit &&
+        w.current_unpaid_commission >= w.unpaid_commission_limit * 0.8)
+  );
+
+  // 2f. Recent Audit Trail
   const { data: recentAuditLogs } = await supabase
     .from('audit_logs')
-    .select('id, action, actor_id, target_table, created_at')
+    .select('id, action_type, entity_type, entity_id, actor_id, created_at')
     .order('created_at', { ascending: false })
     .limit(6);
 
-  const totalUsers = totalUsersCount ?? 0;
-  const readers = totalReadersCount ?? 0;
-  const writers = totalWritersCount ?? 0;
-  const novels = totalNovelsCount ?? 0;
-  const orders = totalOrdersCount ?? 0;
-  const pendingOrders = pendingOrdersCount ?? 0;
-  const pendingApps = (pendingWriters || []) as unknown as PendingWriterItem[];
-  const logs = recentAuditLogs ?? [];
-
   return (
     <div className="space-y-8">
-      {/* Top Banner */}
+      {/* Overview Header Banner */}
       <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              System Active • Postgres RLS Enforced
+              Operational • Postgres Security Definer
             </span>
             <span className="text-xs text-slate-400 font-mono">
-              Admin: {profile.email}
+              Live Queues & Moderation Desk
             </span>
           </div>
           <h1 className="text-2xl font-bold text-white mt-1">
-            Platform Master Overview
+            Admin Master Dashboard
           </h1>
           <p className="text-xs text-slate-400">
-            Real-time counts and security log stream directly from database tables.
+            Real-time actionable moderation queues, financial thresholds, and security audit streams.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-xs text-slate-400">Current Role</div>
-            <div className="text-sm font-bold text-amber-400 uppercase font-mono">
-              {profile.role}
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/novels"
+            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Moderate Novels ({underReviewNovelsCount ?? 0})</span>
+          </Link>
+          <Link
+            href="/admin/writers"
+            className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+          >
+            <Feather className="w-3.5 h-3.5" />
+            <span>Review Writers ({pendingWritersCount ?? 0})</span>
+          </Link>
         </div>
       </div>
 
-      {/* Real Statistics Grid */}
+      {/* Top Queues Metrics Strip */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {/* Total Users */}
+        {/* Pending Writers */}
+        <Link
+          href="/admin/writers?status=pending_approval"
+          className="bg-slate-950/50 border border-slate-800 hover:border-amber-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Writer Apps</span>
+            <Feather className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl font-bold text-amber-400 font-mono">
+            {pendingWritersCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Awaiting approval</p>
+        </Link>
+
+        {/* Novels Under Review */}
+        <Link
+          href="/admin/novels?status=under_review"
+          className="bg-slate-950/50 border border-slate-800 hover:border-rose-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Under Review</span>
+            <BookOpen className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl font-bold text-rose-400 font-mono">
+            {underReviewNovelsCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Novel manuscripts</p>
+        </Link>
+
+        {/* Open Disputes */}
         <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Total Accounts</span>
-            <Users className="w-4 h-4 text-slate-400" />
+            <span>Open Disputes</span>
+            <AlertTriangle className="w-4 h-4 text-orange-400" />
           </div>
-          <div className="text-2xl font-bold text-white font-mono">{totalUsers}</div>
-          <p className="text-[10px] text-slate-500 font-mono">Registered profiles</p>
+          <div className="text-2xl font-bold text-orange-400 font-mono">
+            {openDisputesCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Reader complaints</p>
         </div>
 
-        {/* Readers */}
+        {/* Overdue Orders */}
         <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Readers</span>
-            <Users className="w-4 h-4 text-sky-400" />
+            <span>Delayed Verif.</span>
+            <Clock className="w-4 h-4 text-yellow-400" />
           </div>
-          <div className="text-2xl font-bold text-sky-400 font-mono">{readers}</div>
-          <p className="text-[10px] text-slate-500 font-mono">Role: reader</p>
+          <div className="text-2xl font-bold text-yellow-400 font-mono">
+            {overdueOrdersCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">&gt; 24h unverified</p>
         </div>
 
-        {/* Writers */}
+        {/* Commission Capped Writers */}
         <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Writers</span>
-            <Feather className="w-4 h-4 text-amber-400" />
+            <span>Near/Over Limit</span>
+            <Flame className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="text-2xl font-bold text-amber-400 font-mono">{writers}</div>
-          <p className="text-[10px] text-slate-500 font-mono">Role: writer</p>
+          <div className="text-2xl font-bold text-purple-400 font-mono">
+            {atRiskWriters.length}
+          </div>
+          <p className="text-[10px] text-slate-500">&gt; 80% or paused</p>
         </div>
 
-        {/* Novels */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
+        {/* Total Accounts */}
+        <Link
+          href="/admin/users"
+          className="bg-slate-950/50 border border-slate-800 hover:border-slate-700 rounded-xl p-4 space-y-1 transition-colors block group"
+        >
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Novels</span>
-            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <span>Total Users</span>
+            <Users className="w-4 h-4 text-slate-400 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-emerald-400 font-mono">{novels}</div>
-          <p className="text-[10px] text-slate-500 font-mono">In catalog</p>
-        </div>
-
-        {/* Total Orders */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Total Orders</span>
-            <Receipt className="w-4 h-4 text-indigo-400" />
+          <div className="text-2xl font-bold text-white font-mono">
+            {totalUsersCount ?? 0}
           </div>
-          <div className="text-2xl font-bold text-indigo-400 font-mono">{orders}</div>
-          <p className="text-[10px] text-slate-500 font-mono">Created orders</p>
-        </div>
-
-        {/* Pending Orders */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Pending Verif.</span>
-            <Clock className="w-4 h-4 text-rose-400" />
-          </div>
-          <div className="text-2xl font-bold text-rose-400 font-mono">{pendingOrders}</div>
-          <p className="text-[10px] text-slate-500 font-mono">Awaiting verification</p>
-        </div>
+          <p className="text-[10px] text-slate-500">{publishedNovelsCount ?? 0} novels live</p>
+        </Link>
       </div>
 
-      {/* Main Two Columns: Pending Applications & Audit Logs */}
+      {/* Main Grid: Action Queues */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pending Writer Applications */}
+        {/* 1. Novels Under Review Queue */}
+        <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-rose-400" />
+              <h2 className="text-sm font-bold text-white tracking-wide">
+                Manuscripts Awaiting Editorial Review
+              </h2>
+            </div>
+            <Link
+              href="/admin/novels?status=under_review"
+              className="text-xs text-rose-400 hover:underline flex items-center gap-1"
+            >
+              <span>View All</span>
+              <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          {!underReviewNovels || underReviewNovels.length === 0 ? (
+            <div className="py-10 text-center space-y-2">
+              <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-emerald-400">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-semibold text-slate-300">
+                Novel moderation queue is clear
+              </p>
+              <p className="text-[11px] text-slate-500">
+                All submitted novels have been processed by editorial team.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-800/80">
+              {underReviewNovels.map((novel) => {
+                const wp = Array.isArray(novel.writer_profiles)
+                  ? novel.writer_profiles[0]
+                  : novel.writer_profiles;
+                return (
+                  <div
+                    key={novel.id}
+                    className="py-3 flex items-center justify-between gap-3"
+                  >
+                    <div>
+                      <div className="text-xs font-semibold text-white">
+                        {novel.title_english}
+                      </div>
+                      <UrduText as="div" size="xs" className="text-rose-400 py-0">
+                        {novel.title_urdu}
+                      </UrduText>
+                      <div className="text-[10px] text-slate-400 font-mono">
+                        Author: {wp?.pen_name_english || 'Author'} • PKR {novel.price_pkr}
+                      </div>
+                    </div>
+                    <Link
+                      href={`/admin/novels/${novel.id}`}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-colors"
+                    >
+                      Review
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* 2. Pending Writer Applications Queue */}
         <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
@@ -199,42 +327,96 @@ export default async function AdminDashboardPage() {
                 Pending Writer Applications
               </h2>
             </div>
-            <span className="text-xs font-mono text-amber-400">
-              {pendingApps.length} Pending
-            </span>
+            <Link
+              href="/admin/writers?status=pending_approval"
+              className="text-xs text-amber-400 hover:underline flex items-center gap-1"
+            >
+              <span>View All</span>
+              <ChevronRight className="w-3 h-3" />
+            </Link>
           </div>
 
-          {pendingApps.length === 0 ? (
-            <div className="py-12 text-center space-y-2">
+          {!pendingWriters || pendingWriters.length === 0 ? (
+            <div className="py-10 text-center space-y-2">
               <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-emerald-400">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <p className="text-xs font-semibold text-slate-300">
                 No pending author applications
               </p>
-              <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                When readers apply via /become-a-writer, their pen names, bios, and agreement status will queue here for admin approval.
+              <p className="text-[11px] text-slate-500">
+                Reader applications submitted via /become-a-writer will appear here.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-800">
-              {pendingApps.map((app: PendingWriterItem) => {
-                const profileObj = Array.isArray(app.profiles) ? app.profiles[0] : app.profiles;
+            <div className="divide-y divide-slate-800/80">
+              {pendingWriters.map((writer) => {
+                const profileObj = Array.isArray(writer.profiles)
+                  ? writer.profiles[0]
+                  : writer.profiles;
                 return (
-                  <div key={app.id} className="py-3 flex items-center justify-between gap-3">
+                  <div
+                    key={writer.id}
+                    className="py-3 flex items-center justify-between gap-3"
+                  >
                     <div>
                       <div className="text-xs font-semibold text-white">
-                        {app.pen_name_english}
+                        {writer.pen_name_english}
                       </div>
-                      <UrduText as="div" size="xs" className="text-amber-400/90 py-0">
-                        {app.pen_name_urdu}
+                      <UrduText as="div" size="xs" className="text-amber-400 py-0">
+                        {writer.pen_name_urdu}
                       </UrduText>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        {profileObj?.email} • {new Date(app.created_at).toLocaleDateString()}
+                        {profileObj?.email} • Applied {new Date(writer.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                      pending_approval
+                    <Link
+                      href={`/admin/writers/${writer.id}`}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-colors"
+                    >
+                      Inspect
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Delayed Orders & Commission Overages Strip */}
+        <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-yellow-400" />
+              <h2 className="text-sm font-bold text-white tracking-wide">
+                Delayed Writer Payment Verifications (&gt;24h)
+              </h2>
+            </div>
+            <span className="text-xs font-mono text-yellow-400">
+              {overdueOrdersCount ?? 0} Flagged
+            </span>
+          </div>
+
+          {!overdueOrders || overdueOrders.length === 0 ? (
+            <div className="py-8 text-center text-xs text-slate-400">
+              No orders waiting verification past 24 hours.
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-800/80">
+              {overdueOrders.map((ord) => {
+                const wp = Array.isArray(ord.writer_profiles) ? ord.writer_profiles[0] : ord.writer_profiles;
+                return (
+                  <div key={ord.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <div className="font-mono text-white font-semibold">
+                        {ord.order_number} • PKR {ord.amount_pkr}
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        Novel: {ord.novel_title_snapshot} • Writer: {wp?.pen_name_english || 'Writer'}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-yellow-400 font-mono">
+                      {new Date(ord.created_at).toLocaleDateString()}
                     </span>
                   </div>
                 );
@@ -243,55 +425,98 @@ export default async function AdminDashboardPage() {
           )}
         </div>
 
-        {/* Security & Financial Audit Logs */}
+        {/* 4. Writers Near Commission Limit */}
         <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-400" />
+              <Flame className="w-4 h-4 text-purple-400" />
               <h2 className="text-sm font-bold text-white tracking-wide">
-                Recent Audit Trail (Immutable)
+                Writers Near/Over Commission Threshold
               </h2>
             </div>
-            <span className="text-xs font-mono text-slate-400">
-              {logs.length} Events
+            <span className="text-xs font-mono text-purple-400">
+              {atRiskWriters.length} Accounts
             </span>
           </div>
 
-          {logs.length === 0 ? (
-            <div className="py-12 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <p className="text-xs font-semibold text-slate-300">
-                Audit ledger initialized
-              </p>
-              <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                All financial transfers, role changes, and admin force actions are automatically written to public.audit_logs via triggers.
-              </p>
+          {atRiskWriters.length === 0 ? (
+            <div className="py-8 text-center text-xs text-slate-400">
+              All writers are within safe commission limits.
             </div>
           ) : (
-            <div className="space-y-2 font-mono text-xs">
-              {logs.map((log: AuditLogItem) => (
-                <div
-                  key={log.id}
-                  className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-2"
-                >
-                  <div className="space-y-0.5">
-                    <div className="text-emerald-400 font-semibold text-[11px]">
-                      {log.action}
+            <div className="divide-y divide-slate-800/80">
+              {atRiskWriters.map((writer) => (
+                <div key={writer.id} className="py-2.5 flex items-center justify-between text-xs">
+                  <div>
+                    <div className="font-semibold text-white">
+                      {writer.pen_name_english}
                     </div>
-                    <div className="text-slate-400 text-[10px]">
-                      Target: {log.target_table} • Actor: {log.actor_id ? log.actor_id.slice(0, 8) + '...' : 'system'}
+                    <div className="text-[10px] text-slate-400 font-mono">
+                      Unpaid: PKR {writer.current_unpaid_commission} / Limit: PKR {writer.unpaid_commission_limit}
                     </div>
                   </div>
-                  <div className="text-[10px] text-slate-500 whitespace-nowrap">
-                    {new Date(log.created_at).toLocaleTimeString()}
+                  <div>
+                    {writer.is_orders_paused_for_commission ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
+                        ORDERS PAUSED
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+                        HIGH BALANCE
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+      </div>
+
+      {/* Recent Security & Financial Audit Logs Strip */}
+      <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-bold text-white tracking-wide">
+              Recent Security & Financial Audit Stream
+            </h2>
+          </div>
+          <Link
+            href="/admin/audit"
+            className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+          >
+            <span>Full Audit Log</span>
+            <ChevronRight className="w-3 h-3" />
+          </Link>
+        </div>
+
+        {!recentAuditLogs || recentAuditLogs.length === 0 ? (
+          <div className="py-8 text-center text-xs text-slate-500">
+            Audit ledger initialized. No recent events found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {recentAuditLogs.map((log) => (
+              <div
+                key={log.id}
+                className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1 font-mono text-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-emerald-400 font-bold text-[11px]">
+                    {log.action_type}
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    {new Date(log.created_at).toLocaleTimeString()}
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-400 truncate">
+                  Target: {log.entity_type} #{log.entity_id.slice(0, 8)}...
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

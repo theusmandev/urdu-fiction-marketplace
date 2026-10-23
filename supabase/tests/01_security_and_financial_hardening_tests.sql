@@ -74,30 +74,24 @@ BEGIN
     -- --------------------------------------------------------------------------
     -- FIXTURE SETUP (Executed as postgres / superuser)
     -- --------------------------------------------------------------------------
-    BEGIN
-        INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data)
-        VALUES 
-            (v_reader_id, 'reader@test.com', 'dummy', now(), '{"full_name": "Test Reader"}'::jsonb),
-            (v_reader_2_id, 'reader2@test.com', 'dummy', now(), '{"full_name": "Test Reader 2"}'::jsonb),
-            (v_writer_a_id, 'writera@test.com', 'dummy', now(), '{"full_name": "Writer A"}'::jsonb),
-            (v_writer_b_id, 'writerb@test.com', 'dummy', now(), '{"full_name": "Writer B"}'::jsonb),
-            (v_admin_id, 'admin@test.com', 'dummy', now(), '{"full_name": "Platform Admin"}'::jsonb)
-        ON CONFLICT (id) DO NOTHING;
-    EXCEPTION WHEN undefined_table THEN
-        NULL;
-    END;
+    -- 1. Create fake users in auth.users (handle_new_user trigger creates public.profiles rows)
+    INSERT INTO auth.users (
+        id, instance_id, aud, role, email, encrypted_password,
+        email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    ) VALUES 
+        (v_reader_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'reader@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_reader_2_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'reader2@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_writer_a_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'writera@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_writer_b_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'writerb@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_admin_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now())
+    ON CONFLICT (id) DO NOTHING;
 
-    -- Provision Profiles
-    INSERT INTO public.profiles (id, email, full_name, username, role, is_active)
-    VALUES
-        (v_reader_id, 'reader@test.com', 'Test Reader', 'reader_test', 'reader', true),
-        (v_reader_2_id, 'reader2@test.com', 'Test Reader 2', 'reader2_test', 'reader', true),
-        (v_writer_a_id, 'writera@test.com', 'Writer A', 'writer_a', 'writer', true),
-        (v_writer_b_id, 'writerb@test.com', 'Writer B', 'writer_b', 'writer', true),
-        (v_admin_id, 'admin@test.com', 'Platform Admin', 'admin_test', 'admin', true)
-    ON CONFLICT (id) DO UPDATE SET
-        role = EXCLUDED.role,
-        is_active = EXCLUDED.is_active;
+    -- 2. Bootstrap role & username updates as postgres (handle_new_user assigned 'reader')
+    UPDATE public.profiles SET role = 'writer', username = 'writer_a', full_name = 'Writer A' WHERE id = v_writer_a_id;
+    UPDATE public.profiles SET role = 'writer', username = 'writer_b', full_name = 'Writer B' WHERE id = v_writer_b_id;
+    UPDATE public.profiles SET role = 'admin', username = 'admin_test', full_name = 'Platform Admin' WHERE id = v_admin_id;
+    UPDATE public.profiles SET username = 'reader_test', full_name = 'Test Reader' WHERE id = v_reader_id;
+    UPDATE public.profiles SET username = 'reader2_test', full_name = 'Test Reader 2' WHERE id = v_reader_2_id;
 
     -- Provision Writer Profiles
     INSERT INTO public.writer_profiles (
@@ -127,10 +121,11 @@ BEGIN
     ON CONFLICT (slug) DO NOTHING;
 
     INSERT INTO public.novels (
-        id, writer_id, slug, title_urdu, title_english, synopsis_urdu, price_pkr, status
+        id, writer_id, slug, title_urdu, title_english, synopsis_urdu, price_pkr, status,
+        rights_declaration_accepted, published_at
     ) VALUES
-        (v_novel_a_id, v_writer_a_id, 'novel-alpha-gap-test', 'ناول الف گیپ', 'Novel Alpha Gap', 'خلاصہ الف', 500.00, 'published'),
-        (v_novel_b_id, v_writer_b_id, 'novel-beta-gap-test', 'ناول ب گیپ', 'Novel Beta Gap', 'خلاصہ ب', 700.00, 'published')
+        (v_novel_a_id, v_writer_a_id, 'novel-alpha-gap-test', 'ناول الف گیپ', 'Novel Alpha Gap', 'خلاصہ الف', 500.00, 'published', true, now()),
+        (v_novel_b_id, v_writer_b_id, 'novel-beta-gap-test', 'ناول ب گیپ', 'Novel Beta Gap', 'خلاصہ ب', 700.00, 'published', true, now())
     ON CONFLICT (slug) DO NOTHING;
 
     -- Provision Chapters

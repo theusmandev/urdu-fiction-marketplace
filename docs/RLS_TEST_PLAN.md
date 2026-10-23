@@ -230,4 +230,72 @@ In your local Supabase database or the Supabase SQL Editor:
   1. Direct SQL update is blocked by trigger because the transaction-local setting `app.writer_reapply` is missing.
   2. Calling `apply_as_writer` sets `app.writer_reapply = '1'` locally, accepts terms, logs audit entry, and successfully transitions status to `pending_approval`.
 
+---
+
+## 6. Writer Content & Manuscript Hardening Test Matrix (Step 3.1 — Migration 0011)
+
+**Test Suite Path**: `supabase/tests/04_writer_content_tests.sql`
+
+### Test 1: Writer Cannot Set Own Novel Status to Published
+- **Target**: Trigger function `trg_protect_novel_columns` on `public.novels`.
+- **Condition**: Author attempts direct client SQL `UPDATE novels SET status = 'published' WHERE id = own_novel_id;`
+- **Expected Result**: Blocked by trigger exception (`Unauthorized: Novel status can only be modified via official editorial workflows.`). Only editorial review approval RPC or administrators can mark a novel as published.
+
+### Test 2: Writer Cross-Author Isolation
+- **Target**: RLS policies and triggers on `novels` and `chapters`.
+- **Condition**: Writer A attempts to call `update_novel` on Writer B's novel or insert chapters into Writer B's novel.
+- **Expected Result**: Both operations are aborted with unauthorized exceptions or blocked by RLS policies. Multi-tenant writer boundaries are strictly enforced.
+
+### Test 3: Non-Approved Writer Cannot Create Novels
+- **Target**: RPC `create_novel` and RLS `Writers insert own novels`.
+- **Condition**: Applicant with writer profile status `pending_approval` or `suspended` invokes `create_novel`.
+- **Expected Result**: Aborted with exception (`Only approved writers can create new novels.`).
+
+### Test 4: Reader Cannot Insert Novel
+- **Target**: RPC `create_novel` and direct SQL insert on `novels`.
+- **Condition**: User with role `reader` attempts `create_novel` RPC and direct SQL `INSERT INTO novels`.
+- **Expected Result**: Both attempts are aborted by RPC authorization checks and database RLS.
+
+### Test 5: submit_novel_for_review Complete Lifecycle
+- **Target**: RPC `submit_novel_for_review` and RPC `withdraw_novel_submission`.
+- **Condition**: Author attempts to submit a novel missing cover art, genre, published chapter, or active payment method (for paid novels). Author subsequently provides all prerequisites and submits. Author then tests withdrawing.
+- **Expected Result**:
+  1. Each incomplete submission attempt fails with a descriptive exception identifying the missing requirement.
+  2. Once complete, `submit_novel_for_review` succeeds, transitions status to `under_review`, records an audit log, and notifies all platform administrators.
+  3. Calling `withdraw_novel_submission` safely reverts novel to `draft` status.
+
+### Test 6: Price Change on Published Novel Does Not Alter Existing Orders
+- **Target**: Trigger function `trg_protect_novel_columns`, table `orders`, table `audit_logs`.
+- **Condition**: An existing reader order exists at PKR 600.00. Author updates the published novel price to PKR 950.00.
+- **Expected Result**: The existing order's `amount_pkr` remains completely unchanged at PKR 600.00 (snapshot immutable). An audit log row with `action_type = 'UPDATE_NOVEL_PRICE'` is recorded.
+
+### Test 7: Chapter Hard-Delete Protection on Published Novels
+- **Target**: Trigger function `trg_protect_chapter_deletion` on `chapters`.
+- **Condition**: Author attempts `DELETE FROM chapters WHERE id = chap_id` for a chapter in a submitted or published novel.
+- **Expected Result**: Blocked by trigger exception (`Chapters cannot be hard-deleted once a novel is submitted or published. Please unpublish the chapter instead.`). Hard deletes are strictly allowed only while novel is in draft status.
+
+### Test 8: Draft Novels & Unpublished Chapters Visibility
+- **Target**: RLS policies `Public view published novels` and `Read chapters if free preview or entitled or owner or admin`.
+- **Condition**: Unentitled reader and anon query draft novels or unpublished chapters.
+- **Expected Result**: All queries return `0` rows. Manuscripts remain private to author and platform administrators until published.
+
+---
+
+## 5. Step 3.2 Platform Admin Controls & Governance Matrix (Test Suite 05)
+
+**Test Suite Path**: `supabase/tests/05_admin_controls_tests.sql`
+
+| Scenario ID | Tested Operation / RPC | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **ADM-01** | `suspend_novel`, `unsuspend_novel`, `set_novel_featured`, `create_genre`, `update_genre`, `delete_genre`, `update_platform_settings`, `set_writer_commission_terms`, `admin_update_user_role_status` | Reader, Writer, Anon | `public.is_admin()` gate | Every RPC execution by a non-admin is strictly aborted with an exception (`Restricted: Only platform administrators...`). |
+| **ADM-02** | `update_platform_settings` range validation | Admin | Range constraints (rate 0-100, limit >= 0, dispute 1-365, max price > 0) | Out-of-bound inputs abort with validation exceptions. Valid inputs update `platform_settings` and write audit log with prior and new state. |
+| **ADM-03** | `admin_update_user_role_status` self-protection | Admin | Self-demotion / deactivation block | Admin cannot change their own role to non-admin or set `is_active = false`. Aborts with `Administrators cannot demote or deactivate their own account`. |
+| **ADM-04** | `admin_update_user_role_status` last-admin guard | Admin | Platform administrative continuity | When only one active administrator remains, attempts by another admin or automated workflow to demote or deactivate the last admin abort with `Cannot remove the last remaining active platform administrator`. |
+| **ADM-05** | `admin_update_user_role_status` published writer guard | Admin | Catalog integrity | Demoting an approved writer with published novels to `reader` is blocked with `Cannot demote writer to reader while they have N published novel(s). Suspend the writer and their published novels first.`. |
+| **ADM-06** | `delete_genre` in-use protection | Admin | Taxonomy consistency | Deleting a genre assigned to any novel in `novel_genres` aborts with `Cannot delete genre ... because it is assigned to N novel(s). Deactivate it instead.`. Deleting an unassigned genre succeeds. |
+| **ADM-07** | `suspend_novel` & entitlement preservation | Admin, Reader | Marketplace visibility & Reader Entitlements | Suspending a novel transitions its status to `suspended`, blocks new reader orders, but preserves existing reader purchase entitlements and chapter access. Calling `unsuspend_novel` returns status to `published`. |
+| **ADM-08** | `set_writer_commission_terms` | Admin | Future-sales scope & balance reconciliation | Updates custom commission rate and limit with mandatory reason. Past `sales_ledger` rows remain immutable. Calls `reconcile_writer_unpaid_commission` and writes audit log. |
+| **ADM-09** | Audit trail recording | Admin | Immutable `audit_logs` | Every successful administrative governance action records an append-only row in `public.audit_logs` capturing `actor_id`, `actor_role`, `action_type`, `entity_type`, `entity_id`, `previous_state`, and `new_state`. |
+
+
 

@@ -1,0 +1,703 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { UrduText } from '@/components/urdu/UrduText';
+import {
+  adminCreateGenreAction,
+  adminUpdateGenreAction,
+  adminDeleteGenreAction,
+  adminReorderGenresAction,
+} from '@/app/actions/admin';
+import {
+  Tag,
+  Plus,
+  Edit2,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  Power,
+  BookOpen,
+} from 'lucide-react';
+
+export interface GenreItem {
+  id: string;
+  slug: string;
+  name_english: string;
+  name_urdu: string;
+  display_order: number;
+  is_active: boolean;
+  novel_count: number;
+}
+
+interface GenreManagementProps {
+  initialGenres: GenreItem[];
+}
+
+export function GenreManagement({ initialGenres }: GenreManagementProps) {
+  const router = useRouter();
+  const [genres, setGenres] = useState<GenreItem[]>(initialGenres);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Modal states
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingGenre, setEditingGenre] = useState<GenreItem | null>(null);
+  const [deletingGenre, setDeletingGenre] = useState<GenreItem | null>(null);
+
+  // Form states
+  const [englishName, setEnglishName] = useState('');
+  const [urduName, setUrduName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [displayOrder, setDisplayOrder] = useState<number>(0);
+  const [isActive, setIsActive] = useState<boolean>(true);
+
+  const resetForm = () => {
+    setEnglishName('');
+    setUrduName('');
+    setSlug('');
+    setDisplayOrder(0);
+    setIsActive(true);
+    setEditingGenre(null);
+    setIsCreateOpen(false);
+    setDeletingGenre(null);
+  };
+
+  const handleOpenEdit = (genre: GenreItem) => {
+    setEditingGenre(genre);
+    setEnglishName(genre.name_english);
+    setUrduName(genre.name_urdu);
+    setSlug(genre.slug);
+    setIsActive(genre.is_active);
+    setDisplayOrder(genre.display_order);
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminCreateGenreAction({
+        nameEnglish: englishName.trim(),
+        nameUrdu: urduName.trim(),
+        slug: slug.trim() || undefined,
+        displayOrder,
+      });
+
+      if (!res.success) {
+        setError(res.error || 'Failed to create genre');
+      } else {
+        setSuccessMsg(`Genre "${englishName}" created successfully!`);
+        resetForm();
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingGenre) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminUpdateGenreAction({
+        genreId: editingGenre.id,
+        nameEnglish: englishName.trim(),
+        nameUrdu: urduName.trim(),
+        slug: slug.trim() || undefined,
+        isActive,
+      });
+
+      if (!res.success) {
+        setError(res.error || 'Failed to update genre');
+      } else {
+        setSuccessMsg(`Genre "${englishName}" updated!`);
+        resetForm();
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleActive = async (genre: GenreItem) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminUpdateGenreAction({
+        genreId: genre.id,
+        nameEnglish: genre.name_english,
+        nameUrdu: genre.name_urdu,
+        slug: genre.slug,
+        isActive: !genre.is_active,
+      });
+
+      if (!res.success) {
+        setError(res.error || 'Failed to toggle status');
+      } else {
+        setSuccessMsg(`Genre "${genre.name_english}" status updated!`);
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingGenre) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminDeleteGenreAction(deletingGenre.id);
+      if (!res.success) {
+        setError(res.error || 'Failed to delete genre');
+      } else {
+        setSuccessMsg(`Genre "${deletingGenre.name_english}" deleted successfully!`);
+        setDeletingGenre(null);
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMoveOrder = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= genres.length) return;
+
+    const newOrder = [...genres];
+    const [moved] = newOrder.splice(index, 1);
+    newOrder.splice(targetIndex, 0, moved);
+
+    const updates = newOrder.map((g, idx) => ({
+      id: g.id,
+      display_order: idx + 1,
+    }));
+
+    setGenres(
+      newOrder.map((g, idx) => ({ ...g, display_order: idx + 1 }))
+    );
+
+    setLoading(true);
+    try {
+      const res = await adminReorderGenresAction(updates);
+      if (!res.success) {
+        setError(res.error || 'Failed to save new order');
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      router.refresh();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Alert Notices */}
+      {error && (
+        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-xs text-rose-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <span>{successMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSuccessMsg(null)}
+            className="text-xs text-emerald-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Action Bar */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-slate-400">
+          Showing {genres.length} genre categories. Active genres appear in author novel submission and public catalog filters.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            resetForm();
+            setIsCreateOpen(true);
+          }}
+          disabled={loading}
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-indigo-600/20"
+        >
+          <Plus className="w-4 h-4" />
+          <span>New Genre</span>
+        </button>
+      </div>
+
+      {/* Genres List: Table for desktop, cards for mobile */}
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/40">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th className="py-3 px-4 w-14 text-center">Order</th>
+                <th className="py-3 px-4">English Name / Slug</th>
+                <th className="py-3 px-4">Urdu Title</th>
+                <th className="py-3 px-4">Assigned Novels</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60 font-sans">
+              {genres.map((genre, idx) => (
+                <tr key={genre.id} className="hover:bg-slate-900/40 transition-colors">
+                  <td className="py-3 px-4 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="font-mono text-slate-400 font-bold w-5">
+                        {genre.display_order}
+                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => handleMoveOrder(idx, 'up')}
+                          disabled={idx === 0 || loading}
+                          className="text-slate-500 hover:text-white disabled:opacity-20 transition-colors"
+                          title="Move Up"
+                        >
+                          <ArrowUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleMoveOrder(idx, 'down')}
+                          disabled={idx === genres.length - 1 || loading}
+                          className="text-slate-500 hover:text-white disabled:opacity-20 transition-colors"
+                          title="Move Down"
+                        >
+                          <ArrowDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="py-3 px-4">
+                    <div className="font-semibold text-white">{genre.name_english}</div>
+                    <div className="text-[10px] text-slate-500 font-mono">/{genre.slug}</div>
+                  </td>
+
+                  <td className="py-3 px-4">
+                    <UrduText as="div" size="base" className="text-amber-400 font-medium py-0">
+                      {genre.name_urdu}
+                    </UrduText>
+                  </td>
+
+                  <td className="py-3 px-4 font-mono">
+                    <div className="flex items-center gap-1.5 text-slate-300">
+                      <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{genre.novel_count} novel{genre.novel_count === 1 ? '' : 's'}</span>
+                    </div>
+                  </td>
+
+                  <td className="py-3 px-4">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleActive(genre)}
+                      disabled={loading}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors ${
+                        genre.is_active
+                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                      }`}
+                    >
+                      <Power className="w-2.5 h-2.5" />
+                      <span>{genre.is_active ? 'Active' : 'Inactive'}</span>
+                    </button>
+                  </td>
+
+                  <td className="py-3 px-4 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(genre)}
+                        disabled={loading}
+                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+                        title="Edit Genre"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setDeletingGenre(genre)}
+                        disabled={loading}
+                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                        title="Delete Genre"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile Cards View */}
+      <div className="grid grid-cols-1 gap-3 md:hidden">
+        {genres.map((genre, idx) => (
+          <div
+            key={genre.id}
+            className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <div className="font-semibold text-white text-sm">{genre.name_english}</div>
+                <UrduText as="div" size="sm" className="text-amber-400 py-0">
+                  {genre.name_urdu}
+                </UrduText>
+                <div className="text-[10px] text-slate-500 font-mono">/{genre.slug}</div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleToggleActive(genre)}
+                disabled={loading}
+                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 ${
+                  genre.is_active
+                    ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                }`}
+              >
+                <Power className="w-2.5 h-2.5" />
+                <span>{genre.is_active ? 'Active' : 'Inactive'}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-400 font-mono border-t border-slate-800/60 pt-2">
+              <div className="flex items-center gap-1">
+                <span>Order: {genre.display_order}</span>
+                <button
+                  type="button"
+                  onClick={() => handleMoveOrder(idx, 'up')}
+                  disabled={idx === 0 || loading}
+                  className="p-1 text-slate-400 hover:text-white disabled:opacity-20"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMoveOrder(idx, 'down')}
+                  disabled={idx === genres.length - 1 || loading}
+                  className="p-1 text-slate-400 hover:text-white disabled:opacity-20"
+                >
+                  ▼
+                </button>
+              </div>
+
+              <div>{genre.novel_count} novel{genre.novel_count === 1 ? '' : 's'}</div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-800/40">
+              <button
+                type="button"
+                onClick={() => handleOpenEdit(genre)}
+                disabled={loading}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition-colors"
+              >
+                <Edit2 className="w-3 h-3" />
+                <span>Edit</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDeletingGenre(genre)}
+                disabled={loading}
+                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
+              >
+                <Trash2 className="w-3 h-3" />
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Create Genre Modal */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <form
+            onSubmit={handleCreate}
+            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                <Tag className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Create New Genre</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Taxonomy category for novels. English and Urdu names are both required.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  Genre Name (English) <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={englishName}
+                  onChange={(e) => setEnglishName(e.target.value)}
+                  placeholder="e.g. Mystery & Suspense"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  Genre Name (Urdu RTL) <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  dir="rtl"
+                  value={urduName}
+                  onChange={(e) => setUrduName(e.target.value)}
+                  placeholder="مثلاً: پراسرار اور سسپنس"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-amber-300 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-urdu"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                    Slug (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    placeholder="auto-generated"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                    Display Order
+                  </label>
+                  <input
+                    type="number"
+                    value={displayOrder}
+                    onChange={(e) => setDisplayOrder(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={resetForm}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>Create Genre</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Edit Genre Modal */}
+      {editingGenre && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <form
+            onSubmit={handleUpdate}
+            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                <Edit2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Edit Genre</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Update taxonomy names, slug, or active marketplace visibility.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  Genre Name (English) <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={englishName}
+                  onChange={(e) => setEnglishName(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  Genre Name (Urdu RTL) <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  dir="rtl"
+                  value={urduName}
+                  onChange={(e) => setUrduName(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-amber-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-urdu"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="genre-active-checkbox"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                  className="w-4 h-4 rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-indigo-500/50"
+                />
+                <label htmlFor="genre-active-checkbox" className="text-xs text-slate-300 font-medium cursor-pointer">
+                  Active (visible in submission options and filters)
+                </label>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={resetForm}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>Update Genre</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingGenre && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Delete Genre</h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Are you sure you want to delete <span className="text-white font-semibold">&quot;{deletingGenre.name_english}&quot;</span>?
+                </p>
+              </div>
+            </div>
+
+            {deletingGenre.novel_count > 0 ? (
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+                <span className="font-bold block">Notice: In-Use Protection</span>
+                <p>
+                  This genre is currently linked to {deletingGenre.novel_count} novel(s). The database blocks deleting in-use genres to prevent orphaned catalog metadata. You should <span className="font-semibold text-white">deactivate</span> it instead.
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400">
+                This genre is not linked to any novels and can be safely deleted permanently.
+              </p>
+            )}
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setDeletingGenre(null)}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>Confirm Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

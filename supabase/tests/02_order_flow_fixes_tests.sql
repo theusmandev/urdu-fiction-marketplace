@@ -55,16 +55,22 @@ BEGIN
     -- FIXTURE SETUP (Run as privileged bootstrap)
     -- --------------------------------------------------------------------------
 
-    -- 1. Profiles
-    INSERT INTO public.profiles (id, email, full_name, username, role, is_active)
-    VALUES 
-        (v_reader_id, 'reader1@test.com', 'Test Reader 1', 'test_reader_1', 'reader', true),
-        (v_reader_2_id, 'reader2@test.com', 'Test Reader 2', 'test_reader_2', 'reader', true),
-        (v_writer_id, 'writer@test.com', 'Test Writer', 'test_writer', 'writer', true),
-        (v_admin_id, 'admin@test.com', 'Platform Admin', 'test_admin', 'admin', true)
-    ON CONFLICT (id) DO UPDATE SET
-        role = EXCLUDED.role,
-        is_active = true;
+    -- 1. Create fake users in auth.users (handle_new_user trigger creates public.profiles rows)
+    INSERT INTO auth.users (
+        id, instance_id, aud, role, email, encrypted_password,
+        email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    ) VALUES 
+        (v_reader_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'reader1@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_reader_2_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'reader2@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_writer_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'writer@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_admin_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@test.com', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now())
+    ON CONFLICT (id) DO NOTHING;
+
+    -- 2. Bootstrap role & username updates as postgres (handle_new_user assigned 'reader')
+    UPDATE public.profiles SET role = 'writer', username = 'test_writer', full_name = 'Test Writer' WHERE id = v_writer_id;
+    UPDATE public.profiles SET role = 'admin', username = 'test_admin', full_name = 'Platform Admin' WHERE id = v_admin_id;
+    UPDATE public.profiles SET username = 'test_reader_1', full_name = 'Test Reader 1' WHERE id = v_reader_id;
+    UPDATE public.profiles SET username = 'test_reader_2', full_name = 'Test Reader 2' WHERE id = v_reader_2_id;
 
     -- 2. Writer Profile
     INSERT INTO public.writer_profiles (
@@ -84,10 +90,10 @@ BEGIN
 
     -- 4. Novels
     INSERT INTO public.novels (
-        id, writer_id, title_urdu, title_english, slug, price_pkr, status, is_published, published_at
+        id, writer_id, title_urdu, title_english, synopsis_urdu, slug, price_pkr, status, rights_declaration_accepted, published_at
     ) VALUES 
-        (v_novel_id, v_writer_id, 'شام کا رنگ', 'Color of Evening', 'novel-1-' || substring(gen_random_uuid()::text, 1, 6), 500.00, 'published', true, pg_catalog.now()),
-        (v_novel_2_id, v_writer_id, 'صبح کا تارہ', 'Morning Star', 'novel-2-' || substring(gen_random_uuid()::text, 1, 6), 600.00, 'published', true, pg_catalog.now())
+        (v_novel_id, v_writer_id, 'شام کا رنگ', 'Color of Evening', 'خلاصہ شام کا رنگ', 'novel-1-' || substring(gen_random_uuid()::text, 1, 6), 500.00, 'published', true, pg_catalog.now()),
+        (v_novel_2_id, v_writer_id, 'صبح کا تارہ', 'Morning Star', 'خلاصہ صبح کا تارہ', 'novel-2-' || substring(gen_random_uuid()::text, 1, 6), 600.00, 'published', true, pg_catalog.now())
     ON CONFLICT (id) DO UPDATE SET status = 'published';
 
     -- 5. Writer Payment Method

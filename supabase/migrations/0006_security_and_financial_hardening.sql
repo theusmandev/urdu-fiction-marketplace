@@ -202,7 +202,7 @@ BEGIN
     v_full_name := NEW.raw_user_meta_data->>'full_name';
     v_username := coalesce(
         NEW.raw_user_meta_data->>'username',
-        pg_catalog.split_part(NEW.email, '@', 1) || '_' || pg_catalog.substring(pg_catalog.replace(NEW.id::text, '-', ''), 1, 4)
+        pg_catalog.split_part(NEW.email, '@', 1) || '_' || substring(pg_catalog.replace(NEW.id::text, '-', ''), 1, 4)
     );
 
     INSERT INTO public.profiles (
@@ -486,7 +486,7 @@ BEGIN
     v_writer_share_pkr := v_novel.price_pkr - v_commission_pkr;
 
     -- Generate order number: UNB-YYYY-XXXXXX
-    v_order_number := 'UNB-' || pg_catalog.to_char(pg_catalog.now(), 'YYYY') || '-' || pg_catalog.upper(pg_catalog.substring(pg_catalog.replace(gen_random_uuid()::text, '-', ''), 1, 6));
+    v_order_number := 'UNB-' || pg_catalog.to_char(pg_catalog.now(), 'YYYY') || '-' || pg_catalog.upper(substring(pg_catalog.replace(gen_random_uuid()::text, '-', ''), 1, 6));
 
     -- Insert order
     INSERT INTO public.orders (
@@ -1235,7 +1235,7 @@ BEGIN
         RAISE EXCEPTION 'No unsettled commission transactions found for this writer in the given period.';
     END IF;
 
-    v_invoice_num := 'INV-' || pg_catalog.to_char(p_period_end, 'YYYYMM') || '-' || pg_catalog.upper(pg_catalog.substring(pg_catalog.replace(gen_random_uuid()::text, '-', ''), 1, 6));
+    v_invoice_num := 'INV-' || pg_catalog.to_char(p_period_end, 'YYYYMM') || '-' || pg_catalog.upper(substring(pg_catalog.replace(gen_random_uuid()::text, '-', ''), 1, 6));
 
     -- Create invoice
     INSERT INTO public.commission_invoices (

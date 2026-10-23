@@ -150,7 +150,7 @@ BEGIN
     v_writer_share_pkr := v_novel.price_pkr - v_commission_pkr;
 
     -- Generate order number: UNB-YYYY-XXXXXX
-    v_order_number := 'UNB-' || pg_catalog.to_char(pg_catalog.now(), 'YYYY') || '-' || pg_catalog.upper(pg_catalog.substring(pg_catalog.replace(gen_random_uuid()::text, '-', ''), 1, 6));
+    v_order_number := 'UNB-' || pg_catalog.to_char(pg_catalog.now(), 'YYYY') || '-' || pg_catalog.upper(substring(pg_catalog.replace(gen_random_uuid()::text, '-', ''), 1, 6));
 
     -- Insert order
     INSERT INTO public.orders (

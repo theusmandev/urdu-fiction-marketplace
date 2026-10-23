@@ -160,7 +160,7 @@ BEGIN
     v_writer_share_pkr := v_novel.price_pkr - v_commission_pkr;
 
     -- Generate unique human-readable order number
-    v_order_number := 'ORD-' || pg_catalog.to_char(pg_catalog.now(), 'YYYYMMDD') || '-' || pg_catalog.upper(pg_catalog.substr(pg_catalog.gen_random_uuid()::text, 1, 8));
+    v_order_number := 'ORD-' || pg_catalog.to_char(pg_catalog.now(), 'YYYYMMDD') || '-' || pg_catalog.upper(substr(pg_catalog.gen_random_uuid()::text, 1, 8));
 
     -- Insert order
     INSERT INTO public.orders (

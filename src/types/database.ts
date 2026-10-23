@@ -77,6 +77,7 @@ export interface PlatformSettingsRow {
   default_commission_rate: number;
   default_unpaid_commission_limit: number;
   dispute_window_days: number;
+  max_novel_price_pkr?: number;
   support_email: string;
   updated_at: string;
 }
@@ -128,6 +129,7 @@ export interface GenreRow {
   name_english: string;
   name_urdu: string;
   display_order: number;
+  is_active: boolean;
   created_at: string;
 }
 
@@ -403,6 +405,7 @@ export interface Database {
           name_english: string;
           name_urdu: string;
           display_order?: number;
+          is_active?: boolean;
           created_at?: string;
         };
         Update: Partial<GenreRow>;
@@ -837,18 +840,89 @@ export interface Database {
         Returns: { success: boolean; writer_id: string; status: string };
       };
       approve_novel: {
-        Args: { p_novel_id: string };
+        Args: { p_novel_id: string; p_checklist?: Json | null };
         Returns: { success: boolean; novel_id: string; status: string };
       };
       reject_novel: {
         Args: { p_novel_id: string; p_reason: string };
         Returns: { success: boolean; novel_id: string; status: string };
       };
+      suspend_novel: {
+        Args: { p_novel_id: string; p_reason: string };
+        Returns: { success: boolean; novel_id: string; status: string };
+      };
+      unsuspend_novel: {
+        Args: { p_novel_id: string };
+        Returns: { success: boolean; novel_id: string; status: string };
+      };
+      set_novel_featured: {
+        Args: { p_novel_id: string; p_featured: boolean };
+        Returns: { success: boolean; novel_id: string; is_featured: boolean };
+      };
+      create_genre: {
+        Args: {
+          p_slug?: string | null;
+          p_name_english: string;
+          p_name_urdu: string;
+          p_display_order?: number | null;
+        };
+        Returns: { success: boolean; genre_id: string; slug: string };
+      };
+      update_genre: {
+        Args: {
+          p_genre_id: string;
+          p_name_english: string;
+          p_name_urdu: string;
+          p_slug?: string | null;
+          p_is_active?: boolean | null;
+        };
+        Returns: { success: boolean; genre_id: string };
+      };
+      reorder_genres: {
+        Args: { p_genre_orders: Json };
+        Returns: { success: boolean; updated_count: number };
+      };
+      delete_genre: {
+        Args: { p_genre_id: string };
+        Returns: { success: boolean; deleted_id: string };
+      };
+      update_platform_settings: {
+        Args: {
+          p_default_commission_rate: number;
+          p_default_unpaid_commission_limit: number;
+          p_dispute_window_days: number;
+          p_max_novel_price_pkr: number;
+          p_support_email: string;
+        };
+        Returns: {
+          success: boolean;
+          default_commission_rate: number;
+          default_unpaid_commission_limit: number;
+          dispute_window_days: number;
+          max_novel_price_pkr: number;
+          support_email: string;
+        };
+      };
+      set_writer_commission_terms: {
+        Args: {
+          p_writer_id: string;
+          p_custom_rate?: number | null;
+          p_unpaid_limit?: number | null;
+          p_reason: string;
+        };
+        Returns: {
+          success: boolean;
+          writer_id: string;
+          custom_commission_rate: number | null;
+          unpaid_commission_limit: number;
+        };
+      };
       admin_update_user_role_status: {
         Args: {
           p_user_id: string;
-          p_new_role: UserRole;
+          p_role: UserRole;
           p_is_active: boolean;
+          p_reason: string;
         };
         Returns: {
           success: boolean;
@@ -913,6 +987,90 @@ export interface Database {
           payment_method_id: string;
           is_active: boolean;
         };
+      };
+      submit_novel_for_review: {
+        Args: {
+          p_novel_id: string;
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+          status: string;
+        };
+      };
+      withdraw_novel_submission: {
+        Args: {
+          p_novel_id: string;
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+          status: string;
+        };
+      };
+      unpublish_own_novel: {
+        Args: {
+          p_novel_id: string;
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+          status: string;
+        };
+      };
+      create_novel: {
+        Args: {
+          p_title_urdu: string;
+          p_title_english: string;
+          p_synopsis_urdu: string;
+          p_description_urdu?: string | null;
+          p_cover_url?: string | null;
+          p_cover_public_id?: string | null;
+          p_price_pkr?: number;
+          p_language?: string;
+          p_rights_declaration_accepted?: boolean;
+          p_genre_ids?: string[];
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+          slug: string;
+        };
+      };
+      update_novel: {
+        Args: {
+          p_novel_id: string;
+          p_title_urdu: string;
+          p_title_english: string;
+          p_synopsis_urdu: string;
+          p_description_urdu?: string | null;
+          p_cover_url?: string | null;
+          p_cover_public_id?: string | null;
+          p_price_pkr?: number;
+          p_language?: string;
+          p_genre_ids?: string[];
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+        };
+      };
+      reorder_chapters: {
+        Args: {
+          p_novel_id: string;
+          p_chapter_ids: string[];
+        };
+        Returns: {
+          success: boolean;
+          novel_id: string;
+        };
+      };
+      generate_unique_novel_slug: {
+        Args: {
+          p_title_english: string;
+          p_novel_id: string;
+        };
+        Returns: string;
       };
     };
     Enums: {

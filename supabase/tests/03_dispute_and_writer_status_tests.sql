@@ -61,15 +61,24 @@ BEGIN
     -- FIXTURE SETUP (Run as privileged bootstrap)
     -- --------------------------------------------------------------------------
 
-    -- 1. Profiles
-    INSERT INTO public.profiles (id, email, full_name, username, role, is_active)
-    VALUES 
-        (v_reader_id, 'reader_test@unb.pk', 'Test Reader', 'reader_test_12e', 'reader', true),
-        (v_writer_id, 'writer_test@unb.pk', 'Approved Author', 'author_test_12e', 'writer', true),
-        (v_suspended_id, 'suspended_test@unb.pk', 'Suspended Author', 'suspended_test_12e', 'writer', true),
-        (v_rejected_id, 'rejected_test@unb.pk', 'Rejected Applicant', 'rejected_test_12e', 'reader', true),
-        (v_admin_id, 'admin_test@unb.pk', 'System Admin', 'admin_test_12e', 'admin', true)
-    ON CONFLICT (id) DO UPDATE SET is_active = true, role = EXCLUDED.role;
+    -- 1. Create fake users in auth.users (handle_new_user trigger creates public.profiles rows)
+    INSERT INTO auth.users (
+        id, instance_id, aud, role, email, encrypted_password,
+        email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    ) VALUES 
+        (v_reader_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'reader_test@unb.pk', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_writer_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'writer_test@unb.pk', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_suspended_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'suspended_test@unb.pk', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_rejected_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'rejected_test@unb.pk', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+        (v_admin_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin_test@unb.pk', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now())
+    ON CONFLICT (id) DO NOTHING;
+
+    -- 2. Bootstrap role & username updates as postgres (handle_new_user assigned 'reader')
+    UPDATE public.profiles SET role = 'writer', username = 'author_test_12e', full_name = 'Approved Author' WHERE id = v_writer_id;
+    UPDATE public.profiles SET role = 'writer', username = 'suspended_test_12e', full_name = 'Suspended Author' WHERE id = v_suspended_id;
+    UPDATE public.profiles SET role = 'reader', username = 'rejected_test_12e', full_name = 'Rejected Applicant' WHERE id = v_rejected_id;
+    UPDATE public.profiles SET role = 'admin', username = 'admin_test_12e', full_name = 'System Admin' WHERE id = v_admin_id;
+    UPDATE public.profiles SET username = 'reader_test_12e', full_name = 'Test Reader' WHERE id = v_reader_id;
 
     -- 2. Writer Profiles
     INSERT INTO public.writer_profiles (
@@ -87,17 +96,18 @@ BEGIN
     ON CONFLICT (slug) DO NOTHING;
 
     INSERT INTO public.novels (
-        id, writer_id, slug, title_urdu, title_english, price_pkr, status
+        id, writer_id, slug, title_urdu, title_english, synopsis_urdu, price_pkr, status,
+        rights_declaration_accepted, published_at
     ) VALUES 
-        (v_novel_1_id, v_writer_id, 'novel-dispute-test-1', 'پہلا متنازعہ ناول', 'First Dispute Novel', 750.00, 'published'),
-        (v_novel_2_id, v_writer_id, 'novel-dispute-test-2', 'دوسرا متنازعہ ناول', 'Second Dispute Novel', 950.00, 'published')
+        (v_novel_1_id, v_writer_id, 'novel-dispute-test-1', 'پہلا متنازعہ ناول', 'First Dispute Novel', 'خلاصہ پہلا متنازعہ ناول', 750.00, 'published', true, now()),
+        (v_novel_2_id, v_writer_id, 'novel-dispute-test-2', 'دوسرا متنازعہ ناول', 'Second Dispute Novel', 'خلاصہ دوسرا متنازعہ ناول', 950.00, 'published', true, now())
     ON CONFLICT (slug) DO NOTHING;
 
     -- 4. Writer Direct Payment Method
     INSERT INTO public.writer_payment_methods (
         id, writer_id, method_type, account_title, account_number_or_iban, bank_name, is_active
     ) VALUES (
-        v_method_id, v_writer_id, 'JazzCash', 'Approved Author QC', '03001234567', 'JazzCash', true
+        v_method_id, v_writer_id, 'jazzcash', 'Approved Author QC', '03001234567', 'JazzCash', true
     )
     ON CONFLICT (id) DO UPDATE SET is_active = true;
 
@@ -210,12 +220,14 @@ BEGIN
                 -- Insert expired verified order directly (45 days ago)
                 v_old_order_id := gen_random_uuid();
                 INSERT INTO public.orders (
-                    id, order_number, reader_id, writer_id, novel_id, amount_pkr,
-                    payment_method, applied_commission_rate, calculated_commission_pkr,
+                    id, order_number, reader_id, writer_id, novel_id, novel_title_snapshot,
+                    amount_pkr, selected_payment_method_id, payment_instructions_snapshot,
+                    applied_commission_rate, calculated_commission_pkr,
                     calculated_writer_share_pkr, status, verified_at, created_at, updated_at
                 ) VALUES (
-                    v_old_order_id, 'ORD-OLD-EXPIRED', v_reader_id, v_writer_id, v_novel_2_id, 950.00,
-                    'JazzCash', 20.00, 190.00, 760.00, 'verified',
+                    v_old_order_id, 'ORD-OLD-EXPIRED', v_reader_id, v_writer_id, v_novel_2_id, 'دوسرا متنازعہ ناول',
+                    950.00, v_method_id, jsonb_build_object('method_type', 'jazzcash'),
+                    20.00, 190.00, 760.00, 'verified',
                     now() - interval '45 days', now() - interval '45 days', now() - interval '45 days'
                 );
 
