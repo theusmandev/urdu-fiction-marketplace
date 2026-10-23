@@ -404,4 +404,31 @@ In your local Supabase database or the Supabase SQL Editor:
 | **COM-17** | Platform Payment Instructions Gating | Writer | Access gate for instructions | `get_platform_payment_instructions` returns platform accounts only if writer has an open (`invoiced`, `partially_paid`, `payment_reported`) invoice. Writers without open invoices receive 0 rows. |
 | **COM-18** | Duplicate TID Flagging on Reports | Writer | Audit integrity | Submitting a commission payment report with a TID previously used flags `is_duplicate_tid = true` for administrator inspection. |
 
+---
+
+## 12. Step 5.2 Disputes, Refund Adjustments, Email & Support Matrix (Test Suite 11)
+
+**Test Suite Path**: `supabase/tests/11_disputes_refunds_tests.sql`
+
+| Scenario ID | Tested Operation / RPC | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **DSP-01** | `open_dispute` Wait Cooldown Enforcement | Reader | Minimum wait cooldown rule | Attempting to open a dispute on a `payment_submitted` order before `min_dispute_wait_hours` (default 24h) has elapsed fails with exception (`Dispute wait period has not elapsed...`). |
+| **DSP-02** | `open_dispute` Post-Cooldown Success | Reader | Dispute opening transition | Opening a dispute after `min_dispute_wait_hours` succeeds: order status becomes `disputed`, dispute record is created in `open` status, and author is notified. |
+| **DSP-03** | `open_dispute` Dispute Window Expiration | Reader | Dispute window expiry | Attempting to open a dispute on a verified order older than `dispute_window_days` (default 30d) fails with exception (`Dispute window expired`). |
+| **DSP-04** | Dispute Thread Tenant Isolation | Stranger, Reader, Writer | Multi-tenant thread isolation | A stranger querying `get_dispute` or calling `add_dispute_message` on another user's dispute is rejected with access denied exception. |
+| **DSP-05** | Dispute Message Hourly Rate Limiting | Reader | Anti-spam protection | Exceeding 20 messages per hour on a single dispute thread triggers database rate limit exception (`Rate limit exceeded: You cannot send more than 20 messages per hour.`). |
+| **DSP-06** | Admin Ruling A: Verify for Reader | Admin | Single entitlement & ledger row | `resolve_dispute_for_reader_verify` executes force-verify, writes `sale_verified` ledger entry, creates purchase entitlement, and marks dispute `resolved_for_reader`. Calling a second time fails safely. |
+| **DSP-07** | Admin Ruling B: Refund Adjustment | Admin | Append-only negative ledger adjustment | `resolve_dispute_refund` creates exactly one negative `refund_adjustment` row in `sales_ledger`, revokes reader entitlement, and marks order `refunded_adjusted`. Calling a second time fails safely. |
+| **DSP-08** | Interleaved Verify & Refund Safety | Admin | State transition safety | Attempting to refund an unverified order or re-verify an already refunded order fails safely without creating inconsistent ledger records. |
+| **DSP-09** | Admin Ruling C: Resolve for Writer | Admin | Zero financial mutation | `resolve_dispute_for_writer` marks dispute `resolved_for_writer` and leaves order rejected without creating any ledger entries or entitlements. |
+| **DSP-10** | Single Pending Refund Request Rule | Writer | Duplicate refund block | Attempting to submit a second refund request for an order that already has an active pending request is rejected (`A pending refund request already exists...`). |
+| **DSP-11** | Refund Billing & Commission Deduction | Admin | Lines invoicing reconciliation | A negative `refund_adjustment` ledger entry on an already-invoiced order appears as a negative deduction on the subsequent invoice and properly reconciles the writer's balance. |
+| **DSP-12** | Non-Admin Refund Approval Block | Reader, Writer | Administrative role boundary | A reader or author attempting to call `approve_refund_request` or `reject_refund_request` is rejected with access denied exception (`Restricted: Administrators only.`). |
+| **DSP-13** | Support Ticket Isolation & Daily Limit | User, Stranger | Privacy & rate limiting | Users can only inspect their own support tickets. Attempting to submit more than 5 support tickets in a 24-hour period raises rate limit exception. |
+| **DSP-14** | Email Non-Sensitive Invariant | System | Privacy & security invariant | Transaction outbox email messages never contain bank account numbers, IBANs, raw TIDs, or emails of other users. |
+| **DSP-15** | Notification Preferences Delivery Gate | User | User opt-out vs critical notices | Users with `email_enabled = false` skip optional notification emails, but continue receiving critical notices (disputes, verification, invoices, editorial decisions). |
+| **DSP-16** | Scheduled Reminders Idempotency | System | Deduplication key | Executing `run_scheduled_reminders` twice within the reminder interval enqueues reminders once via idempotent `dedupe_key`. |
+| **DSP-17** | Anonymous RPC Access Lockdown | Anon | Public API hardening | Anonymous callers attempting to execute any dispute, refund, support, or outbox RPC are rejected with error 42501 (permission denied). |
+
+
 

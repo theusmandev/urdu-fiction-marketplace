@@ -311,8 +311,30 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('commission_invoice_lines', 'platform_payment_methods', 'commission_payment_reports');
     SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_name IN ('preview_commission_invoice', 'generate_commission_invoice', 'confirm_commission_settlement', 'report_commission_payment', 'record_commission_adjustment', 'apply_overdue_rules');
     ```
-    Confirm all 3 tables and RPCs exist.
   - Execute automated test suite: `supabase/tests/10_commission_tests.sql`.
+
+### 18. `supabase/migrations/0018_disputes_refunds_support.sql` [DISPUTES, REFUNDS, EMAIL NOTIFICATIONS, REMINDERS, SUPPORT]
+- **Purpose**: Implements Step 5.2 disputes adjudication, off-platform refund adjustments, transactional outbox email delivery, background reminders, customer support desk, and user notification preferences:
+  - `platform_settings`: Adds `min_dispute_wait_hours integer NOT NULL DEFAULT 24` and `verification_reminder_hours integer NOT NULL DEFAULT 12`.
+  - Table `dispute_messages`: `(id, dispute_id, author_id, body, attachment_path, created_at)` with rate limiting (max 20 messages/hour).
+  - Table `refund_requests`: `(id, order_id, requester_id, requester_role, reason, evidence_note, evidence_path, status, admin_note, reviewed_by, reviewed_at, created_at)`.
+  - Table `support_requests`: `(id, user_id, category, subject, status, order_id, created_at, updated_at)` and `support_messages` (max 5 tickets/day rate limit).
+  - Table `notification_preferences`: `(user_id, email_enabled, updated_at)`.
+  - Table `email_outbox`: Transactional outbox `(id, recipient_email, recipient_name, template, subject, body_text, body_html, metadata, status, attempts, max_attempts, last_error, sent_at, created_at)`.
+  - Atomic Security Definer RPCs:
+    - Disputes: `open_dispute`, `add_dispute_message`, `resolve_dispute_for_reader_verify`, `resolve_dispute_refund`, `resolve_dispute_for_writer`, `close_dispute`, `get_my_disputes`, `get_dispute`, `admin_list_disputes`.
+    - Refunds: `request_refund`, `approve_refund_request`, `reject_refund_request`, `admin_list_refund_requests`.
+    - Support: `create_support_request`, `add_support_message`, `close_support_request`, `get_my_support_requests`, `get_support_request`, `admin_list_support_requests`.
+    - Schedulers & Outbox: `run_scheduled_reminders`, `claim_pending_emails_for_sending`, `record_email_delivery_result`, `get_email_outbox_stats`, `retry_failed_emails`, `get_my_notification_preferences`, `update_notification_preferences`.
+- **Action**: Paste contents of `supabase/migrations/0018_disputes_refunds_support.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('dispute_messages', 'refund_requests', 'support_requests', 'support_messages', 'notification_preferences', 'email_outbox');
+    SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_name IN ('open_dispute', 'resolve_dispute_for_reader_verify', 'resolve_dispute_refund', 'request_refund', 'approve_refund_request', 'run_scheduled_reminders', 'claim_pending_emails_for_sending');
+    ```
+    Confirm all 6 tables and RPCs exist.
+  - Execute automated test suite: `supabase/tests/11_disputes_refunds_tests.sql`.
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
@@ -394,16 +416,35 @@ Configure the authentication provider, redirect URLs, and security controls in *
 2. Populate the required keys:
    - `NEXT_PUBLIC_SUPABASE_URL`: From **Supabase Dashboard -> Project Settings -> API -> Project URL**.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: From **Supabase Dashboard -> Project Settings -> API -> Project API Keys (anon/public)**.
-   - `SUPABASE_SERVICE_ROLE_KEY`: Reserved for future offline maintenance; strictly NOT used in Step 1.3 application code.
-   - `NEXT_PUBLIC_APP_URL`: Defaults to `http://localhost:3000`.
-   - Note: Cloudinary environment variables are **prohibited** in Step 1.3. Supabase Storage is the authoritative storage engine.
+   - `SUPABASE_SERVICE_ROLE_KEY`: Server-only administrative key. **Strictly used ONLY by the background cron worker (`src/lib/supabase/cron-client.ts`)** to claim pending outbox emails and record delivery results. Never bundled or exposed in browser JavaScript.
+   - `NEXT_PUBLIC_APP_URL`: Application URL (defaults to `http://localhost:3000`).
+   - `CRON_SECRET`: Secret 32+ character bearer token for constant-time authentication of scheduled cron endpoints (`/api/cron/send-emails` and `/api/cron/reminders`).
+   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`: SMTP server connection details for transactional outbox dispatch. (If omitted in local development, Nodemailer runs in safe dry-run mode without failing).
+   - `EMAIL_FROM`: Default sender address (e.g., `UNB Premium <noreply@unbpremium.pk>`).
 
 ---
 
 ## Stage 5: Verification & Test Execution
 
-Run the SQL test suite in `supabase/tests/` to validate all security policies and financial ledger mechanics:
-1. Review `docs/RLS_TEST_PLAN.md` for the test matrix covering Reader, Writer A, Writer B, and Admin.
-2. Execute `supabase/tests/01_security_and_financial_hardening_tests.sql` in the Supabase SQL Editor.
-3. Confirm that all test assertions return `SUCCESS` or expected exception triggers.
-4. Run `npm run build` locally to verify 100% TypeScript type compilation.
+Run the SQL test suites and automated Jest/Node test runners to validate security policies, business rules, and financial ledger integrity:
+1. Review `docs/RLS_TEST_PLAN.md` for the comprehensive multi-tenant test matrix.
+2. Execute all sequential SQL tests in the Supabase SQL Editor:
+   - `supabase/tests/01_security_and_financial_hardening_tests.sql`
+   - `supabase/tests/02_gap_fixes_tests.sql`
+   - `supabase/tests/03_dispute_and_writer_status_tests.sql`
+   - `supabase/tests/04_writer_content_tests.sql`
+   - `supabase/tests/05_admin_controls_tests.sql`
+   - `supabase/tests/06_public_catalog_tests.sql`
+   - `supabase/tests/07_min_price_tests.sql`
+   - `supabase/tests/08_checkout_tests.sql`
+   - `supabase/tests/09_reader_access_tests.sql`
+   - `supabase/tests/10_commission_tests.sql`
+   - `supabase/tests/11_disputes_refunds_tests.sql` (Validates disputes, refund adjustments, support tickets, and outbox rules)
+3. Run automated Node.js unit tests:
+   ```bash
+   npm test
+   ```
+4. Run full production build verification:
+   ```bash
+   npm run build
+   ```
