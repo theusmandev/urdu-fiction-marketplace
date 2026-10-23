@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { UrduText } from "@/components/urdu/UrduText";
-import { formatPKR } from "@/lib/utils";
+import { formatPKR, resolveCoverUrl } from "@/lib/utils";
 import type { PublicNovel } from "@/types/database";
 import { Sparkles, BookOpen, Feather } from "lucide-react";
 
@@ -25,9 +25,9 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
         <div className="absolute inset-y-0 left-3 w-px bg-white/20 z-10 pointer-events-none" />
 
         {/* Real Cover Image or Curated Calligraphic Fallback */}
-        {novel.cover_url ? (
+        {resolveCoverUrl(novel.cover_url) ? (
           <Image
-            src={novel.cover_url}
+            src={resolveCoverUrl(novel.cover_url)!}
             alt={novel.title_english || novel.title_urdu}
             fill
             priority={priority}
