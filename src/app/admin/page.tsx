@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
+import { getOutboxStatsAction } from '@/app/actions/admin-disputes';
+import { EmailOutboxCard } from '@/components/admin/EmailOutboxCard';
+import type { EmailOutboxStats } from '@/types/database';
 import {
   Users,
   Feather,
@@ -13,6 +16,9 @@ import {
   CheckCircle2,
   ChevronRight,
   Flame,
+  Scale,
+  RotateCcw,
+  LifeBuoy,
 } from 'lucide-react';
 
 function getTwentyFourHoursAgoIso(): string {
@@ -34,6 +40,9 @@ export default async function AdminDashboardPage() {
     { count: publishedNovelsCount },
     { count: pendingReportsCount },
     { count: overdueInvoicesCount },
+    { count: pendingRefundsCount },
+    { count: openSupportTicketsCount },
+    outboxStatsRes,
   ] = await Promise.all([
     supabase.from('writer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending_approval'),
     supabase.from('novels').select('id', { count: 'exact', head: true }).eq('status', 'under_review'),
@@ -46,7 +55,17 @@ export default async function AdminDashboardPage() {
       .select('id', { count: 'exact', head: true })
       .in('status', ['invoiced', 'partially_paid', 'payment_reported'])
       .lt('due_date', new Date().toISOString()),
+    supabase.from('refund_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('support_requests').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+    getOutboxStatsAction(),
   ]);
+
+  const outboxStats: EmailOutboxStats = (outboxStatsRes.success && outboxStatsRes.data) ? outboxStatsRes.data : {
+    pending_count: 0,
+    sent_count: 0,
+    failed_count: 0,
+    skipped_count: 0,
+  };
 
   // 2. Fetch queue items
   // 2a. Pending Writer Applications
@@ -176,71 +195,104 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Top Queues Metrics Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
         {/* Pending Writers */}
         <Link
           href="/admin/writers?status=pending_approval"
-          className="bg-slate-950/50 border border-slate-800 hover:border-amber-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+          className="bg-slate-950/50 border border-slate-800 hover:border-amber-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
         >
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Writer Apps</span>
+            <span>Writers</span>
             <Feather className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-amber-400 font-mono">
+          <div className="text-xl font-bold text-amber-400 font-mono">
             {pendingWritersCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Awaiting approval</p>
+          <p className="text-[10px] text-slate-500">Awaiting app</p>
         </Link>
 
         {/* Novels Under Review */}
         <Link
           href="/admin/novels?status=under_review"
-          className="bg-slate-950/50 border border-slate-800 hover:border-rose-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+          className="bg-slate-950/50 border border-slate-800 hover:border-rose-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
         >
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Under Review</span>
+            <span>Novels</span>
             <BookOpen className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-rose-400 font-mono">
+          <div className="text-xl font-bold text-rose-400 font-mono">
             {underReviewNovelsCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Novel manuscripts</p>
+          <p className="text-[10px] text-slate-500">{publishedNovelsCount ?? 0} live</p>
         </Link>
 
         {/* Open Disputes */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Open Disputes</span>
-            <AlertTriangle className="w-4 h-4 text-orange-400" />
-          </div>
-          <div className="text-2xl font-bold text-orange-400 font-mono">
-            {openDisputesCount ?? 0}
-          </div>
-          <p className="text-[10px] text-slate-500">Reader complaints</p>
-        </div>
-
-        {/* Overdue Orders */}
         <Link
-          href="/admin/orders?stuck=true"
-          className="bg-slate-950/50 border border-slate-800 hover:border-yellow-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+          href="/admin/disputes"
+          className="bg-slate-950/50 border border-slate-800 hover:border-orange-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
         >
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Delayed Verif.</span>
+            <span>Disputes</span>
+            <Scale className="w-4 h-4 text-orange-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-xl font-bold text-orange-400 font-mono">
+            {openDisputesCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Open/Review</p>
+        </Link>
+
+        {/* Pending Refunds */}
+        <Link
+          href="/admin/refunds"
+          className="bg-slate-950/50 border border-slate-800 hover:border-sky-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Refunds</span>
+            <RotateCcw className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-xl font-bold text-sky-400 font-mono">
+            {pendingRefundsCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Pending review</p>
+        </Link>
+
+        {/* Open Support Tickets */}
+        <Link
+          href="/admin/support"
+          className="bg-slate-950/50 border border-slate-800 hover:border-purple-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Support</span>
+            <LifeBuoy className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-xl font-bold text-purple-400 font-mono">
+            {openSupportTicketsCount ?? 0}
+          </div>
+          <p className="text-[10px] text-slate-500">Open inquiries</p>
+        </Link>
+
+        {/* Delayed Verifications */}
+        <Link
+          href="/admin/orders?stuck=true"
+          className="bg-slate-950/50 border border-slate-800 hover:border-yellow-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+        >
+          <div className="flex items-center justify-between text-slate-400 text-xs">
+            <span>Delayed</span>
             <Clock className="w-4 h-4 text-yellow-400 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-yellow-400 font-mono">
+          <div className="text-xl font-bold text-yellow-400 font-mono">
             {overdueOrdersCount ?? 0}
           </div>
           <p className="text-[10px] text-slate-500">&gt; 24h unverified</p>
         </Link>
 
         {/* Commission Capped Writers */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-1">
+        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Near/Over Limit</span>
-            <Flame className="w-4 h-4 text-purple-400" />
+            <span>Near Limit</span>
+            <Flame className="w-4 h-4 text-rose-400" />
           </div>
-          <div className="text-2xl font-bold text-purple-400 font-mono">
+          <div className="text-xl font-bold text-rose-400 font-mono">
             {atRiskWriters.length}
           </div>
           <p className="text-[10px] text-slate-500">&gt; 80% or paused</p>
@@ -249,16 +301,16 @@ export default async function AdminDashboardPage() {
         {/* Total Accounts */}
         <Link
           href="/admin/users"
-          className="bg-slate-950/50 border border-slate-800 hover:border-slate-700 rounded-xl p-4 space-y-1 transition-colors block group"
+          className="bg-slate-950/50 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 space-y-1 transition-colors block group"
         >
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Total Users</span>
+            <span>Users</span>
             <Users className="w-4 h-4 text-slate-400 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-white font-mono">
+          <div className="text-xl font-bold text-slate-200 font-mono">
             {totalUsersCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">{publishedNovelsCount ?? 0} novels live</p>
+          <p className="text-[10px] text-slate-500">Total registered</p>
         </Link>
       </div>
 
@@ -543,6 +595,9 @@ export default async function AdminDashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Email Outbox Health & Dispatch Card */}
+      <EmailOutboxCard stats={outboxStats} />
 
       {/* Recent Security & Financial Audit Logs Strip */}
       <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">

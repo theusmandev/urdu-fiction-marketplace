@@ -15,12 +15,18 @@ import {
   ShoppingBag,
   Receipt,
   DollarSign,
+  Scale,
+  RotateCcw,
+  LifeBuoy,
 } from 'lucide-react';
 import { logoutUser } from '@/app/actions/auth';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+  { href: '/admin/disputes', label: 'Disputes', icon: Scale },
+  { href: '/admin/refunds', label: 'Refunds', icon: RotateCcw },
+  { href: '/admin/support', label: 'Support', icon: LifeBuoy },
   { href: '/admin/commission', label: 'Commission', icon: DollarSign },
   { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
   { href: '/admin/writers', label: 'Writers', icon: Feather },
