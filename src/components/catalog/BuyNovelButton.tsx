@@ -1,10 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { formatPKR } from "@/lib/utils";
-import type { HeaderSessionUser } from "@/components/layout/public-header-client";
-import { ShoppingBag, Lock, Sparkles, AlertCircle } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { formatPKR } from '@/lib/utils';
+import { getNovelPurchaseStatusAction } from '@/app/actions/checkout';
+import {
+  ShoppingBag,
+  Lock,
+  AlertCircle,
+  Clock,
+  BookOpen,
+  ArrowRight,
+  Loader2,
+} from 'lucide-react';
 
 interface BuyNovelButtonProps {
   novelId: string;
@@ -17,16 +25,25 @@ export function BuyNovelButton({
   novelSlug,
   pricePkr,
 }: BuyNovelButtonProps) {
-  const [user, setUser] = useState<HeaderSessionUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<{
+    signedIn: boolean;
+    isOwnNovel: boolean;
+    isOwned: boolean;
+    openOrderNumber: string | null;
+  }>({
+    signedIn: false,
+    isOwnNovel: false,
+    isOwned: false,
+    openOrderNumber: null,
+  });
 
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/auth/session")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
+    getNovelPurchaseStatusAction(novelId)
+      .then((res) => {
         if (isMounted) {
-          setUser(data?.user ?? null);
+          setStatus(res);
           setLoading(false);
         }
       })
@@ -37,22 +54,58 @@ export function BuyNovelButton({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [novelId]);
 
-  const isFree = pricePkr === 0;
+  const isUnavailable = pricePkr < 50;
 
-  // Signed out state: Link to login with return redirect
-  if (!loading && !user) {
+  // 1. Unavailable state if price is below platform minimum (PKR 50)
+  if (isUnavailable) {
+    return (
+      <div className="space-y-2" data-novel-id={novelId}>
+        <button
+          type="button"
+          disabled
+          className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-400 font-semibold py-3.5 px-6 rounded-xl cursor-not-allowed text-sm border border-slate-200"
+        >
+          <Lock className="w-4 h-4 text-slate-400" />
+          <span>Unavailable / دستیاب نہیں</span>
+        </button>
+        <div className="flex items-start gap-1.5 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-[11px] text-rose-800">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <span>
+            This novel is currently unavailable for purchase (pending pricing adjustment by author).
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Loading Skeleton state
+  if (loading) {
+    return (
+      <div className="space-y-2" data-novel-id={novelId}>
+        <button
+          type="button"
+          disabled
+          className="w-full flex items-center justify-center gap-2 bg-stone-900 text-stone-400 font-semibold py-3.5 px-6 rounded-xl text-sm border border-stone-800 animate-pulse"
+        >
+          <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+          <span>Checking availability...</span>
+        </button>
+      </div>
+    );
+  }
+
+  // 3. Signed-out state
+  if (!status.signedIn) {
     return (
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/login?next=${encodeURIComponent(`/novels/${novelSlug}`)}`}
-          className="w-full flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm group"
+          className="w-full flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
         >
           <ShoppingBag className="w-4 h-4 text-accent" />
-          <span>
-            {isFree ? "Sign In to Read Free" : `Sign In to Buy (${formatPKR(pricePkr)})`}
-          </span>
+          <span>Sign In to Buy ({formatPKR(pricePkr)})</span>
         </Link>
         <p className="text-[11px] text-center text-secondary">
           You need a reader account to save this novel in your library.
@@ -61,45 +114,82 @@ export function BuyNovelButton({
     );
   }
 
-  // Free novel state
-  if (isFree) {
+  // 4. Author of their own novel
+  if (status.isOwnNovel) {
     return (
       <div className="space-y-2" data-novel-id={novelId}>
-        <button
-          type="button"
-          disabled
-          className="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white font-semibold py-3.5 px-6 rounded-xl shadow-md opacity-90 cursor-default text-sm"
+        <Link
+          href={`/read/${novelSlug}/1`}
+          className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-md cursor-pointer"
         >
-          <Sparkles className="w-4 h-4" />
-          <span>Free Novel — 1-Click Enrollment in Step 4.2</span>
-        </button>
+          <BookOpen className="w-4 h-4" />
+          <span>Read Novel (Author View)</span>
+        </Link>
         <p className="text-[11px] text-center text-secondary">
-          Instant library enrollment for free novels will be active in release 4.2.
-          You can read free preview chapters immediately below.
+          Manage this book in your{' '}
+          <Link href="/writer/novels" className="text-navy font-semibold underline">
+            Writer Studio
+          </Link>
+          .
         </p>
       </div>
     );
   }
 
-  // Signed in paid novel state (Disabled until Step 4.1 checkout is built)
+  // 5. Already owns the novel
+  if (status.isOwned) {
+    return (
+      <div className="space-y-2" data-novel-id={novelId}>
+        <Link
+          href={`/read/${novelSlug}/1`}
+          className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
+        >
+          <BookOpen className="w-4 h-4" />
+          <span>Read Novel / ناول پڑھیں</span>
+        </Link>
+        <p className="text-[11px] text-center text-emerald-700 font-medium">
+          Full novel access unlocked. Access anytime in your{' '}
+          <Link href="/library" className="underline font-bold">
+            library
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
+
+  // 6. Open order in progress
+  if (status.openOrderNumber) {
+    return (
+      <div className="space-y-2" data-novel-id={novelId}>
+        <Link
+          href={`/orders/${status.openOrderNumber}`}
+          className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
+        >
+          <Clock className="w-4 h-4" />
+          <span>View Your Order ({status.openOrderNumber})</span>
+        </Link>
+        <p className="text-[11px] text-center text-secondary">
+          You have an active or pending order for this novel. Click to view instructions.
+        </p>
+      </div>
+    );
+  }
+
+  // 7. Ready to Checkout
   return (
     <div className="space-y-2" data-novel-id={novelId}>
-      <button
-        type="button"
-        disabled
-        className="w-full flex items-center justify-center gap-2 bg-slate-200 text-slate-500 font-semibold py-3.5 px-6 rounded-xl cursor-not-allowed text-sm border border-slate-300"
+      <Link
+        href={`/checkout/${novelSlug}`}
+        className="w-full flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
       >
-        <Lock className="w-4 h-4" />
-        <span>Checkout opens in release 4.1</span>
-      </button>
-
-      <div className="flex items-start gap-1.5 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-800">
-        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <span>
-          Direct JazzCash / EasyPaisa / Bank checkout opens in Step 4.1. No orders
-          are taken until the direct payment verification pipeline is connected.
-        </span>
-      </div>
+        <ShoppingBag className="w-4 h-4 text-accent" />
+        <span>Buy Now ({formatPKR(pricePkr)})</span>
+        <ArrowRight className="w-4 h-4 text-accent transition-transform group-hover:translate-x-1" />
+      </Link>
+      <p className="text-[11px] text-center text-secondary">
+        Direct writer bank/wallet transfer with receipt verification.
+      </p>
     </div>
   );
 }

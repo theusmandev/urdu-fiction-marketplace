@@ -22,6 +22,7 @@ import {
   User as UserIcon,
   LogOut,
   Loader2,
+  Bell,
 } from "lucide-react";
 
 export interface HeaderSessionUser {
@@ -33,6 +34,7 @@ export interface HeaderSessionUser {
   role: UserRole;
   isWriter: boolean;
   writerStatus: WriterStatus | null;
+  unreadNotificationsCount?: number;
 }
 
 export interface PublicHeaderClientProps {
@@ -297,10 +299,25 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
           </nav>
 
           {/* Desktop Auth / Session Menu Area */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2">
             {user ? (
-              /* Signed-in Account Dropdown */
-              <div className="relative" ref={accountDropdownRef}>
+              <>
+                {/* Notification Bell */}
+                <Link
+                  href="/notifications"
+                  className="relative p-2 rounded-full text-secondary hover:text-navy hover:bg-ivory transition-colors cursor-pointer"
+                  aria-label="Notifications"
+                >
+                  <Bell className="w-5 h-5" />
+                  {(user.unreadNotificationsCount ?? 0) > 0 && (
+                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-stone-950">
+                      {(user.unreadNotificationsCount ?? 0) > 9 ? "9+" : user.unreadNotificationsCount}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Signed-in Account Dropdown */}
+                <div className="relative" ref={accountDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setAccountDropdownOpen((prev) => !prev)}
@@ -412,6 +429,22 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                       )}
 
                       <Link
+                        href="/notifications"
+                        onClick={() => setAccountDropdownOpen(false)}
+                        className="flex items-center justify-between px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Bell className="w-4 h-4 text-secondary shrink-0" />
+                          <span>Notifications</span>
+                        </div>
+                        {(user.unreadNotificationsCount ?? 0) > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700">
+                            {user.unreadNotificationsCount}
+                          </span>
+                        )}
+                      </Link>
+
+                      <Link
                         href="/library"
                         onClick={() => setAccountDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
@@ -461,7 +494,8 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                   </div>
                 )}
               </div>
-            ) : (
+            </>
+          ) : (
               /* Signed-out CTAs */
               <>
                 <Link
