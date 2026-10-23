@@ -153,7 +153,7 @@ BEGIN
         v_order_ver, v_writer_id, v_reader_id, v_novel_id, 'sale_verified', 500.00,
         20.00, 100.00, 400.00, now() - interval '2 days'
     );
-    INSERT INTO public.purchase_entitlements (reader_id, novel_id, order_id, created_at)
+    INSERT INTO public.purchase_entitlements (reader_id, novel_id, order_id, granted_at)
     VALUES (v_reader_id, v_novel_id, v_order_ver, now() - interval '2 days');
 
     -- 4. v_order_oldver: verified 35 days ago (outside 30-day dispute window)

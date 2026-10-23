@@ -144,46 +144,46 @@ BEGIN
     -- 6. Create chapters for Novel 1
     -- Chapter 1: Free preview (published)
     INSERT INTO public.chapters (
-        id, novel_id, chapter_number, title_english, title_urdu,
+        id, novel_id, chapter_number, title_urdu,
         content_urdu, word_count, is_free_preview, is_published, published_at, created_at, updated_at
     ) VALUES (
-        v_chap_free_id, v_novel_1_id, 1, 'Chapter 1: Free Preview', 'باب ۱: مفت نمونہ',
+        v_chap_free_id, v_novel_1_id, 1, 'باب ۱: مفت نمونہ',
         'یہ مفت پیش منظر کا باب ہے۔ تمام قارئین پڑھ سکتے ہیں۔', 12, true, true, now(), now(), now()
     );
 
     -- Chapter 2: Paid (published)
     INSERT INTO public.chapters (
-        id, novel_id, chapter_number, title_english, title_urdu,
+        id, novel_id, chapter_number, title_urdu,
         content_urdu, word_count, is_free_preview, is_published, published_at, created_at, updated_at
     ) VALUES (
-        v_chap_paid_1_id, v_novel_1_id, 2, 'Chapter 2: Secret Paid', 'باب ۲: خفیہ خریدا ہوا',
+        v_chap_paid_1_id, v_novel_1_id, 2, 'باب ۲: خفیہ خریدا ہوا',
         'یہ صرف خریداروں کے لیے خفیہ باب نمبر دو کا مکمل مواد ہے۔', 14, false, true, now(), now(), now()
     );
 
     -- Chapter 3: Paid (published)
     INSERT INTO public.chapters (
-        id, novel_id, chapter_number, title_english, title_urdu,
+        id, novel_id, chapter_number, title_urdu,
         content_urdu, word_count, is_free_preview, is_published, published_at, created_at, updated_at
     ) VALUES (
-        v_chap_paid_2_id, v_novel_1_id, 3, 'Chapter 3: Secret Paid', 'باب ۳: خفیہ خریدا ہوا',
+        v_chap_paid_2_id, v_novel_1_id, 3, 'باب ۳: خفیہ خریدا ہوا',
         'یہ خفیہ باب نمبر تین کا مواد ہے۔', 8, false, true, now(), now(), now()
     );
 
     -- Chapter 4: Unpublished (draft)
     INSERT INTO public.chapters (
-        id, novel_id, chapter_number, title_english, title_urdu,
+        id, novel_id, chapter_number, title_urdu,
         content_urdu, word_count, is_free_preview, is_published, published_at, created_at, updated_at
     ) VALUES (
-        v_chap_unpub_id, v_novel_1_id, 4, 'Chapter 4: Draft Secret', 'باب ۴: غیر شائع شدہ مسودہ',
+        v_chap_unpub_id, v_novel_1_id, 4, 'باب ۴: غیر شائع شدہ مسودہ',
         'یہ مسودہ ابھی شائع نہیں ہوا ہے۔ خریدار بھی نہیں دیکھ سکتے۔', 13, false, false, NULL, now(), now()
     );
 
     -- Chapter for Suspended Novel: Paid (published)
     INSERT INTO public.chapters (
-        id, novel_id, chapter_number, title_english, title_urdu,
+        id, novel_id, chapter_number, title_urdu,
         content_urdu, word_count, is_free_preview, is_published, published_at, created_at, updated_at
     ) VALUES (
-        v_chap_susp_id, v_novel_susp_id, 1, 'Chapter 1 Suspended', 'معطل ناول کا باب ۱',
+        v_chap_susp_id, v_novel_susp_id, 1, 'معطل ناول کا باب ۱',
         'اگرچہ ناول معطل ہے مگر پہلے سے خریدار اسے پڑھ سکتے ہیں۔', 12, false, true, now(), now(), now()
     );
 
