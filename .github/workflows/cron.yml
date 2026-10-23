@@ -1,0 +1,44 @@
+name: Platform Automated Schedulers
+
+on:
+  schedule:
+    # Run every 5 minutes for transaction outbox email delivery
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      trigger_reminders:
+        description: 'Also execute hourly payment and invoice reminders'
+        type: boolean
+        default: true
+
+jobs:
+  cron-worker:
+    name: Execute Cron Endpoints
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Outbox Emails
+        run: |
+          echo "Triggering /api/cron/send-emails..."
+          STATUS=$(curl -s -o /tmp/email_response.json -w "%{http_code}" -X POST "${{ secrets.APP_URL }}/api/cron/send-emails" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          echo "Status: $STATUS"
+          cat /tmp/email_response.json
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Error: Email cron failed with status $STATUS"
+            exit 1
+          fi
+
+      - name: Run Periodic Reminders
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.trigger_reminders || github.event.schedule == '0 * * * *' }}
+        run: |
+          echo "Triggering /api/cron/reminders..."
+          STATUS=$(curl -s -o /tmp/reminder_response.json -w "%{http_code}" -X POST "${{ secrets.APP_URL }}/api/cron/reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          echo "Status: $STATUS"
+          cat /tmp/reminder_response.json
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Error: Reminders cron failed with status $STATUS"
+            exit 1
+          fi
