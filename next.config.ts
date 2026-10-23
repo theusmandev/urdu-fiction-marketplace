@@ -7,8 +7,12 @@ const scriptSrc = isDev
   : "'self' 'unsafe-inline'";
 
 const connectSrc = isDev
-  ? "'self' https://*.supabase.co wss://*.supabase.co ws: wss:"
-  : "'self' https://*.supabase.co wss://*.supabase.co";
+  ? "'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.in wss://*.supabase.in http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* ws: wss:"
+  : "'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.in wss://*.supabase.in";
+
+const imgSrc = isDev
+  ? "'self' blob: data: https://*.supabase.co https://*.supabase.in http://127.0.0.1:* http://localhost:*"
+  : "'self' blob: data: https://*.supabase.co https://*.supabase.in";
 
 const upgradeInsecureRequests = isDev ? "" : "upgrade-insecure-requests;";
 
@@ -16,7 +20,7 @@ const cspHeader = `
     default-src 'self';
     script-src ${scriptSrc};
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    img-src 'self' blob: data: https://*.supabase.co;
+    img-src ${imgSrc};
     font-src 'self' https://fonts.gstatic.com data:;
     connect-src ${connectSrc};
     object-src 'none';
@@ -29,6 +33,26 @@ const cspHeader = `
   .trim();
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.supabase.in',
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
+  },
   turbopack: {
     rules: {
       "*.css": {
