@@ -364,7 +364,11 @@ export async function adminUpdatePlatformSettingsAction(formData: {
   defaultCommissionRate: number;
   defaultUnpaidCommissionLimit: number;
   disputeWindowDays: number;
+  minNovelPricePkr: number;
   maxNovelPricePkr: number;
+  maxOrdersPerHour?: number;
+  maxChapterReadsPerWindow?: number;
+  chapterReadWindowMinutes?: number;
   supportEmail: string;
 }): Promise<ActionResult> {
   await requireRole('admin', '/admin');
@@ -378,8 +382,12 @@ export async function adminUpdatePlatformSettingsAction(formData: {
     p_default_commission_rate: parsed.data.defaultCommissionRate,
     p_default_unpaid_commission_limit: parsed.data.defaultUnpaidCommissionLimit,
     p_dispute_window_days: parsed.data.disputeWindowDays,
+    p_min_novel_price_pkr: parsed.data.minNovelPricePkr,
     p_max_novel_price_pkr: parsed.data.maxNovelPricePkr,
     p_support_email: parsed.data.supportEmail,
+    p_max_orders_per_hour: parsed.data.maxOrdersPerHour,
+    p_max_chapter_reads_per_window: parsed.data.maxChapterReadsPerWindow,
+    p_chapter_read_window_minutes: parsed.data.chapterReadWindowMinutes,
   });
 
   if (error) {

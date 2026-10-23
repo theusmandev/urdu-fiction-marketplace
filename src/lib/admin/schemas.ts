@@ -48,24 +48,52 @@ export const updateGenreSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export const platformSettingsSchema = z.object({
-  defaultCommissionRate: z.coerce
-    .number()
-    .min(0, 'Commission rate cannot be less than 0%')
-    .max(100, 'Commission rate cannot exceed 100%'),
-  defaultUnpaidCommissionLimit: z.coerce
-    .number()
-    .min(0, 'Unpaid commission threshold cannot be negative'),
-  disputeWindowDays: z.coerce
-    .number()
-    .int('Dispute window must be whole days')
-    .min(1, 'Dispute window must be at least 1 day')
-    .max(365, 'Dispute window cannot exceed 365 days'),
-  maxNovelPricePkr: z.coerce
-    .number()
-    .min(1, 'Maximum novel price must be greater than 0 PKR'),
-  supportEmail: z.string().trim().email('Please enter a valid support email address'),
-});
+export const platformSettingsSchema = z
+  .object({
+    defaultCommissionRate: z.coerce
+      .number()
+      .min(0, 'Commission rate cannot be less than 0%')
+      .max(100, 'Commission rate cannot exceed 100%'),
+    defaultUnpaidCommissionLimit: z.coerce
+      .number()
+      .min(0, 'Unpaid commission threshold cannot be negative'),
+    disputeWindowDays: z.coerce
+      .number()
+      .int('Dispute window must be whole days')
+      .min(1, 'Dispute window must be at least 1 day')
+      .max(365, 'Dispute window cannot exceed 365 days'),
+    minNovelPricePkr: z.coerce
+      .number()
+      .int('Minimum novel price must be a whole rupee amount')
+      .min(1, 'Minimum novel price must be at least 1 PKR'),
+    maxNovelPricePkr: z.coerce
+      .number()
+      .int('Maximum novel price must be a whole rupee amount')
+      .min(1, 'Maximum novel price must be greater than 0 PKR'),
+    maxOrdersPerHour: z.coerce
+      .number()
+      .int('Max orders per hour must be a whole number')
+      .min(1, 'Max orders per hour must be at least 1')
+      .max(100, 'Max orders per hour cannot exceed 100')
+      .default(5),
+    maxChapterReadsPerWindow: z.coerce
+      .number()
+      .int('Max chapter reads must be a whole number')
+      .min(1, 'Max chapter reads must be at least 1')
+      .max(1000, 'Max chapter reads cannot exceed 1000')
+      .default(20),
+    chapterReadWindowMinutes: z.coerce
+      .number()
+      .int('Window minutes must be a whole number')
+      .min(1, 'Window minutes must be at least 1')
+      .max(1440, 'Window minutes cannot exceed 1440')
+      .default(10),
+    supportEmail: z.string().trim().email('Please enter a valid support email address'),
+  })
+  .refine((data) => data.minNovelPricePkr <= data.maxNovelPricePkr, {
+    message: 'Minimum novel price cannot exceed maximum novel price',
+    path: ['minNovelPricePkr'],
+  });
 
 export const writerCommissionTermsSchema = z.object({
   writerId: uuidSchema,

@@ -15,6 +15,7 @@ describe('Admin Validation Schemas (Zod)', () => {
         defaultCommissionRate: 20,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 14,
+        minNovelPricePkr: 50,
         maxNovelPricePkr: 50000,
         supportEmail: 'admin@unbpremium.pk',
       };
@@ -27,6 +28,7 @@ describe('Admin Validation Schemas (Zod)', () => {
         defaultCommissionRate: 101,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 14,
+        minNovelPricePkr: 50,
         maxNovelPricePkr: 50000,
         supportEmail: 'admin@unbpremium.pk',
       });
@@ -36,6 +38,7 @@ describe('Admin Validation Schemas (Zod)', () => {
         defaultCommissionRate: -1,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 14,
+        minNovelPricePkr: 50,
         maxNovelPricePkr: 50000,
         supportEmail: 'admin@unbpremium.pk',
       });
@@ -47,6 +50,7 @@ describe('Admin Validation Schemas (Zod)', () => {
         defaultCommissionRate: 20,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 0,
+        minNovelPricePkr: 50,
         maxNovelPricePkr: 50000,
         supportEmail: 'admin@unbpremium.pk',
       });
@@ -56,10 +60,43 @@ describe('Admin Validation Schemas (Zod)', () => {
         defaultCommissionRate: 20,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 400,
+        minNovelPricePkr: 50,
         maxNovelPricePkr: 50000,
         supportEmail: 'admin@unbpremium.pk',
       });
       assert.equal(tooLong.success, false);
+    });
+
+    it('validates minimum and maximum novel price bounds', () => {
+      const zeroMin = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 0,
+        maxNovelPricePkr: 50000,
+        supportEmail: 'admin@unbpremium.pk',
+      });
+      assert.equal(zeroMin.success, false);
+
+      const fractionalMin = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 49.5,
+        maxNovelPricePkr: 50000,
+        supportEmail: 'admin@unbpremium.pk',
+      });
+      assert.equal(fractionalMin.success, false);
+
+      const minExceedsMax = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 60000,
+        maxNovelPricePkr: 50000,
+        supportEmail: 'admin@unbpremium.pk',
+      });
+      assert.equal(minExceedsMax.success, false);
     });
 
     it('rejects invalid support email', () => {
@@ -67,10 +104,42 @@ describe('Admin Validation Schemas (Zod)', () => {
         defaultCommissionRate: 20,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
+        minNovelPricePkr: 50,
         maxNovelPricePkr: 50000,
         supportEmail: 'not-an-email',
       });
       assert.equal(invalidEmail.success, false);
+    });
+
+    it('validates abuse controls (orders per hour and chapter read windows)', () => {
+      const validAbuse = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 50,
+        maxNovelPricePkr: 5000,
+        maxOrdersPerHour: 10,
+        maxChapterReadsPerWindow: 30,
+        chapterReadWindowMinutes: 15,
+        supportEmail: 'admin@unbpremium.pk',
+      });
+      assert.equal(validAbuse.success, true);
+      if (validAbuse.success) {
+        assert.equal(validAbuse.data.maxOrdersPerHour, 10);
+        assert.equal(validAbuse.data.maxChapterReadsPerWindow, 30);
+        assert.equal(validAbuse.data.chapterReadWindowMinutes, 15);
+      }
+
+      const invalidHourly = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 50,
+        maxNovelPricePkr: 5000,
+        maxOrdersPerHour: 0,
+        supportEmail: 'admin@unbpremium.pk',
+      });
+      assert.equal(invalidHourly.success, false);
     });
   });
 

@@ -21,7 +21,11 @@ interface PlatformSettingsFormProps {
     default_commission_rate: number;
     default_unpaid_commission_limit: number;
     dispute_window_days: number;
+    min_novel_price_pkr: number;
     max_novel_price_pkr: number;
+    max_orders_per_hour?: number;
+    max_chapter_reads_per_window?: number;
+    chapter_read_window_minutes?: number;
     support_email: string;
     updated_at: string;
   };
@@ -42,8 +46,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
   const [disputeDays, setDisputeDays] = useState(
     initialSettings.dispute_window_days.toString()
   );
+  const [minPrice, setMinPrice] = useState(
+    (initialSettings.min_novel_price_pkr ?? 50).toString()
+  );
   const [maxPrice, setMaxPrice] = useState(
     initialSettings.max_novel_price_pkr.toString()
+  );
+  const [maxOrdersPerHour, setMaxOrdersPerHour] = useState(
+    (initialSettings.max_orders_per_hour ?? 5).toString()
+  );
+  const [maxChapterReads, setMaxChapterReads] = useState(
+    (initialSettings.max_chapter_reads_per_window ?? 20).toString()
+  );
+  const [chapterReadWindow, setChapterReadWindow] = useState(
+    (initialSettings.chapter_read_window_minutes ?? 10).toString()
   );
   const [supportEmail, setSupportEmail] = useState(initialSettings.support_email);
 
@@ -56,7 +72,11 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
     const parsedRate = Number(commissionRate);
     const parsedLimit = Number(unpaidLimit);
     const parsedDispute = Number(disputeDays);
+    const parsedMinPrice = Number(minPrice);
     const parsedMaxPrice = Number(maxPrice);
+    const parsedOrdersPerHour = Number(maxOrdersPerHour);
+    const parsedChapterReads = Number(maxChapterReads);
+    const parsedWindowMinutes = Number(chapterReadWindow);
 
     if (isNaN(parsedRate) || parsedRate < 0 || parsedRate > 100) {
       setError('Default commission rate must be between 0% and 100%.');
@@ -76,8 +96,38 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       return;
     }
 
-    if (isNaN(parsedMaxPrice) || parsedMaxPrice <= 0) {
-      setError('Max novel price must be greater than zero.');
+    if (isNaN(parsedMinPrice) || parsedMinPrice < 1 || !Number.isInteger(parsedMinPrice)) {
+      setError('Minimum novel price must be a whole rupee amount of at least 1 PKR.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedMaxPrice) || parsedMaxPrice <= 0 || !Number.isInteger(parsedMaxPrice)) {
+      setError('Max novel price must be a whole rupee amount greater than zero.');
+      setLoading(false);
+      return;
+    }
+
+    if (parsedMinPrice > parsedMaxPrice) {
+      setError('Minimum novel price cannot exceed maximum novel price ceiling.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedOrdersPerHour) || parsedOrdersPerHour < 1 || parsedOrdersPerHour > 100) {
+      setError('Max orders per hour must be a whole number between 1 and 100.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedChapterReads) || parsedChapterReads < 1 || parsedChapterReads > 1000) {
+      setError('Max chapter reads per window must be between 1 and 1000.');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(parsedWindowMinutes) || parsedWindowMinutes < 1 || parsedWindowMinutes > 1440) {
+      setError('Chapter read window minutes must be between 1 and 1440.');
       setLoading(false);
       return;
     }
@@ -93,7 +143,11 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         defaultCommissionRate: parsedRate,
         defaultUnpaidCommissionLimit: parsedLimit,
         disputeWindowDays: parsedDispute,
+        minNovelPricePkr: parsedMinPrice,
         maxNovelPricePkr: parsedMaxPrice,
+        maxOrdersPerHour: parsedOrdersPerHour,
+        maxChapterReadsPerWindow: parsedChapterReads,
+        chapterReadWindowMinutes: parsedWindowMinutes,
         supportEmail: supportEmail.trim(),
       });
 
@@ -245,6 +299,34 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
           </div>
         </div>
 
+        {/* Min Novel Price */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-400" />
+              <span>Minimum Novel Price Floor (PKR)</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">Default: 50 PKR</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Minimum purchase price for novels on the marketplace (no free novels allowed). Whole rupees only.
+          </p>
+          <div className="relative">
+            <input
+              type="number"
+              min="1"
+              step="1"
+              required
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            />
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">
+              PKR
+            </span>
+          </div>
+        </div>
+
         {/* Max Novel Price */}
         <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
           <div className="flex items-center justify-between">
@@ -270,6 +352,75 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               PKR
             </span>
           </div>
+        </div>
+
+        {/* Max Orders Per Hour */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-yellow-400" />
+              <span>Max Reader Orders / Hour</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">1 - 100</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Limits how many new orders a single reader can generate per hour to protect writer payment account details from automated scraping.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            required
+            value={maxOrdersPerHour}
+            onChange={(e) => setMaxOrdersPerHour(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
+        </div>
+
+        {/* Max Chapter Reads Per Window */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-cyan-400" />
+              <span>Max Chapter Reads / Window</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">1 - 1000</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Maximum number of distinct chapters an entitled buyer can open within the sliding window before temporary rate limiting triggers.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="1000"
+            required
+            value={maxChapterReads}
+            onChange={(e) => setMaxChapterReads(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
+        </div>
+
+        {/* Chapter Read Window Minutes */}
+        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-400" />
+              <span>Chapter Read Window (Minutes)</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">1 - 1440 min</span>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Duration of the sliding window for tracking reading request frequency and deterring bulk manuscript scrapers.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="1440"
+            required
+            value={chapterReadWindow}
+            onChange={(e) => setChapterReadWindow(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+          />
         </div>
 
         {/* Support Email */}
