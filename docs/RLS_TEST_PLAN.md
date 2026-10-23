@@ -314,6 +314,67 @@ In your local Supabase database or the Supabase SQL Editor:
 | **CAT-07** | Search Wildcard Escaping | Anon | RPC `search_public_novels` | Search strings containing SQL wildcard characters (`%`, `_`, `\`) are escaped automatically. Matching is case-insensitive across Urdu and English titles, synopsis, and pen names. Suspended or draft novels never appear in search results. |
 | **CAT-08** | Instant Catalog Reactivity on Suspension | Anon, Admin | Catalog synchronization | When an administrator calls `suspend_novel`, the novel immediately vanishes from `public_novels` and `search_public_novels`. When unsuspended, it reappears immediately. |
 
+---
 
+## 8. Step 2.1b Minimum Novel Price Enforcement Matrix (Test Suite 07)
+
+**Test Suite Path**: `supabase/tests/07_min_price_tests.sql`
+
+| Scenario ID | Tested Operation / RPC | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **PRC-01** | `INSERT INTO novels (price_pkr = 0)` | Writer, Postgres | Database trigger `trg_novels_validate_price` | Attempting to insert a novel with price 0 is rejected with exception (`Novel price must be at least PKR 50`). |
+| **PRC-02** | `INSERT INTO novels (price_pkr = 49)` | Writer, Postgres | Database trigger `trg_novels_validate_price` | Novel with price 49 (below minimum 50) is rejected with exception (`Novel price must be at least PKR 50`). |
+| **PRC-03** | `INSERT INTO novels (price_pkr = 49.50)` | Writer, Postgres | Database trigger `trg_novels_validate_price` | Fractional paise amount is rejected with exception (`Novel price must be a whole rupee amount`). |
+| **PRC-04** | `INSERT INTO novels (price_pkr = 50)` | Writer, Postgres | Database trigger `trg_novels_validate_price` | Exact minimum price 50 is successfully accepted. |
+| **PRC-05** | `INSERT INTO novels (price_pkr = 5001)` | Writer, Postgres | Database trigger `trg_novels_validate_price` | Price exceeding `max_novel_price_pkr` is rejected with exception (`Novel price cannot exceed PKR 5000`). |
+| **PRC-06** | Admin Direct Price Update Bypass Attempt | Admin, Postgres | `trg_novels_validate_price` universal enforcement | Direct `UPDATE novels SET price_pkr = 30` by an administrator is strictly blocked by the trigger. Admins have no price bypass. |
+| **PRC-07** | `submit_novel_for_review` Legacy Novel Guard | Writer | RPC `submit_novel_for_review` | Attempting to submit a legacy draft novel with `price_pkr = 30` is rejected with descriptive guidance (`Novel price of PKR 30 is below the minimum allowed price of PKR 50. Please update your novel price before submitting for review.`). |
+| **PRC-08** | `create_order` Defensive Price Check | Reader | RPC `create_order` | `create_order` validates that novel `price_pkr > 0` and within `[min, max]` before snapshotting; rejects invalid or corrupted novel prices. |
+| **PRC-09** | Minimum Price Increase Scope | Admin, Reader, Writer | Future-sales scope & snapshot immutability | Admin increases minimum price from 50 to 150 PKR via `update_platform_settings`. Pre-existing order snapshot remains 100 PKR. Future attempts to set novel price to 100 PKR are rejected by new minimum. |
+
+---
+
+## 9. Step 4.1 Checkout, Order Rate Limiting & Payment Submission Matrix (Test Suite 08)
+
+**Test Suite Path**: `supabase/tests/08_checkout_tests.sql`
+
+| Scenario ID | Tested Operation / RPC | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **CHK-01** | `get_checkout_options` Account Masking | Reader, Anon | Sensitive Account Privacy | Returns novel checkout summary with writer's active payment methods; `account_label` is strictly masked (e.g., `•••• 4567`). Raw account numbers and IBANs are strictly hidden from uncommitted shoppers. |
+| **CHK-02** | `get_checkout_options` Author Self-Purchase Gate | Writer (Author) | Self-purchase prohibition | Author calling `get_checkout_options` for their own novel is rejected with exception (`You cannot purchase your own novel`). |
+| **CHK-03** | `get_checkout_options` Prior Ownership Gate | Entitled Reader | Entitlement duplicate check | Reader who already owns active novel entitlement calling `get_checkout_options` is rejected with exception (`You already own this novel`). |
+| **CHK-04** | `get_checkout_options` Unpublished Novel Gate | Reader | Manuscript visibility gate | Calling `get_checkout_options` on draft, under-review, or rejected novel is rejected with exception (`Novel is not available for purchase`). |
+| **CHK-05** | `create_order` Reader Hourly Rate Limit | Reader | Reader account scraping & abuse protection | Reader creating orders in excess of `platform_settings.max_orders_per_hour` (default 5/hr) is blocked with clear rate-limit exception (`Rate limit exceeded: You have created N orders in the last hour...`). |
+| **CHK-06** | `submit_payment` Path Traversal Reject | Reader | Storage bucket path security | Submitting screenshot path containing directory traversal (e.g., `../evil.webp`) is rejected with exception (`Invalid screenshot path: must start with <order_id>/ and contain no path traversal`). |
+| **CHK-07** | `submit_payment` Cross-Order Path Hijack | Reader | Order-scoping storage boundary | Submitting screenshot path with another order's ID prefix is rejected with exception (`Invalid screenshot path: must match this order ID`). |
+| **CHK-08** | `submit_payment` TID Format Validation | Reader | Transaction reference integrity | Non-compliant TIDs (<6 chars, >40 chars, or containing special chars like spaces/punctuation) are rejected with exception (`Invalid transaction ID (TID): must be 6 to 40 characters...`). |
+| **CHK-09** | `submit_payment` Duplicate TID Flagging | Reader A, Reader B | Non-blocking duplicate detection | When Reader B submits a TID identical to one previously submitted on Reader A's order, submission succeeds and status transitions to `payment_submitted`, but `is_duplicate_tid` is automatically flagged `true` with a warning audit trail for the writer. |
+| **CHK-10** | `submit_payment` Idempotent Network Retry | Reader | Idempotent network protection | Calling `submit_payment` with identical order ID and TID within 60 seconds returns the existing pending submission without creating duplicate rows or erroring. |
+| **CHK-11** | RLS: Reader Isolation on Orders & Submissions | Reader A, Reader B | Multi-tenant reader privacy | Reader B attempting `SELECT` on Reader A's orders or `payment_submissions` returns 0 rows. |
+| **CHK-12** | RLS: Writer Isolation on Novel Orders | Writer A, Writer B | Multi-tenant writer privacy | Writer B attempting `SELECT` on orders or payment submissions belonging to Writer A's novels returns 0 rows. |
+| **CHK-13** | RLS: Direct INSERT / UPDATE Prohibited | Reader | Direct client mutation block | Reader attempting direct `INSERT INTO orders` or direct `UPDATE orders SET status = 'verified'` is rejected by database RLS and triggers. Orders can only be mutated via security definer RPCs. |
+
+---
+
+## 10. Step 4.2 Reader Access, Library & Admin Orders Matrix (Test Suite 09)
+
+**Test Suite Path**: `supabase/tests/09_reader_access_tests.sql`
+
+| Scenario ID | Tested Operation / RPC | Personas Evaluated | Target Policy / Invariant | Expected Test Behavior |
+|---|---|---|---|---|
+| **RDR-01** | `get_chapter_for_reader` Entitled Read | Entitled Reader | Server-gated paid content delivery | Entitled reader holding active non-revoked entitlement receives paid chapter `content_urdu`, word count, chapter metadata, and `watermark_code` matching their `order_number`. |
+| **RDR-02** | `get_chapter_for_reader` Non-Entitled Paid Read | Non-Entitled Reader | Generic 404 security gate | Non-entitled reader attempting to read paid chapter is rejected with exact generic exception `Chapter not found`. No chapter metadata, price, or title is disclosed. |
+| **RDR-03** | `get_chapter_for_reader` Free Preview Read | Reader, Anon | Free preview chapter access | Any reader can access chapter with `is_free_preview = true` on a published novel (`access_reason = 'free_preview'`, `watermark_code = null`). |
+| **RDR-04** | Anonymous RPC Access Block | Anon | Privilege revocation | Calling `get_chapter_for_reader` or `get_my_library` as anonymous user fails with permission denied exception (`42501`). |
+| **RDR-05** | Revoked Entitlement Access Loss | Revoked Reader | Entitlement revocation invariant | When entitlement `is_active` becomes `false` (e.g. after refund), subsequent chapter read attempt immediately raises generic `Chapter not found`. |
+| **RDR-06** | Suspended Novel Buyer Retention | Entitled Reader | Grandfathered buyer rights | When an admin suspends a novel from the store (`status = 'suspended'`), entitled buyers continue reading paid chapters without interruption (`access_reason = 'entitled'`). |
+| **RDR-07** | Draft Chapter Hidden from Buyer | Entitled Reader | Unpublished manuscript hiding | Entitled buyer attempting to access an unpublished chapter (`is_published = false`) is rejected with generic `Chapter not found`. |
+| **RDR-08** | Author and Admin Moderation Access | Author, Admin | Elevated access bypass | Author reads own novel chapters (`access_reason = 'owner'`). Platform admin reads any novel for moderation (`access_reason = 'admin'`). Rate limiting is bypassed. |
+| **RDR-09** | Sliding-Window Chapter Rate Limiting | Entitled Reader | Abuse & scraping prevention | When an entitled reader exceeds `max_chapter_reads_per_window` distinct chapters within `chapter_read_window_minutes`, RPC raises `Too many chapters opened, please slow down`. |
+| **RDR-10** | Reader Progress Isolation | Reader A, Reader B | Multi-tenant progress isolation | `upsert_reading_progress` updates only the caller's own reading position. Reader A cannot inspect or modify Reader B's progress. |
+| **RDR-11** | Library Isolation & Grandfathering | Reader A, Reader B | Multi-tenant library isolation | `get_my_library` returns only caller's active purchased novels. Suspended novels are returned with `is_temporarily_unavailable = true`. Other users' purchases are never visible. |
+| **RDR-12** | Admin Order Inspection Access Gate | Reader, Writer, Admin | Administrative role boundary | Calling `admin_list_orders` or `admin_get_order` as a reader or writer is rejected with exception (`Access denied: Administrator role required`). |
+| **RDR-13** | Admin Order Privacy: Email Exclusion | Admin | Reader privacy invariant | `admin_list_orders` and `admin_get_order` return reader `display_name` and `@username`, but strictly omit reader `email` in JSON response. |
+| **RDR-14** | `admin_force_verify` & Direct Chapter SELECT | Admin, Reader | Financial ledger integrity & RLS | `admin_force_verify` verifies order and creates entitlement once; second call is rejected (`Order cannot be force-verified...`). Direct `SELECT` on `chapters` by non-entitled reader returns 0 rows. |
 
 

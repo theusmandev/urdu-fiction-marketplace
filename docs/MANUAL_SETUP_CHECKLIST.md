@@ -180,6 +180,101 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm all 4 public views exist.
   - Execute automated test suite: `supabase/tests/06_public_catalog_tests.sql`.
 
+### 14. `supabase/migrations/0014_min_novel_price.sql` [MINIMUM NOVEL PRICE ENFORCEMENT & PREVENT FREE NOVELS]
+- **Purpose**: Implements Step 2.1b business rule: no free novels on the marketplace. Every novel must cost at least PKR 50 (configurable in platform settings; whole rupees only):
+  - `platform_settings`: Adds `min_novel_price_pkr integer NOT NULL DEFAULT 50` with check constraint `(min_novel_price_pkr >= 1 AND min_novel_price_pkr <= max_novel_price_pkr)`.
+  - Replaces `update_platform_settings(...)` RPC to validate 6 parameters (`p_min_novel_price_pkr integer`), enforcing `min >= 1` and `min <= max`, audit-logging previous/new values with notice that changes affect future sales only.
+  - Adds trigger `trg_novels_validate_price` on `BEFORE INSERT OR UPDATE OF price_pkr ON public.novels`: raises a clear exception if `price_pkr` is not a whole number (`price_pkr = round(price_pkr, 0)`), is below `min_novel_price_pkr`, or is above `max_novel_price_pkr`. Enforced universally for all users (including admins via RPC or direct update).
+  - Updates RPCs `create_novel` and `update_novel` to validate the novel price against `[min_novel_price_pkr, max_novel_price_pkr]`.
+  - Updates RPC `submit_novel_for_review`: rejects submission of any legacy novel whose price is below the current platform minimum with a clear message: `"Novel price of PKR X is below the minimum allowed price of PKR Y. Please update your novel price before submitting for review."`.
+  - Updates RPC `create_order`: adds defensive validation ensuring novel `price_pkr > 0` and within `[min_novel_price_pkr, max_novel_price_pkr]` before snapshotting to the order.
+- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Verification & Legacy Data Audit**:
+  - Run the following audit query in the Supabase SQL Editor to inspect any pre-existing legacy novels below the minimum price and any past orders with non-positive amounts:
+    ```sql
+    -- =========================================================================
+    -- LEGACY DATA AUDIT: Novels below minimum price & Non-positive orders
+    -- NOTE: Do NOT silently modify or delete these rows or past orders.
+    -- Review the results below to decide on grandfathering or manual updates.
+    -- =========================================================================
+    SELECT
+      'novel' AS entity_type,
+      id::text AS entity_id,
+      title_english AS identifier,
+      price_pkr AS amount,
+      status
+    FROM public.novels
+    WHERE price_pkr < (SELECT min_novel_price_pkr FROM public.platform_settings WHERE id = 1)
+
+    UNION ALL
+
+    SELECT
+      'order' AS entity_type,
+      id::text AS entity_id,
+      order_number AS identifier,
+      amount_pkr AS amount,
+      status
+    FROM public.orders
+    WHERE amount_pkr <= 0;
+    ```
+  - Execute automated test suite: `supabase/tests/07_min_price_tests.sql`.
+
+### 15. `supabase/migrations/0015_checkout_and_payment_submission.sql` [CHECKOUT, RATE LIMITING, SECURE PAYMENT SUBMISSION & NOTIFICATIONS]
+- **Purpose**: Implements Step 4.1 reader-to-writer direct payment checkout, abuse rate-limiting, and hardened payment verification workflows:
+  - `platform_settings`: Adds `max_orders_per_hour integer NOT NULL DEFAULT 5` with check constraint `(max_orders_per_hour >= 1 AND max_orders_per_hour <= 100)`.
+  - RPC `public.get_checkout_options(p_novel_id)`: returns novel summary (`novel_id`, `novel_title`, `price_pkr`, `writer_pen_name`), writer's ACTIVE payment methods with MASKED account numbers/IBANs (`•••• 1234`), and `existing_open_order_number`. Fails for unpublished novels, suspended novels, the author themselves, or readers who already own the novel. Full account numbers remain unexposed to uncommitted shoppers.
+  - RPC `public.create_order(p_novel_id, p_payment_method_id)`: hardens abuse protection with an hourly rate limit per reader (`max_orders_per_hour`). Populates immutable `novel_title_snapshot`, `selected_payment_method_id`, and `currency = 'PKR'`. Captures full unmasked payment snapshot for the created order.
+  - RPC `public.submit_payment(...)`:
+    - Strict path traversal protection: `p_screenshot_path` must start with `<order_id>/` and contain only safe alphanumeric characters/hyphens/underscores ending in `.webp` (matching private bucket `payment-proofs`).
+    - TID validation: 6-40 characters, letters/digits/hyphen/underscore.
+    - Claimed amount: positive, whole rupee, maximum 10x order amount.
+    - Single pending submission rule: only one pending submission allowed per order.
+    - Idempotent retry within 60s: returns existing submission instead of creating duplicate records.
+    - Duplicate TID flagging: triggers automatic flag `is_duplicate_tid = true` if TID was used on any other order, without blocking submission.
+    - Automated notification: alerts author of the payment submission.
+  - RPC `public.get_my_unread_notification_count()`: returns unread notification count for the authenticated user.
+  - RPC `public.mark_notifications_as_read(p_notification_ids)`: marks specified notifications (or all unread notifications if empty/NULL) as read for the authenticated caller only.
+  - RLS enforcement: readers select only own orders/submissions, writers select only orders/submissions of own novels, admins select all; no direct client INSERT/UPDATE/DELETE.
+- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = 'platform_settings' AND column_name = 'max_orders_per_hour';
+    SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_name IN ('get_checkout_options', 'get_my_unread_notification_count', 'mark_notifications_as_read');
+    ```
+    Confirm column and all 3 RPCs exist.
+  - Execute automated test suite: `supabase/tests/08_checkout_tests.sql`.
+
+### 16. `supabase/migrations/0016_reader_and_admin_orders.sql` [READER LIBRARY, SECURE WEB READER, ADMIN ORDER INSPECTION & FORCE-VERIFY]
+- **Purpose**: Implements Step 4.2 reader library, server-gated secure chapter access, sliding-window reading abuse rate-limiting, and admin order inspection/force-verification:
+  - `platform_settings`: Adds `max_chapter_reads_per_window integer NOT NULL DEFAULT 20` and `chapter_read_window_minutes integer NOT NULL DEFAULT 10` with sane check constraints.
+  - Table `public.chapter_reads`: Records `(id, reader_id, chapter_id, novel_id, read_at)` with composite indexes on `(reader_id, read_at)` and `(reader_id, novel_id, chapter_id, read_at DESC)`. RLS enabled with direct client access revoked from both `anon` and `authenticated`.
+  - RPC `public.update_platform_settings(...)`: Updated to accept and audit-log 9 settings parameters, including sliding-window reading abuse controls.
+  - RPC `public.get_chapter_for_reader(p_novel_slug, p_chapter_number)`:
+    - Server-gated secure chapter delivery for entitled readers, novel authors, and platform admins.
+    - Free previews served only if the novel is published.
+    - Entitled buyers retain reading access even if the novel is subsequently suspended or unlisted from the public store (`is_temporarily_unavailable = true`).
+    - Watermark code resolution: Returns the buyer's `order_number` for entitled reads (used for DOM watermark rendering) and `null` for owners/admins.
+    - Sliding-window rate limit: Entitled reads check `count(*)` in `chapter_reads` within `chapter_read_window_minutes`. Exceeding `max_chapter_reads_per_window` raises `'Too many chapters opened, please slow down'`.
+    - Information Hiding: In every denied access case, raises the exact generic exception `'Chapter not found'` (never reveals novel title, chapter existence, or price).
+  - RPC `public.upsert_reading_progress(p_novel_id, p_chapter_number)`: Authorizes progress tracking strictly for active entitlement holders, novel authors, or admins; isolates progress to the caller's own record.
+  - RPC `public.get_my_library()`: Returns the caller's active novel entitlements with reading progress, cover art, Urdu/English titles, author pen names, total chapters, order numbers, and `is_temporarily_unavailable` flag.
+  - RPC `public.admin_list_orders(p_status, p_search, p_only_stuck, p_limit, p_offset)` & `admin_get_order(p_order_id)`:
+    - Admin-only inspection queries.
+    - Resolves reader display names and usernames while strictly omitting reader emails for privacy.
+    - Identifies stuck orders (`payment_submitted` for longer than the 24-hour verification window).
+    - Resolves ledger states, payment submissions, duplicate TID flags, and disputes.
+  - RLS Validation & Hardening: Direct `SELECT` on `chapters` never exposes paid content to non-entitled readers.
+- **Action**: Paste contents into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = 'platform_settings' AND column_name IN ('max_chapter_reads_per_window', 'chapter_read_window_minutes');
+    SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_name IN ('get_chapter_for_reader', 'upsert_reading_progress', 'get_my_library', 'admin_list_orders', 'admin_get_order');
+    ```
+    Confirm both columns and all 5 RPCs exist.
+  - Execute automated test suite: `supabase/tests/09_reader_access_tests.sql`.
+
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
