@@ -4,7 +4,7 @@ import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UrduText } from '@/components/urdu/UrduText';
-import { formatPKR } from '@/lib/utils';
+import { formatPKR, resolveCoverUrl } from '@/lib/utils';
 import { createOrderAction } from '@/app/actions/checkout';
 import type { CheckoutOptionsResponse, PaymentMethodType } from '@/types/database';
 import {
@@ -250,18 +250,21 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
 
             {/* Novel Info */}
             <div className="flex gap-4">
-              {novel.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={novel.cover_image_url}
-                  alt={novel.title_english}
-                  className="w-20 h-28 object-cover rounded-xl border border-stone-800 shrink-0"
-                />
-              ) : (
-                <div className="w-20 h-28 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-600 shrink-0">
-                  <BookOpen className="w-8 h-8" />
-                </div>
-              )}
+              {(() => {
+                const cover = resolveCoverUrl(novel.cover_image_url || novel.cover_url);
+                return cover ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={cover}
+                    alt={novel.title_english}
+                    className="w-20 h-28 object-cover rounded-xl border border-stone-800 shrink-0"
+                  />
+                ) : (
+                  <div className="w-20 h-28 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-600 shrink-0">
+                    <BookOpen className="w-8 h-8" />
+                  </div>
+                );
+              })()}
 
               <div className="space-y-1 min-w-0">
                 <h3 className="text-sm font-bold text-white truncate">{novel.title_english}</h3>
