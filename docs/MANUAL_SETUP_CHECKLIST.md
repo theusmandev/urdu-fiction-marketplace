@@ -336,6 +336,18 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm all 6 tables and RPCs exist.
   - Execute automated test suite: `supabase/tests/11_disputes_refunds_tests.sql`.
 
+### 19. `supabase/migrations/0019_database_reconciliation_and_runtime_fixes.sql` [DATABASE RECONCILIATION]
+- **Purpose**: Drops stale function overloads, reconciles checkout and reader RPCs (`get_checkout_options`, `create_order`, `get_chapter_for_reader`, `admin_list_orders`, `admin_get_order`), enforces security search path, and locks down public permissions.
+- **Action**: Paste contents of `supabase/migrations/0019_database_reconciliation_and_runtime_fixes.sql` into the Supabase SQL Editor and click **Run**.
+
+### 20. `supabase/migrations/0020_database_reconciliation_and_immutability_hardening.sql` [RUNTIME FIXES & IMMUTABILITY]
+- **Purpose**: Fixes plpgsql_check defects:
+  - Corrects `resolve_dispute_for_reader_verify` by using real column `granted_at` (removing non-existent `created_at`) and partial index conflict target.
+  - Reconciles `update_platform_settings` with authoritative `public.platform_settings` columns (`default_unpaid_commission_limit`, removing non-existent `unpaid_commission_threshold_pkr` and `payment_verification_window_hours`).
+  - Aligns `verify_order_payment` and `admin_force_verify` with partial unique index predicates (`(reader_id, novel_id) WHERE is_revoked = false` and `(order_id) WHERE entry_type = 'sale_verified'`) with idempotent retries.
+  - Recreates append-only immutability triggers on `sales_ledger` and `audit_logs` (BEFORE UPDATE/DELETE and BEFORE TRUNCATE).
+- **Action**: Paste contents of `supabase/migrations/0020_database_reconciliation_and_immutability_hardening.sql` into the Supabase SQL Editor and click **Run**.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -429,6 +441,7 @@ Configure the authentication provider, redirect URLs, and security controls in *
 Run the SQL test suites and automated Jest/Node test runners to validate security policies, business rules, and financial ledger integrity:
 1. Review `docs/RLS_TEST_PLAN.md` for the comprehensive multi-tenant test matrix.
 2. Execute all sequential SQL tests in the Supabase SQL Editor:
+   - `supabase/tests/00_post_migration_verification.sql` (Canonical post-migration AST, privileges, and schema integrity check)
    - `supabase/tests/01_security_and_financial_hardening_tests.sql`
    - `supabase/tests/02_gap_fixes_tests.sql`
    - `supabase/tests/03_dispute_and_writer_status_tests.sql`
@@ -440,6 +453,7 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/09_reader_access_tests.sql`
    - `supabase/tests/10_commission_tests.sql`
    - `supabase/tests/11_disputes_refunds_tests.sql` (Validates disputes, refund adjustments, support tickets, and outbox rules)
+   - `supabase/tests/12_runtime_smoke.sql` (Comprehensive 15-step end-to-end transactional runtime smoke test)
 3. Run automated Node.js unit tests:
    ```bash
    npm test
