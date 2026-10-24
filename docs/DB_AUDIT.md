@@ -93,3 +93,54 @@ The reconciliation identified four distinct classes of runtime failures:
    - `supabase/tests/00_post_migration_verification.sql`: Rewritten to verify all 29 real tables (removing 10 invented tables), all real RPCs, correct enum `commission_invoice_status`, dynamic `pg_trigger` inspection, and strict anon privilege audit.
    - `supabase/tests/12_runtime_smoke.sql`: Created 15-step behavioral end-to-end smoke test executing real RPCs under fake `auth.users` impersonation within a single transactional `ROLLBACK`.
 
+---
+
+## 4. Migration 0021 — Live Run Analysis & Privilege Hardening (October 2026)
+
+### 4.1 Smoke Test 12 — Defects Found in the Test Script Itself (Not the Database)
+
+After running migration `0020` and both test scripts against the live Supabase database, the following test-authoring bugs were identified. None indicate runtime bugs in database functions.
+
+| Step | Symptom | Root Cause | Fix in v2 |
+|------|---------|------------|-----------|
+| **Step 3** | FAIL: "Unexpected response: {success: true, is_retry: false, submission_id: ...}" | Test asserted `v_status = 'payment_submitted'` but `submit_payment()` returns `{success, submission_id, is_retry}` — no `status` key. The function did succeed. | Assertion rewritten: check `success=true AND submission_id IS NOT NULL` then read order status and reviewer_status directly from DB tables. |
+| **Steps 4–13** | Cascade FAIL / NULL / "Duplicate key" | Step 3 stored `submission_1_id` fixture only in the PASS branch; since step 3 FAILed, the fixture was never stored. Step 11 used the same `novel_id` as step 1, colliding with `uq_orders_reader_novel_active`. | Steps now re-query submission from DB as fallback. Step 11 uses a separate `novel_2_id`. All steps report `SKIPPED` (not `FAIL`) when a prerequisite is missing. |
+| **Step 15** | PASS with lib_count=1, led_count=1 despite step 4 never running | Hardcoded UUIDs (`33333333-...`) left an entitlement and ledger row from a **prior incomplete test run** that ran before the ROLLBACK was added. `get_my_library()` correctly filters `is_revoked=false` — this is **NOT a function bug**. | All fixture UUIDs are now `gen_random_uuid()` per run. Step 15 cross-checks lib_count against step 4's recorded PASS/FAIL. |
+
+### 4.2 New Explicit Assertion: Pre-Verification Access Invariant (Step 3.5)
+
+Step 3.5 was added between `submit_payment` and `verify_order_payment` to assert:
+- Buyer has **zero** active purchase entitlements before verification.
+- Buyer has **zero** `sale_verified` ledger rows before verification.
+- `get_chapter_for_reader` on a paid chapter returns "Chapter not found".
+
+A FAIL here indicates a critical bug (function granting access without verification) or stale data from a prior incomplete run.
+
+### 4.3 Verification Script 00 — 37 FAIL Analysis
+
+All 37 FAILs were script defects, not database bugs:
+
+| Category | Count | Root Cause | Fix in v2 |
+|----------|-------|------------|-----------|
+| pg_trgm extension functions | 31 | `gin_*_trgm*`, `gtrgm_*`, `similarity*` etc. are extension-owned (`pg_depend.deptype='e'`). The anon audit loop did not exclude them. | Anon audit joins `pg_depend` to exclude extension-owned functions; they appear as `INFO` rows. |
+| Trigger functions with anon/auth grants | 5 | `trg_chapters_calculate_word_count` etc. had implicit PUBLIC EXECUTE grants from before the default-privilege lockdown. | Migration `0021` revokes EXECUTE on all trigger functions from PUBLIC/anon/authenticated via a dynamic loop over `pg_proc`. New check 8 verifies zero trigger function grants. |
+| `dispute-proofs` bucket FAIL | 1 | Bucket invented — it does not exist in any migration or source file. Dispute evidence is stored in `payment-proofs/<dispute_id>/` sub-paths. | Check replaced with an `INFO` row describing the intended storage layout. |
+
+### 4.4 Migration 0021 Actions
+
+1. **Dynamic trigger function EXECUTE revocation**: Loop over `pg_proc` for all `prorettype = trigger` in schema public; REVOKE from PUBLIC, anon, authenticated.
+2. **ALTER DEFAULT PRIVILEGES**: `REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated` for role postgres in schema public — future functions are private by default.
+3. **Anon allowlist re-grant**: `search_public_novels`, `get_public_novel_chapters`, `has_novel_entitlement`, `is_admin` keep their anon EXECUTE grants.
+4. **search_path fix on 0020 functions**: All 5 functions rewritten in 0020 used `SET search_path = public, pg_temp` (insecure — `public` schema can shadow names). Fixed to `SET search_path = ''` via `ALTER FUNCTION`. No body changes needed — all references are already schema-qualified.
+5. **Authenticated RPC grant sweep**: Belt-and-suspenders GRANT EXECUTE to authenticated on all workflow RPCs.
+
+### 4.5 search_path Invariant
+
+All SECURITY DEFINER functions must use `SET search_path = ''` (empty string). The updated verification script (check 12) now FAILs any function whose search_path GUC contains 'public'.
+
+### 4.6 Reporting Protocol
+
+When running the updated scripts, send back only:
+- The **SUMMARY row** (last row of each result set)
+- Every row where `status IN ('FAIL', 'SKIPPED', 'WARN')`
+- INFO rows are informational only and not required unless a specific item needs review
