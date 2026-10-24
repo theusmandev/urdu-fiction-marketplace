@@ -356,7 +356,22 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   - **search_path fix**: All 5 functions rewritten in migration 0020 used `SET search_path = public, pg_temp` (insecure). This migration uses `ALTER FUNCTION ... SET search_path = ''` to correct each, without touching function bodies (all references were already schema-qualified).
   - **Authenticated RPC grant sweep**: Belt-and-suspenders GRANT EXECUTE to authenticated on all known workflow RPCs.
 - **Action**: Paste contents of `supabase/migrations/0021_trigger_privilege_lockdown_and_search_path_fix.sql` into the Supabase SQL Editor and click **Run**.
-- **Verification**: Run `supabase/tests/00_post_migration_verification.sql` — expect SUMMARY PASS with zero FAIL rows and INFO rows for pg_trgm extension functions.
+- **Verification**: Run `supabase/tests/00_post_migration_verification.sql`.
+
+### 22. `supabase/migrations/0022_protection_triggers_and_search_path_lockdown.sql` [PROTECTION TRIGGERS & SEARCH PATH LOCKDOWN]
+- **Purpose**: Fixes writer-side `verify_order_payment` execution and hardens search paths across all remaining SECURITY DEFINER functions:
+  - **Protection Trigger Trust Model Overhaul**: Rewrites all 5 sensitive table mutation protection trigger functions (`trg_protect_writer_profile_columns`, `trg_protect_profile_columns`, `trg_protect_novel_columns`, `trg_protect_chapter_deletion`, `trg_protect_notification_columns`) as `SECURITY INVOKER` with `SET search_path = ''`. Replaces fragile `auth.uid()` / `current_setting('role')` checks with `v_is_trusted := (pg_catalog.current_user NOT IN ('authenticated', 'anon', 'authenticator')) OR public.is_admin();`. This allows non-admin writers to execute SECURITY DEFINER RPCs (such as `verify_order_payment` calling `reconcile_writer_unpaid_commission`) without trigger blocks, while strictly preventing direct PostgREST client mutation.
+  - **search_path Lockdown**: Rewrites 9 SECURITY DEFINER functions (`admin_get_order`, `admin_list_orders`, `create_order`, `get_chapter_for_reader`, `get_checkout_options`, `get_public_novel_chapters`, `get_writer_unpaid_commission`, `reconcile_writer_unpaid_commission`, `reject_order_payment`) with `SET search_path = ''` and 100% schema qualifications (`pg_catalog.*`, `public.*`, `extensions.*`), eliminating insecure search paths.
+  - **Privilege Revocation**: Explicitly revokes `EXECUTE` on all 5 trigger functions from `PUBLIC, anon, authenticated` and re-asserts workflow RPC permissions.
+- **Action**: Paste contents of `supabase/migrations/0022_protection_triggers_and_search_path_lockdown.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `supabase/tests/00_post_migration_verification.sql` and `supabase/tests/12_runtime_smoke.sql`.
+
+### 23. `supabase/migrations/0023_fix_sql_construct_qualification_regression.sql` [FIX SQL CONSTRUCT QUALIFICATION REGRESSION]
+- **Purpose**: Resolves `plpgsql_check` parse errors introduced in migration 0022 where SQL grammar constructs and keywords were improperly qualified with `pg_catalog.`:
+  - **Trigger Functions**: Restores unqualified `current_user` in all 5 protection trigger functions (`trg_protect_writer_profile_columns`, `trg_protect_profile_columns`, `trg_protect_novel_columns`, `trg_protect_chapter_deletion`, `trg_protect_notification_columns`), eliminating `missing FROM-clause entry for table "pg_catalog"`.
+  - **SECURITY DEFINER Functions**: Replaces invalid `pg_catalog.coalesce()` with `coalesce()`, `pg_catalog.trim()` with `pg_catalog.btrim()`, and unqualified `greatest()` / `least()` across 8 RPC functions (`admin_get_order`, `admin_list_orders`, `create_order`, `get_checkout_options`, `get_writer_unpaid_commission`, `get_chapter_for_reader`, `get_public_novel_chapters`, `reject_order_payment`).
+- **Action**: Paste contents of `supabase/migrations/0023_fix_sql_construct_qualification_regression.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `npm run check:sql` and execute `supabase/tests/00_post_migration_verification.sql`.
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
