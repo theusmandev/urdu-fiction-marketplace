@@ -47,7 +47,7 @@ BEGIN
         JOIN pg_namespace n ON n.oid = p.pronamespace
         WHERE n.nspname = 'public'
           AND p.prorettype = 'trigger'::regtype
-          AND NOT p.proisagg
+          AND p.prokind = 'f'
     LOOP
         BEGIN
             v_sql := format('REVOKE EXECUTE ON FUNCTION %s FROM PUBLIC, anon, authenticated', r.proc_sig);
@@ -102,7 +102,7 @@ BEGIN
         FROM pg_proc p
         JOIN pg_namespace n ON n.oid = p.pronamespace
         WHERE n.nspname = 'public'
-          AND NOT p.proisagg
+          AND p.prokind = 'f'
           -- exclude trigger functions (already handled in section 1)
           AND p.prorettype != 'trigger'::regtype
     LOOP
