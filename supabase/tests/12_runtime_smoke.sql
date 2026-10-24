@@ -1186,30 +1186,36 @@ $$;
 -- ==============================================================================
 -- FINAL REPORT
 -- ==============================================================================
-SELECT
-    step_num::text AS step,
-    step_name,
-    status,
-    details
-FROM smoke_test_results
-UNION ALL
-SELECT
-    '999',
-    'OVERALL RUNTIME SMOKE STATUS',
-    CASE
-        WHEN count(*) FILTER (WHERE status = 'FAIL') > 0 THEN 'FAIL'
-        WHEN count(*) FILTER (WHERE status = 'PASS') = 0 THEN 'FAIL'
-        ELSE 'PASS'
-    END,
-    format(
-        'Total Steps: %s | PASS: %s | FAIL: %s | SKIPPED: %s',
-        count(*),
-        count(*) FILTER (WHERE status = 'PASS'),
-        count(*) FILTER (WHERE status = 'FAIL'),
-        count(*) FILTER (WHERE status = 'SKIPPED')
-    )
-FROM smoke_test_results
+DROP TABLE IF EXISTS test_results;
+CREATE TEMP TABLE test_results AS
+SELECT * FROM (
+    SELECT
+        step_num::numeric AS step_num,
+        step_name,
+        status,
+        details
+    FROM smoke_test_results
+    UNION ALL
+    SELECT
+        999::numeric AS step_num,
+        'OVERALL RUNTIME SMOKE STATUS' AS step_name,
+        CASE
+            WHEN count(*) FILTER (WHERE status = 'FAIL') > 0 THEN 'FAIL'
+            WHEN count(*) FILTER (WHERE status = 'PASS') = 0 THEN 'FAIL'
+            ELSE 'PASS'
+        END AS status,
+        format(
+            'Total Steps: %s | PASS: %s | FAIL: %s | SKIPPED: %s',
+            count(*),
+            count(*) FILTER (WHERE status = 'PASS'),
+            count(*) FILTER (WHERE status = 'FAIL'),
+            count(*) FILTER (WHERE status = 'SKIPPED')
+        ) AS details
+    FROM smoke_test_results
+) AS results
 ORDER BY step_num::numeric;
+
+SELECT * FROM test_results ORDER BY step_num;
 
 -- ==============================================================================
 -- ROLLBACK — Guarantees zero persistent test data in live database
