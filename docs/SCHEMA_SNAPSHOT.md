@@ -1,5 +1,5 @@
 # UNB Premium — Canonical Database Schema Snapshot
-**Version:** Reconciled from Migrations 0001 through 0020  
+**Version:** Reconciled from Migrations 0001 through 0022  
 **Scope:** Single source of truth for tables, columns, constraints, enums, views, triggers, and RPC signatures.
 
 ---
@@ -476,9 +476,12 @@
   - `trg_sales_ledger_prevent_truncate` (BEFORE TRUNCATE FOR EACH STATEMENT -> RAISE EXCEPTION).
   - `trg_audit_logs_prevent_mutation` (BEFORE UPDATE OR DELETE FOR EACH ROW -> RAISE EXCEPTION).
   - `trg_audit_logs_prevent_truncate` (BEFORE TRUNCATE FOR EACH STATEMENT -> RAISE EXCEPTION).
-- `public.trg_protect_profile_columns()` on `public.profiles`.
-- `public.trg_protect_writer_profile_columns()` on `public.writer_profiles`.
-- `public.trg_protect_notification_columns()` on `public.notifications` (restricts update to `is_read`, `read_at`).
+- **Protection Triggers (0022)** (`SECURITY INVOKER`, `SET search_path = ''`, trust check `current_user NOT IN ('authenticated', 'anon', 'authenticator') OR public.is_admin()`):
+  - `public.trg_protect_profile_columns()` on `public.profiles` (protects `role`, `is_active`, `email`).
+  - `public.trg_protect_writer_profile_columns()` on `public.writer_profiles` (protects `current_unpaid_commission`, `custom_commission_rate`, `unpaid_commission_limit`, `status`, `is_orders_paused_for_commission`, etc.).
+  - `public.trg_protect_novel_columns()` on `public.novels` (protects `status`, `is_featured`, `published_at`, `moderation_reason`, `writer_id`, `total_chapters`, post-publish `slug` / `price_pkr`).
+  - `public.trg_protect_chapter_deletion()` on `public.chapters` (blocks chapter deletion when novel is submitted/published).
+  - `public.trg_protect_notification_columns()` on `public.notifications` (restricts update to `is_read`, `read_at`).
 - `public.check_duplicate_tid_before_insert()` on `public.payment_submissions`.
 - `public.trg_record_chapter_revision()` on `public.chapters`.
 - `public.trg_chapters_calculate_word_count()` and `public.trg_chapters_sync_total_chapters()`.
