@@ -786,25 +786,31 @@ BEGIN
 
 END $$;
 
--- 4. Display results with summary line
-SELECT
-    id,
-    check_category,
-    check_name,
-    status,
-    details
-FROM temp_verification_results
-UNION ALL
-SELECT
-    999999,
-    'SUMMARY',
-    'OVERALL VERIFICATION STATUS',
-    CASE WHEN count(*) FILTER (WHERE status='FAIL') = 0 THEN 'PASS' ELSE 'FAIL' END,
-    format('Total: %s | PASS: %s | FAIL: %s | WARN: %s | INFO: %s',
-           count(*),
-           count(*) FILTER (WHERE status='PASS'),
-           count(*) FILTER (WHERE status='FAIL'),
-           count(*) FILTER (WHERE status='WARN'),
-           count(*) FILTER (WHERE status='INFO'))
-FROM temp_verification_results
-ORDER BY id;
+-- 4. Materialize results with summary line into temp table before final SELECT
+DROP TABLE IF EXISTS test_results;
+CREATE TEMP TABLE test_results AS
+SELECT * FROM (
+    SELECT
+        id::integer AS id,
+        check_category,
+        check_name,
+        status,
+        details
+    FROM temp_verification_results
+    UNION ALL
+    SELECT
+        999999::integer AS id,
+        'SUMMARY' AS check_category,
+        'OVERALL VERIFICATION STATUS' AS check_name,
+        CASE WHEN count(*) FILTER (WHERE status='FAIL') = 0 THEN 'PASS' ELSE 'FAIL' END AS status,
+        format('Total: %s | PASS: %s | FAIL: %s | WARN: %s | INFO: %s',
+               count(*),
+               count(*) FILTER (WHERE status='PASS'),
+               count(*) FILTER (WHERE status='FAIL'),
+               count(*) FILTER (WHERE status='WARN'),
+               count(*) FILTER (WHERE status='INFO')) AS details
+    FROM temp_verification_results
+) AS results
+ORDER BY id::integer;
+
+SELECT * FROM test_results ORDER BY id;
