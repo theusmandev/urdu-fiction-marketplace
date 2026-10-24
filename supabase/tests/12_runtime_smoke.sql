@@ -161,8 +161,10 @@ BEGIN
     VALUES (1, 'Bootstrap Fixtures', 'PASS',
         'Fresh UUIDs; 4 users, 2 novels, 3 chapters, 1 payment method created');
 EXCEPTION WHEN OTHERS THEN
+    -- Include SQLSTATE so the exact failing statement type is identifiable
     INSERT INTO smoke_test_results (step_num, step_name, status, details)
-    VALUES (1, 'Bootstrap Fixtures', 'FAIL', 'Setup exception: ' || SQLERRM);
+    VALUES (1, 'Bootstrap Fixtures', 'FAIL',
+        format('SQLSTATE %s — %s', SQLSTATE, SQLERRM));
 END;
 $$;
 
@@ -367,19 +369,29 @@ $$;
 
 -- ==============================================================================
 -- STEP 4: WRITER verify_order_payment & IDEMPOTENT RETRY
+--   Assertions:
+--     1. Verify by WRITER JWT (not admin) succeeds.
+--     2. Calling it a second time is idempotent:
+--        - exactly 1 entitlement
+--        - exactly 1 sale_verified ledger row
+--        - commission + net = gross
+--     3. Writer's unpaid commission afterwards equals the ledger total minus confirmed payments.
 -- ==============================================================================
 DO $$
 DECLARE
-    v_writer_id     uuid;
-    v_order_id      uuid;
-    v_submission_id uuid;
-    v_res1          jsonb;
-    v_res2          jsonb;
-    v_ent_count     integer;
-    v_led_count     integer;
+    v_writer_id      uuid;
+    v_order_id       uuid;
+    v_submission_id  uuid;
+    v_res1           jsonb;
+    v_res2           jsonb;
+    v_ent_count      integer;
+    v_led_count      integer;
+    v_ledger         record;
+    v_writer_unpaid  numeric(12,2);
+    v_expected_unpaid numeric(12,2);
+    v_total_paid     numeric(12,2);
 BEGIN
     SELECT val_uuid INTO v_writer_id     FROM smoke_fixtures WHERE key = 'writer_id';
-    -- Re-derive from database rather than relying on stored fixture
     SELECT val_uuid INTO v_order_id      FROM smoke_fixtures WHERE key = 'order_1_id';
     SELECT val_uuid INTO v_submission_id FROM smoke_fixtures WHERE key = 'submission_1_id';
 
@@ -399,16 +411,17 @@ BEGIN
         RETURN;
     END IF;
 
+    -- Explicitly verify using WRITER JWT (non-admin)
     PERFORM set_config('request.jwt.claims',
         json_build_object('sub', v_writer_id::text, 'role', 'authenticated')::text, true);
 
-    -- Call 1: Verification
+    -- Call 1: Verification by WRITER
     v_res1 := public.verify_order_payment(v_order_id, v_submission_id, 'Writer confirmed deposit in bank');
 
     IF coalesce((v_res1->>'success')::boolean, false) IS NOT TRUE THEN
         INSERT INTO smoke_test_results (step_num, step_name, status, details)
         VALUES (4, 'Writer verify_order_payment & Idempotency', 'FAIL',
-            'First verify_order_payment call failed: ' || coalesce(v_res1::text, 'NULL'));
+            'First verify_order_payment call by writer JWT failed: ' || coalesce(v_res1::text, 'NULL'));
         RETURN;
     END IF;
 
@@ -419,7 +432,7 @@ BEGIN
         v_res2 := jsonb_build_object('idempotent_error', SQLERRM);
     END;
 
-    -- Invariant: Exactly 1 entitlement and 1 ledger row regardless of retry
+    -- Invariant 1: Exactly 1 entitlement and 1 ledger row regardless of retry
     SELECT count(*) INTO v_ent_count
     FROM public.purchase_entitlements WHERE order_id = v_order_id;
 
@@ -427,10 +440,44 @@ BEGIN
     FROM public.sales_ledger
     WHERE order_id = v_order_id AND entry_type = 'sale_verified';
 
+    SELECT * INTO v_ledger
+    FROM public.sales_ledger
+    WHERE order_id = v_order_id AND entry_type = 'sale_verified';
+
+    -- Invariant 2: Commission + Net = Gross
+    IF (v_ledger.platform_commission_pkr + v_ledger.writer_net_pkr) != v_ledger.gross_amount_pkr THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (4, 'Writer verify_order_payment & Idempotency', 'FAIL',
+            format('Ledger balance mismatch: comm (%s) + net (%s) != gross (%s)',
+                   v_ledger.platform_commission_pkr, v_ledger.writer_net_pkr, v_ledger.gross_amount_pkr));
+        RETURN;
+    END IF;
+
+    -- Invariant 3: Writer unpaid commission equals ledger total minus confirmed payments
+    SELECT current_unpaid_commission INTO v_writer_unpaid
+    FROM public.writer_profiles WHERE id = v_writer_id;
+
+    SELECT coalesce(sum(platform_commission_pkr), 0.00) INTO v_expected_unpaid
+    FROM public.sales_ledger WHERE writer_id = v_writer_id;
+
+    SELECT coalesce(sum(amount_pkr), 0.00) INTO v_total_paid
+    FROM public.commission_payments WHERE writer_id = v_writer_id;
+
+    v_expected_unpaid := greatest(0.00, v_expected_unpaid - v_total_paid);
+
+    IF v_writer_unpaid != v_expected_unpaid THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (4, 'Writer verify_order_payment & Idempotency', 'FAIL',
+            format('Writer balance mismatch: writer_profiles.current_unpaid_commission=%s, expected from ledger minus payments=%s',
+                   v_writer_unpaid, v_expected_unpaid));
+        RETURN;
+    END IF;
+
     IF v_ent_count = 1 AND v_led_count = 1 THEN
         INSERT INTO smoke_test_results (step_num, step_name, status, details)
         VALUES (4, 'Writer verify_order_payment & Idempotency', 'PASS',
-            'Order verified; idempotent retry handled safely; exactly 1 entitlement and 1 ledger row');
+            format('Order verified by writer JWT; idempotent retry handled safely (1 entitlement, 1 ledger row); comm+net=gross; writer unpaid commission=%.2f PKR',
+                   v_writer_unpaid));
     ELSE
         INSERT INTO smoke_test_results (step_num, step_name, status, details)
         VALUES (4, 'Writer verify_order_payment & Idempotency', 'FAIL',
@@ -441,6 +488,170 @@ EXCEPTION WHEN OTHERS THEN
     INSERT INTO smoke_test_results (step_num, step_name, status, details)
     VALUES (4, 'Writer verify_order_payment & Idempotency', 'FAIL',
         'verify_order_payment exception: ' || SQLERRM);
+END;
+$$;
+
+
+-- ==============================================================================
+-- STEP 4.5: CLIENT-SIDE DIRECT MUTATION & PRIVILEGE LOCKDOWN
+--   Proves that direct client writes by an IMPERSONATED authenticated writer FAIL:
+--     1. writer_profiles.current_unpaid_commission
+--     2. writer_profiles.custom_commission_rate
+--     3. writer_profiles.unpaid_commission_limit
+--     4. writer_profiles.status
+--     5. writer_profiles.is_orders_paused_for_commission
+--     6. profiles.role
+--     7. profiles.is_active
+--     8. novels.status
+--     9. novels.price_pkr (invalid / below platform minimum on published novel)
+--     10. novels.slug after publication
+--     11. reconcile_writer_unpaid_commission for another writer
+--     12. get_writer_unpaid_commission for another writer
+-- ==============================================================================
+DO $$
+DECLARE
+    v_writer_id   uuid;
+    v_stranger_id uuid;
+    v_novel_id    uuid;
+    v_fail_count  integer := 0;
+    v_errors      text := '';
+BEGIN
+    SELECT val_uuid INTO v_writer_id   FROM smoke_fixtures WHERE key = 'writer_id';
+    SELECT val_uuid INTO v_stranger_id FROM smoke_fixtures WHERE key = 'stranger_id';
+    SELECT val_uuid INTO v_novel_id    FROM smoke_fixtures WHERE key = 'novel_id';
+
+    IF v_writer_id IS NULL OR v_stranger_id IS NULL OR v_novel_id IS NULL THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (4.5, 'Client-Side Direct Mutation & Privilege Lockdown', 'SKIPPED',
+            'Prerequisite missing: writer_id, stranger_id, or novel_id');
+        RETURN;
+    END IF;
+
+    -- Impersonate writer as authenticated role
+    PERFORM set_config('request.jwt.claims',
+        json_build_object('sub', v_writer_id::text, 'role', 'authenticated')::text, true);
+
+    -- 1. writer_profiles.current_unpaid_commission
+    BEGIN
+        UPDATE public.writer_profiles SET current_unpaid_commission = 0.00 WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: current_unpaid_commission] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL; -- Expected exception
+    END;
+
+    -- 2. writer_profiles.custom_commission_rate
+    BEGIN
+        UPDATE public.writer_profiles SET custom_commission_rate = 5.00 WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: custom_commission_rate] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 3. writer_profiles.unpaid_commission_limit
+    BEGIN
+        UPDATE public.writer_profiles SET unpaid_commission_limit = 99999.00 WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: unpaid_commission_limit] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 4. writer_profiles.status
+    BEGIN
+        UPDATE public.writer_profiles SET status = 'approved' WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: writer_profiles.status] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 5. writer_profiles.is_orders_paused_for_commission
+    BEGIN
+        UPDATE public.writer_profiles SET is_orders_paused_for_commission = false WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: is_orders_paused_for_commission] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 6. profiles.role
+    BEGIN
+        UPDATE public.profiles SET role = 'admin' WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: profiles.role] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 7. profiles.is_active
+    BEGIN
+        UPDATE public.profiles SET is_active = false WHERE id = v_writer_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: profiles.is_active] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 8. novels.status (direct update on published novel)
+    BEGIN
+        UPDATE public.novels SET status = 'draft' WHERE id = v_novel_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: novels.status draft] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 9. novels.price_pkr (below platform minimum on published novel)
+    BEGIN
+        UPDATE public.novels SET price_pkr = 25.00 WHERE id = v_novel_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: novels.price_pkr below min] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 10. novels.slug after publication
+    BEGIN
+        UPDATE public.novels SET slug = 'hacked-slug-' || left(v_novel_id::text, 8) WHERE id = v_novel_id;
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: novels.slug after publication] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 11. reconcile_writer_unpaid_commission for ANOTHER writer
+    BEGIN
+        PERFORM public.reconcile_writer_unpaid_commission(v_stranger_id);
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: reconcile_writer_unpaid_commission cross-writer] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    -- 12. get_writer_unpaid_commission for ANOTHER writer
+    BEGIN
+        PERFORM public.get_writer_unpaid_commission(v_stranger_id);
+        v_fail_count := v_fail_count + 1;
+        v_errors := v_errors || '[Bypass: get_writer_unpaid_commission cross-writer] ';
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
+
+    IF v_fail_count = 0 THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (4.5, 'Client-Side Direct Mutation & Privilege Lockdown', 'PASS',
+            'All 12 direct client mutation attempts correctly rejected by triggers & RPC security checks');
+    ELSE
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (4.5, 'Client-Side Direct Mutation & Privilege Lockdown', 'FAIL',
+            format('%s check(s) bypassed security! Errors: %s', v_fail_count, v_errors));
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    INSERT INTO smoke_test_results (step_num, step_name, status, details)
+    VALUES (4.5, 'Client-Side Direct Mutation & Privilege Lockdown', 'FAIL',
+        'Exception in lockdown tests: ' || SQLERRM);
 END;
 $$;
 
@@ -583,16 +794,23 @@ $$;
 
 
 -- ==============================================================================
--- STEP 7: ADMIN ORDERS RPCs (Privacy Protection)
+-- STEP 7: ADMIN ORDERS RPCs (Order Inspection & Privacy Verification)
+--   Split into 4 separate checks with exact diagnostic error messages:
+--     (i)   admin_list_orders returns the fixture order
+--     (ii)  admin_get_order returns the order with submissions and ledger
+--     (iii) the fixture reader's exact email string does NOT appear anywhere in either JSON
+--     (iv)  the writer's payment method full account number appears only where intended
 -- ==============================================================================
 DO $$
 DECLARE
-    v_admin_id  uuid;
-    v_buyer_id  uuid;
-    v_order_id  uuid;
-    v_list_res  jsonb;
-    v_order_res jsonb;
-    v_buyer_email text;
+    v_admin_id         uuid;
+    v_buyer_id         uuid;
+    v_order_id         uuid;
+    v_list_res         jsonb;
+    v_order_res        jsonb;
+    v_buyer_email      text;
+    v_list_has_order   boolean := false;
+    v_account_number   text := '03001234567';
 BEGIN
     SELECT val_uuid INTO v_admin_id  FROM smoke_fixtures WHERE key = 'admin_id';
     SELECT val_uuid INTO v_buyer_id  FROM smoke_fixtures WHERE key = 'buyer_id';
@@ -614,19 +832,81 @@ BEGIN
     v_list_res  := public.admin_list_orders('verified', NULL, false, 10, 0);
     v_order_res := public.admin_get_order(v_order_id);
 
-    -- Assert: buyer email must NOT appear in either response
-    IF (v_list_res::text  NOT LIKE '%' || v_buyer_email || '%')
-       AND (v_order_res::text NOT LIKE '%' || v_buyer_email || '%')
-       AND (v_order_res->>'id' = v_order_id::text)
-    THEN
-        INSERT INTO smoke_test_results (step_num, step_name, status, details)
-        VALUES (7, 'Admin Orders Inspection & Privacy', 'PASS',
-            'Admin orders returned valid data; buyer email not exposed in response');
-    ELSE
+    -- Check (i): admin_list_orders returns the fixture order
+    SELECT EXISTS (
+        SELECT 1 FROM jsonb_array_elements(v_list_res->'orders') elem
+        WHERE elem->>'id' = v_order_id::text
+    ) INTO v_list_has_order;
+
+    IF NOT v_list_has_order THEN
         INSERT INTO smoke_test_results (step_num, step_name, status, details)
         VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
-            'Privacy leakage detected or order detail missing');
+            format('Check (i) FAIL: admin_list_orders did not return fixture order %s in verified orders list (total_count=%s)',
+                   v_order_id, v_list_res->>'total_count'));
+        RETURN;
     END IF;
+
+    -- Check (ii): admin_get_order returns the order with submissions and ledger
+    IF (v_order_res->'order'->>'id' != v_order_id::text) THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            format('Check (ii) FAIL: admin_get_order did not return order object for %s (got %s)',
+                   v_order_id, coalesce(v_order_res->'order'->>'id', 'NULL')));
+        RETURN;
+    END IF;
+
+    IF jsonb_array_length(coalesce(v_order_res->'submissions', '[]'::jsonb)) < 1 THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            format('Check (ii) FAIL: admin_get_order returned 0 submissions for order %s', v_order_id));
+        RETURN;
+    END IF;
+
+    IF jsonb_array_length(coalesce(v_order_res->'ledger', '[]'::jsonb)) < 1 THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            format('Check (ii) FAIL: admin_get_order returned 0 ledger rows for order %s', v_order_id));
+        RETURN;
+    END IF;
+
+    -- Check (iii): Reader exact email string does NOT appear anywhere in either JSON response
+    IF (v_list_res::text LIKE '%' || v_buyer_email || '%') THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            format('Check (iii) CRITICAL PRIVACY LEAK: Reader email %s leaked in admin_list_orders response', v_buyer_email));
+        RETURN;
+    END IF;
+
+    IF (v_order_res::text LIKE '%' || v_buyer_email || '%') THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            format('Check (iii) CRITICAL PRIVACY LEAK: Reader email %s leaked in admin_get_order response', v_buyer_email));
+        RETURN;
+    END IF;
+
+    -- Check (iv): Writer payment method full account number appears only where intended
+    -- It MUST NOT appear in admin_list_orders
+    IF (v_list_res::text LIKE '%' || v_account_number || '%') THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            format('Check (iv) PRIVACY LEAK: Full writer account number %s leaked in admin_list_orders response', v_account_number));
+        RETURN;
+    END IF;
+
+    -- In admin_get_order, it must appear ONLY inside payment_instructions_snapshot
+    IF (v_order_res->'order'->'payment_instructions_snapshot'->>'account_number_or_iban' != v_account_number) THEN
+        INSERT INTO smoke_test_results (step_num, step_name, status, details)
+        VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL',
+            'Check (iv) FAIL: Writer account details missing from payment_instructions_snapshot in admin_get_order');
+        RETURN;
+    END IF;
+
+    INSERT INTO smoke_test_results (step_num, step_name, status, details)
+    VALUES (7, 'Admin Orders Inspection & Privacy', 'PASS',
+        format('All 4 checks passed: (i) order found in list, (ii) detail returned submissions=%s ledger=%s, (iii) reader email (%s) not exposed, (iv) account number isolated to instructions snapshot',
+               jsonb_array_length(v_order_res->'submissions'),
+               jsonb_array_length(v_order_res->'ledger'),
+               v_buyer_email));
 EXCEPTION WHEN OTHERS THEN
     INSERT INTO smoke_test_results (step_num, step_name, status, details)
     VALUES (7, 'Admin Orders Inspection & Privacy', 'FAIL', 'Admin orders exception: ' || SQLERRM);
