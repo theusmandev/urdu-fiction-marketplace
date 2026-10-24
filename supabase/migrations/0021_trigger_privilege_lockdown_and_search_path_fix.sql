@@ -91,35 +91,6 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
 --
 -- We re-issue grants here so they survive the default-privilege change above.
 
-DO $$
-DECLARE
-    v_fn text;
-    v_cnt integer;
-BEGIN
-    FOREACH v_fn IN ARRAY ARRAY[
-        'search_public_novels',
-        'get_public_novel_chapters',
-        'has_novel_entitlement',
-        'is_admin'
-    ] LOOP
-        SELECT count(*) INTO v_cnt
-        FROM pg_proc p
-        JOIN pg_namespace n ON n.oid = p.pronamespace
-        WHERE n.nspname = 'public' AND p.proname = v_fn;
-
-        IF v_cnt > 0 THEN
-            EXECUTE format(
-                'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated'
-            );
-            -- Targeted grant (use DO block with dynamic SQL per function)
-            -- The above grants all, so we restrict by revoking everything first,
-            -- then granting per-function below.
-        END IF;
-    END LOOP;
-END;
-$$;
-
--- Targeted, explicit approach: revoke all first then grant only what is needed.
 -- Step A: Revoke anon from all non-trigger public functions
 DO $$
 DECLARE
