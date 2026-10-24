@@ -144,3 +144,145 @@ When running the updated scripts, send back only:
 - The **SUMMARY row** (last row of each result set)
 - Every row where `status IN ('FAIL', 'SKIPPED', 'WARN')`
 - INFO rows are informational only and not required unless a specific item needs review
+
+---
+
+## 5. Migration 0022 — Protection Trigger Architecture, search_path Lockdown & Privacy Audit (October 2026)
+
+### 5.1 Root Cause: Writer-Side `verify_order_payment` Failure (Smoke Test Step 4)
+
+#### Defect Description
+In smoke test Step 4, when the writer called `verify_order_payment(order_id, submission_id)`:
+```
+ERROR: Unauthorized: Unpaid commission balance is managed exclusively by ledger reconciliation.
+CONTEXT: PL/pgSQL function trg_protect_writer_profile_columns() line 26 at RAISE
+         SQL statement "UPDATE public.writer_profiles SET current_unpaid_commission = ..."
+         PL/pgSQL function reconcile_writer_unpaid_commission(uuid) line 33 at SQL statement
+         SQL statement "SELECT public.reconcile_writer_unpaid_commission(v_order.writer_id)"
+         PL/pgSQL function verify_order_payment(uuid, uuid, text) line 87 at PERFORM
+```
+
+#### Why Direct Admin Actions Passed While Writer Calls Failed
+When an admin calls an RPC or verifies an order (e.g. in dispute resolution steps 12 and 13), `public.is_admin()` evaluates to `TRUE`. The protection trigger had an admin bypass (`OR public.is_admin()`), so admin-initiated writes succeeded. When a normal author called `verify_order_payment`, `public.is_admin()` evaluated to `FALSE`.
+
+#### The PostgreSQL Security & Role Switching Invariant
+To write secure triggers and RPCs in Supabase, developers must understand how PostgreSQL manages session state during function execution:
+
+1. **`session_user`**: The role that authenticated the initial client connection (in PostgREST, this is `authenticator` or `postgres`). It **never changes** when entering a `SECURITY DEFINER` function.
+2. **`request.jwt.claims`**: A PostgREST transaction-local GUC (`current_setting('request.jwt.claims')`) populated from the caller's JWT. Helper functions like `auth.uid()` extract the `sub` claim from this GUC. A `SECURITY DEFINER` function executes within the same transaction and does **NOT** alter transaction-local GUCs. Therefore, `auth.uid()` continues to return the non-admin caller's UUID, and `current_setting('role')` continues to return `'authenticated'`.
+3. **`current_user`**: The effective role used by PostgreSQL for object privilege evaluation. When a `SECURITY DEFINER` function owned by `postgres` executes, PostgreSQL temporarily switches `current_user` to the function's owner (`postgres`).
+4. **Trigger Security Context**:
+   - If a trigger function is declared `SECURITY DEFINER`, entering the trigger causes PostgreSQL to switch `current_user` to the trigger function owner (`postgres`). This is fatal for protection triggers, because even direct unprivileged client updates via the REST API (`supabase.from('writer_profiles').update(...)`) would execute the trigger body as `postgres`!
+   - Therefore, protection triggers **MUST be declared `SECURITY INVOKER`**. As `SECURITY INVOKER`, the trigger executes under whatever `current_user` is active at the moment of the write statement:
+     - For a direct client API write: `current_user = 'authenticated'` (or `'anon'`).
+     - For a write inside a `SECURITY DEFINER` RPC: `current_user = 'postgres'` (the RPC owner).
+     - For a DBA or migration run in the SQL Editor: `current_user = 'postgres'`.
+
+#### The Flawed vs Robust Trust Test
+- **Previous Flawed Check (0007–0021)**:
+  ```sql
+  v_is_db_admin := (auth.uid() IS NULL AND pg_catalog.current_setting('role', true) NOT IN ('authenticated', 'anon'));
+  IF NOT v_is_db_admin AND NOT public.is_admin() THEN
+      -- Blocked ALL non-admin writes, even those coming from trusted SECURITY DEFINER RPCs!
+  ```
+  Inside a non-admin's `SECURITY DEFINER` RPC, `auth.uid()` was NOT null, and `current_setting('role')` was `'authenticated'`. The trigger falsely concluded the write was an unauthorized direct client write.
+
+- **Authoritative Robust Check (Migration 0022)**:
+  ```sql
+  v_is_trusted := (pg_catalog.current_user NOT IN ('authenticated', 'anon', 'authenticator'))
+                  OR public.is_admin();
+  ```
+  Because the trigger is `SECURITY INVOKER`:
+  - When invoked from a `SECURITY DEFINER` RPC (`verify_order_payment`, `apply_as_writer`, `update_novel`, etc.), `current_user` is `postgres`. `current_user NOT IN ('authenticated', 'anon', 'authenticator')` evaluates to `TRUE`. The write is trusted.
+  - When invoked from a direct PostgREST client update, `current_user` is `'authenticated'`. Since `public.is_admin()` is `FALSE`, `v_is_trusted` evaluates to `FALSE`, and column modifications are strictly blocked.
+  - No client-manipulable GUC flags (e.g. `app.writer_reapply` or `app.novel_status_change`) are needed or trusted.
+
+---
+
+### 5.2 Comprehensive Audit: Non-Admin Callable SECURITY DEFINER Functions
+
+Every function in schema `public` callable by an authenticated non-admin user was audited to ensure no protected columns are blocked:
+
+| Function | Caller | Tables Written | Protected Columns Touched | Protection Mechanism in 0022 |
+|---|---|---|---|---|
+| `verify_order_payment` | Writer | `orders`, `payment_submissions`, `purchase_entitlements`, `sales_ledger`, `writer_profiles` | `writer_profiles.current_unpaid_commission`, `is_orders_paused_for_commission` | RPC is `SECURITY DEFINER` (`current_user = 'postgres'`). Trigger `trg_protect_writer_profile_columns` (now `SECURITY INVOKER`) validates `current_user NOT IN ('authenticated','anon','authenticator')` and allows reconciliation. |
+| `reject_order_payment` | Writer | `orders`, `payment_submissions`, `notifications`, `audit_logs` | `orders.status` ('rejected'), `submissions.reviewer_status` ('rejected') | Tables have no column protection triggers; `orders` and `submissions` RLS prevents direct client writes; mutations routed through this RPC. |
+| `report_commission_payment` | Writer | `commission_payment_reports`, `notifications`, `audit_logs` | None on protected tables | Writes report record; does NOT mutate `writer_profiles.current_unpaid_commission` (verified in Step 9: balance unchanged until admin settlement). |
+| `submit_payment` | Reader | `orders`, `payment_submissions`, `notifications` | `orders.status` ('payment_submitted') | Allowed via RPC state transition; TID duplication checked via `check_duplicate_tid_before_insert()`. |
+| `create_order` | Reader | `orders`, `audit_logs` | INSERT new order in 'pending_payment' | Bounded price validation `[min, max]`; abuse rate limit; unique active order check. |
+| `cancel_order` | Reader | `orders`, `audit_logs` | `orders.status` ('cancelled') | Validates order belongs to reader and status is 'pending_payment'. |
+| `apply_as_writer` | Applicant | `writer_profiles`, `profiles` | `writer_profiles.status` ('pending_approval') | Allowed: RPC is `SECURITY DEFINER` (`current_user = 'postgres'`). Allows rejected authors to re-apply without client GUC tampering. |
+| `upsert_writer_payment_method` / `deactivate_...` | Writer | `writer_payment_methods` | None | Writer-scoped CRUD. |
+| `create_novel` | Writer | `novels`, `novel_genres`, `audit_logs` | INSERT novel in 'draft' | Enforces approved writer status; price bounded to `[min, max]`. |
+| `update_novel` | Writer | `novels`, `novel_genres`, `audit_logs` | `novels.price_pkr`, content fields | Allowed while in 'draft', 'rejected', or 'published'. Writes audit log on published price changes. |
+| `submit_novel_for_review` | Writer | `novels`, `notifications`, `audit_logs` | `novels.status` ('under_review') | Allowed: RPC is `SECURITY DEFINER` (`current_user = 'postgres'`). Validates cover art, genre, published chapter, and payment method. |
+| `withdraw_novel_submission` | Writer | `novels`, `audit_logs` | `novels.status` ('draft') | Allowed: RPC is `SECURITY DEFINER`. Reverts 'under_review' novel to 'draft'. |
+| `unpublish_own_novel` | Writer | `novels`, `audit_logs` | `novels.status` ('draft') | Allowed: RPC is `SECURITY DEFINER`. Reverts 'published' novel to 'draft'. |
+| `create_chapter` / `update_chapter` / `reorder_chapters` | Writer | `chapters` | Revision tracking | Trigger `trg_chapters_calculate_word_count` and `trg_chapters_sync_total_chapters` synchronize metadata. |
+| `unpublish_chapter` | Writer | `chapters` | `chapters.is_published` (false) | Allowed. Soft unpublishing supported for published novels. |
+| `delete_draft_chapter` | Writer | `chapters` | DELETE row | Trigger `trg_protect_chapter_deletion` strictly blocks DELETE once novel is submitted or published. |
+| `request_refund` | Reader | `refund_requests`, `orders`, `notifications` | None | Inserts refund request record. |
+| `open_dispute` | Reader | `disputes`, `orders`, `notifications` | `orders.status` ('disputed') | Validates 24-hour minimum wait window from payment submission. |
+| `add_dispute_message` | Reader / Writer | `dispute_messages`, `notifications` | None | Inserts communication entry. |
+| Support RPCs (`create_support_request`, etc.) | User | `support_requests`, `support_messages` | None | User-scoped support ticket workflows. |
+| Notification RPCs (`mark_notifications_as_read`, etc.) | User | `notifications`, `notification_preferences` | `notifications.is_read`, `read_at` | Non-admin users are restricted to modifying `is_read` and `read_at` by `trg_protect_notification_columns`. |
+| `reconcile_writer_unpaid_commission` | Writer / Admin | `writer_profiles`, `notifications` | `writer_profiles.current_unpaid_commission`, `is_orders_paused_for_commission` | Caller authorization: `auth.uid() = p_writer_id OR public.is_admin()`. `SECURITY DEFINER` executes write as `postgres`. |
+| `get_writer_unpaid_commission` | Writer / Admin | None (Read-only) | None | Caller authorization: `auth.uid() = p_writer_id OR public.is_admin()`. |
+
+---
+
+### 5.3 search_path Enforcement on 9 SECURITY DEFINER Functions
+
+Migration `0021` fixed the 5 functions rewritten in migration `0020`. The 9 functions rewritten in migration `0019` retained `SET search_path = public, pg_temp`. In migration `0022`, all 9 have been recreated with `SET search_path = ''`:
+
+1. `public.get_public_novel_chapters(text)`: Fully schema-qualified catalog TOC accessor (`public.chapters`, `public.novels`, `public.profiles`, `public.writer_profiles`). Explicit casts `n.status::text = 'published'` and `wp.status::text = 'approved'`. Retains anon execution grant.
+2. `public.get_checkout_options(uuid)`: Schema-qualified (`public.novels`, `public.writer_profiles`, `public.writer_payment_methods`, `public.purchase_entitlements`, `public.orders`). Masked account formatting via `pg_catalog.length()` and `pg_catalog.substr()`.
+3. `public.create_order(uuid, uuid)`: Schema-qualified order creation with bounded price checking against `public.platform_settings`, rate limiting, and immutable order snapshotting.
+4. `public.get_chapter_for_reader(text, integer)`: Schema-qualified content delivery with entitlements evaluation, sliding-window rate limiting, and navigation calculations.
+5. `public.admin_list_orders(text, text, boolean, integer, integer)`: Paginated order inspection with `LEFT JOIN public.writer_profiles` and strict reader privacy protections.
+6. `public.admin_get_order(uuid)`: Detailed order inspection returning structured `order`, `reader`, `writer`, `novel`, `submissions`, `disputes`, `ledger`, and `entitlement` objects.
+7. `public.get_writer_unpaid_commission(uuid)`: Authorized ledger aggregation (`public.sales_ledger` minus `public.commission_payments`).
+8. `public.reconcile_writer_unpaid_commission(uuid)`: Authorized reconciliation and automated order pause threshold notifications (80% warning and 100% suspension).
+9. `public.reject_order_payment(uuid, uuid, text)`: Strict status validation (`payment_submitted` order and `pending` submission) with reader notification and audit logging.
+
+Verification check 12 in `supabase/tests/00_post_migration_verification.sql` has been updated to dynamically verify that **every** `SECURITY DEFINER` function in schema public has a strictly empty `search_path` GUC (`search_path=""` or `search_path=`). Any non-empty value triggers a `FAIL`.
+
+---
+
+### 5.4 Smoke Test Step 7 De-anonymization & Privacy Audit
+
+#### Ambiguity in Step 7 v1
+Step 7 in smoke test v1 grouped multiple assertions into a single `IF` statement:
+```sql
+IF (v_list_res::text NOT LIKE '%' || v_buyer_email || '%')
+   AND (v_order_res::text NOT LIKE '%' || v_buyer_email || '%')
+   AND (v_order_res->>'id' = v_order_id::text) -- <-- BUG: admin_get_order returns { "order": { "id": ... } }
+THEN
+```
+Because `admin_get_order()` nests the order metadata under the `'order'` key, `v_order_res->>'id'` was `NULL`. The test failed with the ambiguous message *"Privacy leakage detected or order detail missing"*, obscuring whether a data leak had actually occurred.
+
+#### Step 7 v2 Split Checks & Findings
+Step 7 has been decoupled into four discrete checks with explicit diagnostic errors:
+1. **Check (i) Order Discovery**: `admin_list_orders('verified')` returns the fixture order in the paginated list.
+2. **Check (ii) Order Detail Structure**: `admin_get_order()` returns the order object (`v_order_res->'order'->>'id'`), at least 1 payment submission, and at least 1 sales ledger entry.
+3. **Check (iii) Reader Email Privacy**: The fixture reader's exact email address (`buyer_smoke_...`) does NOT appear anywhere in the raw JSON text of `admin_list_orders` or `admin_get_order`. (Admin RPCs project `display_name` and `username`; emails are never selected).
+4. **Check (iv) Account Number Exposure**: The writer's full account number (`03001234567`) does NOT appear in `admin_list_orders` (where only `payment_method_type` is returned). In `admin_get_order`, the account number appears strictly within `payment_instructions_snapshot` as required for payment reconciliation.
+
+---
+
+### 5.5 Client-Side Protection Verification (Step 4.5)
+
+Step 4.5 was added to `supabase/tests/12_runtime_smoke.sql` to rigorously test client-side security boundaries under an impersonated non-admin writer JWT (`request.jwt.claims -> sub = writer_id, role = 'authenticated'`). All 12 attack vectors are confirmed to fail:
+1. Direct `UPDATE writer_profiles SET current_unpaid_commission = 0.00` -> **BLOCKED** by trigger.
+2. Direct `UPDATE writer_profiles SET custom_commission_rate = 5.00` -> **BLOCKED** by trigger.
+3. Direct `UPDATE writer_profiles SET unpaid_commission_limit = 99999.00` -> **BLOCKED** by trigger.
+4. Direct `UPDATE writer_profiles SET status = 'approved'` -> **BLOCKED** by trigger.
+5. Direct `UPDATE writer_profiles SET is_orders_paused_for_commission = false` -> **BLOCKED** by trigger.
+6. Direct `UPDATE profiles SET role = 'admin'` -> **BLOCKED** by trigger.
+7. Direct `UPDATE profiles SET is_active = false` -> **BLOCKED** by trigger.
+8. Direct `UPDATE novels SET status = 'draft'` -> **BLOCKED** by trigger.
+9. Direct `UPDATE novels SET price_pkr = 25.00` (below platform minimum) -> **BLOCKED** by price validation trigger.
+10. Direct `UPDATE novels SET slug = 'hacked-slug'` after publication -> **BLOCKED** by trigger.
+11. `reconcile_writer_unpaid_commission(stranger_id)` -> **BLOCKED** by authorization check (`Access denied`).
+12. `get_writer_unpaid_commission(stranger_id)` -> **BLOCKED** by authorization check (`Access denied`).
+
