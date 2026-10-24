@@ -1674,18 +1674,26 @@ export interface Database {
       };
       update_platform_settings: {
         Args: {
-          p_default_commission_rate: number;
-          p_default_unpaid_commission_limit: number;
-          p_dispute_window_days: number;
-          p_min_novel_price_pkr: number;
-          p_max_novel_price_pkr: number;
-          p_support_email: string;
+          p_default_commission_rate?: number;
+          p_default_unpaid_commission_limit?: number;
+          p_dispute_window_days?: number;
+          p_min_novel_price_pkr?: number;
+          p_max_novel_price_pkr?: number;
+          p_support_email?: string;
           p_max_orders_per_hour?: number;
           p_max_chapter_reads_per_window?: number;
           p_chapter_read_window_minutes?: number;
+          p_invoice_due_days?: number;
+          p_overdue_grace_days?: number;
+          p_min_dispute_wait_hours?: number;
+          p_verification_reminder_hours?: number;
+          p_unpaid_commission_threshold_pkr?: number;
+          p_payment_verification_window_hours?: number;
         };
         Returns: {
           success: boolean;
+          message?: string;
+          settings?: Json;
         };
       };
       set_writer_commission_terms: {
