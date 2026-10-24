@@ -564,7 +564,7 @@ BEGIN
             'SECURITY DEFINER function has no search_path GUC configured');
     END LOOP;
 
-    -- 12b: Functions with search_path = 'public' or 'public, pg_temp' (insecure)
+    -- 12b: Functions with non-empty search_path (must be strictly empty string '')
     FOR v_rec IN
         SELECT p.proname, pg_get_function_identity_arguments(p.oid) AS args,
                (SELECT cfg FROM unnest(p.proconfig) cfg WHERE cfg LIKE 'search_path=%' LIMIT 1) AS sp
@@ -573,13 +573,13 @@ BEGIN
           AND EXISTS (
               SELECT 1 FROM unnest(p.proconfig) cfg
               WHERE cfg LIKE 'search_path=%'
-                AND (cfg ILIKE '%=public%' OR cfg ILIKE '%= public%')
+                AND trim(substring(cfg from 13)) NOT IN ('', '""', '''''')
           )
         ORDER BY p.proname
     LOOP
         INSERT INTO temp_verification_results (check_category, check_name, status, details)
         VALUES ('SECURITY_DEFINER', v_rec.proname || '(' || v_rec.args || ')', 'FAIL',
-            format('search_path = ''%s'' is insecure; must be '''' (empty). Run migration 0021 to fix.',
+            format('search_path = ''%s'' is not empty; all SECURITY DEFINER functions must have SET search_path = ''''',
                    v_rec.sp));
     END LOOP;
 
@@ -718,6 +718,8 @@ BEGIN
 
     -- =========================================================================
     -- CHECK 17: plpgsql_check AST Runtime Analysis
+    --   FAIL rows include the offending function signature AND the first error
+    --   message so the issue is immediately visible in the check_name column.
     -- =========================================================================
     IF EXISTS (SELECT 1 FROM pg_extension WHERE extname='plpgsql_check') THEN
         -- Standard functions
@@ -734,9 +736,12 @@ BEGIN
                     USING v_rec.func_oid
                 LOOP
                     v_err_count := v_err_count + 1;
+                    -- check_name contains function signature so failures are scannable at a glance
                     INSERT INTO temp_verification_results (check_category, check_name, status, details)
-                    VALUES ('plpgsql_check', v_rec.proname || '(' || v_rec.args || ')', 'FAIL',
-                        v_err.message);
+                    VALUES ('plpgsql_check',
+                        'FUNCTION ' || v_rec.proname || '(' || v_rec.args || ')',
+                        'FAIL',
+                        'First error: ' || v_err.message);
                 END LOOP;
             EXCEPTION WHEN OTHERS THEN
                 INSERT INTO temp_verification_results (check_category, check_name, status, details)
@@ -762,9 +767,12 @@ BEGIN
                     USING v_rec.tgfoid, v_rec.tgrelid
                 LOOP
                     v_err_count := v_err_count + 1;
+                    -- check_name contains trigger name + table so failures are scannable at a glance
                     INSERT INTO temp_verification_results (check_category, check_name, status, details)
-                    VALUES ('plpgsql_check_trigger', v_rec.proname || ' on ' || v_rec.relname, 'FAIL',
-                        v_err.message);
+                    VALUES ('plpgsql_check_trigger',
+                        'TRIGGER ' || v_rec.proname || ' ON ' || v_rec.relname,
+                        'FAIL',
+                        'First error: ' || v_err.message);
                 END LOOP;
             EXCEPTION WHEN OTHERS THEN
                 INSERT INTO temp_verification_results (check_category, check_name, status, details)
