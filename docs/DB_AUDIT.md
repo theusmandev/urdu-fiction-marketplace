@@ -64,4 +64,32 @@ The reconciliation identified four distinct classes of runtime failures:
 | Migrations | Issue | Impact | Plan |
 |---|---|---|---|
 | `0017_a_commission_enum_values.sql` and `0017_commission_and_statements.sql` | Shared numeric prefix `0017`. | Conflicts under Supabase CLI `supabase db push`. | In accordance with repository rules, existing applied files are NOT renamed in git. In future repository release/deployment renumbering, `0017_a` will become `0017_...` and `0017_commission...` will become `0018_...`. |
-| New Migration | `0019_database_reconciliation_and_runtime_fixes.sql` | Must be guarded against missing prerequisites. | Starts with a guarded `DO $$` block validating that `partially_paid` exists and required tables exist before executing DDL. |
+| `0019_database_reconciliation_and_runtime_fixes.sql` | Reconciliation patch for early catalog and checkout RPCs. | Guarded execution of core reader/writer views and procedures. | Applied to live database. |
+| `0020_database_reconciliation_and_immutability_hardening.sql` | Live plpgsql_check defects (resolve_dispute_for_reader_verify, update_platform_settings, verify_order_payment) and immutability triggers. | Eliminates all remaining plpgsql_check AST errors and aligns partial unique indexes. | Apply directly via Supabase SQL Editor. |
+
+---
+
+## 3. Migration 0020 Reconciliation & Live Database Audit Findings
+
+### 3.1 Defect Root Cause Analysis
+
+1. **`resolve_dispute_for_reader_verify` Column Mismatch (`purchase_entitlements.created_at`)**:
+   - *Problem*: Migration 0018 attempted to write to `purchase_entitlements.created_at`. In the canonical schema (`0002_orders_and_financial_ledger.sql`), access grant time is tracked strictly by `granted_at`.
+   - *Fix*: In `0020`, re-implemented with `granted_at = now()`, aligned `ON CONFLICT (reader_id, novel_id) WHERE is_revoked = false`, and set `search_path = public, pg_temp`.
+
+2. **`update_platform_settings` Non-Existent Column & Signature Drift**:
+   - *Problem*: In 0018, the 14-parameter signature attempted to update `unpaid_commission_threshold_pkr` and `payment_verification_window_hours`. Neither column exists on `public.platform_settings` (`default_unpaid_commission_limit` is canonical, and payment verification window was never provisioned as a column).
+   - *Fix*: In `0020`, dropped all 6 stale overloaded signatures; created unified canonical procedure supporting optional parameter aliases (`p_default_unpaid_commission_limit` and `p_unpaid_commission_threshold_pkr`), writing strictly to real columns, and preserving frontend compatibility.
+
+3. **`verify_order_payment` & `admin_force_verify` Partial Unique Index ON CONFLICT Failure**:
+   - *Problem*: PostgreSQL error `there is no unique or exclusion constraint matching the ON CONFLICT specification` occurs when `ON CONFLICT (cols)` does not specify the `WHERE` predicate of a partial unique index. `purchase_entitlements` has partial index `idx_active_purchase_entitlement` on `(reader_id, novel_id) WHERE is_revoked = false`, and `sales_ledger` has `idx_sales_ledger_order_sale_verified` on `(order_id) WHERE entry_type = 'sale_verified'`.
+   - *Fix*: Re-implemented with select-then-insert pattern and explicit partial index predicate matching (`ON CONFLICT (reader_id, novel_id) WHERE is_revoked = false` and `ON CONFLICT (order_id) WHERE entry_type = 'sale_verified' DO NOTHING`). Enforced idempotency so repeat calls return existing records cleanly without duplicate creation.
+
+4. **Append-Only Immutability Triggers on `sales_ledger` and `audit_logs`**:
+   - *Problem*: Migration 0006 defined triggers named `trg_sales_ledger_prevent_mutation` and `trg_audit_logs_prevent_mutation`. Test script 00 checked for invented hardcoded names `trg_immutable_sales_ledger`.
+   - *Fix*: In `0020`, idempotently recreated row-level BEFORE UPDATE OR DELETE triggers (`trg_sales_ledger_prevent_mutation`, `trg_audit_logs_prevent_mutation`) and statement-level BEFORE TRUNCATE triggers (`trg_sales_ledger_prevent_truncate`, `trg_audit_logs_prevent_truncate`) using `public.prevent_append_only_mutation()` with explicit `search_path = public, pg_temp`.
+
+5. **Test Suite Harmonization**:
+   - `supabase/tests/00_post_migration_verification.sql`: Rewritten to verify all 29 real tables (removing 10 invented tables), all real RPCs, correct enum `commission_invoice_status`, dynamic `pg_trigger` inspection, and strict anon privilege audit.
+   - `supabase/tests/12_runtime_smoke.sql`: Created 15-step behavioral end-to-end smoke test executing real RPCs under fake `auth.users` impersonation within a single transactional `ROLLBACK`.
+
