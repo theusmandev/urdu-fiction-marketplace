@@ -348,6 +348,16 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   - Recreates append-only immutability triggers on `sales_ledger` and `audit_logs` (BEFORE UPDATE/DELETE and BEFORE TRUNCATE).
 - **Action**: Paste contents of `supabase/migrations/0020_database_reconciliation_and_immutability_hardening.sql` into the Supabase SQL Editor and click **Run**.
 
+### 21. `supabase/migrations/0021_trigger_privilege_lockdown_and_search_path_fix.sql` [PRIVILEGE LOCKDOWN & SEARCH PATH FIX]
+- **Purpose**: Addresses 37 FAILs found in the live verification run:
+  - **Trigger function EXECUTE revocation**: Dynamically loops over all trigger-returning functions in schema public and REVOKEs EXECUTE from PUBLIC, anon, and authenticated. No hard-coded function names — covers all current and future trigger functions.
+  - **ALTER DEFAULT PRIVILEGES**: Future functions created by the postgres role in schema public are private by default (no automatic PUBLIC EXECUTE grant).
+  - **Anon allowlist preservation**: Re-grants EXECUTE to anon on the four catalog/RLS helper functions (`search_public_novels`, `get_public_novel_chapters`, `has_novel_entitlement`, `is_admin`) that must remain unauthenticated-accessible.
+  - **search_path fix**: All 5 functions rewritten in migration 0020 used `SET search_path = public, pg_temp` (insecure). This migration uses `ALTER FUNCTION ... SET search_path = ''` to correct each, without touching function bodies (all references were already schema-qualified).
+  - **Authenticated RPC grant sweep**: Belt-and-suspenders GRANT EXECUTE to authenticated on all known workflow RPCs.
+- **Action**: Paste contents of `supabase/migrations/0021_trigger_privilege_lockdown_and_search_path_fix.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `supabase/tests/00_post_migration_verification.sql` — expect SUMMARY PASS with zero FAIL rows and INFO rows for pg_trgm extension functions.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
