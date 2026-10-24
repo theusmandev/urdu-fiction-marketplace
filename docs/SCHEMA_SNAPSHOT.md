@@ -1,5 +1,5 @@
 # UNB Premium — Canonical Database Schema Snapshot
-**Version:** Reconciled from Migrations 0001 through 0018  
+**Version:** Reconciled from Migrations 0001 through 0020  
 **Scope:** Single source of truth for tables, columns, constraints, enums, views, triggers, and RPC signatures.
 
 ---
@@ -434,18 +434,16 @@
 | Column | Type | Nullable | Default | Constraints / Description |
 |---|---|---|---|---|
 | `id` | uuid | NO | `gen_random_uuid()` | PRIMARY KEY |
-| `user_id` | uuid | NO | — | REFERENCES `profiles(id)` ON DELETE CASCADE |
-| `to_email` | text | NO | — | |
-| `subject` | text | NO | — | |
-| `body_html` | text | NO | — | |
-| `body_text` | text | NO | — | |
-| `event_type` | text | NO | — | |
-| `entity_refs` | jsonb | NO | `'{}'::jsonb` | |
-| `status` | text | NO | `'pending'` | `CHECK (status IN ('pending', 'processing', 'sent', 'failed', 'skipped'))` |
-| `attempts` | integer | NO | `0` | |
-| `last_error` | text | YES | NULL | |
-| `sent_at` | timestamptz | YES | NULL | |
+| `user_id` | uuid | NO | — | REFERENCES `profiles(id)` ON DELETE RESTRICT |
+| `template` | text | NO | — | Notification template identifier |
+| `subject` | text | NO | — | Email subject line |
+| `body_text` | text | NO | — | Email plaintext body |
+| `status` | text | NO | `'pending'` | `CHECK (status IN ('pending', 'sent', 'failed', 'skipped'))` |
+| `attempts` | integer | NO | `0` | Transmission retry counter |
+| `last_error` | text | YES | NULL | Error message from failed send attempt |
+| `dedupe_key` | text | YES | NULL | UNIQUE idempotency key for recurring reminders |
 | `created_at` | timestamptz | NO | `now()` | |
+| `sent_at` | timestamptz | YES | NULL | |
 
 ### `public.audit_logs` (Append-Only)
 | Column | Type | Nullable | Default | Constraints / Description |
@@ -473,7 +471,11 @@
 
 ## 4. Key Triggers & Security Definer Procedures
 
-- `public.prevent_append_only_mutation()` on `public.sales_ledger` and `public.audit_logs` (BEFORE UPDATE OR DELETE -> RAISE EXCEPTION).
+- `public.prevent_append_only_mutation()` on `public.sales_ledger` and `public.audit_logs`:
+  - `trg_sales_ledger_prevent_mutation` (BEFORE UPDATE OR DELETE FOR EACH ROW -> RAISE EXCEPTION).
+  - `trg_sales_ledger_prevent_truncate` (BEFORE TRUNCATE FOR EACH STATEMENT -> RAISE EXCEPTION).
+  - `trg_audit_logs_prevent_mutation` (BEFORE UPDATE OR DELETE FOR EACH ROW -> RAISE EXCEPTION).
+  - `trg_audit_logs_prevent_truncate` (BEFORE TRUNCATE FOR EACH STATEMENT -> RAISE EXCEPTION).
 - `public.trg_protect_profile_columns()` on `public.profiles`.
 - `public.trg_protect_writer_profile_columns()` on `public.writer_profiles`.
 - `public.trg_protect_notification_columns()` on `public.notifications` (restricts update to `is_read`, `read_at`).
