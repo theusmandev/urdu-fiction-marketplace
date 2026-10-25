@@ -113,13 +113,27 @@ export default function FaqPage() {
           Need assistance with an order, verification, or novel submission?
           Our support team is here to assist you.
         </p>
-        <Link
-          href="/contact"
-          className="inline-flex items-center gap-2 bg-navy text-accent font-semibold px-5 py-2.5 rounded-xl text-xs hover:bg-navy-light transition-colors"
-        >
-          <Mail className="w-4 h-4" />
-          <span>Contact Support</span>
-        </Link>
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <Link
+            href="/how-to-pay"
+            className="inline-flex items-center gap-2 bg-navy text-accent font-semibold px-5 py-2.5 rounded-xl text-xs hover:bg-navy-light transition-colors"
+          >
+            <span>Step-by-Step Payment Guide</span>
+          </Link>
+          <Link
+            href="/refund-policy"
+            className="inline-flex items-center gap-2 bg-white text-navy font-semibold px-5 py-2.5 rounded-xl text-xs border border-border hover:bg-ivory transition-colors"
+          >
+            <span>Refund & Dispute Policy</span>
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-white text-navy font-semibold px-5 py-2.5 rounded-xl text-xs border border-border hover:bg-ivory transition-colors"
+          >
+            <Mail className="w-4 h-4 text-accent" />
+            <span>Contact Support</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

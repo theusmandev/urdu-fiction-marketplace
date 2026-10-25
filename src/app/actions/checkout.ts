@@ -28,7 +28,7 @@ export async function createOrderAction(
   input: CreateOrderFormInput
 ): Promise<ActionResponse<{ orderId: string; orderNumber: string }>> {
   try {
-    await requireAuth('/checkout');
+    await requireAuth();
     const parsed = createOrderFormSchema.safeParse(input);
     if (!parsed.success) {
       return {

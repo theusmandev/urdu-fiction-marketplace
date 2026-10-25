@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
-import { BookOpen, Home } from "lucide-react";
+import { BookOpen, Home, CreditCard, HelpCircle, LifeBuoy } from "lucide-react";
 
 export default function NotFoundPage() {
   return (
@@ -10,20 +10,20 @@ export default function NotFoundPage() {
         404
       </div>
 
-      <div className="space-y-3 max-w-md mx-auto">
+      <div className="space-y-3 max-w-lg mx-auto">
         <UrduText
           as="h1"
           size="3xl"
-          className="text-navy font-bold leading-[2.2] py-0"
+          className="text-navy leading-[2.2] py-0"
         >
-          مطلوبہ صفحہ دستیاب نہیں ہے
+          صفحہ یا معلومات دستیاب نہیں ہیں
         </UrduText>
-        <h2 className="font-serif text-xl font-bold text-navy">
-          Page Not Found
+        <h2 className="font-serif text-xl sm:text-2xl font-bold text-navy">
+          Page or Content Not Found
         </h2>
-        <p className="text-xs text-secondary leading-relaxed">
-          The novel, author, or page you were looking for could not be found or has
-          been moved. You can browse our catalog or explore available genres.
+        <p className="text-xs sm:text-sm text-secondary leading-relaxed">
+          The link you followed may be incorrect, the address might have changed, or the requested
+          novel, author, or order record does not exist or has been unpublished.
         </p>
       </div>
 
@@ -41,6 +41,27 @@ export default function NotFoundPage() {
         >
           <BookOpen className="w-4 h-4 text-accent" />
           <span>Browse All Novels</span>
+        </Link>
+        <Link
+          href="/how-to-pay"
+          className="inline-flex items-center gap-2 bg-white text-navy font-semibold px-5 py-2.5 rounded-xl text-xs border border-border hover:bg-ivory transition-colors"
+        >
+          <CreditCard className="w-4 h-4 text-accent" />
+          <span>Payment Guide</span>
+        </Link>
+        <Link
+          href="/faq"
+          className="inline-flex items-center gap-2 bg-white text-navy font-semibold px-5 py-2.5 rounded-xl text-xs border border-border hover:bg-ivory transition-colors"
+        >
+          <HelpCircle className="w-4 h-4 text-accent" />
+          <span>Reader FAQ</span>
+        </Link>
+        <Link
+          href="/support"
+          className="inline-flex items-center gap-2 bg-white text-navy font-semibold px-5 py-2.5 rounded-xl text-xs border border-border hover:bg-ivory transition-colors"
+        >
+          <LifeBuoy className="w-4 h-4 text-accent" />
+          <span>Support Desk</span>
         </Link>
       </div>
     </div>

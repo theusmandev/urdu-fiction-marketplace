@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "node --test tests/*.test.ts",
     "check:sql": "node scripts/check-sql-syntax-constructs.mjs",
-    "check:frontend": "node scripts/check-frontend-queries.mjs"
+    "check:frontend": "node scripts/check-frontend-queries.mjs",
+    "check:links": "node scripts/check-internal-links.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

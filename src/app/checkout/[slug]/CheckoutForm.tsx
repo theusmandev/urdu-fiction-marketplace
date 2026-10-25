@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   BookOpen,
+  HelpCircle,
 } from 'lucide-react';
 
 interface CheckoutFormProps {
@@ -307,6 +308,33 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
               <p>
                 All purchases are recorded on the platform financial ledger. You can open a dispute if
                 the author does not verify your verified bank transfer.
+              </p>
+            </div>
+
+            {/* Need Help Paying? */}
+            <div className="rounded-xl bg-stone-950/60 p-3.5 border border-stone-800/80 text-[11px] text-stone-400 space-y-1.5">
+              <div className="font-semibold text-stone-200 flex items-center gap-1.5">
+                <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
+                <span>Need help paying?</span>
+              </div>
+              <p className="leading-relaxed">
+                Follow our step-by-step{' '}
+                <Link href="/how-to-pay" className="text-amber-400 hover:underline font-medium">
+                  Payment Guide
+                </Link>
+                , read{' '}
+                <Link href="/how-it-works" className="text-amber-400 hover:underline">
+                  How Direct Payment Works
+                </Link>
+                , check our{' '}
+                <Link href="/faq" className="text-amber-400 hover:underline">
+                  FAQ
+                </Link>
+                , or review the{' '}
+                <Link href="/refund-policy" className="text-amber-400 hover:underline">
+                  Refund Policy
+                </Link>
+                .
               </p>
             </div>
           </div>

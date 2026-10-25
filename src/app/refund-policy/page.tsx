@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 
@@ -112,6 +113,28 @@ export default function RefundPolicyPage() {
             </li>
           </ol>
         </section>
+      </div>
+
+      {/* Cross-Link Guidance */}
+      <div className="bg-surface p-6 rounded-2xl border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+        <div>
+          <h3 className="font-serif font-bold text-navy">Need help with a payment or order?</h3>
+          <p className="text-secondary mt-0.5">Read our step-by-step payment guide or contact reader support.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Link
+            href="/how-to-pay"
+            className="px-3.5 py-2 rounded-xl bg-navy text-accent font-semibold text-xs hover:bg-navy-light transition-colors"
+          >
+            Payment Guide
+          </Link>
+          <Link
+            href="/support"
+            className="px-3.5 py-2 rounded-xl bg-white text-navy font-semibold text-xs border border-border hover:bg-ivory transition-colors"
+          >
+            Reader Support
+          </Link>
+        </div>
       </div>
 
       {/* Footer Banner */}

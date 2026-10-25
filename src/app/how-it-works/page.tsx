@@ -26,7 +26,7 @@ export default function HowItWorksPage() {
         <UrduText
           as="p"
           size="2xl"
-          className="text-secondary font-bold leading-[2.2] py-1"
+          className="text-secondary leading-[2.2] py-1"
         >
           براہ راست ادائیگی اور تصدیق کا شفاف اور آسان طریقہ کار
         </UrduText>
@@ -66,7 +66,11 @@ export default function HowItWorksPage() {
             </h3>
             <p className="text-xs text-secondary leading-relaxed">
               Send the exact PKR amount from your banking or wallet app. Submit your
-              Transaction Reference (TID) and payment receipt screenshot.
+              Transaction Reference (TID) and payment receipt screenshot. (See our{' '}
+              <Link href="/how-to-pay" className="text-navy font-semibold underline hover:text-accent">
+                Step-by-Step Payment Guide
+              </Link>
+              ).
             </p>
           </div>
 
@@ -153,13 +157,20 @@ export default function HowItWorksPage() {
         </p>
       </section>
 
-      <div className="text-center pt-4">
+      <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
         <Link
-          href="/novels"
+          href="/how-to-pay"
           className="inline-flex items-center gap-2 bg-navy text-accent font-semibold px-6 py-3.5 rounded-xl text-xs hover:bg-navy-light shadow-md transition-all"
         >
-          <span>Explore Published Novels Now</span>
+          <span>Read Step-by-Step Payment Guide</span>
           <ArrowRight className="w-4 h-4" />
+        </Link>
+        <Link
+          href="/novels"
+          className="inline-flex items-center gap-2 bg-white text-navy font-semibold px-6 py-3.5 rounded-xl text-xs border border-border hover:bg-ivory shadow-sm transition-all"
+        >
+          <span>Explore Published Novels</span>
+          <ArrowRight className="w-4 h-4 text-accent" />
         </Link>
       </div>
     </div>

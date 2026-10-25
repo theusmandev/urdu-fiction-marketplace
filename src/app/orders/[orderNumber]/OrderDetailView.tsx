@@ -32,6 +32,7 @@ import {
   BookOpen,
   Eye,
   X,
+  HelpCircle,
 } from 'lucide-react';
 
 interface OrderDetailViewProps {
@@ -432,6 +433,36 @@ export function OrderDetailView({
               </div>
             )}
 
+            {/* Need Help Paying? Guide Link */}
+            <div className="rounded-xl bg-stone-900 border border-stone-800 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5 text-stone-300">
+                <HelpCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>Need help with direct payment? Follow our step-by-step payment guide.</span>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] shrink-0 font-medium">
+                <Link
+                  href="/how-to-pay"
+                  className="text-amber-400 hover:text-amber-300 underline font-semibold"
+                >
+                  Payment Guide
+                </Link>
+                <span className="text-stone-700">|</span>
+                <Link
+                  href="/how-it-works"
+                  className="text-stone-400 hover:text-white underline"
+                >
+                  How it Works
+                </Link>
+                <span className="text-stone-700">|</span>
+                <Link
+                  href="/refund-policy"
+                  className="text-stone-400 hover:text-white underline"
+                >
+                  Refund Policy
+                </Link>
+              </div>
+            </div>
+
             {/* Writer's Payment Instructions Card */}
             <div className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-stone-800 pb-3">
@@ -826,6 +857,31 @@ export function OrderDetailView({
             </p>
           </div>
         )}
+
+        {/* Help & Policies Footer */}
+        <div className="pt-4 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-400">
+          <div className="flex items-center gap-1.5">
+            <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
+            <span>Need assistance with this order?</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 text-[11px]">
+            <Link href="/how-to-pay" className="text-amber-400 hover:underline">
+              Payment Guide
+            </Link>
+            <span className="text-stone-700">|</span>
+            <Link href="/faq" className="text-stone-300 hover:text-white hover:underline">
+              Reader FAQ
+            </Link>
+            <span className="text-stone-700">|</span>
+            <Link href="/refund-policy" className="text-stone-300 hover:text-white hover:underline">
+              Refund Policy
+            </Link>
+            <span className="text-stone-700">|</span>
+            <Link href="/support" className="text-stone-300 hover:text-white hover:underline">
+              Reader Support
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* ========================================================================= */}

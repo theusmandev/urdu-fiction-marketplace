@@ -618,17 +618,15 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               <Link
                 key={link.href}
                 href={
-                  link.href === "/writers/onboarding"
-                    ? user?.isWriter
-                      ? "/writer"
-                      : "/become-a-writer"
+                  link.href === "/become-a-writer" && user?.isWriter
+                    ? "/writer"
                     : link.href
                 }
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-between py-2.5 text-sm font-medium text-main hover:text-navy"
               >
                 <span>
-                  {link.href === "/writers/onboarding" && user?.isWriter
+                  {link.href === "/become-a-writer" && user?.isWriter
                     ? "Writer Studio"
                     : link.title}
                 </span>
