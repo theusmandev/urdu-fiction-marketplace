@@ -34,7 +34,9 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
 
   const supabase = await createServerClient();
 
-  const { data: novel, error } = await supabase
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(novelId);
+
+  let queryBuilder = supabase
     .from('novels')
     .select(`
       id,
@@ -52,19 +54,14 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
       total_chapters,
       created_at,
       published_at,
-      writer_profiles:writer_id (
+      writer_profiles!writer_id (
         id,
         pen_name_english,
         pen_name_urdu,
-        status,
-        profiles:id (
-          email,
-          full_name,
-          username
-        )
+        status
       ),
       novel_genres (
-        genre:genre_id (
+        genre:genres!genre_id (
           id,
           name_english,
           name_urdu,
@@ -81,11 +78,53 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
         is_published,
         created_at
       )
-    `)
-    .eq('id', novelId)
-    .single();
+    `);
 
-  if (error || !novel) {
+  if (isUuid) {
+    queryBuilder = queryBuilder.eq('id', novelId);
+  } else {
+    queryBuilder = queryBuilder.eq('slug', novelId);
+  }
+
+  const { data: novel, error } = await queryBuilder.maybeSingle();
+
+  if (error) {
+    console.error('[AdminNovelReviewPage] Database/RLS error fetching novel:', {
+      novelId,
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto py-8">
+        <Link
+          href="/admin/novels"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Moderation Queue</span>
+        </Link>
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>Failed to Load Novel for Editorial Review</span>
+          </div>
+          <p className="text-xs text-rose-200/90 leading-relaxed">
+            A database error occurred while retrieving this manuscript:
+          </p>
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+            {error.message} {error.code ? `(Code: ${error.code})` : ''}
+          </div>
+          {error.hint && (
+            <p className="text-[11px] text-slate-400 italic">Hint: {error.hint}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (!novel) {
     notFound();
   }
 

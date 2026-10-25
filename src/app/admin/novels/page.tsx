@@ -6,6 +6,7 @@ import { UrduText } from '@/components/urdu/UrduText';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { BookOpen, Search, ChevronRight, Star, AlertCircle, ShieldAlert } from 'lucide-react';
 import type { NovelStatus } from '@/types/database';
+import { unwrapQuery } from '@/lib/supabase/query';
 
 interface PageProps {
   searchParams: Promise<{
@@ -38,13 +39,10 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
       rights_declaration_accepted,
       created_at,
       published_at,
-      writer_profiles:writer_id (
+      writer_profiles!writer_id (
         id,
         pen_name_english,
-        pen_name_urdu,
-        profiles:id (
-          email
-        )
+        pen_name_urdu
       )
     `)
     .order('created_at', { ascending: false });
@@ -53,21 +51,20 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
     queryBuilder = queryBuilder.eq('status', currentStatus as NovelStatus);
   }
 
-  const { data: novels } = await queryBuilder;
+  const { data: rawNovels, error } = await queryBuilder;
+  const { data: novels, error: queryError } = unwrapQuery({ data: rawNovels, error }, 'AdminNovelsPage');
 
-  // Filter in memory for query across title or pen name or email
+  // Filter in memory for query across title or pen name
   const filtered = (novels || []).filter((n) => {
     if (!query) return true;
     const qLower = query.toLowerCase();
     const writer = Array.isArray(n.writer_profiles) ? n.writer_profiles[0] : n.writer_profiles;
-    const profile = writer?.profiles ? (Array.isArray(writer.profiles) ? writer.profiles[0] : writer.profiles) : null;
 
     return (
       n.title_english.toLowerCase().includes(qLower) ||
       n.title_urdu.includes(query) ||
-      writer?.pen_name_english.toLowerCase().includes(qLower) ||
-      writer?.pen_name_urdu.includes(query) ||
-      profile?.email.toLowerCase().includes(qLower)
+      (writer?.pen_name_english && writer.pen_name_english.toLowerCase().includes(qLower)) ||
+      (writer?.pen_name_urdu && writer.pen_name_urdu.includes(query))
     );
   });
 
@@ -154,8 +151,24 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
         </form>
       </div>
 
-      {/* Empty State */}
-      {sortedNovels.length === 0 ? (
+      {/* Error State */}
+      {queryError ? (
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span>Database Error Loading Novel Catalog</span>
+          </div>
+          <p className="text-xs text-rose-200/90 leading-relaxed">
+            Unable to retrieve novels from the database due to a query or permissions error:
+          </p>
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+            {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
+          </div>
+          {queryError.hint && (
+            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+          )}
+        </div>
+      ) : sortedNovels.length === 0 ? (
         <div className="py-16 text-center bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
           <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
             <BookOpen className="w-6 h-6" />
