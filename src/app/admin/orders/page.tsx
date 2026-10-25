@@ -4,6 +4,7 @@ import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { formatPKR } from '@/lib/utils';
 import type { AdminOrdersListResponse, AdminOrderItemSummary } from '@/types/database';
+import { unwrapQuery } from '@/lib/supabase/query';
 import {
   ShoppingBag,
   Search,
@@ -36,13 +37,15 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
   const offset = (currentPage - 1) * limit;
 
   const supabase = await createServerClient();
-  const { data, error } = await supabase.rpc('admin_list_orders', {
+  const rpcRes = await supabase.rpc('admin_list_orders', {
     p_status: currentStatus || null,
     p_search: currentSearch || null,
     p_only_stuck: onlyStuck,
     p_limit: limit,
     p_offset: offset,
   });
+
+  const { data, error } = unwrapQuery(rpcRes, 'AdminOrdersPage.admin_list_orders');
 
   const response = (data as unknown as AdminOrdersListResponse) || {
     orders: [],

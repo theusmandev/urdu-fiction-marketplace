@@ -1,9 +1,12 @@
 import React from 'react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { AdminOrderDetailClient } from './AdminOrderDetailClient';
 import type { AdminOrderDetailResponse } from '@/types/database';
+import { ArrowLeft, ShieldAlert } from 'lucide-react';
+import { unwrapQuery } from '@/lib/supabase/query';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,11 +23,38 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   if (!isUuid) {
-    const { data: ord } = await supabase
+    const ordRes = await supabase
       .from('orders')
       .select('id')
       .eq('order_number', id)
       .maybeSingle();
+
+    const { data: ord, error: ordError } = unwrapQuery(ordRes, 'AdminOrderDetailPage.lookupOrderNumber');
+    if (ordError) {
+      return (
+        <div className="space-y-6 max-w-4xl mx-auto py-8">
+          <Link
+            href="/admin/orders"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Orders</span>
+          </Link>
+          <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+            <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+              <ShieldAlert className="w-5 h-5 shrink-0" />
+              <span>Database Error Resolving Order Number</span>
+            </div>
+            <p className="text-xs text-rose-200/90 leading-relaxed">
+              Unable to look up order reference from the database:
+            </p>
+            <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+              {ordError.message} {ordError.code ? `(Code: ${ordError.code})` : ''}
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     if (ord?.id) {
       targetOrderId = ord.id;
@@ -33,11 +63,42 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
     }
   }
 
-  const { data, error } = await supabase.rpc('admin_get_order', {
+  const rpcRes = await supabase.rpc('admin_get_order', {
     p_order_id: targetOrderId,
   });
 
-  if (error || !data) {
+  const { data, error: queryError } = unwrapQuery(rpcRes, 'AdminOrderDetailPage.admin_get_order');
+
+  if (queryError) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto py-8">
+        <Link
+          href="/admin/orders"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Orders</span>
+        </Link>
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span>Database Error Loading Order</span>
+          </div>
+          <p className="text-xs text-rose-200/90 leading-relaxed">
+            Unable to retrieve order details from the database:
+          </p>
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+            {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
+          </div>
+          {queryError.hint && (
+            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
     notFound();
   }
 

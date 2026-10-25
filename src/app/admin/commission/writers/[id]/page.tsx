@@ -2,6 +2,8 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
+import { ShieldAlert } from 'lucide-react';
 import { AdminWriterCommissionDetailClient } from './AdminWriterCommissionDetailClient';
 import type { CommissionInvoiceRow } from '@/types/database';
 
@@ -26,7 +28,7 @@ export default async function AdminWriterCommissionDetailPage({
   const supabase = await createServerClient();
 
   // 1. Fetch Writer Profile
-  const { data: writerData, error: writerError } = await supabase
+  const writerRes = await supabase
     .from('writer_profiles')
     .select(`
       id,
@@ -40,25 +42,66 @@ export default async function AdminWriterCommissionDetailPage({
     .eq('id', writerId)
     .maybeSingle();
 
-  if (writerError || !writerData) {
-    console.error('Writer not found:', writerError);
+  const { data: writerData, error: writerError } = unwrapSingleQuery<{
+    id: string;
+    pen_name_english: string;
+    pen_name_urdu: string;
+    custom_commission_rate: number | null;
+    current_unpaid_commission: number | null;
+    unpaid_commission_limit: number | null;
+    is_orders_paused_for_commission: boolean;
+  }>(writerRes, {
+    context: 'AdminWriterCommissionDetailPage.fetchWriter',
+  });
+
+  if (writerError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+          <ShieldAlert className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-sm">Failed to load author commission profile</h3>
+            <p className="text-xs text-red-400/80 mt-1">{writerError.message}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!writerData) {
     notFound();
   }
 
   // 2. Fetch Writer's Commission Invoices
-  const { data: invoicesData } = await supabase
+  const invoicesRes = await supabase
     .from('commission_invoices')
     .select('*')
     .eq('writer_id', writerId)
     .order('created_at', { ascending: false });
+  const { data: invoicesData } = unwrapQuery<CommissionInvoiceRow[]>(invoicesRes, {
+    context: 'AdminWriterCommissionDetailPage.fetchInvoices',
+  });
 
   // 3. Fetch Recent Sales Ledger Entries (without reader email)
-  const { data: ledgerData } = await supabase
+  const ledgerRes = await supabase
     .from('sales_ledger')
     .select('id, created_at, entry_type, gross_amount_pkr, platform_commission_pkr, writer_net_pkr, notes')
     .eq('writer_id', writerId)
     .order('created_at', { ascending: false })
     .limit(50);
+  const { data: ledgerData } = unwrapQuery<
+    Array<{
+      id: string;
+      created_at: string;
+      entry_type: string;
+      gross_amount_pkr: number | null;
+      platform_commission_pkr: number | null;
+      writer_net_pkr: number | null;
+      notes: string | null;
+    }>
+  >(ledgerRes, {
+    context: 'AdminWriterCommissionDetailPage.fetchLedger',
+  });
 
   const writer = {
     id: writerData.id,
