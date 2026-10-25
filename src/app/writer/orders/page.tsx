@@ -3,6 +3,8 @@
 import React from 'react';
 import { requireWriter } from '@/lib/auth/requireRole';
 import { createClient } from '@/lib/supabase/server';
+import { unwrapQuery } from '@/lib/supabase/query';
+import { AlertCircle } from 'lucide-react';
 import { WriterOrdersClient, type WriterOrderCardData } from './WriterOrdersClient';
 import type { OrderStatus } from '@/types/database';
 
@@ -11,7 +13,7 @@ export default async function WriterOrdersPage() {
   const supabase = await createClient();
 
   // Fetch all orders for this author
-  const { data: orders } = await supabase
+  const ordersRes = await supabase
     .from('orders')
     .select(`
       id,
@@ -28,10 +30,6 @@ export default async function WriterOrdersPage() {
         title_urdu,
         title_english,
         slug
-      ),
-      reader:profiles!orders_reader_id_fkey (
-        full_name,
-        username
       ),
       payment_submissions (
         id,
@@ -55,10 +53,88 @@ export default async function WriterOrdersPage() {
     .eq('writer_id', user.id)
     .order('created_at', { ascending: false });
 
+interface WriterOrderDbRow {
+  id: string;
+  order_number: string;
+  reader_id: string;
+  amount_pkr: number;
+  payment_instructions_snapshot: { method_type?: string } | null;
+  status: OrderStatus;
+  rejected_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  novels: {
+    id: string;
+    title_urdu: string;
+    title_english: string;
+    slug: string;
+  } | {
+    id: string;
+    title_urdu: string;
+    title_english: string;
+    slug: string;
+  }[] | null;
+  payment_submissions: Array<{
+    id: string;
+    transaction_reference_tid: string;
+    screenshot_path: string | null;
+    paid_amount_claimed_pkr: number | null;
+    sender_account_name: string | null;
+    reader_note: string | null;
+    reviewer_status: string;
+    reviewer_note: string | null;
+    is_duplicate_tid_flagged: boolean;
+    created_at: string;
+  }> | null;
+  refund_requests: Array<{
+    id: string;
+    status: string;
+    reason: string | null;
+    created_at: string;
+  }> | null;
+}
+
+  const { data: orders, error: ordersError } = unwrapQuery<WriterOrderDbRow[]>(ordersRes, {
+    context: 'WriterOrdersPage.fetchOrders',
+  });
+
+  if (ordersError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-sm">Failed to load orders</h3>
+            <p className="text-xs text-red-400/80 mt-1">{ordersError.message}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch safe reader display names via RPC (never exposes reader email)
+  const readerIds = Array.from(new Set((orders || []).map((o) => o.reader_id).filter(Boolean)));
+  const readerDisplayMap = new Map<string, { full_name: string | null; username: string }>();
+
+  if (readerIds.length > 0) {
+    const readerRes = await supabase.rpc('get_reader_display_names', {
+      p_reader_ids: readerIds,
+    });
+    const { data: readerData } = unwrapQuery<
+      Array<{ id: string; full_name: string | null; username: string }>
+    >(readerRes, { context: 'WriterOrdersPage.get_reader_display_names' });
+
+    if (readerData) {
+      for (const r of readerData) {
+        readerDisplayMap.set(r.id, { full_name: r.full_name, username: r.username });
+      }
+    }
+  }
+
   // Map to clean client model (reader display name only, never email)
   const formattedOrders: WriterOrderCardData[] = (orders || []).map((o) => {
     const novel = Array.isArray(o.novels) ? o.novels[0] : o.novels;
-    const reader = Array.isArray(o.reader) ? o.reader[0] : o.reader;
+    const readerInfo = readerDisplayMap.get(o.reader_id);
     const refundRequests = Array.isArray(o.refund_requests) ? o.refund_requests : [];
     const pendingRefund = refundRequests.find((r: { status: string }) => r.status === 'pending');
     const submissions = Array.isArray(o.payment_submissions)
@@ -67,7 +143,7 @@ export default async function WriterOrdersPage() {
         )
       : [];
 
-    const displayName = reader?.full_name || reader?.username || 'Reader';
+    const displayName = readerInfo?.full_name || readerInfo?.username || 'Reader';
 
     return {
       id: o.id,
@@ -88,7 +164,7 @@ export default async function WriterOrdersPage() {
       submissions: submissions.map((s) => ({
         id: s.id,
         tid: s.transaction_reference_tid,
-        screenshotPath: s.screenshot_path,
+        screenshotPath: s.screenshot_path || '',
         claimedAmount: Number(s.paid_amount_claimed_pkr ?? o.amount_pkr),
         senderAccountName: s.sender_account_name,
         readerNote: s.reader_note,
@@ -98,7 +174,7 @@ export default async function WriterOrdersPage() {
         createdAt: s.created_at,
       })),
       hasPendingRefund: Boolean(pendingRefund),
-      pendingRefundReason: (pendingRefund as { reason?: string })?.reason || null,
+      pendingRefundReason: pendingRefund?.reason || null,
     };
   });
 
