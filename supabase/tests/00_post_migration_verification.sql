@@ -28,6 +28,110 @@
 --       and FAILs when the function does not exist.
 --   B4c. Schema snapshot table checks now explicitly cover append-only and RLS
 --       expectations for every table listed in docs/SCHEMA_SNAPSHOT.md.
+--
+-- ==============================================================================
+-- CANONICAL SCHEMA REFERENCE: NOT NULL COLUMNS WITHOUT DEFAULT
+-- Generated strictly from docs/SCHEMA_SNAPSHOT.md for fixture integrity.
+--
+-- Tables and their mandatory (NOT NULL, no default) columns:
+--   1. public.profiles:
+--      - id (uuid, references auth.users(id))
+--      - email (text)
+--   2. public.writer_profiles:
+--      - id (uuid, references profiles(id))
+--      - pen_name_urdu (text)
+--      - pen_name_english (text)
+--   3. public.writer_payment_methods:
+--      - writer_id (uuid, references writer_profiles(id))
+--      - method_type (payment_method_type enum: 'jazzcash', 'easypaisa', 'raast', 'bank_iban')
+--      - account_title (text)
+--      - account_number_or_iban (text)
+--   4. public.novels:
+--      - writer_id (uuid, references writer_profiles(id))
+--      - slug (text)
+--      - title_urdu (text)
+--      - title_english (text)
+--      - synopsis_urdu (text)
+--      - price_pkr (numeric(10,2))
+--      - rights_declaration_accepted (boolean)
+--   5. public.chapters:
+--      - novel_id (uuid, references novels(id))
+--      - chapter_number (integer)
+--      - title_urdu (text)
+--      - content_urdu (text)
+--   6. public.orders:
+--      - order_number (text)
+--      - reader_id (uuid, references profiles(id))
+--      - writer_id (uuid, references writer_profiles(id))
+--      - novel_id (uuid, references novels(id))
+--      - novel_title_snapshot (text)
+--      - amount_pkr (numeric(10,2))
+--      - applied_commission_rate (numeric(5,2))
+--      - calculated_commission_pkr (numeric(10,2))
+--      - calculated_writer_share_pkr (numeric(10,2))
+--   7. public.payment_submissions:
+--      - order_id (uuid, references orders(id))
+--      - reader_id (uuid, references profiles(id))
+--      - writer_id (uuid, references writer_profiles(id))
+--      - transaction_reference_tid (text)
+--      - screenshot_url (text)
+--   8. public.purchase_entitlements:
+--      - reader_id (uuid, references profiles(id))
+--      - novel_id (uuid, references novels(id))
+--      - order_id (uuid, references orders(id))
+--   9. public.sales_ledger:
+--      - order_id (uuid, references orders(id))
+--      - writer_id (uuid, references writer_profiles(id))
+--      - reader_id (uuid, references profiles(id))
+--      - novel_id (uuid, references novels(id))
+--      - entry_type (text: 'sale_verified', 'refund_adjustment', 'manual_correction')
+--      - gross_amount_pkr (numeric(10,2))
+--      - commission_rate (numeric(5,2))
+--      - platform_commission_pkr (numeric(10,2))
+--      - writer_net_pkr (numeric(10,2))
+--  10. public.commission_invoices:
+--      - invoice_number (text)
+--      - writer_id (uuid, references writer_profiles(id))
+--      - period_start (timestamptz)
+--      - period_end (timestamptz)
+--  11. public.commission_invoice_lines:
+--      - invoice_id (uuid, references commission_invoices(id))
+--      - ledger_entry_id (uuid, references sales_ledger(id))
+--      - commission_pkr (numeric(10,2))
+--  12. public.commission_payments:
+--      - invoice_id (uuid, references commission_invoices(id))
+--      - writer_id (uuid, references writer_profiles(id))
+--      - amount_pkr (numeric(12,2))
+--      - transaction_reference (text)
+--  13. public.commission_payment_reports:
+--      - invoice_id (uuid, references commission_invoices(id))
+--      - writer_id (uuid, references writer_profiles(id))
+--      - amount_pkr (numeric(12,2))
+--      - transaction_reference (text)
+--      - normalized_tid (text)
+--      - screenshot_path (text)
+--  14. public.disputes:
+--      - order_id (uuid, references orders(id))
+--      - raised_by_id (uuid, references profiles(id))
+--      - reason (text)
+--  15. public.refund_requests:
+--      - order_id (uuid, references orders(id))
+--      - requested_by (uuid, references profiles(id))
+--      - requester_role (text: 'writer', 'reader')
+--      - reason (text)
+--  16. public.support_requests:
+--      - user_id (uuid, references profiles(id))
+--      - category (text: 'order', 'payment', 'account', 'content', 'other')
+--      - subject (text)
+--      - body (text)
+--  17. public.notifications:
+--      - user_id (uuid, references profiles(id))
+--      - title (text)
+--      - message (text)
+--  18. public.audit_logs:
+--      - action_type (text)
+--      - entity_type (text)
+--      - entity_id (text)
 -- ==============================================================================
 
 -- 1. Ensure plpgsql_check extension exists
@@ -455,7 +559,17 @@ BEGIN
     LOOP
         INSERT INTO temp_verification_results (check_category, check_name, status, details)
         VALUES ('TRIGGER_PRIVS', 'Trigger fn with anon/auth grant: ' || v_rec.proname, 'FAIL',
-            'Trigger function ' || v_rec.proname || '(' || v_rec.args || ') is executable by anon or authenticated — run migration 0021 to revoke');
+            format('Trigger function %s(%s) is executable by anon or authenticated — revoke required in migration %s (run 0026_revoke_trigger_privileges_and_default_acls.sql)',
+                   v_rec.proname,
+                   v_rec.args,
+                   CASE v_rec.proname
+                       WHEN 'trg_commission_invoices_updated_at' THEN '0025_commission_settlement_and_audit_hardening.sql / 0026_revoke_trigger_privileges_and_default_acls.sql'
+                       WHEN 'trg_protect_novel_published_status' THEN '0022_protection_triggers_and_search_path_lockdown.sql'
+                       WHEN 'trg_protect_novel_status' THEN '0022_protection_triggers_and_search_path_lockdown.sql'
+                       WHEN 'trg_prevent_direct_unpaid_commission_update' THEN '0022_protection_triggers_and_search_path_lockdown.sql'
+                       WHEN 'prevent_append_only_mutation' THEN '0022_protection_triggers_and_search_path_lockdown.sql'
+                       ELSE 'defining migration for ' || v_rec.proname || ' or 0026_revoke_trigger_privileges_and_default_acls.sql'
+                   END));
     END LOOP;
 
     IF NOT EXISTS (SELECT 1 FROM temp_verification_results WHERE check_category = 'TRIGGER_PRIVS') THEN

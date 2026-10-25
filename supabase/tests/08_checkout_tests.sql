@@ -521,9 +521,11 @@ BEGIN
     v_err_caught := false;
     BEGIN
         INSERT INTO public.orders (
-            order_number, reader_id, writer_id, novel_id, novel_title_snapshot, amount_pkr, status
+            order_number, reader_id, writer_id, novel_id, novel_title_snapshot,
+            amount_pkr, applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr, status
         ) VALUES (
-            'ORD-DIRECT-HACK', v_reader_1_id, v_writer_a_id, v_novel_pub_id, 'Hacked Novel Title', 1, 'verified'
+            'ORD-DIRECT-HACK', v_reader_1_id, v_writer_a_id, v_novel_pub_id, 'Hacked Novel Title',
+            1.00, 20.00, 0.20, 0.80, 'verified'
         );
     EXCEPTION WHEN OTHERS THEN
         v_err_caught := true;

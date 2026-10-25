@@ -373,6 +373,30 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0023_fix_sql_construct_qualification_regression.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Run `npm run check:sql` and execute `supabase/tests/00_post_migration_verification.sql`.
 
+### 24. `supabase/migrations/0024_format_specifiers_and_privilege_lockdown.sql` [FORMAT SPECIFIERS, RPC LOCKDOWN & COLUMN GRANTS]
+- **Purpose**: Canonicalizes format specifiers, locks down internal cross-writer financial RPCs, and enforces table-level safe column UPDATE grants:
+  - **Format Specifier Enforcement**: Replaces printf-style specifiers (`%.2f`) with standard `%s` and explicit casts (`::numeric(12,2)::text`) across canonical financial functions (`verify_order_payment`, `admin_force_verify`, `confirm_commission_settlement`, `generate_commission_invoice`).
+  - **Internal Cross-Writer RPC Lockdown**: Revokes `EXECUTE` on `reconcile_writer_unpaid_commission` and `get_writer_unpaid_commission` from role `authenticated` (callable strictly by internal SECURITY DEFINER owner routines).
+  - **Column-Level UPDATE Grants**: Enforces two-layer defense by restricting direct client UPDATE privileges to safe columns on `profiles` (`full_name`, `username`, `avatar_url`), `writer_profiles` (`pen_name_urdu`, `pen_name_english`, `bio_urdu`, `bio_english`, `agreement_accepted_at`), and `novels` (`title_urdu`, `title_english`, `synopsis_urdu`, `description_urdu`, `cover_url`, `cover_public_id`, `price_pkr`, `language`, `rights_declaration_accepted`).
+- **Action**: Paste contents of `supabase/migrations/0024_format_specifiers_and_privilege_lockdown.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Execute `supabase/tests/00_post_migration_verification.sql`, `supabase/tests/12_runtime_smoke.sql`, and `supabase/tests/13_client_attack_matrix.sql`.
+
+### 25. `supabase/migrations/0025_commission_settlement_and_audit_hardening.sql` [COMMISSION SETTLEMENT, UPDATED_AT TRIGGER & NOVEL PRICE AUDIT HARDENING]
+- **Purpose**: Fixes runtime and verification errors in commission settlement, adds schema consistency trigger, and locks down novel price mutations:
+  - **`commission_invoices.updated_at` & Trigger**: Adds `updated_at timestamptz NOT NULL DEFAULT pg_catalog.now()` to `public.commission_invoices` with `BEFORE UPDATE` trigger `trg_commission_invoices_set_updated_at`, aligning with repository entity table design.
+  - **Canonical `confirm_commission_settlement`**: Re-creates RPC strictly referencing real columns across `commission_invoices`, `commission_payments`, and `commission_payment_reports`. Correctly records admin settlement, produces `partially_paid` when partly paid and `settled` when fully paid, creates `commission_payments` entry, reconciles writer balance, dispatches notification and audit log, and strictly rejects overpayment and double confirmation.
+  - **Novel Price Mutation Lockdown**: Revokes direct client `UPDATE (price_pkr)` on `public.novels` from role `authenticated`. Enforces that all novel updates and price changes flow through the audited, authoritative `update_novel` RPC.
+- **Action**: Paste contents of `supabase/migrations/0025_commission_settlement_and_audit_hardening.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Execute `supabase/tests/00_post_migration_verification.sql`, `supabase/tests/12_runtime_smoke.sql`, and `supabase/tests/13_client_attack_matrix.sql`.
+
+### 26. `supabase/migrations/0026_revoke_trigger_privileges_and_default_acls.sql` [TRIGGER PRIVILEGES & DEFAULT ACL HARDENING]
+- **Purpose**: Eliminates verification FAIL on Check 59 and makes trigger privilege lockdown durable across future migrations:
+  - **Explicit Trigger Revocation**: Revokes `EXECUTE` on `public.trg_commission_invoices_updated_at()` from `PUBLIC`, `anon`, and `authenticated`.
+  - **Durable Default Privileges**: Queries and reports `pg_default_acl` entries for functions, and revokes default `EXECUTE` on functions in schema public for role `postgres`, `supabase_admin`, and current session role.
+  - **Dynamic Trigger Privilege Sweep**: Re-applies `REVOKE EXECUTE` across every trigger function in schema public (`pg_proc.prorettype = 'trigger'::regtype AND prokind = 'f'`) to protect all present and future triggers.
+- **Action**: Paste contents of `supabase/migrations/0026_revoke_trigger_privileges_and_default_acls.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Execute `supabase/tests/00_post_migration_verification.sql` (Check 8 / Check 59 passes), `supabase/tests/12_runtime_smoke.sql` (17/17 PASS), and `supabase/tests/13_client_attack_matrix.sql`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

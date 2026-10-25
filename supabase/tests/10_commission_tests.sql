@@ -116,9 +116,13 @@ BEGIN
     -- --------------------------------------------------------------------------
     BEGIN
         INSERT INTO public.orders (
-            id, order_number, reader_id, writer_id, novel_id, amount_pkr, status, novel_title_snapshot, currency
+            id, order_number, reader_id, writer_id, novel_id, amount_pkr,
+            applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr,
+            status, novel_title_snapshot, currency
         ) VALUES (
-            v_order_1_id, 'ORD-TEST-001', v_reader_id, v_writer_a_id, v_novel_a_id, 500.00, 'verified', 'Alpha Tale', 'PKR'
+            v_order_1_id, 'ORD-TEST-001', v_reader_id, v_writer_a_id, v_novel_a_id, 500.00,
+            20.00, 100.00, 400.00,
+            'verified', 'Alpha Tale', 'PKR'
         );
 
         INSERT INTO public.sales_ledger (
@@ -146,8 +150,15 @@ BEGIN
     -- --------------------------------------------------------------------------
     BEGIN
         -- Insert a second order & sale for 500 (comm: 100)
-        INSERT INTO public.orders (id, order_number, reader_id, writer_id, novel_id, amount_pkr, status, novel_title_snapshot, currency)
-        VALUES (v_order_2_id, 'ORD-TEST-002', v_reader_id, v_writer_a_id, v_novel_a_id, 500.00, 'verified', 'Alpha Tale', 'PKR');
+        INSERT INTO public.orders (
+            id, order_number, reader_id, writer_id, novel_id, amount_pkr,
+            applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr,
+            status, novel_title_snapshot, currency
+        ) VALUES (
+            v_order_2_id, 'ORD-TEST-002', v_reader_id, v_writer_a_id, v_novel_a_id, 500.00,
+            20.00, 100.00, 400.00,
+            'verified', 'Alpha Tale', 'PKR'
+        );
 
         INSERT INTO public.sales_ledger (
             id, order_id, writer_id, reader_id, novel_id, entry_type, gross_amount_pkr, commission_rate, platform_commission_pkr, writer_net_pkr
@@ -335,8 +346,15 @@ BEGIN
         END;
 
         -- Create a third order for Writer B and generate invoice 2, then void it
-        INSERT INTO public.orders (id, order_number, reader_id, writer_id, novel_id, amount_pkr, status, novel_title_snapshot, currency)
-        VALUES (v_order_3_id, 'ORD-TEST-003', v_reader_id, v_writer_b_id, v_novel_b_id, 600.00, 'verified', 'Beta Tale', 'PKR');
+        INSERT INTO public.orders (
+            id, order_number, reader_id, writer_id, novel_id, amount_pkr,
+            applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr,
+            status, novel_title_snapshot, currency
+        ) VALUES (
+            v_order_3_id, 'ORD-TEST-003', v_reader_id, v_writer_b_id, v_novel_b_id, 600.00,
+            20.00, 120.00, 480.00,
+            'verified', 'Beta Tale', 'PKR'
+        );
 
         INSERT INTO public.sales_ledger (
             id, order_id, writer_id, reader_id, novel_id, entry_type, gross_amount_pkr, commission_rate, platform_commission_pkr, writer_net_pkr

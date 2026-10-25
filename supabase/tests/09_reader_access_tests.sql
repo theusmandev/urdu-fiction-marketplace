@@ -191,9 +191,11 @@ BEGIN
     -- Order 1: Verified order for Buyer 1 on Novel 1
     INSERT INTO public.orders (
         id, order_number, reader_id, writer_id, novel_id, amount_pkr,
+        applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr,
         currency, status, novel_title_snapshot, payment_instructions_snapshot, created_at, updated_at, verified_at
     ) VALUES (
         v_order_1_id, 'ORD-TEST-0001', v_buyer_1_id, v_author_id, v_novel_1_id, 300,
+        20.00, 60.00, 240.00,
         'PKR', 'verified', 'Novel One Title', '{"method_type":"jazzcash"}'::jsonb, now(), now(), now()
     );
 
@@ -207,9 +209,11 @@ BEGIN
     -- Order Suspended: Verified order for Buyer 1 on Suspended Novel
     INSERT INTO public.orders (
         id, order_number, reader_id, writer_id, novel_id, amount_pkr,
+        applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr,
         currency, status, novel_title_snapshot, payment_instructions_snapshot, created_at, updated_at, verified_at
     ) VALUES (
         v_order_susp_id, 'ORD-TEST-SUSP', v_buyer_1_id, v_author_id, v_novel_susp_id, 500,
+        20.00, 100.00, 400.00,
         'PKR', 'verified', 'Suspended Novel', '{"method_type":"easypaisa"}'::jsonb, now(), now(), now()
     );
 
@@ -525,18 +529,20 @@ BEGIN
     EXECUTE 'SET LOCAL ROLE postgres';
     INSERT INTO public.orders (
         id, order_number, reader_id, writer_id, novel_id, amount_pkr,
+        applied_commission_rate, calculated_commission_pkr, calculated_writer_share_pkr,
         currency, status, novel_title_snapshot, payment_instructions_snapshot, created_at, updated_at
     ) VALUES (
         v_order_force_id, 'ORD-FORCE-TEST', v_buyer_2_id, v_author_id, v_novel_1_id, 300,
+        20.00, 60.00, 240.00,
         'PKR', 'payment_submitted', 'Novel One Title', '{"method_type":"jazzcash"}'::jsonb, now(), now()
     );
 
     INSERT INTO public.payment_submissions (
-        id, order_id, transaction_reference_tid, paid_amount_claimed_pkr,
-        sender_account_name, screenshot_path, reviewer_status, created_at
+        id, order_id, reader_id, writer_id, transaction_reference_tid, paid_amount_claimed_pkr,
+        screenshot_url, sender_account_name, screenshot_path, reviewer_status, created_at
     ) VALUES (
-        gen_random_uuid(), v_order_force_id, 'TID-FORCE-001', 300,
-        'Buyer Two Account', v_order_force_id::text || '/proof.webp', 'pending', now()
+        gen_random_uuid(), v_order_force_id, v_buyer_2_id, v_author_id, 'TID-FORCE-001', 300,
+        'https://storage.local/proof.webp', 'Buyer Two Account', v_order_force_id::text || '/proof.webp', 'pending', now()
     );
 
     -- Call admin_force_verify as admin

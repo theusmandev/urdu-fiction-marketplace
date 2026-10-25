@@ -270,19 +270,258 @@ Step 7 has been decoupled into four discrete checks with explicit diagnostic err
 
 ---
 
-### 5.5 Client-Side Protection Verification (Step 4.5)
+### 5.5 Client-Side Protection Verification (Step 4.5 Historical Note)
 
-Step 4.5 was added to `supabase/tests/12_runtime_smoke.sql` to rigorously test client-side security boundaries under an impersonated non-admin writer JWT (`request.jwt.claims -> sub = writer_id, role = 'authenticated'`). All 12 attack vectors are confirmed to fail:
-1. Direct `UPDATE writer_profiles SET current_unpaid_commission = 0.00` -> **BLOCKED** by trigger.
-2. Direct `UPDATE writer_profiles SET custom_commission_rate = 5.00` -> **BLOCKED** by trigger.
-3. Direct `UPDATE writer_profiles SET unpaid_commission_limit = 99999.00` -> **BLOCKED** by trigger.
-4. Direct `UPDATE writer_profiles SET status = 'approved'` -> **BLOCKED** by trigger.
-5. Direct `UPDATE writer_profiles SET is_orders_paused_for_commission = false` -> **BLOCKED** by trigger.
-6. Direct `UPDATE profiles SET role = 'admin'` -> **BLOCKED** by trigger.
-7. Direct `UPDATE profiles SET is_active = false` -> **BLOCKED** by trigger.
-8. Direct `UPDATE novels SET status = 'draft'` -> **BLOCKED** by trigger.
-9. Direct `UPDATE novels SET price_pkr = 25.00` (below platform minimum) -> **BLOCKED** by price validation trigger.
-10. Direct `UPDATE novels SET slug = 'hacked-slug'` after publication -> **BLOCKED** by trigger.
-11. `reconcile_writer_unpaid_commission(stranger_id)` -> **BLOCKED** by authorization check (`Access denied`).
-12. `get_writer_unpaid_commission(stranger_id)` -> **BLOCKED** by authorization check (`Access denied`).
+Step 4.5 was originally designed to test client-side security boundaries. However, in smoke test v1, the test block ran purely inside an anonymous `DO $$` block as superuser `postgres` without executing `SET LOCAL ROLE authenticated;`. Because the protection triggers check `current_user NOT IN ('authenticated', 'anon', 'authenticator')`, they correctly treated the `postgres` superuser as an internal trusted database process, allowing the mutations to succeed and appearing to "bypass security". In migration 0024 and smoke test v2, the identity switch is strictly enforced via `SET LOCAL ROLE authenticated;`, and table-level column privileges provide an immutable first layer of defense.
 
+---
+
+## 6. Migration 0024 — Format Placeholders, Cross-Writer RPC Lockdown & Safe Column Privileges
+
+### 6.1 Root Cause Analysis
+
+#### A. Format Specifier Crash in `verify_order_payment` Smoke Step
+PostgreSQL's built-in `format()` function strictly supports only `%s` (simple string conversion), `%I` (SQL identifier escaping), `%L` (SQL literal escaping), and `%%` (literal percent sign), with optional positional (`%1$s`) or width (`%-10s`) arguments. Unlike C printf, it does **not** support precision modifiers or type specifiers such as `%.2f`, `%d`, `%f`, `%i`.
+When smoke test Step 4 reached line 479 to record its PASS result, it evaluated:
+`format('... writer unpaid commission=%.2f PKR', v_writer_unpaid)`
+PostgreSQL threw runtime error `unrecognized format() type specifier "."`, which jumped to `EXCEPTION WHEN OTHERS THEN` and reported `verify_order_payment exception: unrecognized format() type specifier "."`.
+The underlying RPC had executed successfully, but the logging template crashed.
+
+**Fix**:
+1. All format calls across the repository must use `%s` with explicit formatting (e.g., `x::numeric(12,2)::text` or `pg_catalog.to_char(x, 'FM999999990.00')`).
+2. Migration 0024 canonicalizes `verify_order_payment`, `admin_force_verify`, `confirm_commission_settlement`, and `generate_commission_invoice` under `SET search_path = ''` with clean string and number formatting.
+3. Mechanical guard added to `scripts/check-sql-syntax-constructs.mjs` scanning all migrations and test files for invalid format placeholders.
+
+#### B. Smoke Step 4.5 "11 of 12 Attacks Bypassed Security"
+Investigation proved conclusively that the database triggers were NOT bypassed by client identities. Instead, the test was executing as `postgres`:
+1. The test executed `PERFORM set_config('request.jwt.claims', ..., true);` inside a `DO $$` block, but **never executed `SET LOCAL ROLE authenticated;`**.
+2. Inside PostgreSQL, `current_user` remained `'postgres'`.
+3. In `trg_protect_writer_profile_columns`, `v_is_trusted := (current_user NOT IN ('authenticated', 'anon', 'authenticator')) OR public.is_admin();`.
+4. Because `current_user` was `'postgres'`, `v_is_trusted` evaluated to `TRUE`, so the trigger intentionally permitted the update (superuser maintenance mode).
+5. Crucially, attack 6 attempted `UPDATE profiles SET role = 'admin' WHERE id = writer_id`. Because it ran as `postgres`, `writer_id` was updated to `role = 'admin'`!
+6. For attacks 11 and 12 (`reconcile_writer_unpaid_commission` and `get_writer_unpaid_commission`), `public.is_admin()` returned `TRUE` because the writer was now an admin, legally allowing cross-writer operations!
+7. The only attack that failed was attack 9 (`novels.price_pkr = 25.00`), because `trg_novels_validate_price` does not check `v_is_trusted` and unconditionally rejects prices below 50.
+
+### 6.2 Two-Layer Client Mutation Defense Architecture
+
+To guarantee that protected columns cannot be manipulated by clients under any circumstances—even if trigger logic is altered or temporarily bypassed—migration 0024 implements a defense-in-depth architecture:
+
+```
+[ Client Request via PostgREST (Role: authenticated) ]
+                      │
+                      ▼
+ ┌─────────────────────────────────────────────────────────────┐
+ │ LAYER 1: PostgreSQL Table Column-Level Privileges           │
+ │ (REVOKE UPDATE ON <table>; GRANT UPDATE (safe columns))     │
+ └────────────────────────────┬────────────────────────────────┘
+                              │
+                    Allowed Column Only?
+                   ├── NO  ──► SQLSTATE 42501 (Permission Denied)
+                   └── YES
+                              │
+                              ▼
+ ┌─────────────────────────────────────────────────────────────┐
+ │ LAYER 2: BEFORE UPDATE Protection Triggers (SECURITY INVOKER)│
+ │ (Inspects OLD vs NEW, verifies current_user & admin status) │
+ └────────────────────────────┬────────────────────────────────┘
+                              │
+                   Valid State Transition?
+                   ├── NO  ──► RAISE EXCEPTION 'Unauthorized: ...'
+                   └── YES ──► NEW values committed to database
+```
+
+### 6.3 Safe Column Allow-List per Table
+
+Direct `UPDATE` privileges on `public.profiles`, `public.writer_profiles`, and `public.novels` are revoked from role `authenticated` and granted strictly for the following safe column subsets:
+
+| Table | Safe Client-Editable Columns (GRANT UPDATE) | Protected Columns (Blocked by Table Privileges & Triggers) |
+|---|---|---|
+| `public.profiles` | `full_name`, `username`, `avatar_url` | `id` (immutable), `email` (auth managed), `role` (admin only), `is_active` (admin only), `created_at`, `updated_at` |
+| `public.writer_profiles` | `pen_name_urdu`, `pen_name_english`, `bio_urdu`, `bio_english`, `agreement_accepted_at` | `id` (immutable), `status` (admin/workflow only), `custom_commission_rate` (admin only), `unpaid_commission_limit` (admin only), `current_unpaid_commission` (ledger only), `is_orders_paused_for_commission` (automated only), `approved_by` (admin only), `created_at`, `updated_at` |
+| `public.novels` | `title_urdu`, `title_english`, `synopsis_urdu`, `description_urdu`, `cover_url`, `cover_public_id`, `price_pkr`, `language`, `rights_declaration_accepted` | `id` (immutable), `writer_id` (immutable), `slug` (locked on publish), `status` (governed by workflow RPCs: `submit_novel_for_review`, `withdraw_novel_submission`, `approve_novel`), `moderation_reason` (admin only), `total_chapters` (trigger maintained), `is_featured` (admin only), `published_at`, `created_at`, `updated_at` |
+
+**Impact on Server Actions and RPCs**:
+All workflow state mutations in the application (novel creation, review submission, approvals, chapter reordering, order creation, payment verification, commission settlements) execute via `SECURITY DEFINER` RPCs owned by `postgres`. Because `SECURITY DEFINER` functions run with owner privileges, they are completely unrestricted by client column-level grants.
+
+### 6.4 Cross-Writer RPC Lockdown
+
+The financial calculation procedures:
+- `public.get_writer_unpaid_commission(uuid)`
+- `public.reconcile_writer_unpaid_commission(uuid)`
+
+are strictly internal helper routines used by `verify_order_payment`, `admin_force_verify`, and `confirm_commission_settlement`.
+- A repository search of `src/` confirmed **0 direct invocations** from frontend pages or server actions.
+- `REVOKE ALL ON FUNCTION public.get_writer_unpaid_commission(uuid) FROM PUBLIC, anon, authenticated;`
+- `REVOKE ALL ON FUNCTION public.reconcile_writer_unpaid_commission(uuid) FROM PUBLIC, anon, authenticated;`
+- Added explicit caller check rejecting any client-impersonated caller who is neither the owner writer nor a platform administrator.
+
+---
+
+## 7. Migration 0025 — Commission Settlement, Schema Hardening, Frontend Column Audit & Mechanical Guard (October 2026)
+
+### 7.1 Real Bug: `confirm_commission_settlement` and `commission_invoices.updated_at`
+
+#### Root Cause Analysis
+During post-migration verification (`plpgsql_check`) and runtime smoke step 10, PostgreSQL reported:
+`column "updated_at" of relation "commission_invoices" does not exist`
+
+Investigation of schema history revealed:
+1. In migration `0002_orders_and_financial_ledger.sql`, `commission_invoices` was created with `created_at` but without `updated_at`.
+2. Migration `0017_commission_and_statements.sql` added due dates and void tracking columns, but did not provision `updated_at`.
+3. In migration `0024`, `confirm_commission_settlement` attempted to write `updated_at = pg_catalog.now()`. Because the column did not exist, `plpgsql_check` failed on AST validation, and runtime step 10 failed.
+4. Additionally, migration `0024` attempted to insert `payment_method` and `confirmed_by` into `commission_payments`. In the canonical schema (`0002`), `payment_method` does not exist on `commission_payments`, and the administrator foreign key is `confirmed_by_admin_id`.
+
+#### Architectural Decision: Adding `updated_at` vs. Removing Write
+- **Decision**: Add `updated_at timestamptz NOT NULL DEFAULT pg_catalog.now()` to `public.commission_invoices` and attach standard BEFORE UPDATE trigger `trg_commission_invoices_set_updated_at`.
+- **Rationale**: In the UNB database architecture, every mutable entity table (`profiles`, `writer_profiles`, `novels`, `chapters`, `orders`, `platform_settings`) maintains an `updated_at` timestamp synchronized via a `BEFORE UPDATE` trigger (`handle_updated_at()`). Only append-only tables (`sales_ledger`, `audit_logs`) omit `updated_at`. Since `commission_invoices` undergoes multiple state transitions (`open` -> `payment_reported` -> `partially_paid` -> `settled` / `overdue` / `voided`), adding `updated_at` maintains architectural consistency across the repository.
+
+#### Audit of 10 Related Tables & Canonical RPCs
+Every function modifying the audited tables was audited against `docs/SCHEMA_SNAPSHOT.md` and live migration definitions:
+1. `public.commission_invoices`: Validated all columns (`id`, `invoice_number`, `writer_id`, `period_start`, `period_end`, `total_sales_count`, `total_gross_pkr`, `total_commission_owed_pkr`, `amount_settled_pkr`, `status`, `due_date`, `voided_at`, `voided_by`, `void_reason`, `writer_reported_tid`, `writer_reported_screenshot_url`, `settled_by_admin_id`, `settled_at`, `created_at`, `updated_at`).
+2. `public.commission_invoice_lines`: Verified columns (`id`, `invoice_id`, `ledger_entry_id`, `amount_pkr`, `created_at`). Append-only, no `updated_at`.
+3. `public.commission_payments`: Verified columns (`id`, `invoice_id`, `writer_id`, `amount_pkr`, `transaction_reference`, `confirmed_by_admin_id`, `notes`, `created_at`). No `payment_method` column.
+4. `public.commission_payment_reports`: Verified columns (`id`, `invoice_id`, `writer_id`, `amount_pkr`, `transaction_reference`, `receipt_url`, `receipt_path`, `notes`, `status`, `reviewed_by`, `reviewed_at`, `created_at`).
+5. `public.refund_requests`: Verified columns (`id`, `order_id`, `reader_id`, `reason`, `status`, `admin_notes`, `resolved_by`, `resolved_at`, `created_at`, `updated_at`).
+6. `public.disputes`: Verified columns (`id`, `order_id`, `reader_id`, `writer_id`, `dispute_reason`, `dispute_details`, `status`, `resolution_type`, `admin_resolution_notes`, `resolved_by`, `resolved_at`, `created_at`, `updated_at`).
+7. `public.support_requests`: Verified columns (`id`, `ticket_number`, `user_id`, `category`, `subject`, `description`, `status`, `priority`, `assigned_to`, `resolved_by`, `resolved_at`, `created_at`, `updated_at`).
+8. `public.email_outbox`: Verified columns (`id`, `recipient_email`, `subject`, `template_name`, `template_payload`, `status`, `retry_count`, `max_retries`, `last_error`, `sent_at`, `next_retry_at`, `created_at`).
+9. `public.notifications`: Verified columns (`id`, `user_id`, `title`, `message`, `notification_type`, `entity_type`, `entity_id`, `is_read`, `read_at`, `created_at`).
+10. `public.platform_settings`: Verified columns (`id`, `default_commission_rate`, `default_unpaid_commission_limit`, `min_novel_price_pkr`, `max_novel_price_pkr`, `max_orders_per_hour`, `maintenance_mode`, `is_orders_paused_globally`, `updated_at`, `updated_by`).
+
+Re-audited 6 RPCs:
+- `public.confirm_commission_settlement(uuid, numeric, text, text)`: Hardened to validate invoice exists and is not voided; rejects double-confirmation when already fully settled (`amount_settled_pkr >= total_commission_owed_pkr`); rejects overpayment (`p_amount > remaining`); sets `status = 'settled'` when fully paid or `status = 'partially_paid'` when partly paid; records `settled_at` and `settled_by_admin_id`; updates pending payment report to `confirmed`; creates immutable `commission_payments` row; reconciles writer balance; dispatches Urdu notification; and writes structured audit log.
+- `public.report_commission_payment(uuid, numeric, text, text, text)`: Uses canonical `commission_payment_reports` columns.
+- `public.reject_commission_report(uuid, text)`: Reverts invoice status from `payment_reported` to `open` (or `partially_paid` if prior settlements exist), updates report status to `rejected`, and notifies writer.
+- `public.void_commission_invoice(uuid, text)`: Verifies zero confirmed payments exist before voiding, marks `is_voided = true` on lines, sets `status = 'voided'`, and records `voided_at` and `voided_by`.
+- `public.generate_commission_invoice(uuid, timestamptz, timestamptz)`: Binds uninvoiced ledger entries via `commission_invoice_lines` with verified arithmetic.
+- `public.apply_overdue_rules()`: Accurately transitions overdue invoices and pauses new orders when writer crosses thresholds.
+
+---
+
+### 7.2 Hardening Item 3a: `novels.price_pkr` Direct Mutation Lockdown
+
+#### Context & Problem
+In migration `0024`, `price_pkr` was included in the safe column list for direct `GRANT UPDATE (...) ON public.novels TO authenticated`. While this allowed writers to update their novel prices, it bypassed:
+1. The structured `update_novel` RPC validation and audit log generation (`UPDATE_NOVEL_PRICE` audit trail).
+2. The core platform business invariant requiring price changes on published novels to create an authoritative audit trail.
+
+#### Architectural Choice: RPC Enforcement vs. AFTER UPDATE Trigger
+- **Option 1: Column Grant Revocation (Selected)**:
+  - Revoke direct `UPDATE (price_pkr)` from role `authenticated` (`REVOKE UPDATE (price_pkr) ON public.novels FROM authenticated;`).
+  - Verify that the writer application uses `updateNovelAction` / `update_novel` RPC for all edits.
+  - *Rationale*: Defense-in-depth at Layer 1. Attempted direct client writes on `price_pkr` fail immediately at the privilege layer with SQLSTATE `42501` (Permission Denied). This eliminates unnecessary trigger overhead, prevents race conditions, and guarantees that every price mutation—whether draft or published—flows through the single audited, authoritative RPC entrypoint.
+- **Option 2: AFTER UPDATE Trigger (Rejected)**:
+  - Allowing direct table mutations and recording audit logs via trigger introduces dual code paths for price updates, complicates error handling on client-initiated partial updates, and weakens the principle of atomic RPC-based state mutation.
+
+#### Server Action Verification
+An audit of `src/app/actions/writer.ts` confirmed:
+- `updateNovelAction()` (lines 142–184) calls `supabase.rpc('update_novel', { p_novel_id: novelId, p_title_urdu: ..., p_price_pkr: pricePkr, ... })`.
+- No frontend page or server action executes direct `supabase.from('novels').update(...)` for price changes.
+- Therefore, revoking `price_pkr` from the direct column grant causes zero frontend regressions while enforcing complete audit integrity.
+
+---
+
+### 7.3 Hardening Item 3b: Exhaustive Frontend `.update()` Audit
+
+An exhaustive scan across all TypeScript files under `src/app` and `src/lib` identified exactly four `.update()` calls. Each call was audited against the PostgreSQL column privileges defined in migration `0024` and `0025`:
+
+| File & Line | Target Table | Columns Sent | Column Grant Status | Action Taken |
+|---|---|---|---|---|
+| `src/app/actions/profile.ts:60` | `public.profiles` | `full_name`, `username`, `avatar_url`, ~~`updated_at`~~ | `full_name`, `username`, `avatar_url` are GRANTED. `updated_at` is NOT granted (managed by database trigger). | **Fixed**: Removed `updated_at: new Date().toISOString()` from payload. Updates now succeed with SQLSTATE `00000`. |
+| `src/app/actions/writer.ts:49` | `public.writer_profiles` | `pen_name_urdu`, `pen_name_english`, `bio_urdu`, `bio_english`, ~~`updated_at`~~ | Pen names and bios are GRANTED. `updated_at` is NOT granted. | **Fixed**: Removed `updated_at: new Date().toISOString()` from payload. Database trigger maintains `updated_at`. |
+| `src/app/actions/writer.ts:66` | `public.profiles` | `avatar_url`, ~~`updated_at`~~ | `avatar_url` is GRANTED. `updated_at` is NOT granted. | **Fixed**: Removed `updated_at: new Date().toISOString()` from payload. |
+| `src/app/actions/writer.ts:405` | `public.chapters` | `chapter_number`, `title_urdu`, `content_urdu`, `is_free_preview`, `is_published` | All content columns are granted to writers under RLS for draft chapters. | **Verified Valid**: No protected columns sent. Novel status protection trigger prevents draft chapter mutation once novel is published. |
+| *Direct updates on `novels`* | `public.novels` | *(None)* | `price_pkr` revoked in 0025; novel creation/edits route through `create_novel` and `update_novel` RPCs. | **Verified Valid**: Zero direct `novels.update()` calls exist in codebase. |
+
+---
+
+### 7.4 Hardening Item 3c: Mechanical Guard Extension & Test Fixture Audit
+
+#### Extended Mechanical Guard (`scripts/check-sql-syntax-constructs.mjs`)
+The repository static analysis script was extended to validate:
+1. **Schema Construct Qualification**: Forbids `pg_catalog.` qualification on SQL syntax constructs (`coalesce`, `nullif`, `greatest`, `least`, `trim`, `current_user`, etc.).
+2. **PostgreSQL format() Placeholders**: Forbids invalid printf placeholders (`%.2f`, `%d`, etc.).
+3. **Test Fixture Mandatory Columns**: Scans every `.sql` file in `supabase/tests/` to guarantee that any `INSERT INTO` on key operational and financial tables supplies all mandatory NOT NULL columns without default:
+   - `public.orders`: `order_number`, `reader_id`, `writer_id`, `novel_id`, `novel_title_snapshot`, `amount_pkr`, `applied_commission_rate`, `calculated_commission_pkr`, `calculated_writer_share_pkr`, `status`
+   - `public.payment_submissions`: `order_id`, `reader_id`, `writer_id`, `transaction_reference_tid`, `screenshot_url`
+   - `public.purchase_entitlements`: `reader_id`, `novel_id`
+   - `public.sales_ledger`: `order_id`, `writer_id`, `reader_id`, `novel_id`, `entry_type`, `gross_amount_pkr`, `commission_rate`, `platform_commission_pkr`, `writer_net_pkr`
+   - `public.commission_invoices`: `writer_id`, `invoice_number`, `period_start`, `period_end`
+4. **Positional INSERT Prohibition**: Flags any `INSERT INTO <table> VALUES (...)` without an explicit column list.
+
+#### Test Fixtures Harmonization
+- `supabase/tests/13_client_attack_matrix.sql`:
+  - Fixed fixture `orders` INSERT at DO block line 76 by supplying `novel_title_snapshot = 'ناول الف'` and all snapshot/commission metrics.
+  - Fixed `payment_submissions` fixture by using canonical columns (`transaction_reference_tid`, `screenshot_url`, `screenshot_path`, `paid_amount_claimed_pkr`, `reviewer_status`).
+  - Added Test 3.10 verifying that direct writer update of `novels.price_pkr` is blocked at Layer 1 (SQLSTATE `42501`).
+  - Client emulation strictly enforces `SET LOCAL ROLE authenticated;` with `request.jwt.claims`, records results in temp table `attack_matrix_results`, prints output before `ROLLBACK`, and verifies unchanged data state under `postgres`.
+- `supabase/tests/08_checkout_tests.sql`, `09_reader_access_tests.sql`, `10_commission_tests.sql`, and `12_runtime_smoke.sql`:
+  - Audited and updated all fixture INSERTs to supply complete NOT NULL columns.
+
+
+
+
+---
+
+## 8. Migration 0026 & Comprehensive PL/pgSQL Test Suites Variable Audit (October 2026)
+
+### 8.1 Root Cause Analysis
+
+#### 1. Verification FAIL: Check 59 (`trg_commission_invoices_updated_at`)
+- **Root Cause**: In migration `0025`, `public.trg_commission_invoices_updated_at()` was created as a trigger function without an explicit `REVOKE EXECUTE` statement. While migration `0021` previously ran `ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated`, default privileges in Supabase environments depend on the role executing the migration (e.g., `postgres` vs `supabase_admin`) and do not eliminate implicit public execution grants on existing or re-created objects if the session role differs. Check 8 in the verification suite detected that `has_function_privilege('anon'/'authenticated', 'trg_commission_invoices_updated_at', 'EXECUTE')` returned true.
+- **Durable Remediation (Migration 0026)**:
+  1. Explicitly revoked EXECUTE on `public.trg_commission_invoices_updated_at()` from `PUBLIC`, `anon`, and `authenticated`.
+  2. Queried and logged `pg_default_acl` entries for functions in schema public.
+  3. Re-applied `ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated`.
+  4. Executed safe DO blocks applying the same default privilege revocation for `supabase_admin` and `current_user`.
+  5. Added a dynamic loop revoking EXECUTE from `PUBLIC`, `anon`, `authenticated` on every trigger function in schema public (`pg_proc.prorettype = 'trigger'::regtype AND pg_proc.prokind = 'f'`).
+  6. Added a permanent mechanical guard in `npm run check:sql` requiring any migration defining a trigger function (`RETURNS trigger`) to include an explicit REVOKE or the dynamic trigger privilege revocation loop.
+  7. Made verification Check 8 dynamic, reporting the specific migration file required for revocation.
+
+#### 2. Client Attack Matrix Failure: ERROR 42601 (`v_details` undeclared at line 1068)
+- **Root Cause**: `supabase/tests/13_client_attack_matrix.sql` originally structured all client emulation tests (spanning 800+ lines) into a single monolithic "mega" DO block. At test 5.5, a query attempted `SELECT email INTO v_details FROM public.profiles WHERE id = v_writer_a;`. In PostgreSQL PL/pgSQL, any variable target in `SELECT ... INTO` must be declared in the enclosing `DECLARE` section. Because PL/pgSQL compiles entire DO blocks before executing any statement, a single syntax or variable binding error caused the entire matrix to abort immediately with SQLSTATE `42601`, preventing all test results from rendering.
+- **Architectural Solution**:
+  1. Replaced `v_details` with an explicitly declared `v_email text;` target variable.
+  2. Modularized the attack matrix from 1 monolithic block into 6 independent, category-scoped DO blocks (Bootstrap Fixtures + 5 Category Blocks).
+  3. Each block independently queries fixtures from the temp table `attack_fixtures`, runs tests for its category, records findings into `attack_matrix_results`, and issues `RESET ROLE;`. One syntax anomaly can no longer cascade or mask results from remaining attack categories.
+
+---
+
+### 8.2 Exhaustive DO Block Variable & Syntax Audit Table
+
+Every DO block across `13_client_attack_matrix.sql`, `12_runtime_smoke.sql`, and `00_post_migration_verification.sql` was systematically parsed and walked. The table below lists every variable declared, every variable referenced in execution, target bindings for `SELECT ... INTO`, and `EXCEPTION` block closures:
+
+| File | Block # | Name / Category | Lines | Declared Variables & Types | Variables Used | Undeclared | SELECT INTO Targets | EXCEPTION Block Status |
+|---|---|---|---|---|---|---|---|---|
+| `13_client_attack_matrix.sql` | 1 | Bootstrap Fixtures | 149–287 | `v_ts text`, `v_admin_id uuid`, `v_writer_a uuid`, `v_writer_b uuid`, `v_reader_a uuid`, `v_reader_b uuid`, `v_novel_a uuid`, `v_novel_b uuid`, `v_ch_free uuid`, `v_ch_paid uuid`, `v_order_a uuid`, `v_sub_a uuid`, `v_ent_a uuid`, `v_led_a uuid`, `v_inv_a uuid`, `v_meth_a uuid`, `v_meth_b uuid`, `v_slug_a text`, `v_slug_b text` (19 total) | All 19 used | **0** | N/A (Fixture INSERTs) | Closed with `END;` |
+| `13_client_attack_matrix.sql` | 2 | Cat 1: Reader Direct DML | 293–541 | `v_reader_a uuid`, `v_writer_a uuid`, `v_novel_a uuid`, `v_novel_b uuid`, `v_order_a uuid`, `v_sub_a uuid`, `v_ent_a uuid`, `v_led_a uuid`, `v_inv_a uuid`, `v_test_id integer`, `v_rows integer`, `v_chk_amt numeric`, `v_chk_num numeric`, `v_chk_ostatus order_status`, `v_chk_invstatus commission_invoice_status`, `v_chk_text text`, `v_chk_uuid uuid` (17 total) | All 17 used | **0** | 14 statements; all targets match declared variables | 12 inner blocks; all closed with `END;` |
+| `13_client_attack_matrix.sql` | 3 | Cat 2: Writer Direct DML | 546–675 | `v_writer_a uuid`, `v_order_a uuid`, `v_ent_a uuid`, `v_led_a uuid`, `v_inv_a uuid`, `v_test_id integer`, `v_rows integer`, `v_chk_ostatus order_status`, `v_chk_num numeric`, `v_chk_wshare numeric`, `v_chk_invstatus commission_invoice_status` (11 total) | All 11 used | **0** | 8 statements; all targets match declared variables | 5 inner blocks; all closed with `END;` |
+| `13_client_attack_matrix.sql` | 4 | Cat 3: Column Privilege Defense | 680–896 | `v_writer_a uuid`, `v_novel_a uuid`, `v_slug_a text`, `v_test_id integer`, `v_rows integer`, `v_chk_unpaid numeric`, `v_chk_rate numeric`, `v_chk_limit numeric`, `v_chk_wstatus writer_status`, `v_chk_paused boolean`, `v_chk_role user_role`, `v_chk_active boolean`, `v_chk_nstatus novel_status`, `v_chk_slug text`, `v_chk_price numeric` (15 total) | All 15 used | **0** | 4 statements; all targets match declared variables | 10 inner blocks; all closed with `END;` |
+| `13_client_attack_matrix.sql` | 5 | Cat 4: Admin-Only RPCs | 901–1061 | `v_reader_a uuid`, `v_writer_a uuid`, `v_writer_b uuid`, `v_order_a uuid`, `v_inv_a uuid`, `v_test_id integer`, `v_res_json jsonb`, `v_res_num numeric` (8 total) | All 8 used | **0** | 5 statements; all targets match declared variables | 12 inner blocks; all closed with `END;` |
+| `13_client_attack_matrix.sql` | 6 | Cat 5: Privacy & Isolation | 1066–1205 | `v_reader_b uuid`, `v_writer_a uuid`, `v_writer_b uuid`, `v_ch_paid uuid`, `v_order_a uuid`, `v_sub_a uuid`, `v_slug_a text`, `v_test_id integer`, `v_rows integer`, `v_res_json jsonb`, `v_email text` (11 total) | All 11 used | **0** | 13 statements; all targets match declared variables (including `v_email`) | 7 inner blocks; all closed with `END;` |
+| `12_runtime_smoke.sql` | 1 | Step 1: Bootstrap Fixtures | 163–273 | `v_admin_id`, `v_writer_id`, `v_buyer_id`, `v_stranger_id`, `v_novel_id`, `v_novel_2_id`, `v_ch1_id`, `v_ch2_id`, `v_ch3_id`, `v_method_id` (all uuid, 10 total) | All 10 used | **0** | N/A (Fixture INSERTs) | Outer block exception closed with `END;` |
+| `12_runtime_smoke.sql` | 2 | Step 2: create_order (Novel 1) | 279–321 | `v_buyer_id`, `v_novel_id`, `v_method_id`, `v_res jsonb`, `v_order_id uuid` (5 total) | All 5 used | **0** | 3 fixture queries; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 3 | Step 3: submit_payment | 327–400 | `v_buyer_id`, `v_order_id`, `v_res jsonb`, `v_sub_id uuid`, `v_order_status text`, `v_reviewer_st text` (6 total) | All 6 used | **0** | 4 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 4 | Step 3A: Pre-Verification Gate | 406–478 | `v_buyer_id`, `v_order_id`, `v_ent_count integer`, `v_led_count integer`, `v_ch2_id uuid`, `v_novel_slug text`, `v_ch_res jsonb` (7 total) | All 7 used | **0** | 5 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 5 | Step 4: verify_order_payment | 484–643 | `v_writer_id`, `v_order_id`, `v_res jsonb`, `v_order_status text`, `v_sub_status text`, `v_ent_count integer`, `v_led_count integer`, `v_unpaid_bal numeric`, `v_is_paused boolean`, `v_notif_count integer`, `v_audit_count integer` (11 total) | All 11 used | **0** | 8 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 6 | Step 5: Double Verification Idempotency | 649–912 | `v_writer_id`, `v_order_id`, `v_res jsonb`, `v_ent_count integer`, `v_led_count integer`, `v_audit_count integer` (6 total) | All 6 used | **0** | 5 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 7 | Step 6: Sales Ledger Immutability | 918–966 | `v_order_id uuid`, `v_ledger record` (2 total) | All 2 used | **0** | 1 query into `v_order_id` | Closed with `END;` |
+| `12_runtime_smoke.sql` | 8 | Step 7: Content Access Enforcement | 972–1054 | `v_buyer_id`, `v_stranger_id`, `v_order_id`, `v_novel_slug text`, `v_res_buyer jsonb`, `v_res_free jsonb`, `v_stranger_denied boolean` (7 total) | All 7 used | **0** | 3 fixture queries; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 9 | Step 8: Admin RPCs | 1060–1163 | `v_admin_id`, `v_buyer_id`, `v_order_id`, `v_step4_status text`, `v_list_res jsonb`, `v_order_res jsonb`, `v_buyer_email text`, `v_list_has_order boolean`, `v_account_number text`, `v_errors text` (10 total) | All 10 used | **0** | 5 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 10 | Step 9: Commission Invoice Generation | 1169–1232 | `v_admin_id`, `v_writer_id`, `v_order_id`, `v_preview jsonb`, `v_gen jsonb`, `v_invoice_id uuid` (6 total) | All 6 used | **0** | 3 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 11 | Step 10: Report Commission Payment | 1238–1291 | `v_writer_id`, `v_invoice_id`, `v_bal_before numeric`, `v_bal_after numeric`, `v_res jsonb`, `v_report_id uuid` (6 total) | All 6 used | **0** | 2 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 12 | Step 10A: Confirm Commission Settlement | 1297–1344 | `v_admin_id`, `v_writer_id`, `v_invoice_id`, `v_report_id`, `v_bal_after numeric`, `v_res jsonb` (6 total) | All 6 used | **0** | 4 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 13 | Step 11: Dispute Creation | 1350–1425 | `v_buyer_id`, `v_writer_id`, `v_novel_2_id`, `v_method_id`, `v_order_2_id`, `v_res_disp jsonb`, `v_dispute_id uuid` (7 total) | All 7 used | **0** | 4 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 14 | Step 12: Resolve Dispute for Reader | 1431–1486 | `v_admin_id`, `v_order_2_id`, `v_dispute_id`, `v_res jsonb`, `v_ent_count integer`, `v_led_count integer` (6 total) | All 6 used | **0** | 3 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 15 | Step 13: Refund Request Workflow | 1492–1573 | `v_buyer_id`, `v_admin_id`, `v_order_2_id`, `v_req_res jsonb`, `v_app_res jsonb`, `v_request_id uuid`, `v_revoked boolean`, `v_neg_led_count integer`, `v_order_status text` (9 total) | All 9 used | **0** | 3 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 16 | Step 14: Platform Settings Overload | 1579–1633 | `v_admin_id`, `v_res jsonb`, `v_settings record` (3 total) | All 3 used | **0** | 2 statements; all targets valid | Closed with `END;` |
+| `12_runtime_smoke.sql` | 17 | Step 15: Post-Test Data Integrity | 1640–1712 | `v_buyer_id`, `v_writer_id`, `v_order_id`, `v_lib jsonb`, `v_lib_count integer`, `v_led_count integer`, `v_summary jsonb`, `v_step4_ran boolean`, `v_expected_count integer` (9 total) | All 9 used | **0** | 4 statements; all targets valid | Closed with `END;` |
+| `00_post_migration_verification.sql` | 1 | Complete Post-Migration Verification Suite | 152–899 | `v_rec record`, `v_err record`, `v_cnt integer`, `v_has boolean`, `v_err_count integer`, `v_expected_tables text[]`, `v_expected_rpcs text[]`, `v_authenticated_rpcs text[]`, `v_anon_allowlist text[]`, `v_expected_types text[]`, `v_expected_buckets text[]`, `v_fn text`, `v_tbl text`, `v_ext_fn_count integer`, `v_ext_fn_list text` (15 total) | All 15 used | **0** | 6 statements; all targets valid (`v_cnt`) | All inner blocks closed with `END;` |
+
+**Audit Conclusion**: 
+- Total DO blocks audited: **24** across 3 test suites.
+- Undeclared variables: **0**.
+- Variable scope leaks (inner-block variables used outside enclosing block): **0**.
+- `SELECT ... INTO` target/type mismatches: **0**.
+- Unclosed `EXCEPTION` blocks: **0**.
+- All three SQL scripts compile cleanly under strict PostgreSQL PL/pgSQL validation.

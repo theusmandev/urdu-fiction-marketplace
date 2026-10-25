@@ -281,6 +281,7 @@
 | `settled_by_admin_id` | uuid | YES | NULL | REFERENCES `profiles(id)` |
 | `settled_at` | timestamptz | YES | NULL | |
 | `created_at` | timestamptz | NO | `now()` | |
+| `updated_at` | timestamptz | NO | `now()` | Added in 0025, maintained by `trg_commission_invoices_set_updated_at` | |
 
 ### `public.commission_invoice_lines` (0017)
 | Column | Type | Nullable | Default | Constraints / Description |
