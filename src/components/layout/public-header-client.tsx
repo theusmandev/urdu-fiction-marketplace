@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useTransition } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
-import { logoutUser } from "@/app/actions/auth";
 import type { UserRole, WriterStatus } from "@/types/database";
 import {
   BookMarked,
@@ -20,10 +19,8 @@ import {
   BookOpen,
   ShoppingBag,
   User as UserIcon,
-  LogOut,
-  Loader2,
-  Bell,
 } from "lucide-react";
+import { AccountMenu, NotificationBell, LogoutButton } from "./shared";
 
 export interface HeaderSessionUser {
   id: string;
@@ -41,54 +38,7 @@ export interface PublicHeaderClientProps {
   user?: HeaderSessionUser | null;
 }
 
-/**
- * Interactive Logout Button with loading/disabled feedback
- */
-export function LogoutButton({
-  onLoggedOut,
-  className,
-  isMobile,
-}: {
-  onLoggedOut?: () => void;
-  className?: string;
-  isMobile?: boolean;
-}) {
-  const [isPending, startTransition] = useTransition();
-
-  const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    startTransition(async () => {
-      onLoggedOut?.();
-      await logoutUser();
-    });
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleLogout}
-      disabled={isPending}
-      className={
-        className ||
-        (isMobile
-          ? "flex items-center justify-center gap-2.5 w-full py-3 px-4 rounded-xl text-sm font-semibold text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/25 border border-rose-500/20 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          : "flex items-center gap-2.5 w-full px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed")
-      }
-    >
-      {isPending ? (
-        <>
-          <Loader2 className="w-4 h-4 animate-spin text-rose-600 shrink-0" />
-          <span>Signing out...</span>
-        </>
-      ) : (
-        <>
-          <LogOut className="w-4 h-4 text-rose-600 shrink-0" />
-          <span>Sign Out</span>
-        </>
-      )}
-    </button>
-  );
-}
+export { LogoutButton };
 
 export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderClientProps) {
   const router = useRouter();
@@ -96,9 +46,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
-  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
 
-  const accountDropdownRef = useRef<HTMLDivElement>(null);
   const genreDropdownRef = useRef<HTMLDivElement>(null);
 
   // Client-side session resolution (avoids breaking static/ISR page caching)
@@ -131,12 +79,6 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        accountDropdownRef.current &&
-        !accountDropdownRef.current.contains(event.target as Node)
-      ) {
-        setAccountDropdownOpen(false);
-      }
       if (
         genreDropdownRef.current &&
         !genreDropdownRef.current.contains(event.target as Node)
@@ -302,200 +244,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
           <div className="hidden sm:flex items-center gap-2">
             {user ? (
               <>
-                {/* Notification Bell */}
-                <Link
-                  href="/notifications"
-                  className="relative p-2 rounded-full text-secondary hover:text-navy hover:bg-ivory transition-colors cursor-pointer"
-                  aria-label="Notifications"
-                >
-                  <Bell className="w-5 h-5" />
-                  {(user.unreadNotificationsCount ?? 0) > 0 && (
-                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-stone-950">
-                      {(user.unreadNotificationsCount ?? 0) > 9 ? "9+" : user.unreadNotificationsCount}
-                    </span>
-                  )}
-                </Link>
-
-                {/* Signed-in Account Dropdown */}
-                <div className="relative" ref={accountDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setAccountDropdownOpen((prev) => !prev)}
-                  className="flex items-center gap-2.5 py-1.5 px-3 rounded-full border border-border/90 hover:border-accent/50 bg-surface hover:bg-ivory/60 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer"
-                  aria-expanded={accountDropdownOpen}
-                  aria-haspopup="true"
-                  aria-label="Account menu"
-                >
-                  {user.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover border border-border shrink-0"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-navy text-accent border border-navy-light flex items-center justify-center font-bold text-xs shrink-0 shadow-inner">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="flex flex-col text-left max-w-[130px]">
-                    <span className="text-xs font-semibold text-main truncate leading-tight">
-                      {user.name}
-                    </span>
-                    <span className="text-[10px] text-secondary capitalize leading-tight">
-                      {user.role === "admin"
-                        ? "Admin"
-                        : user.isWriter
-                        ? "Author"
-                        : "Reader"}
-                    </span>
-                  </div>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 text-secondary transition-transform duration-200 ${
-                      accountDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {accountDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-surface rounded-2xl shadow-xl border border-border/80 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                    {/* User Info Header */}
-                    <div className="px-3 py-2.5 bg-ivory/70 rounded-xl mb-1.5 border border-border/60">
-                      <div className="flex items-center gap-2.5">
-                        {user.avatarUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={user.avatarUrl}
-                            alt={user.name}
-                            className="w-9 h-9 rounded-full object-cover border border-border shrink-0"
-                          />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-navy text-accent border border-navy-light flex items-center justify-center font-bold text-sm shrink-0">
-                            {user.name.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold text-navy truncate">
-                            {user.name}
-                          </p>
-                          <p className="text-[11px] text-secondary truncate">
-                            {user.email}
-                          </p>
-                          <div className="mt-1">
-                            <span
-                              className={`inline-block text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
-                                user.role === "admin"
-                                  ? "bg-rose-500/10 text-rose-700 border border-rose-500/20"
-                                  : user.isWriter
-                                  ? "bg-amber-500/10 text-amber-700 border border-amber-500/20"
-                                  : "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
-                              }`}
-                            >
-                              {user.role === "admin"
-                                ? "Platform Admin"
-                                : user.writerStatus === "pending_approval"
-                                ? "Author (Pending)"
-                                : user.isWriter
-                                ? "Verified Author"
-                                : "Reader"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Role-Aware Navigation Links */}
-                    <div className="space-y-0.5">
-                      {user.role === "admin" && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setAccountDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 rounded-xl transition-colors"
-                        >
-                          <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
-                          <span>Admin Panel</span>
-                        </Link>
-                      )}
-
-                      {(user.isWriter || user.role === "admin") && (
-                        <Link
-                          href="/writer"
-                          onClick={() => setAccountDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-50 rounded-xl transition-colors"
-                        >
-                          <Feather className="w-4 h-4 text-amber-600 shrink-0" />
-                          <span>Writer Studio</span>
-                        </Link>
-                      )}
-
-                      <Link
-                        href="/notifications"
-                        onClick={() => setAccountDropdownOpen(false)}
-                        className="flex items-center justify-between px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Bell className="w-4 h-4 text-secondary shrink-0" />
-                          <span>Notifications</span>
-                        </div>
-                        {(user.unreadNotificationsCount ?? 0) > 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700">
-                            {user.unreadNotificationsCount}
-                          </span>
-                        )}
-                      </Link>
-
-                      <Link
-                        href="/library"
-                        onClick={() => setAccountDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
-                      >
-                        <BookOpen className="w-4 h-4 text-secondary shrink-0" />
-                        <span>My Library</span>
-                      </Link>
-
-                      <Link
-                        href="/orders"
-                        onClick={() => setAccountDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
-                      >
-                        <ShoppingBag className="w-4 h-4 text-secondary shrink-0" />
-                        <span>My Orders</span>
-                      </Link>
-
-                      <Link
-                        href="/account"
-                        onClick={() => setAccountDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
-                      >
-                        <UserIcon className="w-4 h-4 text-secondary shrink-0" />
-                        <span>Account</span>
-                      </Link>
-
-                      {user.role === "reader" && !user.isWriter && (
-                        <Link
-                          href="/become-a-writer"
-                          onClick={() => setAccountDropdownOpen(false)}
-                          className="flex items-center justify-between px-3 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 rounded-xl transition-colors"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <Feather className="w-4 h-4 text-amber-600 shrink-0" />
-                            <span>Become a writer</span>
-                          </div>
-                          <span className="text-[10px] bg-amber-500/15 text-amber-700 font-semibold px-1.5 py-0.5 rounded">
-                            Sell
-                          </span>
-                        </Link>
-                      )}
-                    </div>
-
-                    {/* Divider & Sign Out */}
-                    <div className="h-px bg-border my-1.5" />
-                    <LogoutButton onLoggedOut={() => setAccountDropdownOpen(false)} />
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
+                <NotificationBell
+                  unreadCount={user.unreadNotificationsCount}
+                  variant="marketplace"
+                />
+                <AccountMenu user={user} variant="marketplace" />
+              </>
+            ) : (
               /* Signed-out CTAs */
               <>
                 <Link

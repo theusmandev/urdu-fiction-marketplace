@@ -2,7 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { requireWriter } from '@/lib/auth/requireRole';
 import { getDisputeDetailAction } from '@/app/actions/disputes';
-import { DisputeDetailClient } from '@/app/disputes/[id]/DisputeDetailClient';
+import { DisputeDetailClient } from '@/app/(marketplace)/disputes/[id]/DisputeDetailClient';
 
 export const dynamic = 'force-dynamic';
 
