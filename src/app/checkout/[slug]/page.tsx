@@ -4,6 +4,7 @@ import React from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { createClient } from '@/lib/supabase/server';
+import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
 import { CheckoutForm } from './CheckoutForm';
 import type { CheckoutOptionsResponse } from '@/types/database';
 
@@ -19,13 +20,36 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const supabase = await createClient();
 
   // 1. Fetch novel by slug
-  const { data: novel, error: novelError } = await supabase
+  const novelRes = await supabase
     .from('novels')
     .select('id, title_english, title_urdu, slug, status, price_pkr, writer_id')
     .eq('slug', slug)
     .maybeSingle();
 
-  if (novelError || !novel || novel.status !== 'published') {
+  const { data: novel, error: novelError } = unwrapSingleQuery<{
+    id: string;
+    title_english: string;
+    title_urdu: string;
+    slug: string;
+    status: string;
+    price_pkr: number;
+    writer_id: string;
+  }>(novelRes, {
+    context: 'CheckoutPage.fetchNovel',
+  });
+
+  if (novelError) {
+    return (
+      <div className="min-h-screen bg-stone-950 text-stone-100 py-16 px-4 sm:px-6">
+        <div className="max-w-xl mx-auto text-center space-y-4 bg-stone-900 border border-stone-800 p-8 rounded-2xl shadow-xl">
+          <h1 className="text-xl font-bold text-rose-400">Checkout Error</h1>
+          <p className="text-sm text-stone-300">{novelError.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!novel || novel.status !== 'published') {
     notFound();
   }
 
@@ -35,12 +59,16 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   // 3. Call get_checkout_options RPC
-  const { data: checkoutData, error: checkoutError } = await supabase.rpc(
+  const checkoutRes = await supabase.rpc(
     'get_checkout_options',
     {
       p_novel_id: novel.id,
     }
   );
+
+  const { data: checkoutData, error: checkoutError } = unwrapQuery<CheckoutOptionsResponse>(checkoutRes, {
+    context: 'CheckoutPage.get_checkout_options',
+  });
 
   if (checkoutError) {
     const msg = checkoutError.message.toLowerCase();
