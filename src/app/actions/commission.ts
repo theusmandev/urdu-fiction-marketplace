@@ -22,8 +22,11 @@ export async function reportCommissionPaymentAction(rawInput: ReportCommissionPa
     const { invoiceId, amountPkr, tid, screenshotPath, writerNote } = parseResult.data;
     const supabase = await createServerClient();
 
-    const { data: sessionData } = await supabase.auth.getUser();
-    if (!sessionData?.user) {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (authError || !user) {
       return { success: false, error: 'Authentication required. Please sign in.' };
     }
 

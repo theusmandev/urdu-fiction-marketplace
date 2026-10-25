@@ -108,7 +108,7 @@ export async function closeSupportRequestAction(
   await requireAuth(`/support/${requestId}`);
   const supabase = await createServerClient();
 
-  const { data, error } = await supabase.rpc('close_support_request', {
+  const { error } = await supabase.rpc('close_support_request', {
     p_request_id: requestId,
   });
 
@@ -125,7 +125,7 @@ export async function closeSupportRequestAction(
 
   return {
     success: true,
-    data: { request_id: data.request_id },
+    data: { request_id: requestId },
     message: 'Support request has been closed.',
   };
 }

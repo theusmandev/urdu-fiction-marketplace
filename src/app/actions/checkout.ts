@@ -309,11 +309,15 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
     }
 
     // 1. Check if novel exists and belongs to current user
-    const { data: novel } = await supabase
+    const { data: novel, error: novelErr } = await supabase
       .from('novels')
       .select('writer_id')
       .eq('id', novelId)
       .maybeSingle();
+
+    if (novelErr) {
+      console.error('getNovelCheckoutStatusAction: novel query error:', novelErr);
+    }
 
     const isOwnNovel = novel?.writer_id === user.id;
     if (isOwnNovel) {
@@ -326,13 +330,17 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
     }
 
     // 2. Check if user holds active entitlement
-    const { data: entitlement } = await supabase
+    const { data: entitlement, error: entitlementErr } = await supabase
       .from('purchase_entitlements')
       .select('id')
       .eq('reader_id', user.id)
       .eq('novel_id', novelId)
       .eq('is_revoked', false)
       .maybeSingle();
+
+    if (entitlementErr) {
+      console.error('getNovelCheckoutStatusAction: entitlement query error:', entitlementErr);
+    }
 
     if (entitlement) {
       return {
@@ -344,7 +352,7 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
     }
 
     // 3. Check if user has an open order for this novel
-    const { data: openOrder } = await supabase
+    const { data: openOrder, error: orderErr } = await supabase
       .from('orders')
       .select('order_number')
       .eq('reader_id', user.id)
@@ -354,13 +362,18 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
       .limit(1)
       .maybeSingle();
 
+    if (orderErr) {
+      console.error('getNovelCheckoutStatusAction: openOrder query error:', orderErr);
+    }
+
     return {
       signedIn: true,
       isOwnNovel: false,
       isOwned: false,
       openOrderNumber: openOrder?.order_number || null,
     };
-  } catch {
+  } catch (err) {
+    console.error('getNovelCheckoutStatusAction caught unexpected error:', err);
     return {
       signedIn: false,
       isOwnNovel: false,

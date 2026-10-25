@@ -39,12 +39,16 @@ export async function updateProfile(formData: FormData): Promise<ProfileActionRe
 
   // Check username uniqueness if changed
   if (username.toLowerCase() !== context.profile.username?.toLowerCase()) {
-    const { data: existing } = await supabase
+    const { data: existing, error: checkError } = await supabase
       .from('profiles')
       .select('id')
       .ilike('username', username)
       .neq('id', context.user.id)
       .maybeSingle();
+
+    if (checkError) {
+      console.error('updateProfileAction: username check error:', checkError);
+    }
 
     if (existing) {
       return {

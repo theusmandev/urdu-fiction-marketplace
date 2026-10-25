@@ -27,11 +27,15 @@ export async function getCurrentUser(): Promise<CurrentUserResult> {
   }
 
   // Fetch application profile from public.profiles
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
+
+  if (profileError) {
+    console.error('getCurrentUser: failed to fetch profile:', profileError);
+  }
 
   if (profile && !profile.is_active) {
     // Security enforcement: Deactivated users are immediately signed out
@@ -45,11 +49,15 @@ export async function getCurrentUser(): Promise<CurrentUserResult> {
   }
 
   // Check for writer profile extension (if approved, pending, or rejected)
-  const { data: writerProfile } = await supabase
+  const { data: writerProfile, error: writerProfileError } = await supabase
     .from('writer_profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
+
+  if (writerProfileError) {
+    console.error('getCurrentUser: failed to fetch writer profile:', writerProfileError);
+  }
 
   return {
     user,

@@ -50,9 +50,14 @@ export async function getFeaturedNovels(limit = 6): Promise<PublicNovel[]> {
       .order("published_at", { ascending: false })
       .limit(limit);
 
-    if (error || !data) return [];
+    if (error) {
+      console.error("[getFeaturedNovels] query error:", error.code, error.message);
+      return [];
+    }
+    if (!data) return [];
     return data as PublicNovel[];
-  } catch {
+  } catch (err) {
+    console.error("[getFeaturedNovels] unexpected error:", err);
     return [];
   }
 }
@@ -69,9 +74,14 @@ export async function getNewestNovels(limit = 8): Promise<PublicNovel[]> {
       .order("published_at", { ascending: false })
       .limit(limit);
 
-    if (error || !data) return [];
+    if (error) {
+      console.error("[getNewestNovels] query error:", error.code, error.message);
+      return [];
+    }
+    if (!data) return [];
     return data as PublicNovel[];
-  } catch {
+  } catch (err) {
+    console.error("[getNewestNovels] unexpected error:", err);
     return [];
   }
 }
@@ -87,9 +97,14 @@ export async function getPublicGenres(): Promise<PublicGenre[]> {
       .select("*")
       .order("display_order", { ascending: true });
 
-    if (error || !data) return [];
+    if (error) {
+      console.error("[getPublicGenres] query error:", error.code, error.message);
+      return [];
+    }
+    if (!data) return [];
     return data as PublicGenre[];
-  } catch {
+  } catch (err) {
+    console.error("[getPublicGenres] unexpected error:", err);
     return [];
   }
 }
@@ -106,9 +121,14 @@ export async function getPublicGenreBySlug(slug: string): Promise<PublicGenre | 
       .eq("slug", slug)
       .maybeSingle();
 
-    if (error || !data) return null;
+    if (error) {
+      console.error("[getPublicGenreBySlug] query error:", error.code, error.message);
+      return null;
+    }
+    if (!data) return null;
     return data as PublicGenre;
-  } catch {
+  } catch (err) {
+    console.error("[getPublicGenreBySlug] unexpected error:", err);
     return null;
   }
 }
@@ -126,7 +146,9 @@ export async function getPublicNovelBySlug(slug: string): Promise<PublicNovel | 
       .eq("slug", slug)
       .maybeSingle();
 
-    if (!slugErr && novelBySlug) {
+    if (slugErr) {
+      console.error("[getPublicNovelBySlug] slug query error:", slugErr.code, slugErr.message);
+    } else if (novelBySlug) {
       return novelBySlug as PublicNovel;
     }
 
@@ -135,17 +157,22 @@ export async function getPublicNovelBySlug(slug: string): Promise<PublicNovel | 
       slug
     );
     if (isUuid) {
-      const { data: novelById } = await supabase
+      const { data: novelById, error: idErr } = await supabase
         .from("public_novels")
         .select("*")
         .eq("id", slug)
         .maybeSingle();
 
-      if (novelById) return novelById as PublicNovel;
+      if (idErr) {
+        console.error("[getPublicNovelBySlug] id fallback query error:", idErr.code, idErr.message);
+      } else if (novelById) {
+        return novelById as PublicNovel;
+      }
     }
 
     return null;
-  } catch {
+  } catch (err) {
+    console.error("[getPublicNovelBySlug] unexpected error:", err);
     return null;
   }
 }
@@ -190,9 +217,14 @@ export async function getFreePreviewChapter(
       .eq("chapter_number", chapterNumber)
       .maybeSingle();
 
-    if (error || !data) return null;
+    if (error) {
+      console.error("[getFreePreviewChapter] query error:", error.code, error.message);
+      return null;
+    }
+    if (!data) return null;
     return data as PublicFreePreviewChapter;
-  } catch {
+  } catch (err) {
+    console.error("[getFreePreviewChapter] unexpected error:", err);
     return null;
   }
 }
@@ -209,9 +241,14 @@ export async function getPublicWriters(limit = 24): Promise<PublicWriter[]> {
       .order("published_novels_count", { ascending: false })
       .limit(limit);
 
-    if (error || !data) return [];
+    if (error) {
+      console.error("[getPublicWriters] query error:", error.code, error.message);
+      return [];
+    }
+    if (!data) return [];
     return data as PublicWriter[];
-  } catch {
+  } catch (err) {
+    console.error("[getPublicWriters] unexpected error:", err);
     return [];
   }
 }
@@ -230,9 +267,14 @@ export async function getPublicWriterByUsername(
       .eq("username", username)
       .maybeSingle();
 
-    if (error || !data) return null;
+    if (error) {
+      console.error("[getPublicWriterByUsername] query error:", error.code, error.message);
+      return null;
+    }
+    if (!data) return null;
     return data as PublicWriter;
-  } catch {
+  } catch (err) {
+    console.error("[getPublicWriterByUsername] unexpected error:", err);
     return null;
   }
 }
@@ -249,9 +291,14 @@ export async function getNovelsByWriter(writerId: string): Promise<PublicNovel[]
       .eq("writer_id", writerId)
       .order("published_at", { ascending: false });
 
-    if (error || !data) return [];
+    if (error) {
+      console.error("[getNovelsByWriter] query error:", error.code, error.message);
+      return [];
+    }
+    if (!data) return [];
     return data as PublicNovel[];
-  } catch {
+  } catch (err) {
+    console.error("[getNovelsByWriter] unexpected error:", err);
     return [];
   }
 }
@@ -274,7 +321,11 @@ export async function searchPublicNovels(
       p_offset: offset,
     });
 
-    if (error || !data) {
+    if (error) {
+      console.error("[searchPublicNovels] RPC error:", error.code, error.message);
+      return { novels: [], totalCount: 0 };
+    }
+    if (!data) {
       return { novels: [], totalCount: 0 };
     }
 
@@ -312,16 +363,20 @@ export async function searchPublicNovels(
 export async function getPlatformSupportEmail(): Promise<string> {
   try {
     const supabase = getPublicSupabase();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("platform_settings")
       .select("support_email")
       .eq("id", 1)
       .maybeSingle();
 
+    if (error) {
+      console.error("[getPlatformSupportEmail] query error:", error.code, error.message);
+    }
+
     const settings = data as { support_email?: string } | null;
     if (settings?.support_email) return settings.support_email;
-  } catch {
-    // Ignore and return fallback
+  } catch (err) {
+    console.error("[getPlatformSupportEmail] unexpected error:", err);
   }
   return "support@unbpremium.pk";
 }

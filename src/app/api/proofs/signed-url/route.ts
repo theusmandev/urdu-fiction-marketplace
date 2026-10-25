@@ -62,11 +62,15 @@ export async function GET(request: NextRequest) {
   }
 
   // Database verification: Look up in orders, or in commission_invoices
-  const { data: order } = await supabase
+  const { data: order, error: orderErr } = await supabase
     .from('orders')
     .select('id, reader_id, writer_id')
     .eq('id', orderId)
     .maybeSingle();
+
+  if (orderErr) {
+    console.error('signed-url route: order lookup error:', orderErr);
+  }
 
   let isAuthorized = false;
 
@@ -76,11 +80,15 @@ export async function GET(request: NextRequest) {
     }
   } else {
     // Check if this identifier is a commission invoice
-    const { data: invoice } = await supabase
+    const { data: invoice, error: invoiceErr } = await supabase
       .from('commission_invoices')
       .select('id, writer_id')
       .eq('id', orderId)
       .maybeSingle();
+
+    if (invoiceErr) {
+      console.error('signed-url route: invoice lookup error:', invoiceErr);
+    }
 
     if (invoice && invoice.writer_id === user.id) {
       isAuthorized = true;
@@ -89,11 +97,15 @@ export async function GET(request: NextRequest) {
 
   // If not direct owner/reader/writer, check if caller is an admin
   if (!isAuthorized) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileErr } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
+
+    if (profileErr) {
+      console.error('signed-url route: profile lookup error:', profileErr);
+    }
 
     if (profile?.role === 'admin') {
       isAuthorized = true;

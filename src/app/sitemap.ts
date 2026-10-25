@@ -37,10 +37,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let novelRoutes: MetadataRoute.Sitemap = [];
   try {
     const supabase = getPublicSupabase();
-    const { data: novels } = await supabase
+    const { data: novels, error: novelsError } = await supabase
       .from("public_novels")
       .select("slug, published_at")
       .limit(1000);
+
+    if (novelsError) {
+      console.error("sitemap generation novel fetch error:", novelsError);
+    }
 
     const typedNovels = novels as Array<{ slug: string; published_at: string | null }> | null;
     if (typedNovels) {
@@ -51,8 +55,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       }));
     }
-  } catch {
-    // Ignore fetch error in build time
+  } catch (err) {
+    console.error("sitemap generation caught error:", err);
   }
 
   // 3. Dynamic Active Genres

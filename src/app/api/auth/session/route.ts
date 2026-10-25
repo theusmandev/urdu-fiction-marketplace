@@ -14,7 +14,10 @@ export async function GET() {
     }
 
     const supabase = await createClient();
-    const { data: unreadCount } = await supabase.rpc("get_my_unread_notification_count");
+    const { data: unreadCount, error: countErr } = await supabase.rpc("get_my_unread_notification_count");
+    if (countErr) {
+      console.error("session route: unread count RPC error:", countErr);
+    }
 
     const sessionUser: HeaderSessionUser = {
       id: user.id,

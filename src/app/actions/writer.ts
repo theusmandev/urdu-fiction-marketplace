@@ -160,11 +160,15 @@ export async function createNovelAction(
     const supabase = await createClient();
 
     // Fetch dynamic bounds from platform_settings
-    const { data: settings } = await supabase
+    const { data: settings, error: settingsError } = await supabase
       .from('platform_settings')
       .select('min_novel_price_pkr, max_novel_price_pkr')
       .eq('id', 1)
       .maybeSingle();
+
+    if (settingsError) {
+      console.error('createNovelAction: settings query error:', settingsError);
+    }
 
     const minPrice = settings?.min_novel_price_pkr ?? 50;
     const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
@@ -221,11 +225,15 @@ export async function updateNovelAction(
     const supabase = await createClient();
 
     // Fetch dynamic bounds from platform_settings
-    const { data: settings } = await supabase
+    const { data: settings, error: settingsError } = await supabase
       .from('platform_settings')
       .select('min_novel_price_pkr, max_novel_price_pkr')
       .eq('id', 1)
       .maybeSingle();
+
+    if (settingsError) {
+      console.error('updateNovelAction: settings query error:', settingsError);
+    }
 
     const minPrice = settings?.min_novel_price_pkr ?? 50;
     const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
@@ -382,9 +390,14 @@ export async function saveChapterAction(
       .from('novels')
       .select('id, status, writer_id')
       .eq('id', novelId)
-      .single();
+      .maybeSingle();
 
-    if (novelError || !novel) {
+    if (novelError) {
+      console.error('upsertChapterAction: novel lookup error:', novelError);
+      return { success: false, error: novelError.message };
+    }
+
+    if (!novel) {
       return { success: false, error: 'Novel not found.' };
     }
 
@@ -459,11 +472,16 @@ export async function deleteChapterAction(
     const { user } = await requireWriter(`/writer/novels/${novelId}/chapters`);
     const supabase = await createClient();
 
-    const { data: novel } = await supabase
+    const { data: novel, error: novelError } = await supabase
       .from('novels')
       .select('status, writer_id')
       .eq('id', novelId)
-      .single();
+      .maybeSingle();
+
+    if (novelError) {
+      console.error('deleteChapterAction: novel lookup error:', novelError);
+      return { success: false, error: novelError.message };
+    }
 
     if (!novel || novel.writer_id !== user.id) {
       return { success: false, error: 'Unauthorized.' };
@@ -539,11 +557,16 @@ export async function importChaptersAction(
     const supabase = await createClient();
 
     // Verify novel
-    const { data: novel } = await supabase
+    const { data: novel, error: novelError } = await supabase
       .from('novels')
       .select('status, writer_id')
       .eq('id', novelId)
-      .single();
+      .maybeSingle();
+
+    if (novelError) {
+      console.error('importChaptersAction: novel lookup error:', novelError);
+      return { success: false, error: novelError.message };
+    }
 
     if (!novel || novel.writer_id !== user.id) {
       return { success: false, error: 'Unauthorized.' };
@@ -554,12 +577,16 @@ export async function importChaptersAction(
     }
 
     // Determine highest existing chapter number
-    const { data: existingChapters } = await supabase
+    const { data: existingChapters, error: chaptersError } = await supabase
       .from('chapters')
       .select('chapter_number')
       .eq('novel_id', novelId)
       .order('chapter_number', { ascending: false })
       .limit(1);
+
+    if (chaptersError) {
+      console.error('importChaptersAction: existingChapters query error:', chaptersError);
+    }
 
     let startNumber = (existingChapters && existingChapters[0]?.chapter_number) || 0;
 

@@ -43,11 +43,15 @@ export async function registerUser(formData: FormData): Promise<AuthActionResult
   const supabase = await createClient();
 
   // 1. Verify username uniqueness explicitly before signup
-  const { data: existingProfile } = await supabase
+  const { data: existingProfile, error: profileErr } = await supabase
     .from('profiles')
     .select('id')
     .ilike('username', username)
     .maybeSingle();
+
+  if (profileErr) {
+    console.error('signupAction: username uniqueness check error:', profileErr);
+  }
 
   if (existingProfile) {
     return {
@@ -129,11 +133,15 @@ export async function loginUser(
   }
 
   // Authoritative check on profile status
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('is_active, role')
     .eq('id', data.user.id)
     .maybeSingle();
+
+  if (profileError) {
+    console.error('signInAction: profile check error:', profileError);
+  }
 
   if (profile && !profile.is_active) {
     await supabase.auth.signOut();
@@ -143,11 +151,15 @@ export async function loginUser(
     };
   }
 
-  const { data: writerProfile } = await supabase
+  const { data: writerProfile, error: writerProfileErr } = await supabase
     .from('writer_profiles')
     .select('status')
     .eq('id', data.user.id)
     .maybeSingle();
+
+  if (writerProfileErr) {
+    console.error('signInAction: writerProfile check error:', writerProfileErr);
+  }
 
   const roleDashboard = getRoleDashboard(profile?.role, writerProfile?.status);
   const safeDestination = getSafeRedirectUrl(nextParam, roleDashboard);
@@ -250,11 +262,16 @@ export async function checkUsernameAvailability(
   }
 
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .select('id')
     .ilike('username', username.trim().toLowerCase())
     .maybeSingle();
+
+  if (error) {
+    console.error('checkUsernameAvailabilityAction: query error:', error);
+    return { available: false, error: 'Database check failed.' };
+  }
 
   return { available: !data };
 }
