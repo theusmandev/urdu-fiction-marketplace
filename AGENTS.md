@@ -31,6 +31,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
    - Maintain a step-by-step checklist instructing the developer on which SQL scripts to run, environment variables to populate, and Supabase dashboard settings to configure.
 4. **Environment Variables Template (`.env.example`)**:
    - Keep `.env.example` strictly synchronized with all required environment keys. Never store secrets in git.
+5. **Frontend PostgREST Queries & Error Handling Rules (`npm run check:frontend`)**:
+   - **PostgREST Embed Syntax**: Never use foreign-key column names as embed targets (e.g. `writer_profiles:writer_id`, `profiles:actor_id`, `genre:genre_id` will fail with PGRST200). In PostgREST, syntax is `target_table!fk_column(...)` or `alias:target_table!fk_column(...)`. If no foreign key exists or relationships cross views, execute two sequential queries or create a `SECURITY DEFINER` RPC.
+   - **Zero Silent 404s & Error Handling**: Never destructure only `{ data }` from a Supabase query without handling `error`. Never turn query errors into silent empty lists (`data ?? []`) or 404s (`if (error || !data) notFound()`). Always log query errors via `console.error` (including error code and message) and render an explicit error UI banner. Call `notFound()` strictly when there is zero error and zero row returned.
+   - **Safe Single-Row Queries**: Avoid `.single()` on queries where zero rows can legitimately exist (PGRST116). Use `.maybeSingle()` combined with `unwrapSingleQuery` from `@/lib/supabase/query`. Run `npm run check:frontend` to verify all queries across `src/`.
 
 ## CORE BUSINESS & ARCHITECTURAL INVARIANTS
 1. **Payment Model**: Direct reader-to-writer payment via Pakistani rails (JazzCash, EasyPaisa, Raast, Direct Bank Transfer). No automated gateways (no Stripe, PayPal, etc.).

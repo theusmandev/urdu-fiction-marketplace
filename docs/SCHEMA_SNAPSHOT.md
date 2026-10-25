@@ -495,3 +495,28 @@
 - `payment-proofs`: **Private** bucket (`public = false`). RLS allows upload by reader under `<order_id>/...` and read by reader/writer/admin.
 - `novel-assets`: **Public** bucket (`public = true`). RLS allows upload/update/delete by author in folder `<auth.uid()>/...`.
 - `dispute-proofs`: **Private** bucket (`public = false`). Provisioned in 0018.
+
+---
+
+## 6. Key Invoicing & Commission RPC Signatures
+
+- `public.admin_get_invoice(p_invoice_id uuid)` (0028)
+  - `SECURITY DEFINER`, `SET search_path = ''`.
+  - Restricted strictly to admins (`public.is_admin()`).
+  - Returns `jsonb` root object containing `{ invoice, lines, payments, reports }`.
+- `public.get_my_invoice(p_invoice_id uuid)` (0017_b)
+  - `SECURITY DEFINER`, `SET search_path = ''`.
+  - Restricted to the invoice's owning author (`auth.uid() = writer_id`).
+  - Returns `jsonb` root object containing `{ id, invoice_number, writer_id, ... lines, payments, reports }`.
+- `public.get_my_invoices()` (0017_b)
+  - `SECURITY DEFINER`, `SET search_path = ''`.
+  - Returns `jsonb` array of invoice summaries for `auth.uid()`.
+- `public.get_my_sales_summary(p_from timestamptz, p_to timestamptz)` (0017_b)
+  - `SECURITY DEFINER`, `SET search_path = ''`.
+  - Returns aggregate sales, gross PKR, commission owed PKR, settled PKR, unpaid balance, pause status.
+- `public.get_my_ledger(p_from timestamptz, p_to timestamptz, p_entry_type text, p_limit integer, p_offset integer)` (0017_b)
+  - `SECURITY DEFINER`, `SET search_path = ''`.
+  - Returns `{ entries: [...], total_count: n }` without exposing reader personal identifiers.
+- `public.get_platform_payment_instructions()` (0017_b)
+  - `SECURITY DEFINER`, `SET search_path = ''`.
+  - Returns active platform bank/microfinance receiving accounts for writers settling commission invoices.
