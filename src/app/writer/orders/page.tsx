@@ -18,7 +18,7 @@ export default async function WriterOrdersPage() {
       order_number,
       reader_id,
       amount_pkr,
-      payment_method,
+      payment_instructions_snapshot,
       status,
       rejected_reason,
       created_at,
@@ -78,7 +78,9 @@ export default async function WriterOrdersPage() {
       novelTitleEnglish: novel?.title_english || 'Novel',
       novelSlug: novel?.slug || '',
       amountPkr: Number(o.amount_pkr),
-      paymentMethod: o.payment_method,
+      paymentMethod:
+        ((o.payment_instructions_snapshot as { method_type?: string })?.method_type as string) ||
+        'Direct Payment',
       status: o.status as OrderStatus,
       rejectedReason: o.rejected_reason,
       createdAt: o.created_at,

@@ -16,8 +16,25 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
   const { id } = await params;
 
   const supabase = await createServerClient();
+  let targetOrderId = id;
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (!isUuid) {
+    const { data: ord } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('order_number', id)
+      .maybeSingle();
+
+    if (ord?.id) {
+      targetOrderId = ord.id;
+    } else {
+      notFound();
+    }
+  }
+
   const { data, error } = await supabase.rpc('admin_get_order', {
-    p_order_id: id,
+    p_order_id: targetOrderId,
   });
 
   if (error || !data) {

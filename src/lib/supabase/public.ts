@@ -1,6 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type {
-  Database,
   PublicNovel,
   PublicWriter,
   PublicGenre,
@@ -10,13 +9,13 @@ import type {
 } from "@/types/database";
 import type { CatalogSearchParams } from "@/lib/catalog/params";
 
-let cachedPublicClient: ReturnType<typeof createClient<Database>> | null = null;
+let cachedPublicClient: SupabaseClient | null = null;
 
 /**
  * Returns a cookie-free, anonymous Supabase client strictly for reading public data.
  * Ideal for Next.js SSG / ISR pages to prevent dynamic rendering bailouts.
  */
-export function getPublicSupabase() {
+export function getPublicSupabase(): SupabaseClient {
   if (cachedPublicClient) return cachedPublicClient;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,7 +27,7 @@ export function getPublicSupabase() {
     );
   }
 
-  cachedPublicClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  cachedPublicClient = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -159,12 +158,7 @@ export async function getPublicNovelChapters(
 ): Promise<PublicNovelChapterMeta[]> {
   try {
     const supabase = getPublicSupabase();
-    const rpcClient = supabase.rpc as unknown as (
-      fn: string,
-      args?: Record<string, unknown>
-    ) => Promise<{ data: unknown; error: unknown }>;
-
-    const { data, error } = await rpcClient("get_public_novel_chapters", {
+    const { data, error } = await supabase.rpc("get_public_novel_chapters", {
       p_novel_slug: novelSlug,
     });
 
@@ -272,12 +266,7 @@ export async function searchPublicNovels(
     const supabase = getPublicSupabase();
     const offset = (params.page - 1) * params.limit;
 
-    const rpcClient = supabase.rpc as unknown as (
-      fn: string,
-      args?: Record<string, unknown>
-    ) => Promise<{ data: unknown; error: unknown }>;
-
-    const { data, error } = await rpcClient("search_public_novels", {
+    const { data, error } = await supabase.rpc("search_public_novels", {
       p_query: params.q || null,
       p_genre_slug: params.genre || null,
       p_sort: params.sort || "featured",

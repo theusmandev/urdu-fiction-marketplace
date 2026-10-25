@@ -61,7 +61,6 @@ export async function updateProfile(formData: FormData): Promise<ProfileActionRe
       full_name: fullName,
       username,
       avatar_url: avatarUrl || null,
-      updated_at: new Date().toISOString(),
     })
     .eq('id', context.user.id);
 

@@ -15,11 +15,15 @@ interface OrderPageProps {
 
 export default async function OrderPage({ params }: OrderPageProps) {
   const { orderNumber } = await params;
-  const { user } = await requireAuth(`/orders/${orderNumber}`);
+  const { user, profile } = await requireAuth(`/orders/${orderNumber}`);
   const supabase = await createClient();
 
-  // 1. Fetch order details strictly for the current reader
-  const { data: order, error } = await supabase
+  // Support both friendly order_number (e.g. ORD-...) and UUID id
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    orderNumber
+  );
+
+  let orderQuery = supabase
     .from('orders')
     .select(`
       id,
@@ -27,8 +31,9 @@ export default async function OrderPage({ params }: OrderPageProps) {
       reader_id,
       writer_id,
       novel_id,
+      novel_title_snapshot,
       amount_pkr,
-      payment_method,
+      currency,
       payment_instructions_snapshot,
       applied_commission_rate,
       status,
@@ -40,19 +45,32 @@ export default async function OrderPage({ params }: OrderPageProps) {
         title_english,
         title_urdu,
         slug,
-        cover_image_url
+        cover_url
       ),
       writer:writer_profiles!orders_writer_id_fkey (
         pen_name_english,
         pen_name_urdu
       )
-    `)
-    .eq('order_number', orderNumber)
-    .eq('reader_id', user.id)
-    .maybeSingle();
+    `);
+
+  if (isUuid) {
+    orderQuery = orderQuery.or(`order_number.eq.${orderNumber},id.eq.${orderNumber}`);
+  } else {
+    orderQuery = orderQuery.eq('order_number', orderNumber);
+  }
+
+  // 1. Fetch order details strictly for the authorized caller
+  const { data: order, error } = await orderQuery.maybeSingle();
 
   // If order not found or does not belong to caller, return 404 (never reveal other user orders)
   if (error || !order) {
+    notFound();
+  }
+
+  // Authorization check: must be the purchasing reader, author, or admin
+  const isAuthorized =
+    order.reader_id === user.id || order.writer_id === user.id || profile.role === 'admin';
+  if (!isAuthorized) {
     notFound();
   }
 
@@ -94,6 +112,9 @@ export default async function OrderPage({ params }: OrderPageProps) {
   const novel = Array.isArray(order.novels) ? order.novels[0] : order.novels;
   const writer = Array.isArray(order.writer) ? order.writer[0] : order.writer;
 
+  const instructions = (order.payment_instructions_snapshot as Record<string, unknown>) || {};
+  const paymentMethod = (instructions.method_type as string) || 'Direct Payment';
+
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -103,7 +124,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
             orderNumber: order.order_number,
             amountPkr: order.amount_pkr,
             status: order.status as OrderStatus,
-            paymentMethod: order.payment_method,
+            paymentMethod,
             instructionsSnapshot: order.payment_instructions_snapshot as Record<string, unknown> | null,
             rejectedReason: order.rejected_reason,
             createdAt: order.created_at,
@@ -111,10 +132,10 @@ export default async function OrderPage({ params }: OrderPageProps) {
           }}
           novel={{
             id: novel?.id || '',
-            titleEnglish: novel?.title_english || 'Novel',
+            titleEnglish: novel?.title_english || order.novel_title_snapshot || 'Novel',
             titleUrdu: novel?.title_urdu || 'ناول',
             slug: novel?.slug || '',
-            coverImageUrl: novel?.cover_image_url || null,
+            coverImageUrl: novel?.cover_url || null,
           }}
           writer={{
             penNameEnglish: writer?.pen_name_english || 'Author',

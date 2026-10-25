@@ -469,6 +469,7 @@ export interface CommissionInvoiceRow {
   settled_by_admin_id: string | null;
   settled_at: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface CommissionInvoiceLineRow {
@@ -1229,6 +1230,7 @@ export interface Database {
           settled_by_admin_id?: string | null;
           settled_at?: string | null;
           created_at?: string;
+          updated_at?: string;
         };
         Update: Partial<CommissionInvoiceRow>;
         Relationships: [];

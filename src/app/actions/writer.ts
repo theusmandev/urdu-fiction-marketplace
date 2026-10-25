@@ -51,7 +51,6 @@ export async function updateWriterProfileAction(
         pen_name_english: pen_name_english.trim(),
         bio_urdu: bio_urdu ? cleanUrduText(bio_urdu) : null,
         bio_english: bio_english ? bio_english.trim() : null,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', user.id);
 
@@ -65,7 +64,6 @@ export async function updateWriterProfileAction(
         .from('profiles')
         .update({
           avatar_url: avatar_url || null,
-          updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
     }
