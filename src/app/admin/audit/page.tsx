@@ -2,8 +2,9 @@ import React from 'react';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { AuditLogViewer, AuditEntry } from '@/components/admin/AuditLogViewer';
-import { History, Filter, RotateCcw } from 'lucide-react';
+import { History, Filter, RotateCcw, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
+import { unwrapQuery } from '@/lib/supabase/query';
 
 interface PageProps {
   searchParams: Promise<{
@@ -40,7 +41,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
       previous_state,
       new_state,
       created_at,
-      profiles:actor_id (
+      profiles!actor_id (
         email,
         username,
         full_name,
@@ -67,7 +68,8 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
 
   queryBuilder = queryBuilder.range(fromIdx, toIdx);
 
-  const { data: logs, count } = await queryBuilder;
+  const { data: rawLogs, count, error } = await queryBuilder;
+  const { data: logs, error: queryError } = unwrapQuery({ data: rawLogs, error }, 'AdminAuditPage');
 
   // Available distinct action types and entity types for dropdown filter
   const ACTION_TYPES = [
@@ -199,7 +201,23 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
       </form>
 
       {/* Audit Log Results */}
-      {!logs || logs.length === 0 ? (
+      {queryError ? (
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span>Database Error Loading Audit Logs</span>
+          </div>
+          <p className="text-xs text-rose-200/90 leading-relaxed">
+            Unable to retrieve system audit records from the database:
+          </p>
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+            {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
+          </div>
+          {queryError.hint && (
+            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+          )}
+        </div>
+      ) : !logs || logs.length === 0 ? (
         <div className="py-16 text-center bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
           <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
             <History className="w-6 h-6" />
