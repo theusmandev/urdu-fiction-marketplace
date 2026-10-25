@@ -32,7 +32,7 @@ interface NovelCardProps {
 
 export function NovelCard({ novel }: NovelCardProps) {
   return (
-    <article className="group relative bg-surface rounded-xl sm:rounded-2xl border border-border/80 hover:border-accent/40 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+    <article className="group relative bg-surface rounded-xl sm:rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-accent/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden cursor-pointer">
       
       {/* Constrained 3:4 Aspect Ratio Cover Container */}
       <div className="relative aspect-[3/4] max-h-48 sm:max-h-56 w-full overflow-hidden bg-ivory-dark">
@@ -42,7 +42,7 @@ export function NovelCard({ novel }: NovelCardProps) {
 
         {/* Artistic Cover Art (Gradient/Texture + Calligraphy) */}
         <div
-          className={`w-full h-full p-3 sm:p-4 flex flex-col justify-between text-white relative transition-transform duration-500 group-hover:scale-105 ${novel.coverGradient}`}
+          className={`w-full h-full p-3 sm:p-4 flex flex-col justify-between text-white relative transition-transform duration-500 ease-out group-hover:scale-105 pointer-events-none ${novel.coverGradient}`}
         >
           {/* Subtle Islamic/Geometric Corner Ornamentation */}
           <div className="absolute top-2 right-2 text-white/30 text-[8px] sm:text-[9px] font-serif select-none pointer-events-none">
@@ -50,7 +50,7 @@ export function NovelCard({ novel }: NovelCardProps) {
           </div>
 
           {/* Top Badges */}
-          <div className="flex items-center justify-between gap-1.5 z-10">
+          <div className="flex items-center justify-between gap-1.5 z-10 pointer-events-none">
             {novel.hasFreePreview && (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-white/90 backdrop-blur-sm text-navy px-2 py-0.5 rounded-full shadow-xs">
                 <Sparkles className="w-2.5 h-2.5 text-accent" />
@@ -63,7 +63,7 @@ export function NovelCard({ novel }: NovelCardProps) {
           </div>
 
           {/* Center Calligraphic Title on Cover */}
-          <div className="my-auto text-center z-10 px-1">
+          <div className="my-auto text-center z-10 px-1 pointer-events-none">
             <UrduText
               as="h2"
               size="base"
@@ -77,7 +77,7 @@ export function NovelCard({ novel }: NovelCardProps) {
           </div>
 
           {/* Bottom Cover Author Callout */}
-          <div className="border-t border-white/20 pt-1.5 z-10 flex items-center justify-between text-[10px]">
+          <div className="border-t border-white/20 pt-1.5 z-10 flex items-center justify-between text-[10px] pointer-events-none">
             <span className="font-serif text-white/80 truncate max-w-[55%]">{novel.authorNameEn}</span>
             <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%]">
               {novel.authorNameUrdu}
@@ -93,22 +93,23 @@ export function NovelCard({ novel }: NovelCardProps) {
         <div className="space-y-1">
           <Link
             href={`/novels/${novel.slug}`}
-            className="group-hover:text-accent transition-colors block"
+            className="group-hover:text-accent transition-colors block after:absolute after:inset-0 after:z-10 focus:outline-none"
+            aria-label={`Read ${novel.titleEn || novel.titleUrdu}`}
           >
             <UrduText
               as="h3"
               size="base"
-              className="font-bold text-navy group-hover:text-accent leading-[2.0] sm:leading-[2.1] py-0 line-clamp-1 text-base sm:text-lg"
+              className="font-bold text-navy group-hover:text-accent leading-[2.0] sm:leading-[2.1] py-0 line-clamp-1 text-base sm:text-lg transition-colors"
             >
               {novel.titleUrdu}
             </UrduText>
-            <p className="font-serif text-xs text-secondary tracking-wider uppercase line-clamp-1">
+            <p className="font-serif text-xs text-secondary group-hover:text-navy/80 tracking-wider uppercase line-clamp-1 transition-colors">
               {novel.titleEn}
             </p>
           </Link>
 
           {/* Author Byline */}
-          <div className="flex items-center justify-between text-[11px] sm:text-xs text-secondary pt-0.5">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs text-secondary pt-0.5 relative z-20 pointer-events-none">
             <div className="flex items-center gap-1 min-w-0">
               <Feather className="w-3 h-3 text-accent shrink-0" />
               <span className="font-medium truncate">{novel.authorNameEn}</span>
@@ -120,7 +121,7 @@ export function NovelCard({ novel }: NovelCardProps) {
         </div>
 
         {/* Footer: Chapter count & Price */}
-        <div className="pt-2 mt-1 border-t border-border flex items-center justify-between text-xs">
+        <div className="pt-2 mt-1 border-t border-border flex items-center justify-between text-xs pointer-events-none">
           <div className="flex items-center gap-1 text-secondary text-[11px] sm:text-xs">
             <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-accent shrink-0" />
             <span className="truncate">
