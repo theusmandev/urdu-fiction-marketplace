@@ -183,12 +183,12 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
 
         {/* Primary Hero Info Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-          {/* Left Column: 2:3 Cover Image & Buy CTA (4 cols) */}
+          {/* Left Column: Constrained 2:3 Cover Image & Buy CTA (4 cols) */}
           <div className="md:col-span-5 lg:col-span-4 space-y-6">
-            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden bg-ivory-dark shadow-2xl border border-border/80">
+            <div className="relative aspect-[2/3] w-full max-w-[180px] sm:max-w-[220px] md:max-w-[240px] mx-auto md:mx-0 rounded-xl overflow-hidden bg-ivory-dark shadow-md border border-border/80">
               {/* Book Spine Detail */}
-              <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10 pointer-events-none" />
-              <div className="absolute inset-y-0 left-4 w-px bg-white/20 z-10 pointer-events-none" />
+              <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-y-0 left-3 w-px bg-white/20 z-10 pointer-events-none" />
 
               {resolveCoverUrl(novel.cover_url) ? (
                 <Image
@@ -196,33 +196,33 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   alt={novel.title_english || novel.title_urdu}
                   fill
                   priority
-                  sizes="(max-width: 768px) 100vw, 380px"
+                  sizes="(max-width: 640px) 180px, (max-width: 768px) 220px, 240px"
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full p-8 flex flex-col justify-between text-white bg-gradient-to-br from-[#17243A] via-[#1E293B] to-[#0F172A]">
-                  <div className="text-right text-xs font-serif tracking-widest text-white/40">
+                <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between text-white bg-gradient-to-br from-[#17243A] via-[#1E293B] to-[#0F172A]">
+                  <div className="text-right text-[9px] font-serif tracking-widest text-white/40">
                     ✦ UNB EDITORIAL ✦
                   </div>
-                  <div className="my-auto text-center">
+                  <div className="my-auto text-center px-1">
                     <UrduText
                       as="h2"
-                      size="3xl"
-                      className="text-white drop-shadow-lg leading-[2.4] py-1"
+                      size="xl"
+                      className="text-white drop-shadow-md leading-[2.2] py-0.5 text-lg sm:text-xl line-clamp-2"
                     >
                       {novel.title_urdu}
                     </UrduText>
                     {novel.title_english && (
-                      <p className="font-serif text-xs text-white/80 tracking-widest uppercase mt-2">
+                      <p className="font-serif text-[10px] sm:text-xs text-white/80 tracking-widest uppercase mt-1 line-clamp-1">
                         {novel.title_english}
                       </p>
                     )}
                   </div>
-                  <div className="border-t border-white/20 pt-3 flex items-center justify-between text-xs">
-                    <span className="font-serif text-white/80">
+                  <div className="border-t border-white/20 pt-2 flex items-center justify-between text-[11px]">
+                    <span className="font-serif text-white/80 truncate max-w-[55%]">
                       {novel.writer_pen_name_english || "Author"}
                     </span>
-                    <UrduText as="span" size="xs" className="text-white/90 py-0">
+                    <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%]">
                       {novel.writer_pen_name_urdu}
                     </UrduText>
                   </div>

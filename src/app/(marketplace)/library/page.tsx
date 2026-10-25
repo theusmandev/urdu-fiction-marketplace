@@ -76,7 +76,7 @@ export default async function LibraryPage() {
 
         {/* Library Grid */}
         {!error && libraryItems.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {libraryItems.map((item) => {
               const progress = calculateLibraryProgress(item.last_chapter_number, item.total_chapters);
               const readChapterNumber = item.last_chapter_number && item.last_chapter_number > 0
@@ -86,10 +86,10 @@ export default async function LibraryPage() {
               return (
                 <div
                   key={item.novel_id}
-                  className="group flex flex-col rounded-2xl border border-stone-800 bg-stone-900/60 overflow-hidden hover:border-amber-500/40 hover:shadow-2xl transition-all"
+                  className="group flex flex-col rounded-xl sm:rounded-2xl border border-stone-800 bg-stone-900/60 overflow-hidden hover:border-amber-500/40 hover:shadow-2xl transition-all"
                 >
                   {/* Cover Header */}
-                  <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full bg-stone-900 overflow-hidden border-b border-stone-800">
+                  <div className="relative aspect-[3/4] max-h-40 sm:max-h-48 w-full bg-stone-900 overflow-hidden border-b border-stone-800">
                     {item.cover_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -98,8 +98,8 @@ export default async function LibraryPage() {
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center p-4 text-center bg-stone-900 text-stone-600">
-                        <BookOpen className="h-10 w-10 text-stone-700" />
+                      <div className="h-full w-full flex items-center justify-center p-3 text-center bg-stone-900 text-stone-600">
+                        <BookOpen className="h-8 w-8 text-stone-700" />
                       </div>
                     )}
 
@@ -107,44 +107,44 @@ export default async function LibraryPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-transparent" />
 
                     {/* Status Badges */}
-                    <div className="absolute top-2.5 right-2.5 flex flex-col items-end gap-1.5">
-                      <span className="rounded-full bg-emerald-950/90 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-bold text-emerald-400 backdrop-blur-md flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
+                    <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+                      <span className="rounded-full bg-emerald-950/90 border border-emerald-500/40 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400 backdrop-blur-md flex items-center gap-1">
+                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         <span>UNLOCKED</span>
                       </span>
 
                       {item.is_temporarily_unavailable && (
-                        <span className="rounded-full bg-amber-950/90 border border-amber-500/40 px-2 py-0.5 text-[9px] font-bold text-amber-300 backdrop-blur-md">
-                          Temporarily Unlisted
+                        <span className="rounded-full bg-amber-950/90 border border-amber-500/40 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold text-amber-300 backdrop-blur-md">
+                          Unlisted
                         </span>
                       )}
                     </div>
                   </div>
 
                   {/* Body Details */}
-                  <div className="p-4 flex flex-col flex-1 justify-between space-y-4">
-                    <div className="space-y-1.5">
+                  <div className="p-2.5 sm:p-3.5 flex flex-col flex-1 justify-between space-y-2.5 sm:space-y-3">
+                    <div className="space-y-1">
                       <UrduText
                         size="base"
-                        className="text-white group-hover:text-amber-400 transition-colors line-clamp-1 py-0 leading-tight font-bold"
+                        className="text-white group-hover:text-amber-400 transition-colors line-clamp-1 py-0 leading-[2.0] sm:leading-[2.1] font-bold text-sm sm:text-base"
                       >
                         {item.title_urdu}
                       </UrduText>
-                      <h3 className="text-xs font-semibold text-stone-300 line-clamp-1">
+                      <h3 className="text-[11px] sm:text-xs font-semibold text-stone-300 line-clamp-1">
                         {item.title_english}
                       </h3>
-                      <p className="text-[11px] text-stone-400">
+                      <p className="text-[10px] sm:text-[11px] text-stone-400 truncate">
                         By <span className="text-amber-400/90 font-medium">{item.writer_pen_name}</span>
                       </p>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="space-y-1.5 pt-1 border-t border-stone-800/80">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-stone-400 font-medium">{progress.label}</span>
-                        <span className="text-stone-500 font-mono">{progress.percent}%</span>
+                    <div className="space-y-1 pt-1 border-t border-stone-800/80">
+                      <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+                        <span className="text-stone-400 font-medium truncate">{progress.label}</span>
+                        <span className="text-stone-500 font-mono shrink-0 ml-1">{progress.percent}%</span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full bg-stone-800 overflow-hidden">
+                      <div className="w-full h-1 sm:h-1.5 rounded-full bg-stone-800 overflow-hidden">
                         <div
                           className="h-full bg-amber-500 rounded-full transition-all duration-300"
                           style={{ width: `${progress.percent}%` }}
@@ -153,43 +153,43 @@ export default async function LibraryPage() {
                     </div>
 
                     {/* Order Reference & Date */}
-                    <div className="flex items-center justify-between text-[10px] text-stone-500 pt-1 border-t border-stone-800/60 font-mono">
+                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] text-stone-500 pt-1 border-t border-stone-800/60 font-mono">
                       {item.order_number ? (
                         <Link
                           href={`/orders/${item.order_number}`}
-                          className="text-amber-400/80 hover:text-amber-300 hover:underline flex items-center gap-1"
+                          className="text-amber-400/80 hover:text-amber-300 hover:underline flex items-center gap-0.5 truncate max-w-[60%]"
                           title="View Order Receipt"
                         >
-                          <span>{item.order_number}</span>
-                          <ExternalLink className="w-2.5 h-2.5" />
+                          <span className="truncate">{item.order_number}</span>
+                          <ExternalLink className="w-2.5 h-2.5 shrink-0" />
                         </Link>
                       ) : (
-                        <span>Verified Direct</span>
+                        <span>Verified</span>
                       )}
-                      <span>{new Date(item.granted_at).toLocaleDateString()}</span>
+                      <span className="shrink-0">{new Date(item.granted_at).toLocaleDateString()}</span>
                     </div>
 
                     {/* Unlisted Notice */}
                     {item.is_temporarily_unavailable && (
-                      <p className="text-[10px] text-amber-400/80 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20 leading-relaxed">
-                        This novel is unlisted from the store, but you retain full lifetime reading access.
+                      <p className="text-[9px] text-amber-400/80 bg-amber-500/10 p-1.5 rounded-lg border border-amber-500/20 leading-relaxed">
+                        Lifetime access active.
                       </p>
                     )}
 
                     {/* Primary CTA */}
-                    <div className="pt-2">
+                    <div className="pt-1">
                       <Link
                         href={`/read/${item.novel_slug}/${readChapterNumber}`}
-                        className="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-md shadow-amber-500/10"
+                        className="w-full py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-amber-500/10"
                       >
                         {item.last_chapter_number && item.last_chapter_number > 0 ? (
                           <>
-                            <BookOpen className="w-3.5 h-3.5" />
-                            <span>Continue Reading (Ch {item.last_chapter_number})</span>
+                            <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                            <span className="truncate">Continue (Ch {item.last_chapter_number})</span>
                           </>
                         ) : (
                           <>
-                            <Sparkles className="w-3.5 h-3.5" />
+                            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                             <span>Start Reading</span>
                           </>
                         )}
