@@ -2,8 +2,10 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { requireWriter } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
+import { AlertCircle } from 'lucide-react';
 import { NovelForm } from '../../NovelForm';
-import type { GenreRow } from '@/types/database';
+import type { GenreRow, NovelRow, PlatformSettingsRow } from '@/types/database';
 
 interface EditNovelPageProps {
   params: Promise<{ id: string }>;
@@ -15,18 +17,36 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
   const supabase = await createServerClient();
 
   // 1. Fetch novel data
-  const { data: novel, error: novelError } = await supabase
+  const novelRes = await supabase
     .from('novels')
     .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
-  if (novelError || !novel || novel.writer_id !== user.id) {
+  const { data: novel, error: novelError } = unwrapSingleQuery<NovelRow>(novelRes, {
+    context: 'EditNovelPage.fetchNovel',
+  });
+
+  if (novelError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-sm">Failed to load novel</h3>
+            <p className="text-xs text-red-400/80 mt-1">{novelError.message}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!novel || novel.writer_id !== user.id) {
     notFound();
   }
 
   // 2. Fetch available genres and platform settings
-  const [{ data: genres }, { data: settings }] = await Promise.all([
+  const [genresRes, settingsRes] = await Promise.all([
     supabase
       .from('genres')
       .select('*')
@@ -38,14 +58,25 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
       .maybeSingle(),
   ]);
 
+  const { data: genres } = unwrapQuery<GenreRow[]>(genresRes, {
+    context: 'EditNovelPage.fetchGenres',
+  });
+  const { data: settings } = unwrapSingleQuery<Pick<PlatformSettingsRow, 'min_novel_price_pkr' | 'max_novel_price_pkr'>>(settingsRes, {
+    context: 'EditNovelPage.fetchSettings',
+  });
+
   // 3. Fetch linked genres for this novel
-  const { data: linkedGenres } = await supabase
+  const linkedGenresRes = await supabase
     .from('novel_genres')
     .select('genre_id')
     .eq('novel_id', id);
 
+  const { data: linkedGenres } = unwrapQuery<Array<{ genre_id: string }>>(linkedGenresRes, {
+    context: 'EditNovelPage.fetchLinkedGenres',
+  });
+
   const linkedGenreIds = (linkedGenres || []).map((g) => g.genre_id);
-  const availableGenres = (genres as GenreRow[]) || [];
+  const availableGenres = genres || [];
   const commissionRate = writerProfile.custom_commission_rate ?? 20;
   const minPrice = settings?.min_novel_price_pkr ?? 50;
   const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
