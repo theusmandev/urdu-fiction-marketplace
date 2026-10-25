@@ -23,7 +23,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-interface NotificationItem {
+export interface NotificationItem {
   id: string;
   type: string;
   title: string;
