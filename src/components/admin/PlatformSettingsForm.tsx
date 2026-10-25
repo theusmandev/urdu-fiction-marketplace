@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminUpdatePlatformSettingsAction } from '@/app/actions/admin';
 import {
@@ -36,8 +36,11 @@ interface PlatformSettingsFormProps {
   };
 }
 
+const emptySubscribe = () => () => {};
+
 export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormProps) {
   const router = useRouter();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -589,9 +592,14 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
 
       {/* Save Footer Bar */}
       <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="text-xs text-slate-500 font-mono flex items-center gap-1.5">
+        <div className="text-xs text-slate-500 font-mono flex items-center gap-1.5" suppressHydrationWarning>
           <HelpCircle className="w-3.5 h-3.5" />
-          <span>Last modified: {new Date(initialSettings.updated_at).toLocaleString()}</span>
+          <span suppressHydrationWarning>
+            Last modified:{' '}
+            {mounted && initialSettings.updated_at
+              ? new Date(initialSettings.updated_at).toLocaleString()
+              : initialSettings.updated_at || 'Never'}
+          </span>
         </div>
 
         <button

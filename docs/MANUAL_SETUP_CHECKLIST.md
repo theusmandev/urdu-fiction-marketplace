@@ -433,6 +433,17 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm both functions exist with `prosecdef = true`.
   - Execute automated test suite: `supabase/tests/17_sensitive_column_exposure.sql` (18/18 PASS).
 
+### 30. `supabase/migrations/0030_platform_payment_methods_admin_policy.sql` [PLATFORM PAYMENT METHODS ADMIN RLS & GRANTS]
+- **Purpose**: Grants platform administrators direct SELECT and mutation rights on marketplace payment accounts:
+  - **Admin Policy**: Adds policy `"platform_payment_methods_admin_all"` on `public.platform_payment_methods` restricted to `public.is_admin()`.
+  - **Grants**: Grants `SELECT, INSERT, UPDATE, DELETE` to `authenticated` role so admin RLS policies can evaluate. Regular readers and writers remain denied.
+- **Action**: Paste contents of `supabase/migrations/0030_platform_payment_methods_admin_policy.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT policyname FROM pg_policies WHERE tablename = 'platform_payment_methods';
+  ```
+  Confirm `"platform_payment_methods_admin_all"` appears.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

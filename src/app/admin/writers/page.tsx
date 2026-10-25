@@ -36,7 +36,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
       is_orders_paused_for_commission,
       agreement_accepted_at,
       created_at,
-      profiles!id (
+      profiles:profiles!writer_profiles_id_fkey (
         email,
         full_name,
         username,

@@ -78,7 +78,7 @@ export default async function AdminDashboardPage() {
       pen_name_urdu,
       created_at,
       status,
-      profiles!id (
+      profiles:profiles!writer_profiles_id_fkey (
         full_name,
         email
       )

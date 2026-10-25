@@ -50,7 +50,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
       agreement_accepted_at,
       created_at,
       updated_at,
-      profiles!id (
+      profiles:profiles!writer_profiles_id_fkey (
         id,
         email,
         full_name,

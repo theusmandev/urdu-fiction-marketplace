@@ -38,13 +38,29 @@ export function unwrapQuery<T>(
   const contextStr = options.context ? ` [${options.context}]` : '';
   const resultCount = result.count ?? null;
 
-  if (result.error) {
+  const rawError = result.error as (PostgrestError & { [key: string]: unknown }) | null;
+  const hasRealError =
+    Boolean(rawError) &&
+    (Boolean(rawError?.message) ||
+      Boolean(rawError?.code) ||
+      Boolean(rawError?.details) ||
+      (typeof rawError === 'object' && Object.keys(rawError || {}).length > 0));
+
+  if (hasRealError && rawError) {
+    const code = rawError.code || 'UNKNOWN';
+    const message =
+      rawError.message ||
+      (typeof rawError === 'string' ? rawError : 'Database query error');
+    const hint = rawError.hint || null;
+    const details = rawError.details || null;
+    const isNotFound = code === 'PGRST116';
+
     const errorPayload: AppQueryError = {
-      code: result.error.code,
-      message: result.error.message,
-      hint: result.error.hint || null,
-      details: result.error.details || null,
-      isNotFound: result.error.code === 'PGRST116',
+      code,
+      message,
+      hint,
+      details,
+      isNotFound,
     };
 
     console.error(`[SupabaseQueryError]${contextStr}:`, {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
-import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
+import { unwrapSingleQuery } from '@/lib/supabase/query';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
 import { Settings, AlertCircle } from 'lucide-react';
@@ -39,11 +39,11 @@ export default async function AdminSettingsPage() {
       .maybeSingle(),
     supabase
       .from('platform_payment_methods')
-      .select('*')
+      .select('id, method_type, account_title, account_number_or_iban, bank_name, instructions_note, is_active, created_at, updated_at')
       .order('created_at', { ascending: true }),
   ]);
 
-  const { data: settings, error: settingsError } = unwrapSingleQuery<{
+  const { data: rawSettings, error: settingsError } = unwrapSingleQuery<{
     default_commission_rate: number;
     default_unpaid_commission_limit: number;
     dispute_window_days: number;
@@ -60,31 +60,53 @@ export default async function AdminSettingsPage() {
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
-  const { data: paymentMethodsData, error: paymentMethodsError } = unwrapQuery<PlatformPaymentMethodRow[]>(
-    paymentMethodsRes,
-    { context: 'AdminSettingsPage.payment_methods' }
-  );
+  let paymentMethods: PlatformPaymentMethodRow[] = [];
+  let paymentLoadError: { code?: string; message: string } | null = null;
 
-  let paymentMethods: PlatformPaymentMethodRow[] = paymentMethodsData || [];
-  let paymentLoadError = paymentMethodsError;
+  // Gracefully handle platform payment methods:
+  // 1. Direct table query succeeds (including 0 rows, which is a valid empty list)
+  if (paymentMethodsRes.data && !paymentMethodsRes.error) {
+    paymentMethods = (paymentMethodsRes.data as PlatformPaymentMethodRow[]).map((m) => ({
+      id: String(m.id),
+      method_type: m.method_type,
+      account_title: String(m.account_title),
+      account_number_or_iban: String(m.account_number_or_iban),
+      bank_name: m.bank_name ? String(m.bank_name) : null,
+      instructions_note: m.instructions_note ? String(m.instructions_note) : null,
+      is_active: Boolean(m.is_active),
+      created_at: String(m.created_at),
+      updated_at: String(m.updated_at),
+    }));
+  } else if (paymentMethodsRes.error) {
+    // 2. Direct table SELECT failed (e.g. privilege lockdown before policy migration), fallback to RPC
+    const rawErr = paymentMethodsRes.error;
+    const hasErrMsg = Boolean(rawErr.message || rawErr.code || (typeof rawErr === 'object' && Object.keys(rawErr).length > 0));
+    if (hasErrMsg) {
+      console.warn('[AdminSettingsPage.payment_methods] Table query failed, attempting RPC fallback:', rawErr.message || rawErr.code);
+    }
 
-  // Fallback: If table SELECT failed (e.g. privilege lockdown), query get_platform_payment_instructions RPC
-  if (paymentMethodsError || paymentMethods.length === 0) {
     const instructionsRes = await supabase.rpc('get_platform_payment_instructions');
-    const { data: instructionsData, error: instructionsError } = unwrapQuery<PlatformPaymentMethodRow[]>(
-      instructionsRes,
-      { context: 'AdminSettingsPage.get_platform_payment_instructions' }
-    );
-    if (instructionsData && instructionsData.length > 0) {
-      paymentMethods = instructionsData.map((m) => ({
-        ...m,
+    if (instructionsRes.error) {
+      const rpcErr = instructionsRes.error;
+      if (rpcErr.message || rpcErr.code) {
+        console.error('[AdminSettingsPage.get_platform_payment_instructions]:', rpcErr);
+        paymentLoadError = {
+          code: rpcErr.code,
+          message: rpcErr.message || 'Failed to load platform payment methods.',
+        };
+      }
+    } else if (Array.isArray(instructionsRes.data)) {
+      paymentMethods = (instructionsRes.data as Array<Record<string, unknown>>).map((m) => ({
+        id: String(m.id || ''),
+        method_type: (m.method_type as PlatformPaymentMethodRow['method_type']) || 'bank_transfer',
+        account_title: String(m.account_title || ''),
+        account_number_or_iban: String(m.account_number_or_iban || ''),
+        bank_name: m.bank_name ? String(m.bank_name) : null,
+        instructions_note: m.instructions_note ? String(m.instructions_note) : null,
         is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        created_at: '2026-01-01T00:00:00.000Z',
+        updated_at: '2026-01-01T00:00:00.000Z',
       }));
-      paymentLoadError = null;
-    } else if (instructionsError && paymentMethodsError) {
-      paymentLoadError = instructionsError;
     }
   }
 
@@ -102,10 +124,28 @@ export default async function AdminSettingsPage() {
     min_dispute_wait_hours: 24,
     verification_reminder_hours: 12,
     support_email: 'support@unbpremium.pk',
-    updated_at: new Date().toISOString(),
+    updated_at: '2026-01-01T00:00:00.000Z',
   };
 
-  const currentSettings = settings || fallbackSettings;
+  const currentSettings = rawSettings
+    ? {
+        default_commission_rate: Number(rawSettings.default_commission_rate ?? 20),
+        default_unpaid_commission_limit: Number(rawSettings.default_unpaid_commission_limit ?? 5000),
+        dispute_window_days: Number(rawSettings.dispute_window_days ?? 3),
+        min_novel_price_pkr: Number(rawSettings.min_novel_price_pkr ?? 50),
+        max_novel_price_pkr: Number(rawSettings.max_novel_price_pkr ?? 5000),
+        max_orders_per_hour: Number(rawSettings.max_orders_per_hour ?? 5),
+        max_chapter_reads_per_window: Number(rawSettings.max_chapter_reads_per_window ?? 20),
+        chapter_read_window_minutes: Number(rawSettings.chapter_read_window_minutes ?? 10),
+        invoice_due_days: Number(rawSettings.invoice_due_days ?? 7),
+        overdue_grace_days: Number(rawSettings.overdue_grace_days ?? 3),
+        min_dispute_wait_hours: Number(rawSettings.min_dispute_wait_hours ?? 24),
+        verification_reminder_hours: Number(rawSettings.verification_reminder_hours ?? 12),
+        support_email: String(rawSettings.support_email ?? 'support@unbpremium.pk'),
+        updated_at: String(rawSettings.updated_at ?? '2026-01-01T00:00:00.000Z'),
+      }
+    : fallbackSettings;
+
   const pageError = settingsError || paymentLoadError;
 
   return (
