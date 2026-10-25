@@ -40,10 +40,10 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   if (novelError) {
     return (
-      <div className="min-h-screen bg-stone-950 text-stone-100 py-16 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto text-center space-y-4 bg-stone-900 border border-stone-800 p-8 rounded-2xl shadow-xl">
-          <h1 className="text-xl font-bold text-rose-400">Checkout Error</h1>
-          <p className="text-sm text-stone-300">{novelError.message}</p>
+      <div className="min-h-screen bg-ivory text-main py-16 px-4 sm:px-6">
+        <div className="max-w-xl mx-auto text-center space-y-4 bg-surface border border-border p-8 rounded-2xl shadow-card">
+          <h1 className="text-xl font-bold font-serif text-rose-700">Checkout Error</h1>
+          <p className="text-sm text-secondary">{novelError.message}</p>
         </div>
       </div>
     );
@@ -80,14 +80,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     }
     // Render error state if unable to proceed
     return (
-      <div className="min-h-screen bg-stone-950 text-stone-100 py-16 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto text-center space-y-4 bg-stone-900 border border-stone-800 p-8 rounded-2xl shadow-xl">
-          <h1 className="text-xl font-bold text-rose-400">Checkout Unavailable</h1>
-          <p className="text-sm text-stone-300">{checkoutError.message}</p>
+      <div className="min-h-screen bg-ivory text-main py-16 px-4 sm:px-6">
+        <div className="max-w-xl mx-auto text-center space-y-4 bg-surface border border-border p-8 rounded-2xl shadow-card">
+          <h1 className="text-xl font-bold font-serif text-rose-700">Checkout Unavailable</h1>
+          <p className="text-sm text-secondary">{checkoutError.message}</p>
           <div className="pt-4">
             <a
               href={`/novels/${slug}`}
-              className="inline-flex items-center px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-sm font-semibold text-white transition-colors"
+              className="inline-flex items-center px-4 py-2 rounded-xl bg-surface-muted hover:bg-slate-100 border border-border text-sm font-semibold text-navy transition-colors shadow-sm"
             >
               Return to Novel Details
             </a>
@@ -105,7 +105,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-ivory text-main py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <CheckoutForm options={options} />
       </div>

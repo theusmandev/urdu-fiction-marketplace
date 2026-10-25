@@ -120,12 +120,12 @@ export default async function OrderPage({ params }: OrderPageProps) {
 
   if (orderError) {
     return (
-      <div className="min-h-screen bg-stone-950 text-stone-100 py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+      <div className="min-h-screen bg-ivory text-main py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load order</h3>
-            <p className="text-xs text-red-400/80 mt-1">{orderError.message}</p>
+            <p className="text-xs text-rose-700/80 mt-1">{orderError.message}</p>
           </div>
         </div>
       </div>
@@ -224,7 +224,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
   }));
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-ivory text-main py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <OrderDetailView
           order={{

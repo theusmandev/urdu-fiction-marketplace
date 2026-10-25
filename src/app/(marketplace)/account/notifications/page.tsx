@@ -16,7 +16,7 @@ export default async function AccountNotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-stone-800 bg-stone-900/60 p-6 md:p-8 backdrop-blur-md">
+      <div className="rounded-2xl border border-border bg-surface p-6 md:p-8 shadow-card">
         <NotificationPreferencesClient initialEmailEnabled={initialEmailEnabled} />
       </div>
     </div>

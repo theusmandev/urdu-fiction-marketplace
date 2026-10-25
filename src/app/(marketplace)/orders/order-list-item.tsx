@@ -70,24 +70,24 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
   };
 
   return (
-    <div className="rounded-xl border border-stone-800 bg-stone-900/60 p-5 backdrop-blur-sm space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-800/80 pb-3">
+    <div className="rounded-2xl border border-border bg-surface p-5 shadow-card space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-sm font-bold text-amber-500">
+            <span className="font-mono text-sm font-bold text-accent-admin">
               {order.order_number}
             </span>
             <StatusBadge status={order.status} />
           </div>
-          <p className="text-xs text-stone-500 mt-0.5">
+          <p className="text-xs text-secondary mt-0.5">
             Placed on {new Date(order.created_at).toLocaleDateString()} at{' '}
             {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
 
         <div className="text-right sm:text-right flex items-center justify-between sm:block">
-          <span className="text-xs text-stone-400 sm:hidden">Total Amount:</span>
-          <span className="text-base font-bold text-white">
+          <span className="text-xs text-secondary sm:hidden">Total Amount:</span>
+          <span className="text-base font-bold text-navy">
             PKR {order.amount_pkr.toLocaleString()}
           </span>
         </div>
@@ -95,18 +95,18 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <UrduText as="h3" size="xl" className="text-white">
+          <UrduText as="h3" size="xl" className="text-navy font-bold leading-[2.2]">
             {order.novel_title_snapshot}
           </UrduText>
           {order.status === 'rejected' && order.rejected_reason && (
-            <p className="mt-1 text-xs text-red-400 bg-red-950/40 border border-red-800/40 px-2.5 py-1.5 rounded-md">
+            <p className="mt-1 text-xs text-rose-700 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">
               <strong className="font-semibold">Author Note:</strong> {order.rejected_reason}
             </p>
           )}
           {order.latest_submission && (
-            <p className="mt-1 text-xs text-stone-400">
-              Reported TID:{' '}
-              <span className="font-mono text-stone-200">
+            <p className="mt-1 text-xs text-secondary flex items-center gap-1.5">
+              <span>Reported TID:</span>
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-semibold">
                 {order.latest_submission.transaction_reference_tid}
               </span>
             </p>
@@ -119,12 +119,12 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
               type="button"
               onClick={() => handleViewProof(order.latest_submission!.screenshot_path)}
               disabled={loadingProof}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-700 bg-stone-800 px-3 py-1.5 text-xs font-medium text-stone-300 hover:bg-stone-700 hover:text-white transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-main hover:bg-surface-muted transition-colors shadow-xs cursor-pointer"
             >
               {loadingProof ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Eye className="h-3.5 w-3.5 text-amber-500" />
+                <Eye className="h-3.5 w-3.5 text-accent" />
               )}
               <span>Receipt Proof</span>
             </button>
@@ -132,16 +132,16 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
 
           <Link
             href={`/orders/${order.order_number}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-1.5 text-xs font-semibold text-amber-400 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface hover:bg-surface-muted px-3.5 py-1.5 text-xs font-semibold text-main transition-colors shadow-xs"
           >
             <span>View Order</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            <ArrowUpRight className="h-3.5 w-3.5 text-secondary" />
           </Link>
 
           {order.status === 'verified' && (
             <Link
               href={`/orders/${order.order_number}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/90 hover:bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors shadow-xs"
             >
               <span>Access Novel</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -153,7 +153,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
               type="button"
               onClick={handleCancel}
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-800/50 bg-red-950/30 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-900/50 hover:text-red-200 transition-colors disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
             >
               {isPending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -166,7 +166,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
         </div>
       </div>
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-rose-600">{error}</p>}
     </div>
   );
 }

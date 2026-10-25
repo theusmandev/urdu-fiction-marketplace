@@ -63,13 +63,13 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-ivory text-main py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Navigation */}
         <div>
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-stone-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-secondary hover:text-navy transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Support Desk</span>
@@ -77,28 +77,28 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
         </div>
 
         {/* Ticket Header Card */}
-        <div className="rounded-2xl bg-stone-900 border border-stone-800 p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-800 pb-4">
+        <div className="rounded-2xl bg-surface border border-border p-6 space-y-4 shadow-card">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 border border-stone-700">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                   {request.category}
                 </span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     statusMeta.variant === 'warning'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      ? 'bg-amber-50 text-amber-800 border border-amber-200'
                       : statusMeta.variant === 'success'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-stone-800 text-stone-400 border border-stone-700'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'bg-slate-100 text-slate-600 border border-slate-200'
                   }`}
                 >
                   {statusMeta.label}
                 </span>
               </div>
-              <h1 className="text-lg font-bold text-white">{request.subject}</h1>
+              <h1 className="text-lg font-bold font-serif text-navy">{request.subject}</h1>
               {request.order_number && (
-                <span className="text-xs font-mono text-amber-400 block">
+                <span className="text-xs font-mono text-brand-gold block">
                   Related to Order #{request.order_number}
                 </span>
               )}
@@ -110,7 +110,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   type="button"
                   onClick={handleCloseTicket}
                   disabled={isPending}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-400 hover:text-white bg-stone-950 hover:bg-stone-800 border border-stone-800 transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors cursor-pointer"
                 >
                   Mark as Resolved / Close
                 </button>
@@ -118,18 +118,18 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-stone-400">
+          <div className="flex items-center gap-4 text-xs text-secondary">
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-stone-500" />
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
               <span>Created {new Date(request.created_at).toLocaleString()}</span>
             </div>
           </div>
         </div>
 
         {/* Message Thread */}
-        <div className="rounded-2xl bg-stone-900 border border-stone-800 p-6 space-y-6">
-          <div className="border-b border-stone-800 pb-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-stone-400">
+        <div className="rounded-2xl bg-surface border border-border p-6 space-y-6 shadow-card">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-secondary">
               Support Thread ({messages.length} messages)
             </h2>
           </div>
@@ -142,30 +142,30 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   key={msg.id}
                   className={`rounded-2xl p-4 space-y-2 border ${
                     isAdmin
-                      ? 'bg-sky-950/20 border-sky-800/40'
-                      : 'bg-stone-950 border-stone-800'
+                      ? 'bg-sky-50/70 border-sky-200'
+                      : 'bg-surface-muted border-border'
                   }`}
                 >
-                  <div className="flex items-center justify-between border-b border-stone-800/50 pb-2">
+                  <div className="flex items-center justify-between border-b border-border/60 pb-2">
                     <div className="flex items-center gap-2">
                       {isAdmin ? (
-                        <Shield className="w-4 h-4 text-sky-400" />
+                        <Shield className="w-4 h-4 text-sky-600" />
                       ) : (
-                        <User className="w-4 h-4 text-stone-400" />
+                        <User className="w-4 h-4 text-slate-500" />
                       )}
-                      <span className="font-bold text-xs text-white">{msg.author_name}</span>
+                      <span className="font-bold text-xs text-navy">{msg.author_name}</span>
                       {isAdmin && (
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300">
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
                           Support Team
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] text-stone-500 font-mono">
+                    <span className="text-[10px] text-secondary font-mono">
                       {new Date(msg.created_at).toLocaleString()}
                     </span>
                   </div>
 
-                  <p className="text-xs text-stone-200 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-xs text-main leading-relaxed whitespace-pre-wrap">
                     {msg.body}
                   </p>
                 </div>
@@ -175,20 +175,20 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
 
           {/* Reply Form */}
           {!isClosed ? (
-            <form onSubmit={handleSendReply} className="pt-4 border-t border-stone-800 space-y-4">
+            <form onSubmit={handleSendReply} className="pt-4 border-t border-border space-y-4">
               {errorMsg && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-stone-300">
+                  <label className="text-xs font-semibold text-navy">
                     Your Reply
                   </label>
-                  <span className="text-[10px] text-stone-500 font-mono">
+                  <span className="text-[10px] text-secondary font-mono">
                     {replyBody.length} / 2000 chars
                   </span>
                 </div>
@@ -198,7 +198,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
                   placeholder="Type your reply here..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 leading-relaxed"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-xs text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -206,7 +206,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                 <button
                   type="submit"
                   disabled={isPending || !replyBody.trim()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-stone-950 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 transition-all shadow-md cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-all shadow-sm cursor-pointer"
                 >
                   {isPending ? (
                     <>
@@ -223,8 +223,8 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
               </div>
             </form>
           ) : (
-            <div className="pt-4 border-t border-stone-800 text-center py-4">
-              <span className="text-xs text-stone-500 italic">
+            <div className="pt-4 border-t border-border text-center py-4">
+              <span className="text-xs text-secondary italic">
                 This ticket has been marked as closed.
               </span>
             </div>

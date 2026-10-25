@@ -61,30 +61,30 @@ export default async function OrdersPage() {
   const hasOrders = orders && orders.length > 0;
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-ivory text-main py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
         {ordersError && (
-          <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
             <div>
               <h3 className="font-semibold text-sm">Failed to load orders</h3>
-              <p className="text-xs text-red-400/80 mt-1">{ordersError.message}</p>
+              <p className="text-xs text-rose-700/80 mt-1">{ordersError.message}</p>
             </div>
           </div>
         )}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-800 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-              <ShoppingBag className="h-7 w-7 text-amber-500" />
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-navy flex items-center gap-3 font-serif">
+              <ShoppingBag className="h-7 w-7 text-accent" />
               <span>Purchase Orders</span>
             </h1>
-            <p className="mt-1 text-sm text-stone-400">
+            <p className="mt-1 text-sm text-secondary">
               Track direct bank verification status, resubmit payment proofs, or cancel orders.
             </p>
           </div>
           <Link
             href="/novels"
-            className="inline-flex items-center gap-2 rounded-lg bg-amber-600/90 hover:bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors shrink-0"
+            className="inline-flex items-center gap-2 rounded-xl bg-accent hover:bg-accent-dark px-4 py-2.5 text-sm font-bold text-navy transition-colors shrink-0 shadow-xs"
           >
             <span>Explore Novels</span>
             <ArrowRight className="h-4 w-4" />

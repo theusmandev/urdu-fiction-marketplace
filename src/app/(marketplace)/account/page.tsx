@@ -8,17 +8,17 @@ export default async function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-stone-800 bg-stone-900/60 p-6 md:p-8 backdrop-blur-md">
+      <div className="rounded-2xl border border-border bg-surface p-6 md:p-8 shadow-card">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+          <h1 className="text-xl md:text-2xl font-bold font-serif text-navy tracking-tight">
             Account Profile
           </h1>
-          <p className="mt-1 text-sm text-stone-400">
+          <p className="mt-1 text-sm text-secondary">
             Manage your personal reader information and avatar.
           </p>
         </div>
 
-        <div className="mt-6 border-t border-stone-800 pt-6">
+        <div className="mt-6 border-t border-border pt-6">
           <ProfileEditForm user={user} profile={profile} />
         </div>
       </div>

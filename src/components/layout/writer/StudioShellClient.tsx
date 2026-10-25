@@ -9,6 +9,7 @@ import {
   BookOpen,
   LayoutDashboard,
   CreditCard,
+  Scale,
   Receipt,
   TrendingUp,
   Landmark,
@@ -27,6 +28,7 @@ export interface StudioShellClientProps {
   profile: ProfileRow;
   writerProfile: WriterProfileRow;
   pendingVerificationCount?: number;
+  openDisputesCount?: number;
   unreadNotificationsCount?: number;
 }
 
@@ -35,12 +37,12 @@ export function StudioShellClient({
   profile,
   writerProfile,
   pendingVerificationCount = 0,
+  openDisputesCount = 0,
   unreadNotificationsCount = 0,
 }: StudioShellClientProps) {
   const pathname = usePathname();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
 
   const navItems = [
     { href: '/writer', label: 'Overview', icon: LayoutDashboard },
@@ -51,6 +53,13 @@ export function StudioShellClient({
       icon: CreditCard,
       badge: pendingVerificationCount,
       badgeColor: 'bg-amber-500 text-stone-950 font-bold',
+    },
+    {
+      href: '/writer/disputes',
+      label: 'Disputes',
+      icon: Scale,
+      badge: openDisputesCount,
+      badgeColor: 'bg-rose-500 text-white font-bold',
     },
     { href: '/writer/earnings', label: 'Earnings', icon: TrendingUp },
     { href: '/writer/commission', label: 'Commission', icon: Receipt },
@@ -209,7 +218,7 @@ export function StudioShellClient({
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
                   title={isCollapsed ? item.label : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                     active
                       ? 'bg-navy text-white font-semibold shadow-sm'
                       : 'text-secondary hover:text-navy hover:bg-ivory'
@@ -229,6 +238,13 @@ export function StudioShellClient({
                     >
                       {item.badge}
                     </span>
+                  )}
+                  {isCollapsed && typeof item.badge === 'number' && item.badge > 0 && (
+                    <span
+                      className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 ring-surface ${
+                        item.href === '/writer/disputes' ? 'bg-rose-500' : 'bg-amber-500'
+                      }`}
+                    />
                   )}
                 </Link>
               );
@@ -256,7 +272,7 @@ export function StudioShellClient({
 
         {/* Mobile Navigation Drawer */}
         {mobileDrawerOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-sm flex">
+          <div className="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex">
             <div
               className="w-72 max-w-[85vw] bg-surface border-r border-border h-full flex flex-col p-4 shadow-2xl animate-in slide-in-from-left duration-200"
               role="dialog"

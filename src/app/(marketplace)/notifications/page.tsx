@@ -34,14 +34,14 @@ export default async function NotificationsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-ivory text-main py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-6">
         {notificationsError && (
-          <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
             <div>
               <h3 className="font-semibold text-sm">Failed to load notifications</h3>
-              <p className="text-xs text-red-400/80 mt-1">{notificationsError.message}</p>
+              <p className="text-xs text-rose-700 mt-1">{notificationsError.message}</p>
             </div>
           </div>
         )}

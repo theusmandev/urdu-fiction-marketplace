@@ -47,39 +47,39 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-stone-950">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-stone-800 bg-stone-900/80 p-8 shadow-2xl backdrop-blur-xl">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-ivory text-main">
+      <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-surface p-8 shadow-card">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <span className="font-urdu text-4xl tracking-tight text-amber-500">
+            <span className="font-urdu text-4xl tracking-tight text-accent">
               یو این بی پریمیم
             </span>
-            <span className="block text-xs uppercase tracking-widest text-stone-400 font-sans mt-0.5">
+            <span className="block text-xs uppercase tracking-widest text-secondary font-sans mt-0.5 font-bold">
               UNB Premium
             </span>
           </Link>
-          <h1 className="mt-6 text-2xl font-bold tracking-tight text-white">
+          <h1 className="mt-6 text-2xl font-bold font-serif tracking-tight text-navy">
             Set new password
           </h1>
-          <p className="mt-2 text-sm text-stone-400">
+          <p className="mt-2 text-sm text-secondary">
             Please choose a strong, secure password for your account.
           </p>
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-950/60 border border-red-800/80 p-4 flex items-start gap-3 text-red-200 text-sm">
-            <AlertCircle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
+          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
+            <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-stone-300">
+            <label htmlFor="password" className="block text-sm font-semibold text-secondary">
               New Password
             </label>
             <div className="relative mt-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                 <Lock className="h-4 w-4" />
               </div>
               <input
@@ -92,20 +92,20 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
               />
             </div>
             {fieldErrors.password && (
-              <p className="mt-1 text-xs text-red-400">{fieldErrors.password[0]}</p>
+              <p className="mt-1 text-xs text-rose-600">{fieldErrors.password[0]}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-stone-300">
+            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-secondary">
               Confirm New Password
             </label>
             <div className="relative mt-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                 <Lock className="h-4 w-4" />
               </div>
               <input
@@ -118,40 +118,40 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
               />
             </div>
             {fieldErrors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-400">{fieldErrors.confirmPassword[0]}</p>
+              <p className="mt-1 text-xs text-rose-600">{fieldErrors.confirmPassword[0]}</p>
             )}
           </div>
 
           {/* Strength validation checklist */}
-          <div className="grid grid-cols-2 gap-1.5 text-[11px] text-stone-400 bg-stone-950/50 p-3 rounded-lg border border-stone-800">
-            <span className={rules.length ? 'text-emerald-400 flex items-center gap-1' : 'text-stone-500'}>
-              {rules.length ? <CheckCircle2 className="h-3 w-3" /> : '•'} 8+ characters
+          <div className="grid grid-cols-2 gap-1.5 text-[11px] text-secondary bg-surface-muted p-3 rounded-xl border border-border">
+            <span className={rules.length ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.length ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 8+ characters
             </span>
-            <span className={rules.upper ? 'text-emerald-400 flex items-center gap-1' : 'text-stone-500'}>
-              {rules.upper ? <CheckCircle2 className="h-3 w-3" /> : '•'} 1 uppercase
+            <span className={rules.upper ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.upper ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 uppercase
             </span>
-            <span className={rules.lower ? 'text-emerald-400 flex items-center gap-1' : 'text-stone-500'}>
-              {rules.lower ? <CheckCircle2 className="h-3 w-3" /> : '•'} 1 lowercase
+            <span className={rules.lower ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.lower ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 lowercase
             </span>
-            <span className={rules.number ? 'text-emerald-400 flex items-center gap-1' : 'text-stone-500'}>
-              {rules.number ? <CheckCircle2 className="h-3 w-3" /> : '•'} 1 number
+            <span className={rules.number ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.number ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 number
             </span>
-            <span className={rules.special ? 'text-emerald-400 flex items-center gap-1' : 'text-stone-500'}>
-              {rules.special ? <CheckCircle2 className="h-3 w-3" /> : '•'} 1 special char
+            <span className={rules.special ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.special ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 special char
             </span>
-            <span className={rules.match ? 'text-emerald-400 flex items-center gap-1' : 'text-stone-500'}>
-              {rules.match ? <CheckCircle2 className="h-3 w-3" /> : '•'} Passwords match
+            <span className={rules.match ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.match ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} Passwords match
             </span>
           </div>
 
           <button
             type="submit"
             disabled={isPending || !rules.match}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 disabled:opacity-50 transition-all cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
           >
             {isPending ? (
               <>

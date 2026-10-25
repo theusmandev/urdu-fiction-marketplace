@@ -87,7 +87,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
       <div>
         <Link
           href={`/novels/${novel.slug}`}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 hover:text-amber-400 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary hover:text-accent transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Novel Details</span>
@@ -98,29 +98,29 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
         {/* Left Column: Form & Payment Methods (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-              <CreditCard className="w-6 h-6 text-amber-500" />
+            <h1 className="text-2xl font-bold font-serif tracking-tight text-navy flex items-center gap-2.5">
+              <CreditCard className="w-6 h-6 text-accent" />
               <span>Direct Writer Checkout</span>
             </h1>
-            <p className="mt-1 text-xs text-stone-400">
+            <p className="mt-1 text-xs text-secondary">
               Select your preferred Pakistani payment channel to initiate your purchase.
             </p>
           </div>
 
           {/* Payment Model Explanation Banner */}
-          <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 sm:p-5 space-y-2">
+          <div className="rounded-2xl bg-amber-50/80 border border-amber-200 p-4 sm:p-5 space-y-2">
             <div className="flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-amber-950">
                   Direct Reader-to-Writer Payment
                 </h2>
-                <p className="text-xs text-stone-300 leading-relaxed">
+                <p className="text-xs text-amber-900 leading-relaxed">
                   You pay the writer directly. Access unlocks after the writer verifies your payment.
                   The platform never receives your money.
                 </p>
                 <div className="pt-1">
-                  <UrduText as="p" size="xs" className="text-amber-300/90 leading-[2.2]">
+                  <UrduText as="p" size="xs" className="text-amber-950 font-medium leading-[2.2]">
                     آپ رقم براہِ راست مصنف کے اکاؤنٹ میں بھیجتے ہیں۔ مصنف کی تصدیق کے بعد ناول تک رسائی حاصل ہو گی۔
                   </UrduText>
                 </div>
@@ -130,8 +130,8 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
 
           {/* Error Alert */}
           {error && (
-            <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 p-4 flex items-start gap-3 text-xs text-rose-300">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-xs text-rose-800">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span className="leading-relaxed">{error}</span>
             </div>
           )}
@@ -139,7 +139,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
           {/* Payment Method Selector */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-stone-300 block">
+              <label className="text-xs font-bold uppercase tracking-wider text-navy block">
                 Choose Author Payment Account
               </label>
 
@@ -149,10 +149,10 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                   return (
                     <label
                       key={method.id}
-                      className={`block p-4 rounded-xl border transition-all cursor-pointer ${
+                      className={`block p-4 rounded-xl border transition-all cursor-pointer shadow-sm ${
                         isSelected
-                          ? 'bg-amber-500/10 border-amber-500 shadow-md ring-1 ring-amber-500/30'
-                          : 'bg-stone-900 border-stone-800 hover:border-stone-700'
+                          ? 'bg-amber-50/80 border-accent shadow-sm ring-1 ring-accent/30'
+                          : 'bg-surface border-border hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -162,22 +162,22 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                           value={method.id}
                           checked={isSelected}
                           onChange={() => setSelectedMethodId(method.id)}
-                          className="mt-1 h-4 w-4 text-amber-500 border-stone-700 focus:ring-amber-500 focus:ring-offset-stone-900"
+                          className="mt-1 h-4 w-4 text-accent border-border focus:ring-accent"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-xs font-bold text-white">
+                            <span className="text-xs font-bold text-navy">
                               {getMethodLabel(method.method_type, method.bank_name)}
                             </span>
-                            <span className="text-[11px] font-mono text-amber-400 font-semibold bg-stone-800/80 px-2 py-0.5 rounded">
+                            <span className="text-[11px] font-mono text-accent font-semibold bg-surface-muted px-2 py-0.5 rounded border border-border">
                               {method.masked_account}
                             </span>
                           </div>
-                          <p className="text-[11px] text-stone-400 mt-0.5">
-                            Account Title: <span className="text-stone-200">{method.account_title}</span>
+                          <p className="text-[11px] text-secondary mt-0.5">
+                            Account Title: <span className="text-navy font-semibold">{method.account_title}</span>
                           </p>
                           {method.instructions_note && (
-                            <p className="text-[10px] text-stone-500 mt-1 italic">
+                            <p className="text-[10px] text-muted mt-1 italic">
                               Note: {method.instructions_note}
                             </p>
                           )}
@@ -188,8 +188,8 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                 })}
               </div>
 
-              <p className="text-[11px] text-stone-500 flex items-center gap-1.5 mt-2">
-                <Lock className="w-3.5 h-3.5 text-stone-400" />
+              <p className="text-[11px] text-secondary flex items-center gap-1.5 mt-2">
+                <Lock className="w-3.5 h-3.5 text-secondary" />
                 <span>
                   Full account numbers and IBANs are revealed on your order invoice upon placing the order.
                 </span>
@@ -197,21 +197,21 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
             </div>
 
             {/* Terms and Refund Policy Agreement */}
-            <div className="pt-2 border-t border-stone-800">
+            <div className="pt-2 border-t border-border">
               <label className="flex items-start gap-2.5 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded text-amber-500 border-stone-700 focus:ring-amber-500 focus:ring-offset-stone-900"
+                  className="mt-1 h-4 w-4 rounded text-accent border-border focus:ring-accent"
                 />
-                <span className="text-xs text-stone-300 leading-relaxed">
+                <span className="text-xs text-secondary leading-relaxed">
                   I understand that I am transferring funds directly to the author’s personal account. I have read and agree to the{' '}
-                  <Link href="/terms" target="_blank" className="text-amber-400 underline hover:text-amber-300">
+                  <Link href="/terms" target="_blank" className="text-accent underline hover:text-accent-dark font-semibold">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/refund-policy" target="_blank" className="text-amber-400 underline hover:text-amber-300">
+                  <Link href="/refund-policy" target="_blank" className="text-accent underline hover:text-accent-dark font-semibold">
                     Refund & Dispute Policy
                   </Link>
                   .
@@ -224,7 +224,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
               <button
                 type="submit"
                 disabled={isPending || !selectedMethodId || !termsAccepted}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-sm text-stone-950 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-amber-500/10 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-sm text-navy bg-accent hover:bg-accent-dark active:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
               >
                 {isPending ? (
                   <>
@@ -244,8 +244,8 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
 
         {/* Right Column: Order Summary Card (5 cols) */}
         <div className="lg:col-span-5">
-          <div className="sticky top-6 rounded-2xl bg-stone-900 border border-stone-800 p-6 space-y-6 shadow-xl">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-stone-400 pb-3 border-b border-stone-800">
+          <div className="sticky top-6 rounded-2xl bg-surface border border-border p-6 space-y-6 shadow-card">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-secondary pb-3 border-b border-border">
               Order Summary
             </h2>
 
@@ -258,25 +258,25 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                   <img
                     src={cover}
                     alt={novel.title_english}
-                    className="w-20 h-28 object-cover rounded-xl border border-stone-800 shrink-0"
+                    className="w-20 h-28 object-cover rounded-xl border border-border shrink-0"
                   />
                 ) : (
-                  <div className="w-20 h-28 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-600 shrink-0">
+                  <div className="w-20 h-28 rounded-xl bg-surface-muted border border-border flex items-center justify-center text-secondary shrink-0">
                     <BookOpen className="w-8 h-8" />
                   </div>
                 );
               })()}
 
               <div className="space-y-1 min-w-0">
-                <h3 className="text-sm font-bold text-white truncate">{novel.title_english}</h3>
-                <UrduText as="h4" size="sm" className="text-amber-400 truncate leading-[2.2]">
+                <h3 className="text-sm font-bold text-navy truncate">{novel.title_english}</h3>
+                <UrduText as="h4" size="sm" className="text-accent truncate leading-[2.2]">
                   {novel.title_urdu}
                 </UrduText>
-                <p className="text-xs text-stone-400 pt-1">
-                  By <span className="text-stone-200 font-semibold">{novel.writer_pen_name}</span>
+                <p className="text-xs text-secondary pt-1">
+                  By <span className="text-navy font-semibold">{novel.writer_pen_name}</span>
                 </p>
                 <div className="pt-2">
-                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-stone-800 text-stone-300">
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-surface-muted border border-border text-secondary">
                     Full Novel Access
                   </span>
                 </div>
@@ -284,25 +284,25 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
             </div>
 
             {/* Price Breakdown */}
-            <div className="space-y-2 pt-4 border-t border-stone-800 text-xs">
-              <div className="flex justify-between text-stone-400">
+            <div className="space-y-2 pt-4 border-t border-border text-xs">
+              <div className="flex justify-between text-secondary">
                 <span>Novel Price</span>
-                <span>{formatPKR(novel.price_pkr)}</span>
+                <span className="font-mono text-navy font-semibold">{formatPKR(novel.price_pkr)}</span>
               </div>
-              <div className="flex justify-between text-stone-400">
+              <div className="flex justify-between text-secondary">
                 <span>Platform Fee</span>
-                <span className="text-emerald-400 font-medium">Free (PKR 0)</span>
+                <span className="text-emerald-700 font-semibold font-mono">Free (PKR 0)</span>
               </div>
-              <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-stone-800/60">
+              <div className="flex justify-between text-sm font-bold text-navy pt-2 border-t border-border">
                 <span>Total Amount Due</span>
-                <span className="text-amber-400 text-base">{formatPKR(novel.price_pkr)}</span>
+                <span className="text-navy text-base font-mono">{formatPKR(novel.price_pkr)}</span>
               </div>
             </div>
 
             {/* Safe Notice */}
-            <div className="rounded-xl bg-stone-950/60 p-3.5 border border-stone-800/80 text-[11px] text-stone-400 space-y-1">
-              <div className="font-semibold text-stone-300 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
+            <div className="rounded-xl bg-surface-muted p-3.5 border border-border text-[11px] text-secondary space-y-1">
+              <div className="font-semibold text-navy flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-accent" />
                 <span>Buyer Protection</span>
               </div>
               <p>
@@ -312,26 +312,26 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
             </div>
 
             {/* Need Help Paying? */}
-            <div className="rounded-xl bg-stone-950/60 p-3.5 border border-stone-800/80 text-[11px] text-stone-400 space-y-1.5">
-              <div className="font-semibold text-stone-200 flex items-center gap-1.5">
-                <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
+            <div className="rounded-xl bg-surface-muted p-3.5 border border-border text-[11px] text-secondary space-y-1">
+              <div className="font-semibold text-navy flex items-center gap-1.5">
+                <HelpCircle className="w-3.5 h-3.5 text-accent" />
                 <span>Need help paying?</span>
               </div>
               <p className="leading-relaxed">
                 Follow our step-by-step{' '}
-                <Link href="/how-to-pay" className="text-amber-400 hover:underline font-medium">
+                <Link href="/how-to-pay" className="text-accent hover:underline font-semibold">
                   Payment Guide
                 </Link>
                 , read{' '}
-                <Link href="/how-it-works" className="text-amber-400 hover:underline">
+                <Link href="/how-it-works" className="text-accent hover:underline font-semibold">
                   How Direct Payment Works
                 </Link>
                 , check our{' '}
-                <Link href="/faq" className="text-amber-400 hover:underline">
+                <Link href="/faq" className="text-accent hover:underline font-semibold">
                   FAQ
                 </Link>
                 , or review the{' '}
-                <Link href="/refund-policy" className="text-amber-400 hover:underline">
+                <Link href="/refund-policy" className="text-accent hover:underline font-semibold">
                   Refund Policy
                 </Link>
                 .

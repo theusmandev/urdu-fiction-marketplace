@@ -60,16 +60,16 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
 
   if (success) {
     return (
-      <div className="rounded-xl border border-emerald-800/80 bg-emerald-950/60 p-8 text-center space-y-4">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
-        <h2 className="text-xl font-bold text-white">Application Submitted!</h2>
-        <p className="text-sm text-emerald-200/90 leading-relaxed max-w-md mx-auto">
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center space-y-4 shadow-sm">
+        <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
+        <h2 className="text-xl font-bold font-serif text-emerald-950">Application Submitted!</h2>
+        <p className="text-sm text-emerald-800 leading-relaxed max-w-md mx-auto">
           Your author application has been submitted for review. Once approved by our team, your author dashboard will be activated.
         </p>
         <div className="pt-2">
           <Link
             href="/account"
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shadow-sm"
           >
             <span>Return to Account</span>
             <ArrowRight className="h-4 w-4" />
@@ -82,15 +82,15 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {isReapplying && (
-        <div className="rounded-lg bg-amber-950/60 border border-amber-800/80 p-4 text-amber-200 text-sm">
-          <strong className="font-semibold block mb-1">Reapplying for Author Status</strong>
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-amber-900 text-sm">
+          <strong className="font-bold block mb-1">Reapplying for Author Status</strong>
           Please update your pen name or bio information below and resubmit for editorial review.
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg bg-red-950/60 border border-red-800/80 p-4 flex items-start gap-3 text-red-200 text-sm">
-          <AlertCircle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
+        <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
+          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
@@ -98,8 +98,8 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Pen Name Urdu */}
         <div>
-          <label htmlFor="penNameUrdu" className="block text-sm font-medium text-stone-300">
-            Urdu Pen Name (قلمی نام اردو) <span className="text-amber-500">*</span>
+          <label htmlFor="penNameUrdu" className="block text-sm font-semibold text-secondary">
+            Urdu Pen Name (قلمی نام اردو) <span className="text-rose-500">*</span>
           </label>
           <input
             id="penNameUrdu"
@@ -110,17 +110,17 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setPenNameUrdu(e.target.value)}
             placeholder="مثلاً: نمرہ احمد"
             disabled={isPending}
-            className="font-urdu mt-1 block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 px-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-base disabled:opacity-50"
+            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base leading-[2.2] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.penNameUrdu && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.penNameUrdu[0]}</p>
+            <p className="mt-1 text-xs text-rose-600">{fieldErrors.penNameUrdu[0]}</p>
           )}
         </div>
 
         {/* Pen Name English */}
         <div>
-          <label htmlFor="penNameEnglish" className="block text-sm font-medium text-stone-300">
-            English Pen Name (Roman/English) <span className="text-amber-500">*</span>
+          <label htmlFor="penNameEnglish" className="block text-sm font-semibold text-secondary">
+            English Pen Name (Roman/English) <span className="text-rose-500">*</span>
           </label>
           <input
             id="penNameEnglish"
@@ -130,16 +130,16 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setPenNameEnglish(e.target.value)}
             placeholder="e.g. Nimra Ahmed"
             disabled={isPending}
-            className="mt-1 block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 px-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
           />
           {fieldErrors.penNameEnglish && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.penNameEnglish[0]}</p>
+            <p className="mt-1 text-xs text-rose-600">{fieldErrors.penNameEnglish[0]}</p>
           )}
         </div>
 
         {/* Bio Urdu */}
         <div className="md:col-span-2">
-          <label htmlFor="bioUrdu" className="block text-sm font-medium text-stone-300">
+          <label htmlFor="bioUrdu" className="block text-sm font-semibold text-secondary">
             Author Bio in Urdu (مختصر تعارف اردو)
           </label>
           <textarea
@@ -150,13 +150,13 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setBioUrdu(e.target.value)}
             placeholder="اپنے ادبی سفر اور اندازِ تحریر کے بارے میں چند جملے..."
             disabled={isPending}
-            className="font-urdu mt-1 block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 px-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm leading-relaxed disabled:opacity-50"
+            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base leading-[2.2] disabled:opacity-50 transition-colors"
           />
         </div>
 
         {/* Bio English */}
         <div className="md:col-span-2">
-          <label htmlFor="bioEnglish" className="block text-sm font-medium text-stone-300">
+          <label htmlFor="bioEnglish" className="block text-sm font-semibold text-secondary">
             Author Bio in English (Optional)
           </label>
           <textarea
@@ -166,13 +166,13 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setBioEnglish(e.target.value)}
             placeholder="A brief introduction to your literary background..."
             disabled={isPending}
-            className="mt-1 block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 px-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
           />
         </div>
       </div>
 
       {/* Agreement Checkbox */}
-      <div className="pt-2 border-t border-stone-800">
+      <div className="pt-2 border-t border-border">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -180,14 +180,14 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             checked={acceptAgreement}
             onChange={(e) => setAcceptAgreement(e.target.checked)}
             disabled={isPending}
-            className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-600 focus:ring-amber-500 cursor-pointer"
+            className="mt-1 h-4 w-4 rounded border-border bg-white text-accent focus:ring-accent cursor-pointer"
           />
-          <span className="text-xs text-stone-300 leading-normal">
+          <span className="text-xs text-secondary leading-normal">
             I confirm that all published Urdu stories are my original work, and I agree to the{' '}
             <Link
               href="/writer/agreement"
               target="_blank"
-              className="text-amber-500 hover:text-amber-400 underline underline-offset-2 font-medium"
+              className="text-accent hover:text-accent-dark underline underline-offset-2 font-semibold"
             >
               Writer Platform Agreement
             </Link>{' '}
@@ -200,7 +200,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
         <button
           type="submit"
           disabled={isPending || !acceptAgreement}
-          className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
         >
           {isPending ? (
             <>

@@ -89,25 +89,25 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-stone-950">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-stone-800 bg-stone-900/80 p-8 shadow-2xl backdrop-blur-xl">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-ivory text-main">
+      <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-surface p-8 shadow-card">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <span className="font-urdu text-4xl tracking-tight text-amber-500">
+            <span className="font-urdu text-4xl tracking-tight text-accent">
               یو این بی پریمیم
             </span>
-            <span className="block text-xs uppercase tracking-widest text-stone-400 font-sans mt-0.5">
+            <span className="block text-xs uppercase tracking-widest text-secondary font-sans mt-0.5 font-bold">
               UNB Premium
             </span>
           </Link>
-          <h1 className="mt-6 text-2xl font-bold tracking-tight text-white">
+          <h1 className="mt-6 text-2xl font-bold font-serif tracking-tight text-navy">
             Create your account
           </h1>
-          <p className="mt-2 text-sm text-stone-400">
+          <p className="mt-2 text-sm text-secondary">
             Already have an account?{' '}
             <Link
               href={nextParam ? `/login?next=${encodeURIComponent(nextParam)}` : '/login'}
-              className="font-medium text-amber-500 hover:text-amber-400 transition-colors"
+              className="font-semibold text-accent hover:text-accent-dark transition-colors"
             >
               Sign in
             </Link>
@@ -115,16 +115,16 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
         </div>
 
         {successMessage ? (
-          <div className="rounded-xl border border-emerald-800/80 bg-emerald-950/60 p-6 text-center space-y-4">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
-            <h2 className="text-lg font-semibold text-white">Verification Email Sent</h2>
-            <p className="text-sm text-emerald-200/90 leading-relaxed">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-4 shadow-sm">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
+            <h2 className="text-lg font-bold font-serif text-emerald-950">Verification Email Sent</h2>
+            <p className="text-sm text-emerald-800 leading-relaxed">
               {successMessage}
             </p>
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors"
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shadow-sm"
               >
                 <span>Proceed to Sign in</span>
                 <ArrowRight className="h-4 w-4" />
@@ -134,8 +134,8 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
         ) : (
           <>
             {error && (
-              <div className="rounded-lg bg-red-950/60 border border-red-800/80 p-4 flex items-start gap-3 text-red-200 text-sm">
-                <AlertCircle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
+              <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
+                <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
@@ -143,11 +143,11 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               {/* Full Name */}
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-stone-300">
+                <label htmlFor="fullName" className="block text-sm font-semibold text-secondary">
                   Full Name
                 </label>
                 <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                     <User className="h-4 w-4" />
                   </div>
                   <input
@@ -159,41 +159,41 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Ahmed Khan"
                     disabled={isPending}
-                    className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
                   />
                 </div>
                 {fieldErrors.fullName && (
-                  <p className="mt-1 text-xs text-red-400">{fieldErrors.fullName[0]}</p>
+                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.fullName[0]}</p>
                 )}
               </div>
 
               {/* Username with Realtime Availability */}
               <div>
                 <div className="flex items-center justify-between">
-                  <label htmlFor="username" className="block text-sm font-medium text-stone-300">
+                  <label htmlFor="username" className="block text-sm font-semibold text-secondary">
                     Username
                   </label>
                   {usernameChecking && (
-                    <span className="text-xs text-amber-400 flex items-center gap-1">
+                    <span className="text-xs text-accent flex items-center gap-1 font-medium">
                       <Loader2 className="h-3 w-3 animate-spin" /> Checking...
                     </span>
                   )}
                   {!usernameChecking && usernameStatus === 'available' && (
-                    <span className="text-xs text-emerald-400 flex items-center gap-1">
+                    <span className="text-xs text-emerald-600 flex items-center gap-1 font-semibold">
                       <CheckCircle2 className="h-3 w-3" /> Available
                     </span>
                   )}
                   {!usernameChecking && usernameStatus === 'taken' && (
-                    <span className="text-xs text-red-400 flex items-center gap-1">
+                    <span className="text-xs text-rose-600 flex items-center gap-1 font-semibold">
                       <AlertCircle className="h-3 w-3" /> Unavailable
                     </span>
                   )}
                   {!usernameChecking && usernameStatus === 'invalid' && (
-                    <span className="text-xs text-amber-400">Lowercase letters, numbers, _</span>
+                    <span className="text-xs text-amber-700">Lowercase letters, numbers, _</span>
                   )}
                 </div>
                 <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                     <AtSign className="h-4 w-4" />
                   </div>
                   <input
@@ -209,21 +209,21 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onBlur={handleUsernameBlur}
                     placeholder="ahmed_khan"
                     disabled={isPending}
-                    className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
                   />
                 </div>
                 {fieldErrors.username && (
-                  <p className="mt-1 text-xs text-red-400">{fieldErrors.username[0]}</p>
+                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.username[0]}</p>
                 )}
               </div>
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-stone-300">
+                <label htmlFor="email" className="block text-sm font-semibold text-secondary">
                   Email address
                 </label>
                 <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                     <Mail className="h-4 w-4" />
                   </div>
                   <input
@@ -236,21 +236,21 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     disabled={isPending}
-                    className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
                   />
                 </div>
                 {fieldErrors.email && (
-                  <p className="mt-1 text-xs text-red-400">{fieldErrors.email[0]}</p>
+                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.email[0]}</p>
                 )}
               </div>
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-stone-300">
+                <label htmlFor="password" className="block text-sm font-semibold text-secondary">
                   Password
                 </label>
                 <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                     <Lock className="h-4 w-4" />
                   </div>
                   <input
@@ -263,38 +263,38 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={isPending}
-                    className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
                   />
                 </div>
 
                 {/* Password strength visual guidelines */}
-                <div className="mt-2 grid grid-cols-2 gap-1.5 text-[11px] text-stone-400 bg-stone-950/50 p-2.5 rounded-lg border border-stone-800">
-                  <span className={rules.length ? 'text-emerald-400' : 'text-stone-500'}>
+                <div className="mt-2 grid grid-cols-2 gap-1.5 text-[11px] text-secondary bg-surface-muted p-2.5 rounded-xl border border-border">
+                  <span className={rules.length ? 'text-emerald-700 font-semibold' : 'text-muted'}>
                     ✓ At least 8 characters
                   </span>
-                  <span className={rules.upper ? 'text-emerald-400' : 'text-stone-500'}>
+                  <span className={rules.upper ? 'text-emerald-700 font-semibold' : 'text-muted'}>
                     ✓ 1 uppercase letter
                   </span>
-                  <span className={rules.lower ? 'text-emerald-400' : 'text-stone-500'}>
+                  <span className={rules.lower ? 'text-emerald-700 font-semibold' : 'text-muted'}>
                     ✓ 1 lowercase letter
                   </span>
-                  <span className={rules.number ? 'text-emerald-400' : 'text-stone-500'}>
+                  <span className={rules.number ? 'text-emerald-700 font-semibold' : 'text-muted'}>
                     ✓ 1 number
                   </span>
-                  <span className={`col-span-2 ${rules.special ? 'text-emerald-400' : 'text-stone-500'}`}>
+                  <span className={`col-span-2 ${rules.special ? 'text-emerald-700 font-semibold' : 'text-muted'}`}>
                     ✓ 1 special character (!@#$%^&*)
                   </span>
                 </div>
 
                 {fieldErrors.password && (
-                  <p className="mt-1 text-xs text-red-400">{fieldErrors.password[0]}</p>
+                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.password[0]}</p>
                 )}
               </div>
 
               <button
                 type="submit"
                 disabled={isPending || usernameStatus === 'taken'}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 disabled:opacity-50 transition-all cursor-pointer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isPending ? (
                   <>

@@ -45,12 +45,12 @@ export function LogoutButton({
       break;
     case 'icon':
       defaultStyles =
-        'p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+        'p-2 rounded-lg text-secondary hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
       break;
     case 'marketplace':
     default:
       defaultStyles =
-        'flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+        'flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
       break;
   }
 

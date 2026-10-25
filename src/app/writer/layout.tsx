@@ -7,6 +7,8 @@ import { UrduText } from '@/components/urdu/UrduText';
 import { Clock, FileText, User } from 'lucide-react';
 import { StudioShellClient } from '@/components/layout/writer/StudioShellClient';
 
+import { unwrapQuery } from '@/lib/supabase/query';
+
 export const metadata: Metadata = {
   title: 'Writer Studio | UNB Premium',
 };
@@ -80,24 +82,44 @@ export default async function WriterLayout({
     );
   }
 
-  // Fetch pending verification count and unread notification count
+  // Fetch pending verification count, active disputes count, and unread notification count
   const [
-    { count: pendingVerificationCount },
-    { data: unreadNotificationsCount },
+    pendingVerificationRes,
+    disputesRes,
+    notificationsRes,
   ] = await Promise.all([
     supabase
       .from('orders')
       .select('id', { count: 'exact', head: true })
       .eq('writer_id', user.id)
       .eq('status', 'payment_submitted'),
+    supabase
+      .from('disputes')
+      .select('id, orders!inner(writer_id)', { count: 'exact', head: true })
+      .eq('orders.writer_id' as 'order_id', user.id)
+      .in('status', ['open', 'under_review']),
     supabase.rpc('get_my_unread_notification_count'),
   ]);
+
+  const { count: pendingVerificationCount } = unwrapQuery(
+    pendingVerificationRes,
+    'WriterLayout.pendingVerification'
+  );
+  const { count: openDisputesCount } = unwrapQuery(
+    disputesRes,
+    'WriterLayout.openDisputes'
+  );
+  const { data: unreadNotificationsCount } = unwrapQuery(
+    notificationsRes,
+    'WriterLayout.unreadNotifications'
+  );
 
   return (
     <StudioShellClient
       profile={profile}
       writerProfile={writerProfile}
       pendingVerificationCount={pendingVerificationCount ?? 0}
+      openDisputesCount={openDisputesCount ?? 0}
       unreadNotificationsCount={unreadNotificationsCount ?? 0}
     >
       {children}

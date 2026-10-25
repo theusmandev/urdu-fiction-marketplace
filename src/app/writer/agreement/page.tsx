@@ -5,33 +5,33 @@ import { UrduText } from '@/components/urdu/UrduText';
 
 export default function WriterAgreementPage() {
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-8 rounded-2xl border border-stone-800 bg-stone-900/60 p-8 md:p-12 backdrop-blur-xl shadow-2xl">
-        <div className="border-b border-stone-800 pb-6">
+    <div className="min-h-screen bg-ivory text-main py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto space-y-8 rounded-2xl border border-border bg-surface p-8 md:p-12 shadow-card">
+        <div className="border-b border-border pb-6">
           <Link
             href="/become-a-writer"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-500 hover:text-amber-400 mb-4 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:text-accent-dark mb-4 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to application</span>
           </Link>
           <div className="flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-amber-500" />
+            <ShieldCheck className="h-8 w-8 text-accent" />
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold font-serif text-navy tracking-tight">
                 Writer Platform Agreement
               </h1>
-              <UrduText size="sm" className="text-amber-400 mt-1">
+              <UrduText size="sm" className="text-accent mt-1 leading-[2.2]">
                 مصنفین کے لیے ضابطہ اخلاق اور معاہدہ شراکت
               </UrduText>
             </div>
           </div>
         </div>
 
-        <div className="space-y-6 text-sm text-stone-300 leading-relaxed">
+        <div className="space-y-6 text-sm text-secondary leading-relaxed">
           <section className="space-y-2">
-            <h2 className="text-base font-semibold text-white flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <h2 className="text-base font-semibold text-navy flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               1. Direct Reader-to-Writer Payout Model
             </h2>
             <p>
@@ -40,8 +40,8 @@ export default function WriterAgreementPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-base font-semibold text-white flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <h2 className="text-base font-semibold text-navy flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               2. Platform Commission & Accrual Threshold
             </h2>
             <p>
@@ -50,8 +50,8 @@ export default function WriterAgreementPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-base font-semibold text-white flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <h2 className="text-base font-semibold text-navy flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               3. Copyright & Original Authorship
             </h2>
             <p>
@@ -60,8 +60,8 @@ export default function WriterAgreementPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-base font-semibold text-white flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <h2 className="text-base font-semibold text-navy flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               4. Verification Obligations
             </h2>
             <p>
@@ -70,10 +70,10 @@ export default function WriterAgreementPage() {
           </section>
         </div>
 
-        <div className="pt-6 border-t border-stone-800 text-center">
+        <div className="pt-6 border-t border-border text-center">
           <Link
             href="/become-a-writer"
-            className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/20"
+            className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-navy hover:bg-accent-dark transition-colors shadow-sm"
           >
             <span>I Understand & Agree</span>
           </Link>

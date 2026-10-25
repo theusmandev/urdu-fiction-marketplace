@@ -52,15 +52,15 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
       {successMessage && (
-        <div className="rounded-lg bg-emerald-950/60 border border-emerald-800/80 p-4 flex items-start gap-3 text-emerald-200 text-sm">
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400 mt-0.5" />
+        <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 text-emerald-800 text-sm">
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg bg-red-950/60 border border-red-800/80 p-4 flex items-start gap-3 text-red-200 text-sm">
-          <AlertCircle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
+        <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
+          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
@@ -82,7 +82,7 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Full Name */}
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-stone-300">
+          <label htmlFor="fullName" className="block text-sm font-semibold text-secondary">
             Full Name
           </label>
           <input
@@ -92,16 +92,16 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             disabled={isPending}
-            className="mt-1 block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 px-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
           />
           {fieldErrors.fullName && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.fullName[0]}</p>
+            <p className="mt-1 text-xs text-rose-600">{fieldErrors.fullName[0]}</p>
           )}
         </div>
 
         {/* Username */}
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-stone-300">
+          <label htmlFor="username" className="block text-sm font-semibold text-secondary">
             Username
           </label>
           <input
@@ -111,16 +111,16 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
             value={username}
             onChange={(e) => setUsername(e.target.value.toLowerCase())}
             disabled={isPending}
-            className="mt-1 block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 px-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
           />
           {fieldErrors.username && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.username[0]}</p>
+            <p className="mt-1 text-xs text-rose-600">{fieldErrors.username[0]}</p>
           )}
         </div>
 
         {/* Email (Read Only) */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-stone-400">
+          <label htmlFor="email" className="block text-sm font-semibold text-secondary">
             Email Address (Verified)
           </label>
           <input
@@ -129,24 +129,24 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
             readOnly
             disabled
             value={profile.email}
-            className="mt-1 block w-full rounded-lg border border-stone-800 bg-stone-950/40 py-2.5 px-3 text-stone-400 text-sm cursor-not-allowed"
+            className="mt-1 block w-full rounded-xl border border-border bg-slate-100 py-2.5 px-3 text-secondary text-sm cursor-not-allowed"
           />
-          <p className="mt-1 text-[11px] text-stone-500">
+          <p className="mt-1 text-[11px] text-secondary">
             Primary email address cannot be changed directly.
           </p>
         </div>
 
         {/* Role & Member Since */}
         <div>
-          <label className="block text-sm font-medium text-stone-400">
+          <label className="block text-sm font-semibold text-secondary">
             Account Status & Role
           </label>
-          <div className="mt-1 flex items-center gap-2 h-[42px] px-3 rounded-lg border border-stone-800 bg-stone-950/40 text-stone-300 text-sm">
-            <span className="uppercase font-bold text-xs tracking-wider text-amber-400">
+          <div className="mt-1 flex items-center gap-2 h-[42px] px-3 rounded-xl border border-border bg-slate-100 text-main text-sm">
+            <span className="uppercase font-bold text-xs tracking-wider text-accent">
               {profile.role}
             </span>
-            <span className="text-stone-600">•</span>
-            <span className="text-xs text-stone-400">
+            <span className="text-border">•</span>
+            <span className="text-xs text-secondary">
               Member since {new Date(profile.created_at).toLocaleDateString()}
             </span>
           </div>
@@ -157,7 +157,7 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-colors cursor-pointer"
         >
           {isPending ? (
             <>

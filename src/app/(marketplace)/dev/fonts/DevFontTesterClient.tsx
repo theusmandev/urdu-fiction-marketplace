@@ -38,14 +38,14 @@ export function DevFontTesterClient() {
   return (
     <div className="space-y-8">
       {/* Control Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-surface border border-border shadow-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-border">
           <button
             type="button"
             onClick={() => setActiveTab('matrix')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-              activeTab === 'matrix' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              activeTab === 'matrix' ? 'bg-brand-gold text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
             }`}
           >
             Line-Height Matrix
@@ -53,8 +53,8 @@ export function DevFontTesterClient() {
           <button
             type="button"
             onClick={() => setActiveTab('specimen')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-              activeTab === 'specimen' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              activeTab === 'specimen' ? 'bg-brand-gold text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
             }`}
           >
             Comprehensive Specimen
@@ -62,8 +62,8 @@ export function DevFontTesterClient() {
           <button
             type="button"
             onClick={() => setActiveTab('quran-audit')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-              activeTab === 'quran-audit' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              activeTab === 'quran-audit' ? 'bg-brand-gold text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
             }`}
           >
             Quranic Tashkeel Audit
@@ -72,24 +72,24 @@ export function DevFontTesterClient() {
 
         {/* Theme & Visual Guides */}
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-xs text-secondary cursor-pointer select-none">
             <input
               type="checkbox"
               checked={showBoundingBox}
               onChange={(e) => setShowBoundingBox(e.target.checked)}
-              className="rounded bg-slate-950 border-slate-700 text-amber-500 focus:ring-0"
+              className="rounded bg-surface border-border text-brand-gold focus:ring-0"
             />
             <span>Visual Bounding Box</span>
           </label>
 
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-border text-xs">
             {(['light', 'dark', 'sepia'] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setTheme(t)}
-                className={`px-2.5 py-1 rounded-md capitalize font-medium transition-colors ${
-                  theme === t ? 'bg-slate-800 text-amber-400 font-bold' : 'text-slate-400 hover:text-white'
+                className={`px-2.5 py-1 rounded-md capitalize font-medium transition-colors cursor-pointer ${
+                  theme === t ? 'bg-surface text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
                 }`}
               >
                 {t}
@@ -113,10 +113,10 @@ export function DevFontTesterClient() {
                   key={sz}
                   type="button"
                   onClick={() => setSelectedSize(sz)}
-                  className={`px-3 py-1 rounded-lg font-mono font-semibold transition-colors ${
+                  className={`px-3 py-1 rounded-lg font-mono font-semibold transition-colors cursor-pointer ${
                     selectedSize === sz
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-brand-gold text-navy font-bold shadow-sm'
+                      : 'bg-surface border border-border text-secondary hover:text-navy'
                   }`}
                 >
                   {sz}px
@@ -180,18 +180,18 @@ export function DevFontTesterClient() {
       {activeTab === 'specimen' && (
         <div className="space-y-8">
           {/* Selectors */}
-          <div className="flex flex-wrap items-center gap-4 bg-slate-900 p-4 rounded-2xl border border-slate-800 text-xs">
+          <div className="flex flex-wrap items-center gap-4 bg-surface p-4 rounded-2xl border border-border shadow-card text-xs">
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 font-mono">Size:</span>
+              <span className="text-secondary font-mono">Size:</span>
               {SIZES.map((sz) => (
                 <button
                   key={sz}
                   type="button"
                   onClick={() => setSelectedSize(sz)}
-                  className={`px-2.5 py-1 rounded font-mono font-semibold transition-colors ${
+                  className={`px-2.5 py-1 rounded font-mono font-semibold transition-colors cursor-pointer ${
                     selectedSize === sz
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-brand-gold text-navy font-bold shadow-sm'
+                      : 'bg-slate-100 border border-border text-secondary hover:text-navy'
                   }`}
                 >
                   {sz}px
@@ -200,16 +200,16 @@ export function DevFontTesterClient() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 font-mono">Line-Height:</span>
+              <span className="text-secondary font-mono">Line-Height:</span>
               {LINE_HEIGHTS.map((lh) => (
                 <button
                   key={lh}
                   type="button"
                   onClick={() => setSelectedLineHeight(lh)}
-                  className={`px-2.5 py-1 rounded font-mono font-semibold transition-colors ${
+                  className={`px-2.5 py-1 rounded font-mono font-semibold transition-colors cursor-pointer ${
                     selectedLineHeight === lh
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-brand-gold text-navy font-bold shadow-sm'
+                      : 'bg-slate-100 border border-border text-secondary hover:text-navy'
                   }`}
                 >
                   {lh.toFixed(1)}
@@ -305,11 +305,11 @@ export function DevFontTesterClient() {
       {/* ---------------------------------------------------------------------- */}
       {activeTab === 'quran-audit' && (
         <div className="space-y-6">
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 space-y-1">
-            <div className="font-semibold text-amber-400">Quranic &amp; Arabic Tashkeel Rendering Verification</div>
-            <p>
+          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+            <div className="font-semibold text-amber-950">Quranic &amp; Arabic Tashkeel Rendering Verification</div>
+            <p className="text-amber-800">
               In traditional Nastaliq typography, dense Arabic diacritics (harakat / tashkeel like fatha, kasra, shaddah, sukun) can sometimes collide with diagonally stacked ligatures.
-              Below is a direct side-by-side comparison of Quranic verses rendered in <span className="font-semibold text-amber-300">Gulzar (Nastaliq)</span> versus our dedicated opt-in <span className="font-semibold text-emerald-300">&lt;ArabicText&gt; component (Amiri Naskh)</span>.
+              Below is a direct side-by-side comparison of Quranic verses rendered in <span className="font-semibold text-amber-950">Gulzar (Nastaliq)</span> versus our dedicated opt-in <span className="font-semibold text-emerald-800">&lt;ArabicText&gt; component (Amiri Naskh)</span>.
             </p>
           </div>
 

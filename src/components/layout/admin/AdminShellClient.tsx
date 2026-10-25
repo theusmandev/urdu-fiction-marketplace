@@ -426,7 +426,7 @@ export function AdminShellClient({
             </div>
           </div>
           <div
-            className="flex-1 bg-stone-950/70 backdrop-blur-sm"
+            className="flex-1 bg-black/50 backdrop-blur-sm"
             onClick={() => setMobileDrawerOpen(false)}
             aria-hidden="true"
           />

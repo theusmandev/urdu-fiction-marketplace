@@ -228,7 +228,7 @@ export function AuditLogViewer({
 
       {/* Detail Slide-Over Drawer for JSON inspection */}
       {selectedEntry && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-stone-950/60 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm animate-in fade-in">
           <div className="w-full max-w-2xl bg-surface border-l border-border h-full overflow-y-auto p-6 shadow-2xl space-y-6 flex flex-col justify-between">
             <div className="space-y-6">
               {/* Drawer Header */}

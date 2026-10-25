@@ -127,18 +127,18 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <Bell className="w-6 h-6 text-amber-500" />
+          <h1 className="text-2xl font-bold font-serif text-navy flex items-center gap-2.5">
+            <Bell className="w-6 h-6 text-accent" />
             <span>Notifications</span>
             {unreadCount > 0 && (
-              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-stone-950">
+              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-accent text-navy">
                 {unreadCount} new
               </span>
             )}
           </h1>
-          <p className="text-xs text-stone-400 mt-1">
+          <p className="text-xs text-secondary mt-1">
             Real-time updates on your novel orders, payments, and library activity.
           </p>
         </div>
@@ -148,12 +148,12 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
             type="button"
             onClick={handleMarkAllRead}
             disabled={isPending}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-stone-300 hover:text-white bg-stone-900 hover:bg-stone-800 border border-stone-800 transition-colors disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-secondary hover:text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <CheckCheck className="w-3.5 h-3.5 text-amber-400" />
+              <CheckCheck className="w-3.5 h-3.5 text-accent" />
             )}
             <span>Mark all as read</span>
           </button>
@@ -162,12 +162,12 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
 
       {/* List */}
       {notifications.length === 0 ? (
-        <div className="rounded-2xl bg-stone-900 border border-stone-800 p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-xl bg-stone-800 text-stone-500 flex items-center justify-center mx-auto">
+        <div className="rounded-2xl bg-surface border border-border p-12 text-center space-y-3 shadow-card">
+          <div className="w-12 h-12 rounded-xl bg-surface-muted text-secondary flex items-center justify-center mx-auto border border-border">
             <Inbox className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-bold text-white">No Notifications Yet</h3>
-          <p className="text-xs text-stone-400 max-w-sm mx-auto">
+          <h3 className="text-sm font-bold font-serif text-navy">No Notifications Yet</h3>
+          <p className="text-xs text-secondary max-w-sm mx-auto">
             When you place an order, make a payment, or when an author confirms access, alerts will appear here.
           </p>
         </div>
@@ -176,29 +176,29 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
           {notifications.map((item) => (
             <div
               key={item.id}
-              className={`rounded-2xl border p-4 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-3 ${
+              className={`rounded-2xl border p-4 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-3 shadow-card ${
                 item.is_read
-                  ? 'bg-stone-900/40 border-stone-800/60 opacity-80'
-                  : 'bg-stone-900 border-stone-700/80 shadow-md ring-1 ring-amber-500/10'
+                  ? 'bg-surface border-border opacity-90'
+                  : 'bg-amber-50/40 border-amber-200 border-l-4 border-l-accent'
               }`}
             >
               <div className="flex items-start gap-3 min-w-0 flex-1">
-                <div className="p-2 rounded-xl bg-stone-800 border border-stone-700/60 shrink-0 mt-0.5">
+                <div className="p-2 rounded-xl bg-surface-muted border border-border shrink-0 mt-0.5">
                   {getNotificationIcon(item.type)}
                 </div>
 
                 <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-bold text-white truncate">{item.title}</h4>
+                    <h4 className="text-xs font-bold text-navy truncate">{item.title}</h4>
                     {!item.is_read && (
-                      <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" title="Unread" />
+                      <span className="w-2 h-2 rounded-full bg-accent shrink-0" title="Unread" />
                     )}
                   </div>
-                  <p className="text-xs text-stone-300 leading-relaxed">{item.message}</p>
+                  <p className="text-xs text-main leading-relaxed">{item.message}</p>
                   {item.body && item.body !== item.message && (
-                    <p className="text-[11px] text-stone-400 leading-relaxed pt-0.5">{item.body}</p>
+                    <p className="text-[11px] text-secondary leading-relaxed pt-0.5">{item.body}</p>
                   )}
-                  <div className="flex items-center gap-3 pt-1 text-[10px] text-stone-500">
+                  <div className="flex items-center gap-3 pt-1 text-[10px] text-secondary">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {new Date(item.created_at).toLocaleString()}
@@ -211,7 +211,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
                           onClick={() => {
                             if (!item.is_read) handleMarkOneRead(item.id);
                           }}
-                          className="text-amber-400 hover:text-amber-300 font-semibold inline-flex items-center gap-1 underline"
+                          className="text-accent hover:text-accent-dark font-semibold inline-flex items-center gap-1 underline"
                         >
                           <span>View Details</span>
                           <ExternalLink className="w-2.5 h-2.5" />
@@ -229,9 +229,9 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
                     onClick={() => handleMarkOneRead(item.id)}
                     disabled={isPending}
                     title="Mark as read"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-stone-400 hover:text-amber-400 bg-stone-800/80 hover:bg-stone-800 px-2.5 py-1 rounded-lg border border-stone-700/60 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-secondary hover:text-navy bg-white hover:bg-surface-muted px-2.5 py-1 rounded-lg border border-border shadow-sm transition-colors cursor-pointer"
                   >
-                    <Check className="w-3 h-3" />
+                    <Check className="w-3 h-3 text-accent" />
                     <span>Mark read</span>
                   </button>
                 </div>

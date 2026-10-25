@@ -87,9 +87,9 @@ export function BuyNovelButton({
         <button
           type="button"
           disabled
-          className="w-full flex items-center justify-center gap-2 bg-stone-900 text-stone-400 font-semibold py-3.5 px-6 rounded-xl text-sm border border-stone-800 animate-pulse"
+          className="w-full flex items-center justify-center gap-2 bg-surface-muted text-secondary font-semibold py-3.5 px-6 rounded-xl text-sm border border-border animate-pulse"
         >
-          <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+          <Loader2 className="w-4 h-4 animate-spin text-brand-gold" />
           <span>Checking availability...</span>
         </button>
       </div>
@@ -120,7 +120,7 @@ export function BuyNovelButton({
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/read/${novelSlug}/1`}
-          className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-md cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-md cursor-pointer"
         >
           <BookOpen className="w-4 h-4" />
           <span>Read Novel (Author View)</span>
@@ -164,7 +164,7 @@ export function BuyNovelButton({
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/orders/${status.openOrderNumber}`}
-          className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
         >
           <Clock className="w-4 h-4" />
           <span>View Your Order ({status.openOrderNumber})</span>

@@ -16,18 +16,18 @@ export default function DevFontsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 font-sans">
+    <div className="min-h-screen bg-ivory text-main p-6 md:p-12 font-sans">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="border-b border-slate-800 pb-6 space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono">
+        <div className="border-b border-border pb-6 space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-mono font-medium">
             <span>DEVELOPMENT ENVIRONMENT ONLY</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl font-bold font-serif tracking-tight text-navy">
             Gulzar Typography & Line-Height Tuning Lab
           </h1>
-          <p className="text-sm text-slate-400 max-w-3xl">
-            Empirical typography verification laboratory for the Google Font <code className="text-amber-300 font-mono">Gulzar</code> (weight 400).
+          <p className="text-sm text-secondary max-w-3xl">
+            Empirical typography verification laboratory for the Google Font <code className="text-brand-gold font-mono font-bold">Gulzar</code> (weight 400).
             Use this workbench to inspect ligature shaping, baseline alignment, vertical descender/ascender clipping, Urdu punctuation, bilingual embedding, and compare Quranic harakat in Gulzar vs. Amiri Naskh.
           </p>
         </div>

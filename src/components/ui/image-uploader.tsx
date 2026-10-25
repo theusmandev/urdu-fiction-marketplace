@@ -101,12 +101,12 @@ export function ImageUploader({
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-stone-300 mb-1.5">
+        <label className="block text-sm font-medium text-navy mb-1.5">
           {label}
         </label>
       )}
 
-      <div className="relative group rounded-xl border-2 border-dashed border-stone-700 bg-stone-900/60 p-4 transition-all hover:border-amber-600/50 hover:bg-stone-900/90">
+      <div className="relative group rounded-xl border-2 border-dashed border-border bg-surface-muted/60 p-4 transition-all hover:border-brand-gold/60 hover:bg-surface">
         <input
           ref={fileInputRef}
           type="file"
@@ -119,7 +119,7 @@ export function ImageUploader({
 
         {previewUrl ? (
           <div className="relative flex flex-col items-center justify-center">
-            <div className="relative overflow-hidden rounded-lg border border-stone-700 shadow-md">
+            <div className="relative overflow-hidden rounded-lg border border-border shadow-md">
               {previewUrl.startsWith('http') || previewUrl.startsWith('blob:') ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -134,8 +134,8 @@ export function ImageUploader({
                   }`}
                 />
               ) : (
-                <div className="flex h-24 w-48 items-center justify-center gap-2 bg-stone-800 text-stone-300 text-xs p-2 text-center">
-                  <ImageIcon className="h-4 w-4 text-amber-500" />
+                <div className="flex h-24 w-48 items-center justify-center gap-2 bg-slate-100 text-slate-700 text-xs p-2 text-center">
+                  <ImageIcon className="h-4 w-4 text-brand-gold" />
                   <span>Private proof uploaded</span>
                 </div>
               )}
@@ -147,7 +147,7 @@ export function ImageUploader({
                     e.stopPropagation();
                     handleRemove();
                   }}
-                  className="absolute top-1 right-1 z-20 rounded-full bg-red-600/90 p-1 text-white shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-red-500"
+                  className="absolute top-1 right-1 z-20 rounded-full bg-red-600/90 p-1 text-white shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-red-500 cursor-pointer"
                   title="Remove image"
                 >
                   <X className="h-4 w-4" />
@@ -155,8 +155,8 @@ export function ImageUploader({
               )}
             </div>
 
-            <p className="mt-2 text-xs text-emerald-400 flex items-center gap-1 font-medium">
-              <CheckCircle2 className="h-3.5 w-3.5" />
+            <p className="mt-2 text-xs text-emerald-700 flex items-center gap-1 font-medium">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
               Image compressed and ready
             </p>
           </div>
@@ -164,26 +164,26 @@ export function ImageUploader({
           <div className="flex flex-col items-center justify-center py-4 text-center">
             {isUploading ? (
               <div className="flex flex-col items-center">
-                <Loader2 className="h-8 w-8 animate-spin text-amber-500 mb-2" />
-                <p className="text-sm font-medium text-stone-200">
+                <Loader2 className="h-8 w-8 animate-spin text-brand-gold mb-2" />
+                <p className="text-sm font-medium text-navy">
                   Compressing & uploading ({progress}%)...
                 </p>
-                <div className="mt-2 h-1.5 w-36 overflow-hidden rounded-full bg-stone-800">
+                <div className="mt-2 h-1.5 w-36 overflow-hidden rounded-full bg-slate-200">
                   <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-300"
+                    className="h-full bg-brand-gold transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
             ) : (
               <>
-                <div className="mb-2 rounded-full bg-stone-800/80 p-3 text-stone-400 group-hover:text-amber-500 group-hover:bg-amber-500/10 transition-colors">
+                <div className="mb-2 rounded-full bg-slate-100 p-3 text-slate-500 group-hover:text-brand-gold group-hover:bg-amber-50 transition-colors">
                   <UploadCloud className="h-6 w-6" />
                 </div>
-                <p className="text-sm font-medium text-stone-300">
+                <p className="text-sm font-medium text-navy">
                   Click or drag image to upload
                 </p>
-                <p className="mt-1 text-xs text-stone-500">
+                <p className="mt-1 text-xs text-secondary">
                   WebP, JPG, or PNG (auto-compressed to WebP)
                 </p>
               </>
@@ -193,14 +193,14 @@ export function ImageUploader({
       </div>
 
       {error && (
-        <p className="mt-1.5 flex items-center gap-1 text-xs text-red-400">
+        <p className="mt-1.5 flex items-center gap-1 text-xs text-rose-600">
           <AlertCircle className="h-3.5 w-3.5 shrink-0" />
           <span>{error}</span>
         </p>
       )}
 
       {helperText && !error && (
-        <p className="mt-1.5 text-xs text-stone-400">{helperText}</p>
+        <p className="mt-1.5 text-xs text-secondary">{helperText}</p>
       )}
     </div>
   );

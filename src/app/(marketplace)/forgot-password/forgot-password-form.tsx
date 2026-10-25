@@ -31,36 +31,36 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-stone-950">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-stone-800 bg-stone-900/80 p-8 shadow-2xl backdrop-blur-xl">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-ivory text-main">
+      <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-surface p-8 shadow-card">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <span className="font-urdu text-4xl tracking-tight text-amber-500">
+            <span className="font-urdu text-4xl tracking-tight text-accent">
               یو این بی پریمیم
             </span>
-            <span className="block text-xs uppercase tracking-widest text-stone-400 font-sans mt-0.5">
+            <span className="block text-xs uppercase tracking-widest text-secondary font-sans mt-0.5 font-bold">
               UNB Premium
             </span>
           </Link>
-          <h1 className="mt-6 text-2xl font-bold tracking-tight text-white">
+          <h1 className="mt-6 text-2xl font-bold font-serif tracking-tight text-navy">
             Reset your password
           </h1>
-          <p className="mt-2 text-sm text-stone-400">
+          <p className="mt-2 text-sm text-secondary">
             Enter your registered email address and we will send you instructions to reset your password.
           </p>
         </div>
 
         {submitted ? (
-          <div className="rounded-xl border border-emerald-800/80 bg-emerald-950/60 p-6 text-center space-y-4">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
-            <h2 className="text-lg font-semibold text-white">Check Your Inbox</h2>
-            <p className="text-sm text-emerald-200/90 leading-relaxed">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-4 shadow-sm">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
+            <h2 className="text-lg font-bold font-serif text-emerald-950">Check Your Inbox</h2>
+            <p className="text-sm text-emerald-800 leading-relaxed">
               {message}
             </p>
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 text-sm font-medium text-amber-500 hover:text-amber-400 transition-colors"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dark transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Return to sign in</span>
@@ -70,19 +70,19 @@ export function ForgotPasswordForm() {
         ) : (
           <>
             {error && (
-              <div className="rounded-lg bg-red-950/60 border border-red-800/80 p-4 flex items-start gap-3 text-red-200 text-sm">
-                <AlertCircle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
+              <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
+                <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-stone-300">
+                <label htmlFor="email" className="block text-sm font-semibold text-secondary">
                   Email address
                 </label>
                 <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-stone-500">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                     <Mail className="h-4 w-4" />
                   </div>
                   <input
@@ -95,7 +95,7 @@ export function ForgotPasswordForm() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     disabled={isPending}
-                    className="block w-full rounded-lg border border-stone-700 bg-stone-950/80 py-2.5 pl-10 pr-3 text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm disabled:opacity-50"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
                   />
                 </div>
               </div>
@@ -103,7 +103,7 @@ export function ForgotPasswordForm() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 disabled:opacity-50 transition-all cursor-pointer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isPending ? (
                   <>
@@ -121,7 +121,7 @@ export function ForgotPasswordForm() {
               <div className="text-center pt-2">
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-400 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-navy transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back to login</span>
