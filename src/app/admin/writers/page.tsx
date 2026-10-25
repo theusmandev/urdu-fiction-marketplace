@@ -4,8 +4,9 @@ import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { Feather, ChevronRight, Search } from 'lucide-react';
+import { Feather, ChevronRight, Search, ShieldAlert } from 'lucide-react';
 import type { WriterStatus } from '@/types/database';
+import { unwrapQuery } from '@/lib/supabase/query';
 
 interface PageProps {
   searchParams: Promise<{
@@ -35,7 +36,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
       is_orders_paused_for_commission,
       agreement_accepted_at,
       created_at,
-      profiles:id (
+      profiles!id (
         email,
         full_name,
         username,
@@ -48,7 +49,8 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
     queryBuilder = queryBuilder.eq('status', currentStatus as WriterStatus);
   }
 
-  const { data: writers } = await queryBuilder;
+  const { data: rawWriters, error } = await queryBuilder;
+  const { data: writers, error: queryError } = unwrapQuery({ data: rawWriters, error }, 'AdminWritersPage');
 
   // Filter in memory for search query across email or pen names
   const filteredWriters = (writers || []).filter((w) => {
@@ -123,7 +125,23 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
       </div>
 
       {/* Results List */}
-      {filteredWriters.length === 0 ? (
+      {queryError ? (
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span>Database Error Loading Writers Catalog</span>
+          </div>
+          <p className="text-xs text-rose-200/90 leading-relaxed">
+            Unable to retrieve author records from the database:
+          </p>
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+            {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
+          </div>
+          {queryError.hint && (
+            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+          )}
+        </div>
+      ) : filteredWriters.length === 0 ? (
         <div className="py-16 text-center bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
           <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
             <Feather className="w-6 h-6" />

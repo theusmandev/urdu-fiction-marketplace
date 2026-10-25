@@ -17,7 +17,9 @@ import {
   Shield,
   AlertTriangle,
   ExternalLink,
+  ShieldAlert,
 } from 'lucide-react';
+import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
 
 interface PageProps {
   params: Promise<{
@@ -32,7 +34,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
   const supabase = await createServerClient();
 
   // 1. Fetch writer profile with user profile
-  const { data: writer, error: writerError } = await supabase
+  const writerRes = await supabase
     .from('writer_profiles')
     .select(`
       id,
@@ -48,7 +50,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
       agreement_accepted_at,
       created_at,
       updated_at,
-      profiles:id (
+      profiles!id (
         id,
         email,
         full_name,
@@ -59,27 +61,64 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
       )
     `)
     .eq('id', writerId)
-    .single();
+    .maybeSingle();
 
-  if (writerError || !writer) {
+  const { data: writer, error: writerError, isNotFound } = unwrapSingleQuery(
+    writerRes,
+    'AdminWriterDetailPage'
+  );
+
+  if (writerError) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto py-8">
+        <Link
+          href="/admin/writers"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Authors Directory</span>
+        </Link>
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span>Database Error Loading Author Profile</span>
+          </div>
+          <p className="text-xs text-rose-200/90 leading-relaxed">
+            A database error occurred while retrieving this writer profile:
+          </p>
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+            {writerError.message} {writerError.code ? `(Code: ${writerError.code})` : ''}
+          </div>
+          {writerError.hint && (
+            <p className="text-[11px] text-slate-400 italic">Hint: {writerError.hint}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (isNotFound || !writer) {
     notFound();
   }
 
   const profile = Array.isArray(writer.profiles) ? writer.profiles[0] : writer.profiles;
 
-  // 2. Fetch writer payment methods (without full account number exposure)
-  const { data: paymentMethods } = await supabase
-    .from('writer_payment_methods')
-    .select('id, method_type, account_title, account_number_or_iban, bank_name, instructions_note, is_active, created_at')
-    .eq('writer_id', writerId)
-    .order('created_at', { ascending: false });
+  // 2. Fetch writer payment methods & novels
+  const [pmRes, novelsRes] = await Promise.all([
+    supabase
+      .from('writer_payment_methods')
+      .select('id, method_type, account_title, account_number_or_iban, bank_name, instructions_note, is_active, created_at')
+      .eq('writer_id', writerId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('novels')
+      .select('id, slug, title_urdu, title_english, price_pkr, status, is_featured, total_chapters, created_at, published_at')
+      .eq('writer_id', writerId)
+      .order('created_at', { ascending: false }),
+  ]);
 
-  // 3. Fetch writer novels
-  const { data: novels } = await supabase
-    .from('novels')
-    .select('id, slug, title_urdu, title_english, price_pkr, status, is_featured, total_chapters, created_at, published_at')
-    .eq('writer_id', writerId)
-    .order('created_at', { ascending: false });
+  const { data: paymentMethods } = unwrapQuery(pmRes, 'AdminWriterDetailPage.paymentMethods');
+  const { data: novels } = unwrapQuery(novelsRes, 'AdminWriterDetailPage.novels');
 
   // Helper to mask account number / IBAN
   const maskAccountNumber = (num: string) => {
