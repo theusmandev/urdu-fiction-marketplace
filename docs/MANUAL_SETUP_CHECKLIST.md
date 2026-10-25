@@ -397,6 +397,42 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0026_revoke_trigger_privileges_and_default_acls.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Execute `supabase/tests/00_post_migration_verification.sql` (Check 8 / Check 59 passes), `supabase/tests/12_runtime_smoke.sql` (17/17 PASS), and `supabase/tests/13_client_attack_matrix.sql`.
 
+### 27. `supabase/migrations/0027_admin_novel_moderation_rls.sql` [ADMIN NOVEL MODERATION RLS HARDENING]
+- **Purpose**: Fixes admin moderation access boundaries and re-asserts base table SELECT privileges:
+  - **Standalone Admin SELECT Policies**: Explicitly adds dedicated `FOR SELECT` RLS policies using `public.is_admin()` on `public.novels` (`"Admins view all novels"`), `public.chapters` (`"Admins view all chapters"`), `public.writer_profiles` (`"Admins view all writer profiles"`), and `public.novel_genres` (`"Admins view all novel genres"`).
+  - **Table Privilege Re-assertion**: Re-asserts explicit `GRANT SELECT` on all 6 moderation catalog tables (`novels`, `chapters`, `novel_genres`, `genres`, `writer_profiles`, `profiles`) to role `authenticated`.
+  - **Preserves Isolation**: Confirms `anon` base table access remains strictly revoked; preserves reader/writer policies (readers can only read published novels/free previews/entitled chapters; non-owner authors cannot read other writers' drafts).
+- **Action**: Paste contents of `supabase/migrations/0027_admin_novel_moderation_rls.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Execute automated test suite: `supabase/tests/14_admin_read_access.sql`.
+
+### 28. `supabase/migrations/0028_admin_get_invoice_rpc.sql` [ADMIN GET INVOICE RPC]
+- **Purpose**: Implements administrative invoice inspection RPC `public.admin_get_invoice(p_invoice_id uuid)`:
+  - **Security Definer**: Enforces admin check via `public.is_admin()`, strictly rejecting non-administrators with `'Access denied: Administrator privileges required'`.
+  - **Comprehensive Payload**: Returns structured `jsonb` containing `{ invoice, lines, payments, reports }` aggregating line items from `commission_invoice_lines` joined with `orders`, settlement payments from `commission_payments`, and writer payment claims from `commission_payment_reports`.
+  - **search_path & Permissions**: Uses `SET search_path = ''` with 100% schema qualifications. Revokes execution from `PUBLIC` and `anon`; grants to `authenticated`.
+- **Action**: Paste contents of `supabase/migrations/0028_admin_get_invoice_rpc.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname = 'admin_get_invoice';
+  ```
+  Confirm function exists with `prosecdef = true`.
+
+### 29. `supabase/migrations/0029_sensitive_column_exposure_hardening.sql` [SENSITIVE COLUMN EXPOSURE HARDENING & SAFE DISPLAY RPCs]
+- **Purpose**: Closes horizontal and vertical privacy exposure on `profiles` and `writer_profiles`, and provides safe display RPCs:
+  - **Profiles RLS Lockdown**: Drops wide-open policy `"Public view basic profiles"` (`USING true`). Replaces with `"profiles_select_owner_or_admin"` (`USING (id = auth.uid() OR public.is_admin())`). Unrelated users directly querying other profiles return 0 rows.
+  - **Writer Profiles RLS Lockdown**: Drops `"Public view approved writer profiles"`. Replaces with `"writer_profiles_select_owner_or_admin"` (`USING (id = auth.uid() OR public.is_admin())`). Unrelated users directly querying other authors return 0 rows, completely protecting commission rates, limits, and balances.
+  - **Safe Display RPCs**:
+    - `public.get_reader_display_names(p_reader_ids uuid[])`: `SECURITY DEFINER` RPC returning strictly `(id, full_name, username)`. Accessible to admins, self, or authors with orders from those readers. Never exposes email or role.
+    - `public.get_writer_display_names(p_writer_ids uuid[])`: `SECURITY DEFINER` RPC returning strictly `(id, pen_name_urdu, pen_name_english, username)`. Never exposes financial rates, limits, or balances.
+- **Action**: Paste contents of `supabase/migrations/0029_sensitive_column_exposure_hardening.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('get_reader_display_names', 'get_writer_display_names');
+    ```
+    Confirm both functions exist with `prosecdef = true`.
+  - Execute automated test suite: `supabase/tests/17_sensitive_column_exposure.sql` (18/18 PASS).
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -503,6 +539,8 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/10_commission_tests.sql`
    - `supabase/tests/11_disputes_refunds_tests.sql` (Validates disputes, refund adjustments, support tickets, and outbox rules)
    - `supabase/tests/12_runtime_smoke.sql` (Comprehensive 15-step end-to-end transactional runtime smoke test)
+   - `supabase/tests/13_client_attack_matrix.sql` (Exhaustive 46-vector client privilege escalation attack matrix)
+   - `supabase/tests/14_admin_read_access.sql` (Admin moderation read access and reader/writer/anon isolation matrix)
 3. Run automated Node.js unit tests:
    ```bash
    npm test

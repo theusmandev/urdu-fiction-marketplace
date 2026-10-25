@@ -317,7 +317,7 @@ const totalViolations = constructViolations.length + formatViolations.length + f
 if (totalViolations === 0) {
   console.log(`✅  check:sql PASSED — No forbidden pg_catalog.<construct>, invalid format() specifiers, trigger privilege leaks, or test fixture NOT NULL omissions found.`);
   console.log(`   Scanned : ${files.length} SQL file(s) (all migrations & test suites)`);
-  for (const [file, exp] of Object.entries(HISTORICAL_EXCEPTIONS)) {
+  for (const file of Object.keys(HISTORICAL_EXCEPTIONS)) {
     console.log(`   Documented historical exception: ${file} (${historicalAllowedCounts[file] || 0} occurrences — fixed in 0023)`);
   }
   for (const [file, reason] of Object.entries(HISTORICAL_TRIGGER_REVOKE_EXCEPTIONS)) {

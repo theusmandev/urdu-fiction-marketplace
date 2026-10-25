@@ -525,3 +525,115 @@ Every DO block across `13_client_attack_matrix.sql`, `12_runtime_smoke.sql`, and
 - `SELECT ... INTO` target/type mismatches: **0**.
 - Unclosed `EXCEPTION` blocks: **0**.
 - All three SQL scripts compile cleanly under strict PostgreSQL PL/pgSQL validation.
+
+---
+
+## 9. Mechanical RPC Signature & JSON Keys Audit (Test Suite 15)
+
+### 9.1 Mechanical Tooling & Methodology
+To eliminate any reliance on human memory, `scripts/gen-rpc-signature-check.mjs` was created. It traverses all TypeScript source files under `src/` using the TypeScript Compiler AST parser, locates every `.rpc('function_name', { ...args })` call site, extracts all argument key names (including multi-line object literals and shorthand properties), and automatically generates `supabase/tests/15_rpc_signature_check.sql`.
+
+The generated SQL script creates a temporary table `expected_rpc_calls` containing all 94 frontend call sites and cross-examines them against PostgreSQL's live system catalogs (`pg_proc` and `pg_get_function_arguments`) in schema `public`:
+- **PASS**: The function exists, every parameter passed by the frontend exists in at least one overload, and all non-default mandatory parameters are provided.
+- **FAIL**: Missing function, unexpected parameter name, or missing required parameter.
+
+All 94 call sites were audited against the 110 functions declared across migrations `0001` through `0029`.
+
+### 9.2 Key Target Procedures Audited
+
+| Function Name | Migration Source | Parameter Count | Mandatory Arguments | Defaulted Arguments | Call Sites in `src/` | Status |
+|---|---|---|---|---|---|---|
+| `approve_novel` | `0012`, `0027` | 2 | `p_novel_id uuid` | `p_notes jsonb` | `src/app/admin/novels/[id]/page.tsx` | **PASS** |
+| `reject_novel` | `0012` | 2 | `p_novel_id uuid`, `p_rejection_reason text` | None | `src/app/admin/novels/[id]/page.tsx` | **PASS** |
+| `suspend_novel` | `0012` | 2 | `p_novel_id uuid`, `p_suspension_reason text` | None | `src/app/admin/novels/[id]/page.tsx` | **PASS** |
+| `unsuspend_novel` | `0012` | 2 | `p_novel_id uuid` | `p_notes text` | `src/app/admin/novels/[id]/page.tsx` | **PASS** |
+| `verify_order_payment` | `0009`, `0024` | 3 | `p_order_id uuid`, `p_submission_id uuid` | `p_writer_note text` | `src/app/actions/orders.ts`, `src/app/actions/writer-orders.ts` | **PASS** |
+| `reject_order_payment` | `0009` | 3 | `p_order_id uuid`, `p_submission_id uuid`, `p_rejection_reason text` | None | `src/app/actions/orders.ts`, `src/app/actions/writer-orders.ts` | **PASS** |
+| `update_platform_settings` | `0020` | 14 | None (all have defaults) | 14 parameters | `src/app/admin/settings/page.tsx` | **PASS** |
+| `upsert_reading_progress` | `0003`, `0006` | 4 | `p_novel_id uuid`, `p_chapter_id uuid`, `p_chapter_number int` | `p_scroll_percentage numeric` | `src/app/actions/reader.ts` | **PASS** |
+| `admin_update_user_role_status`| `0012` | 3 | `p_target_user_id uuid`, `p_new_role user_role`, `p_is_active boolean` | None | `src/app/admin/users/page.tsx` | **PASS** |
+| `apply_overdue_rules` | `0017` | 1 | None | `p_reference_time timestamptz` | `src/app/admin/commission/page.tsx` | **PASS** |
+| `record_commission_adjustment`| `0017` | 4 | `p_writer_id uuid`, `p_amount_pkr numeric`, `p_reason text` | `p_invoice_id uuid` | `src/app/admin/commission/writers/[id]/page.tsx` | **PASS** |
+| `report_commission_payment` | `0017` | 6 | `p_invoice_id uuid`, `p_amount_pkr numeric`, `p_transaction_reference text`, `p_screenshot_path text` | `p_normalized_tid text`, `p_writer_note text` | `src/app/writer/commission/[invoiceId]/page.tsx` | **PASS** |
+| `submit_payment` | `0002`, `0006` | 6 | `p_order_id uuid`, `p_transaction_reference_tid text`, `p_screenshot_url text`, `p_screenshot_path text` | `p_paid_amount_claimed_pkr numeric`, `p_reader_note text` | `src/app/actions/checkout.ts` | **PASS** |
+| `apply_as_writer` | `0009` | 2 | `p_pen_name_urdu text`, `p_pen_name_english text` | None | `src/app/actions/profile.ts`, `src/app/actions/writer.ts` | **PASS** |
+| `set_writer_commission_terms`| `0017` | 3 | `p_writer_id uuid`, `p_custom_commission_rate numeric`, `p_unpaid_commission_limit numeric` | None | `src/app/admin/commission/writers/[id]/page.tsx` | **PASS** |
+
+### 9.3 RPC JSON Return Keys Reconciliation
+The JSON structure built by PostgreSQL `jsonb_build_object` was mechanically cross-referenced with the property keys accessed in TypeScript:
+
+| Function Name | Keys Built by PostgreSQL (`jsonb_build_object`) | Keys Read by Frontend | Alignment Status | Notes / Fix |
+|---|---|---|---|---|
+| `create_order` | `success, order_id, order_number, amount_pkr, currency, status, payment_instructions` | `order_number` | **ALIGNED** | Matches `order_number` string |
+| `submit_payment` | `success, submission_id, order_id, status` | `submission_id` | **ALIGNED** | Matches `submission_id` UUID |
+| `verify_order_payment` | `success, order_id, entitlement_id, ledger_id, current_unpaid_commission, is_orders_paused_for_commission` | `order_id` | **ALIGNED** | Matches `order_id` UUID |
+| `reject_order_payment` | `success, order_id, status` | `order_id` | **ALIGNED** | Matches `order_id` UUID |
+| `cancel_order` | `success, order_id, status` | `status` | **ALIGNED** | Matches `status` |
+| `apply_as_writer` | `success, writer_id, status` | `status, success` | **ALIGNED** | Matches `status` |
+| `upsert_writer_payment_method` | `success, payment_method_id` | `success, payment_method_id` | **ALIGNED** | Matches `payment_method_id` |
+| `create_novel` | `success, novel_id, slug` | `success, novel_id, slug` | **ALIGNED** | Matches `novel_id, slug` |
+| `update_novel` | `success, novel_id` | `success, novel_id` | **ALIGNED** | Matches `novel_id` |
+| `submit_novel_for_review` | `success, novel_id, status` | `novel_id, status` | **ALIGNED** | Matches `status` |
+| `request_refund` | `success, request_id, order_id, status` | `request_id` | **ALIGNED** | Matches `request_id` |
+| `create_support_request` | `success, request_id, status` | `request_id` | **ALIGNED** | Matches `request_id` |
+| `add_support_message` | `success, message_id, created_at` | `message_id` | **ALIGNED** | Matches `message_id` |
+| `close_support_request` | `success, status` | `request_id` | **FIXED** | RPC returns `status`; frontend action adjusted to return input parameter `requestId`. |
+| `admin_get_invoice` | `id, invoice, line_items, payments, reports, adjustments` | `invoice` | **ALIGNED** | Added in `0028` with full invoice object graph |
+| `admin_list_invoices` | `invoices, total_count, page, per_page` | `invoices, total_count` | **ALIGNED** | Matches pagination wrapper |
+| `get_my_ledger` | `entries, total_count, page, per_page` | `entries, total_count` | **ALIGNED** | Matches ledger export array |
+
+---
+
+## 10. Mechanical Frontend Column & Relationship Check (Test Suite 16)
+
+### 10.1 PostgREST Select AST Parser
+Script `scripts/gen-select-column-check.mjs` was written to extract every table and column referenced across `.from('table').select('...')`, `.eq()`, `.neq()`, `.in()`, `.order()`, and `.or()` calls.
+- Total Unique Table-Column Pairs Extracted: **166**
+- Total Embedded Relationships Extracted: **10**
+- Output Generated: `supabase/tests/16_frontend_columns_check.sql` verifying:
+  1. Every column exists in `information_schema.columns` under schema `public`.
+  2. Every PostgREST embedded table relationship possesses a verified foreign key constraint in `pg_constraint` linking the host table and embedded table.
+
+### 10.2 Non-Existent Column Suspects Audit
+- **`profiles.phone_number`**: Verified across all 192 source files under `src/`. Neither `src/app/admin/writers/page.tsx` nor `src/app/admin/writers/[id]/page.tsx` selects `phone_number`. The canonical schema stores user phone numbers only when provided as payout identifiers on `writer_payment_methods.account_number_or_iban`. No personal data column was arbitrarily added.
+- **Sensitive Column Exposure Remediation**: Identified that `src/app/orders/[orderNumber]/page.tsx` selected `applied_commission_rate` from `orders`. Even though platform commission rate is calculated server-side, disclosing the author's internal commission tier to the reader was inappropriate. Removed `applied_commission_rate` from the query string and interface.
+
+---
+
+## 11. Sensitive Column Exposure Hardening & Safe Display Architecture (Test Suite 17 & Migration 0029)
+
+### 11.1 Problem Statement & Vulnerability Analysis
+Prior to Migration 0029:
+1. `public.profiles` had RLS policy `"Public view basic profiles"` with `USING (true)`. Any authenticated reader or author could directly issue `SELECT email, role, is_active FROM public.profiles WHERE id = 'victim_uuid'` and harvest other users' email addresses.
+2. `public.writer_profiles` had RLS policy `"Public view approved writer profiles"` with `USING (status = 'approved' OR ...)`. This exposed private commercial columns (`custom_commission_rate`, `unpaid_commission_limit`, `current_unpaid_commission`, `is_orders_paused_for_commission`) to readers and competing writers.
+
+### 11.2 Migration 0029 Remediation Architecture
+1. **Base Table RLS Lockdown**:
+   - `public.profiles`: Replaced with `profiles_select_owner_or_admin` (`USING (id = auth.uid() OR public.is_admin())`). Direct queries on other profiles return **0 rows**.
+   - `public.writer_profiles`: Replaced with `writer_profiles_select_owner_or_admin` (`USING (id = auth.uid() OR public.is_admin())`). Direct queries on other authors return **0 rows**.
+   - `public.writer_payment_methods`: Enforced `writer_payment_methods_select` (`USING (writer_id = auth.uid() OR public.is_admin())`). Direct queries return **0 rows**.
+2. **Safe Display Security Definer RPCs**:
+   - `public.get_reader_display_names(p_reader_ids uuid[])`: Returns strictly `(id, full_name, username)`. Authorization rule: Accessible only if caller is admin, self, or an author who has received an order from that reader. Never exposes email or role.
+   - `public.get_writer_display_names(p_writer_ids uuid[])`: Returns strictly `(id, pen_name_urdu, pen_name_english, username)`. Authorization rule: Accessible only if caller is admin, self, author is approved, or reader placed an order with that author. Never exposes commission rates, balances, or limits.
+
+### 11.3 Page Display Sources & Data Flow
+
+| Page | Data Needed | Previous Vulnerable Source | Safe Source Implemented in 0029 | Visible Information |
+|---|---|---|---|---|
+| `src/app/writer/orders/page.tsx` | Ordering reader display name | `reader:profiles!reader_id (full_name, username)` (Bypassed if RLS locked) | `get_reader_display_names(p_reader_ids)` RPC | Reader full name or username. **Zero email exposure.** |
+| `src/app/orders/[orderNumber]/page.tsx` | Novel author pen name | `writer:writer_profiles!writer_id (pen_name_english, pen_name_urdu)` | `get_writer_display_names(p_writer_ids)` RPC | Pen name English & Urdu. **Zero commission exposure.** |
+| `src/app/orders/page.tsx` | Reader order history | `orders` with `payment_submissions` | Direct `orders` query (own reader orders only via RLS) | Order snapshot & status. |
+| `src/app/checkout/[slug]/page.tsx` | Novel details & payment instructions | `novels` + `get_checkout_options(p_novel_id)` RPC | `get_checkout_options` (SECURITY DEFINER) | Whitelisted payment options snapshot. |
+| `src/app/admin/*` | Full user & writer lists | Direct `profiles` & `writer_profiles` | Direct queries (Permitted via `public.is_admin() = true`) | Full administrative oversight. |
+
+### 11.4 Test Suite 17 Verification Matrix
+`supabase/tests/17_sensitive_column_exposure.sql` tests 18 distinct client attack vectors under `SET LOCAL ROLE authenticated`:
+- Reader & Writer attacking `writer_profiles` (financial terms) → **0 rows (PASS)**
+- Reader & Writer attacking `profiles` (other user email/role) → **0 rows (PASS)**
+- Reader & Writer attacking `writer_payment_methods` (IBAN) → **0 rows (PASS)**
+- Reader & Writer attacking `orders` & `payment_submissions` of others → **0 rows (PASS)**
+- Reader & Writer attacking `novels` (moderation_reason of drafts) → **0 rows (PASS)**
+- Reader & Writer attacking `commission_*` tables → **0 rows (PASS)**
+- Reader & Writer attacking `disputes` of others → **0 rows (PASS)**
+- Reader & Writer attacking `support_*` tickets of others → **0 rows (PASS)**
+

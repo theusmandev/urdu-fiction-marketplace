@@ -2358,6 +2358,27 @@ export interface Database {
           email_enabled: boolean;
         };
       };
+      get_reader_display_names: {
+        Args: {
+          p_reader_ids: string[];
+        };
+        Returns: Array<{
+          id: string;
+          full_name: string | null;
+          username: string;
+        }>;
+      };
+      get_writer_display_names: {
+        Args: {
+          p_writer_ids: string[];
+        };
+        Returns: Array<{
+          id: string;
+          pen_name_urdu: string;
+          pen_name_english: string;
+          username: string;
+        }>;
+      };
     };
     Enums: {
       user_role: UserRole;
