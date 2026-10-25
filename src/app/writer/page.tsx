@@ -4,7 +4,7 @@ import { requireWriter } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { unwrapQuery } from '@/lib/supabase/query';
+import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
 import type { NovelStatus } from '@/types/database';
 import {
   BookOpen,
@@ -19,6 +19,8 @@ import {
   Plus,
   Layers,
 } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 interface RecentNovelSummary {
   id: string;
@@ -35,51 +37,79 @@ export default async function WriterDashboardPage() {
   const { user, writerProfile } = await requireWriter('/writer');
   const supabase = await createServerClient();
 
-  // Fetch real novel count from Supabase using correct writer_id column
-  const novelCountRes = await supabase
-    .from('novels')
-    .select('id', { count: 'exact', head: true })
-    .eq('writer_id', user.id);
+  // Execute all dashboard queries in parallel including platform_settings
+  const [
+    novelCountRes,
+    pendingOrdersRes,
+    paymentMethodsRes,
+    recentNovelsRes,
+    settingsRes,
+  ] = await Promise.all([
+    supabase
+      .from('novels')
+      .select('id', { count: 'exact', head: true })
+      .eq('writer_id', user.id),
+    supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('writer_id', user.id)
+      .eq('status', 'payment_submitted'),
+    supabase
+      .from('writer_payment_methods')
+      .select('id', { count: 'exact', head: true })
+      .eq('writer_id', user.id)
+      .eq('is_active', true),
+    supabase
+      .from('novels')
+      .select('id, slug, title_urdu, title_english, status, cover_url, price_pkr, total_chapters')
+      .eq('writer_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(4),
+    supabase
+      .from('platform_settings')
+      .select('default_unpaid_commission_limit')
+      .eq('id', 1)
+      .maybeSingle(),
+  ]);
+
   const { count: novelCount, error: novelCountErr } = unwrapQuery(novelCountRes, {
     context: 'WriterDashboardPage.novelCount',
   });
-
-  // Fetch real count of orders awaiting writer verification
-  const pendingOrdersRes = await supabase
-    .from('orders')
-    .select('id', { count: 'exact', head: true })
-    .eq('writer_id', user.id)
-    .eq('status', 'payment_submitted');
   const { count: pendingVerificationCount, error: pendingOrdersErr } = unwrapQuery(pendingOrdersRes, {
     context: 'WriterDashboardPage.pendingOrders',
   });
-
-  // Fetch active payment methods count
-  const paymentMethodsRes = await supabase
-    .from('writer_payment_methods')
-    .select('id', { count: 'exact', head: true })
-    .eq('writer_id', user.id)
-    .eq('is_active', true);
   const { count: paymentMethodsCount, error: paymentMethodsErr } = unwrapQuery(paymentMethodsRes, {
     context: 'WriterDashboardPage.paymentMethods',
   });
-
-  // Fetch recent authored novels (up to 4)
-  const recentNovelsRes = await supabase
-    .from('novels')
-    .select('id, slug, title_urdu, title_english, status, cover_url, price_pkr, total_chapters')
-    .eq('writer_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(4);
   const { data: recentNovels, error: recentNovelsErr } = unwrapQuery<RecentNovelSummary[]>(recentNovelsRes, {
     context: 'WriterDashboardPage.recentNovels',
   });
+  const { data: platformSettings, error: settingsErr } = unwrapSingleQuery<{
+    default_unpaid_commission_limit: number;
+  }>(settingsRes, {
+    context: 'WriterDashboardPage.platformSettings',
+  });
 
-  const queryError = novelCountErr || pendingOrdersErr || paymentMethodsErr || recentNovelsErr;
+  const queryError = novelCountErr || pendingOrdersErr || paymentMethodsErr || recentNovelsErr || settingsErr;
   const novelsTotal = novelCount ?? 0;
   const pendingOrdersTotal = pendingVerificationCount ?? 0;
   const activePayoutsTotal = paymentMethodsCount ?? 0;
   const commissionRate = writerProfile.custom_commission_rate ?? 20;
+
+  // Resolve effective unpaid commission limit:
+  // If individual writer has a custom unpaid_commission_limit_pkr in writer_profiles, use it.
+  // If null or undefined, fall back to global platform_settings.default_unpaid_commission_limit.
+  const customLimit =
+    writerProfile.unpaid_commission_limit_pkr !== undefined
+      ? writerProfile.unpaid_commission_limit_pkr
+      : null;
+
+  const globalLimit = platformSettings?.default_unpaid_commission_limit ?? 5000;
+
+  const effectiveLimit =
+    customLimit !== null && customLimit !== undefined
+      ? Number(customLimit)
+      : Number(globalLimit);
 
   return (
     <div className="space-y-8">
@@ -138,7 +168,7 @@ export default async function WriterDashboardPage() {
               Reader Orders Temporarily Paused (Commission Limit Exceeded)
             </div>
             <p>
-              Your accrued unpaid platform commission has exceeded PKR {writerProfile.unpaid_commission_limit.toLocaleString()}.
+              Your accrued unpaid platform commission has exceeded PKR {effectiveLimit.toLocaleString()}.
               New reader purchases are paused until commission is remitted. Please contact platform administration to settle your balance.
             </p>
           </div>
@@ -192,20 +222,20 @@ export default async function WriterDashboardPage() {
           </p>
         </Link>
 
-        {/* Accrued Commission */}
+        {/* Outstanding Commission Balance */}
         <Link
           href="/writer/commission"
           className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
         >
           <div className="flex items-center justify-between text-secondary">
-            <span className="text-xs font-semibold uppercase tracking-wider">Accrued Commission</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Outstanding Commission Balance</span>
             <ShieldCheck className="w-4 h-4 text-navy" />
           </div>
           <div className="text-2xl font-bold text-navy">
             PKR {Number(writerProfile.current_unpaid_commission || 0).toLocaleString()}
           </div>
           <p className="text-[11px] text-secondary">
-            Limit: PKR {Number(writerProfile.unpaid_commission_limit || 5000).toLocaleString()} ({commissionRate}% rate)
+            Limit: PKR {effectiveLimit.toLocaleString()} ({commissionRate}% rate)
           </p>
         </Link>
       </div>

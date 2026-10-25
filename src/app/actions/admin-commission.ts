@@ -15,6 +15,7 @@ import {
   type PlatformPaymentMethodInput,
 } from '@/lib/commission/schemas';
 import { revalidatePath } from 'next/cache';
+import { unwrapQuery } from '@/lib/supabase/query';
 
 export async function previewCommissionInvoiceAction(
   writerId: string,
@@ -201,7 +202,8 @@ export async function upsertPlatformPaymentMethodAction(rawInput: PlatformPaymen
   const { id, methodType, accountTitle, accountNumberOrIban, bankName, instructionsNote } = parsed.data;
   const supabase = await createServerClient();
 
-  const { data, error } = await supabase.rpc('upsert_platform_payment_method', {
+  // 1. Attempt upsert via SECURITY DEFINER RPC
+  const rpcRes = await supabase.rpc('upsert_platform_payment_method', {
     p_id: id || null,
     p_method_type: methodType,
     p_account_title: accountTitle,
@@ -210,30 +212,104 @@ export async function upsertPlatformPaymentMethodAction(rawInput: PlatformPaymen
     p_instructions_note: instructionsNote || null,
   });
 
-  if (error) {
-    return { success: false, error: error.message };
+  const { data: rpcData, error: rpcError } = unwrapQuery(rpcRes, {
+    context: 'upsertPlatformPaymentMethodAction.rpc',
+  });
+
+  let finalData = rpcData;
+
+  // 2. If RPC fails, fallback to direct table operation with unwrapQuery
+  if (rpcError) {
+    console.warn('upsertPlatformPaymentMethodAction: RPC failed, attempting direct table mutation:', rpcError.message);
+    if (id) {
+      const updateRes = await supabase
+        .from('platform_payment_methods')
+        .update({
+          method_type: methodType,
+          account_title: accountTitle,
+          account_number_or_iban: accountNumberOrIban,
+          bank_name: bankName || null,
+          instructions_note: instructionsNote || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+      const { data: updateData, error: updateError } = unwrapQuery(updateRes, {
+        context: 'upsertPlatformPaymentMethodAction.update',
+      });
+      if (updateError) {
+        return { success: false, error: updateError.message };
+      }
+      finalData = updateData;
+    } else {
+      const insertRes = await supabase
+        .from('platform_payment_methods')
+        .insert({
+          method_type: methodType,
+          account_title: accountTitle,
+          account_number_or_iban: accountNumberOrIban,
+          bank_name: bankName || null,
+          instructions_note: instructionsNote || null,
+          is_active: true,
+        })
+        .select()
+        .maybeSingle();
+
+      const { data: insertData, error: insertError } = unwrapQuery(insertRes, {
+        context: 'upsertPlatformPaymentMethodAction.insert',
+      });
+      if (insertError) {
+        return { success: false, error: insertError.message };
+      }
+      finalData = insertData;
+    }
   }
 
+  // 3. Clear all affected caches immediately
   revalidatePath('/admin/settings');
+  revalidatePath('/admin/settings', 'page');
   revalidatePath('/admin/commission');
+  revalidatePath('/', 'layout');
 
-  return { success: true, result: data };
+  return { success: true, result: finalData };
 }
 
 export async function deactivatePlatformPaymentMethodAction(id: string) {
   await requireRole('admin', '/admin/settings');
   const supabase = await createServerClient();
 
-  const { data, error } = await supabase.rpc('deactivate_platform_payment_method', {
+  const rpcRes = await supabase.rpc('deactivate_platform_payment_method', {
     p_id: id,
   });
 
-  if (error) {
-    return { success: false, error: error.message };
+  const { data: rpcData, error: rpcError } = unwrapQuery(rpcRes, {
+    context: 'deactivatePlatformPaymentMethodAction.rpc',
+  });
+
+  if (rpcError) {
+    console.warn('deactivatePlatformPaymentMethodAction: RPC failed, attempting direct table update:', rpcError.message);
+    const updateRes = await supabase
+      .from('platform_payment_methods')
+      .update({
+        is_active: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+
+    const { error: updateError } = unwrapQuery(updateRes, {
+      context: 'deactivatePlatformPaymentMethodAction.update',
+    });
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
   }
 
   revalidatePath('/admin/settings');
+  revalidatePath('/admin/settings', 'page');
   revalidatePath('/admin/commission');
+  revalidatePath('/', 'layout');
 
-  return { success: true, result: data };
+  return { success: true, result: rpcData };
 }

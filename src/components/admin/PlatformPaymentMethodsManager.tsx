@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   upsertPlatformPaymentMethodAction,
@@ -15,6 +15,7 @@ import {
   Edit2,
   Trash2,
   X,
+  Zap,
 } from 'lucide-react';
 
 interface PlatformPaymentMethodsManagerProps {
@@ -26,17 +27,34 @@ export function PlatformPaymentMethodsManager({
 }: PlatformPaymentMethodsManagerProps) {
   const router = useRouter();
 
+  const [methods, setMethods] = useState<PlatformPaymentMethodRow[]>(initialMethods);
+  const [prevInitial, setPrevInitial] = useState(initialMethods);
+  if (initialMethods !== prevInitial) {
+    setPrevInitial(initialMethods);
+    setMethods(initialMethods);
+  }
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form State
-  const [methodType, setMethodType] = useState<'jazzcash' | 'easypaisa' | 'bank_transfer'>('bank_transfer');
+  const [methodType, setMethodType] = useState<'jazzcash' | 'easypaisa' | 'raast' | 'bank_transfer'>('bank_transfer');
   const [accountTitle, setAccountTitle] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [bankName, setBankName] = useState('');
   const [instructionsNote, setInstructionsNote] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
 
   const handleOpenAdd = () => {
     setEditingId(null);
@@ -51,7 +69,7 @@ export function PlatformPaymentMethodsManager({
 
   const handleOpenEdit = (m: PlatformPaymentMethodRow) => {
     setEditingId(m.id);
-    setMethodType(m.method_type as 'jazzcash' | 'easypaisa' | 'bank_transfer');
+    setMethodType(m.method_type);
     setAccountTitle(m.account_title);
     setAccountNumber(m.account_number_or_iban);
     setBankName(m.bank_name || '');
@@ -79,6 +97,46 @@ export function PlatformPaymentMethodsManager({
         setFormError(res.error || 'Failed to save payment account.');
       } else {
         setIsModalOpen(false);
+
+        // Immediate optimistic / local state update so the new method shows without waiting
+        const resultRecord = res.result as Record<string, unknown> | undefined;
+        const returnedId =
+          (typeof resultRecord?.id === 'string' ? resultRecord.id : null) ||
+          editingId ||
+          `temp-${Date.now()}`;
+
+        if (editingId) {
+          setMethods((prev) =>
+            prev.map((m) =>
+              m.id === editingId
+                ? {
+                    ...m,
+                    method_type: methodType,
+                    account_title: accountTitle.trim(),
+                    account_number_or_iban: accountNumber.trim(),
+                    bank_name: methodType === 'bank_transfer' ? bankName.trim() : null,
+                    instructions_note: instructionsNote.trim() || null,
+                    updated_at: new Date().toISOString(),
+                  }
+                : m
+            )
+          );
+        } else {
+          setMethods((prev) => [
+            ...prev,
+            {
+              id: returnedId,
+              method_type: methodType,
+              account_title: accountTitle.trim(),
+              account_number_or_iban: accountNumber.trim(),
+              bank_name: methodType === 'bank_transfer' ? bankName.trim() : null,
+              instructions_note: instructionsNote.trim() || null,
+              is_active: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          ]);
+        }
         router.refresh();
       }
     } catch (err: unknown) {
@@ -98,6 +156,9 @@ export function PlatformPaymentMethodsManager({
       if (!res.success) {
         alert(res.error || 'Failed to deactivate account.');
       } else {
+        setMethods((prev) =>
+          prev.map((m) => (m.id === id ? { ...m, is_active: false } : m))
+        );
         router.refresh();
       }
     } catch (err: unknown) {
@@ -121,23 +182,44 @@ export function PlatformPaymentMethodsManager({
         </div>
 
         <button
+          id="add-payment-account-btn"
           type="button"
           onClick={handleOpenAdd}
-          className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors"
+          className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Payment Account
         </button>
       </div>
 
-      {initialMethods.length === 0 ? (
-        <div className="py-8 text-center text-slate-500 text-xs">
-          No platform payment accounts configured yet. Authors will see a placeholder notice on open invoices.
+      {methods.length === 0 ? (
+        <div className="py-10 text-center space-y-3 bg-slate-900/50 rounded-xl border border-dashed border-slate-800">
+          <div className="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center mx-auto text-slate-400">
+            <CreditCard className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-slate-300">
+              No platform remittance accounts configured yet
+            </p>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Authors who have open commission invoices will see a placeholder notice until you add official banking details.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleOpenAdd}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Add First Payment Account
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {initialMethods.map((m) => {
+          {methods.map((m) => {
             const isBank = m.method_type === 'bank_transfer';
+            const isRaast = m.method_type === 'raast';
+
             return (
               <div
                 key={m.id}
@@ -151,11 +233,13 @@ export function PlatformPaymentMethodsManager({
                   <div className="flex items-center gap-2">
                     {isBank ? (
                       <Building className="w-4 h-4 text-indigo-400" />
+                    ) : isRaast ? (
+                      <Zap className="w-4 h-4 text-amber-400" />
                     ) : (
                       <Smartphone className="w-4 h-4 text-emerald-400" />
                     )}
                     <span className="font-semibold text-white text-xs uppercase">
-                      {m.bank_name || m.method_type.replace('_', ' ')}
+                      {m.bank_name || (isRaast ? 'RAAST P2M' : m.method_type.replace('_', ' '))}
                     </span>
                   </div>
 
@@ -173,7 +257,7 @@ export function PlatformPaymentMethodsManager({
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(m)}
-                      className="p-1 text-slate-400 hover:text-white transition-colors"
+                      className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
                       title="Edit Account"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -182,7 +266,7 @@ export function PlatformPaymentMethodsManager({
                       <button
                         type="button"
                         onClick={() => handleDeactivate(m.id)}
-                        className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
+                        className="p-1 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
                         title="Deactivate Account"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -198,7 +282,7 @@ export function PlatformPaymentMethodsManager({
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 uppercase">
-                      {isBank ? 'Account / IBAN:' : 'Wallet Number:'}
+                      {isBank ? 'Account / IBAN:' : isRaast ? 'Raast ID / IBAN:' : 'Wallet Number:'}
                     </span>
                     <div className="font-mono text-white font-medium">
                       {m.account_number_or_iban}
@@ -218,8 +302,13 @@ export function PlatformPaymentMethodsManager({
 
       {/* Modal for Add / Edit */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl">
+        <div
+          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsModalOpen(false);
+          }}
+        >
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl relative">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="font-serif font-bold text-lg text-white">
                 {editingId ? 'Edit Platform Account' : 'Add Platform Account'}
@@ -227,7 +316,7 @@ export function PlatformPaymentMethodsManager({
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -241,14 +330,15 @@ export function PlatformPaymentMethodsManager({
               )}
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-method-type" className="block text-slate-300 font-medium mb-1">
                   Payment Method Type *
                 </label>
                 <select
+                  id="platform-method-type"
                   value={methodType}
                   onChange={(e) =>
                     setMethodType(
-                      e.target.value as 'jazzcash' | 'easypaisa' | 'bank_transfer'
+                      e.target.value as 'jazzcash' | 'easypaisa' | 'raast' | 'bank_transfer'
                     )
                   }
                   className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -256,15 +346,17 @@ export function PlatformPaymentMethodsManager({
                   <option value="bank_transfer">Direct Bank Transfer (IBAN)</option>
                   <option value="jazzcash">JazzCash Mobile Wallet</option>
                   <option value="easypaisa">EasyPaisa Mobile Wallet</option>
+                  <option value="raast">Raast Instant P2M / Account</option>
                 </select>
               </div>
 
               {methodType === 'bank_transfer' && (
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">
+                  <label htmlFor="platform-bank-name" className="block text-slate-300 font-medium mb-1">
                     Bank Name *
                   </label>
                   <input
+                    id="platform-bank-name"
                     type="text"
                     required
                     placeholder="e.g. Meezan Bank, HBL, Bank Alfalah"
@@ -276,10 +368,11 @@ export function PlatformPaymentMethodsManager({
               )}
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-account-title" className="block text-slate-300 font-medium mb-1">
                   Account Title *
                 </label>
                 <input
+                  id="platform-account-title"
                   type="text"
                   required
                   placeholder="e.g. Urdu Novels Bazaar PVT LTD"
@@ -290,13 +383,24 @@ export function PlatformPaymentMethodsManager({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
-                  {methodType === 'bank_transfer' ? 'IBAN / Account Number *' : 'Wallet Number *'}
+                <label htmlFor="platform-account-number" className="block text-slate-300 font-medium mb-1">
+                  {methodType === 'bank_transfer'
+                    ? 'IBAN / Account Number *'
+                    : methodType === 'raast'
+                    ? 'Raast ID / Account / IBAN *'
+                    : 'Wallet Number *'}
                 </label>
                 <input
+                  id="platform-account-number"
                   type="text"
                   required
-                  placeholder={methodType === 'bank_transfer' ? 'PK36MEZN0001000123456701' : '03001234567'}
+                  placeholder={
+                    methodType === 'bank_transfer'
+                      ? 'PK36MEZN0001000123456701'
+                      : methodType === 'raast'
+                      ? '03001234567 or PK36MEZN...'
+                      : '03001234567'
+                  }
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -304,12 +408,13 @@ export function PlatformPaymentMethodsManager({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-instructions-note" className="block text-slate-300 font-medium mb-1">
                   Remittance Instructions Note (Optional)
                 </label>
                 <textarea
+                  id="platform-instructions-note"
                   rows={2}
-                  placeholder="e.g. Mention your Pen Name in the transfer description..."
+                  placeholder="e.g. Mention your Pen Name or Invoice Number in the transfer description..."
                   value={instructionsNote}
                   onChange={(e) => setInstructionsNote(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -320,14 +425,14 @@ export function PlatformPaymentMethodsManager({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? 'Saving...' : 'Save Account'}
                 </button>

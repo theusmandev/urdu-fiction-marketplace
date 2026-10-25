@@ -404,6 +404,10 @@ export async function adminUpdatePlatformSettingsAction(formData: {
 
   revalidatePath('/admin');
   revalidatePath('/admin/settings');
+  revalidatePath('/writer');
+  revalidatePath('/writer/commission');
+  revalidatePath('/writer/earnings');
+  revalidatePath('/', 'layout');
   return { success: true, data };
 }
 

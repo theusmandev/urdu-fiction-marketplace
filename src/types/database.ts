@@ -293,6 +293,7 @@ export interface WriterProfileRow {
   bio_english: string | null;
   status: WriterStatus;
   custom_commission_rate: number | null;
+  unpaid_commission_limit_pkr?: number | null;
   unpaid_commission_limit: number;
   current_unpaid_commission: number;
   is_orders_paused_for_commission: boolean;

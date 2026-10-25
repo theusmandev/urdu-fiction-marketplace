@@ -86,6 +86,7 @@ export async function requireWriter(nextPath?: string): Promise<{
         bio_english: null,
         status: 'approved',
         custom_commission_rate: 0,
+        unpaid_commission_limit_pkr: null,
         unpaid_commission_limit: 5000,
         current_unpaid_commission: 0,
         is_orders_paused_for_commission: false,

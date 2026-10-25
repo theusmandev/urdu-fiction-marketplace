@@ -1,10 +1,10 @@
 import React from 'react';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
-import { unwrapQuery } from '@/lib/supabase/query';
+import { unwrapQuery, unwrapSingleQuery } from '@/lib/supabase/query';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
-import { Settings } from 'lucide-react';
+import { Settings, AlertCircle } from 'lucide-react';
 import type { PlatformPaymentMethodRow } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
@@ -43,8 +43,50 @@ export default async function AdminSettingsPage() {
       .order('created_at', { ascending: true }),
   ]);
 
-  const { data: settings } = unwrapQuery(settingsRes, 'AdminSettingsPage.platform_settings');
-  const { data: paymentMethodsData } = unwrapQuery(paymentMethodsRes, 'AdminSettingsPage.payment_methods');
+  const { data: settings, error: settingsError } = unwrapSingleQuery<{
+    default_commission_rate: number;
+    default_unpaid_commission_limit: number;
+    dispute_window_days: number;
+    min_novel_price_pkr: number;
+    max_novel_price_pkr: number;
+    max_orders_per_hour?: number;
+    max_chapter_reads_per_window?: number;
+    chapter_read_window_minutes?: number;
+    invoice_due_days?: number;
+    overdue_grace_days?: number;
+    min_dispute_wait_hours?: number;
+    verification_reminder_hours?: number;
+    support_email: string;
+    updated_at: string;
+  }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
+
+  const { data: paymentMethodsData, error: paymentMethodsError } = unwrapQuery<PlatformPaymentMethodRow[]>(
+    paymentMethodsRes,
+    { context: 'AdminSettingsPage.payment_methods' }
+  );
+
+  let paymentMethods: PlatformPaymentMethodRow[] = paymentMethodsData || [];
+  let paymentLoadError = paymentMethodsError;
+
+  // Fallback: If table SELECT failed (e.g. privilege lockdown), query get_platform_payment_instructions RPC
+  if (paymentMethodsError || paymentMethods.length === 0) {
+    const instructionsRes = await supabase.rpc('get_platform_payment_instructions');
+    const { data: instructionsData, error: instructionsError } = unwrapQuery<PlatformPaymentMethodRow[]>(
+      instructionsRes,
+      { context: 'AdminSettingsPage.get_platform_payment_instructions' }
+    );
+    if (instructionsData && instructionsData.length > 0) {
+      paymentMethods = instructionsData.map((m) => ({
+        ...m,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }));
+      paymentLoadError = null;
+    } else if (instructionsError && paymentMethodsError) {
+      paymentLoadError = instructionsError;
+    }
+  }
 
   const fallbackSettings = {
     default_commission_rate: 20.0,
@@ -64,7 +106,7 @@ export default async function AdminSettingsPage() {
   };
 
   const currentSettings = settings || fallbackSettings;
-  const paymentMethods = (paymentMethodsData as PlatformPaymentMethodRow[]) || [];
+  const pageError = settingsError || paymentLoadError;
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -82,6 +124,16 @@ export default async function AdminSettingsPage() {
           </p>
         </div>
       </div>
+
+      {pageError && (
+        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-sm">Failed to load platform settings data</h3>
+            <p className="text-xs text-red-400/80 mt-1">{pageError.message}</p>
+          </div>
+        </div>
+      )}
 
       <PlatformSettingsForm initialSettings={currentSettings} />
 
