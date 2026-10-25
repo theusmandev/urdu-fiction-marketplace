@@ -6,6 +6,7 @@ import { UrduText } from '@/components/urdu/UrduText';
 import { getOutboxStatsAction } from '@/app/actions/admin-disputes';
 import { EmailOutboxCard } from '@/components/admin/EmailOutboxCard';
 import type { EmailOutboxStats } from '@/types/database';
+import { unwrapQuery } from '@/lib/supabase/query';
 import {
   Users,
   Feather,
@@ -69,7 +70,7 @@ export default async function AdminDashboardPage() {
 
   // 2. Fetch queue items
   // 2a. Pending Writer Applications
-  const { data: pendingWriters } = await supabase
+  const pendingWritersRes = await supabase
     .from('writer_profiles')
     .select(`
       id,
@@ -77,7 +78,7 @@ export default async function AdminDashboardPage() {
       pen_name_urdu,
       created_at,
       status,
-      profiles:id (
+      profiles!id (
         full_name,
         email
       )
@@ -86,8 +87,10 @@ export default async function AdminDashboardPage() {
     .order('created_at', { ascending: false })
     .limit(5);
 
+  const { data: pendingWriters } = unwrapQuery(pendingWritersRes, 'AdminDashboard.pendingWriters');
+
   // 2b. Novels Under Review
-  const { data: underReviewNovels } = await supabase
+  const underReviewNovelsRes = await supabase
     .from('novels')
     .select(`
       id,
@@ -96,7 +99,7 @@ export default async function AdminDashboardPage() {
       price_pkr,
       created_at,
       status,
-      writer_profiles:writer_id (
+      writer_profiles!writer_id (
         pen_name_english,
         pen_name_urdu
       )
@@ -105,9 +108,11 @@ export default async function AdminDashboardPage() {
     .order('created_at', { ascending: false })
     .limit(5);
 
+  const { data: underReviewNovels } = unwrapQuery(underReviewNovelsRes, 'AdminDashboard.underReviewNovels');
+
   // 2c. Overdue Orders (Awaiting writer verification > 24 hours)
   const twentyFourHoursAgo = getTwentyFourHoursAgoIso();
-  const { data: overdueOrders, count: overdueOrdersCount } = await supabase
+  const overdueOrdersRes = await supabase
     .from('orders')
     .select(`
       id,
@@ -115,7 +120,7 @@ export default async function AdminDashboardPage() {
       amount_pkr,
       novel_title_snapshot,
       created_at,
-      writer_profiles:writer_id (
+      writer_profiles!writer_id (
         pen_name_english
       )
     `, { count: 'exact' })
@@ -124,8 +129,11 @@ export default async function AdminDashboardPage() {
     .order('created_at', { ascending: true })
     .limit(5);
 
+  const { data: overdueOrders } = unwrapQuery(overdueOrdersRes, 'AdminDashboard.overdueOrders');
+  const overdueOrdersCount = overdueOrdersRes.count;
+
   // 2e. Writers Near/Over Commission Limit
-  const { data: cappedWriters } = await supabase
+  const cappedWritersRes = await supabase
     .from('writer_profiles')
     .select(`
       id,
@@ -139,6 +147,8 @@ export default async function AdminDashboardPage() {
     .order('current_unpaid_commission', { ascending: false })
     .limit(5);
 
+  const { data: cappedWriters } = unwrapQuery(cappedWritersRes, 'AdminDashboard.cappedWriters');
+
   // Filter writers near or over limit (>= 80% or paused)
   const atRiskWriters = (cappedWriters || []).filter(
     (w) =>
@@ -149,11 +159,23 @@ export default async function AdminDashboardPage() {
   );
 
   // 2f. Recent Audit Trail
-  const { data: recentAuditLogs } = await supabase
+  const recentAuditLogsRes = await supabase
     .from('audit_logs')
     .select('id, action_type, entity_type, entity_id, actor_id, created_at')
     .order('created_at', { ascending: false })
     .limit(6);
+  const { data: recentAuditLogs } = unwrapQuery<
+    Array<{
+      id: string;
+      action_type: string;
+      entity_type: string;
+      entity_id: string;
+      actor_id: string | null;
+      created_at: string;
+    }>
+  >(recentAuditLogsRes, {
+    context: 'AdminDashboard.recentAuditLogs',
+  });
 
   return (
     <div className="space-y-8">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { unwrapQuery } from '@/lib/supabase/query';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
 import { Settings } from 'lucide-react';
@@ -13,8 +14,8 @@ export default async function AdminSettingsPage() {
   const supabase = await createServerClient();
 
   const [
-    { data: settings },
-    { data: paymentMethodsData },
+    settingsRes,
+    paymentMethodsRes,
   ] = await Promise.all([
     supabase
       .from('platform_settings')
@@ -35,12 +36,15 @@ export default async function AdminSettingsPage() {
         updated_at
       `)
       .eq('id', 1)
-      .single(),
+      .maybeSingle(),
     supabase
       .from('platform_payment_methods')
       .select('*')
       .order('created_at', { ascending: true }),
   ]);
+
+  const { data: settings } = unwrapQuery(settingsRes, 'AdminSettingsPage.platform_settings');
+  const { data: paymentMethodsData } = unwrapQuery(paymentMethodsRes, 'AdminSettingsPage.payment_methods');
 
   const fallbackSettings = {
     default_commission_rate: 20.0,

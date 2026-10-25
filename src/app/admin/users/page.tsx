@@ -2,8 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { unwrapQuery } from '@/lib/supabase/query';
 import { UserManagementTable, UserItem } from '@/components/admin/UserManagementTable';
-import { Users, Search } from 'lucide-react';
+import { Users, Search, AlertCircle } from 'lucide-react';
 import type { UserRole } from '@/types/database';
 
 interface PageProps {
@@ -30,7 +31,10 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     queryBuilder = queryBuilder.eq('role', currentRole as UserRole);
   }
 
-  const { data: rawUsers } = await queryBuilder;
+  const usersRes = await queryBuilder;
+  const { data: rawUsers, error: usersError } = unwrapQuery<UserItem[]>(usersRes, {
+    context: 'AdminUsersPage.fetchUsers',
+  });
 
   // Filter in memory for email or username or full name
   const filteredUsers = (rawUsers || []).filter((u) => {
@@ -53,6 +57,15 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
+      {usersError && (
+        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-sm">Failed to load users</h3>
+            <p className="text-xs text-red-400/80 mt-1">{usersError.message}</p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
