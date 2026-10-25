@@ -382,12 +382,13 @@ export function SecureReaderClient({
       <main className="flex-1 w-full max-w-[65ch] mx-auto px-5 sm:px-6 py-8 sm:py-12 relative z-10 print:hidden">
         {/* Chapter Header */}
         <div className="text-center space-y-2 mb-8 pb-6 border-b border-current/10">
-          <span className="text-[11px] font-mono font-semibold uppercase tracking-widest opacity-60">
-            باب نمبر {chapter.chapter_number}
-          </span>
+          <div className="flex items-center justify-center gap-1.5 text-xs opacity-70">
+            <span className="font-urdu">باب نمبر</span>
+            <span className="font-mono font-semibold">{chapter.chapter_number}</span>
+          </div>
           <UrduText
             size="2xl"
-            className="text-center leading-tight py-1 font-bold"
+            className="text-center leading-tight py-1 text-inherit"
           >
             {chapter.chapter_title}
           </UrduText>
@@ -443,7 +444,7 @@ export function SecureReaderClient({
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
-                  <UrduText size="lg" className="font-bold">
+                  <UrduText size="xl" className="text-amber-500">
                     پڑھنے کا شکریہ!
                   </UrduText>
                   <p className="text-xs opacity-80 max-w-sm mx-auto">

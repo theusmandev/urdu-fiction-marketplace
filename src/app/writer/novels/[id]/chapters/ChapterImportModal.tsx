@@ -285,12 +285,12 @@ export function ChapterImportModal({
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-navy text-white">
                           #{chap.chapter_number}
                         </span>
-                        <UrduText as="span" size="sm" className="font-bold text-navy py-0" dir="rtl">
+                        <UrduText as="span" size="base" className="text-navy py-0" dir="rtl">
                           {chap.title_urdu}
                         </UrduText>
                       </div>
 
-                      <p className="text-[11px] text-secondary line-clamp-2 italic" dir="rtl">
+                      <p className="text-xs text-secondary line-clamp-2 font-urdu" dir="rtl">
                         &ldquo;{chap.content_urdu.slice(0, 160)}...&rdquo;
                       </p>
                     </div>

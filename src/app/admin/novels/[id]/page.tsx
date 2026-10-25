@@ -213,7 +213,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                 <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                   {novel.title_english}
                 </h1>
-                <UrduText as="div" size="xl" className="text-amber-400 font-semibold py-1">
+                <UrduText as="div" size="2xl" className="text-amber-400 py-1">
                   {novel.title_urdu}
                 </UrduText>
               </div>
@@ -370,7 +370,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                       {chapter.chapter_number}
                     </span>
                     <div>
-                      <UrduText as="div" size="base" className="font-semibold text-white py-0">
+                      <UrduText as="div" size="lg" className="text-white py-0">
                         {chapter.title_urdu}
                       </UrduText>
                       <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">

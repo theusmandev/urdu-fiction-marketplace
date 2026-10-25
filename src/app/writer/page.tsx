@@ -303,7 +303,7 @@ export default async function WriterDashboardPage() {
                     </div>
 
                     <div className="min-w-0 space-y-0.5">
-                      <UrduText as="div" size="sm" className="font-bold text-navy truncate py-0" dir="rtl">
+                      <UrduText as="div" size="base" className="text-navy truncate py-0" dir="rtl">
                         {novel.title_urdu}
                       </UrduText>
                       <div className="text-[11px] text-secondary truncate">

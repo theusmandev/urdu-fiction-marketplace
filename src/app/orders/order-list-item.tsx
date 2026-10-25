@@ -95,7 +95,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <UrduText as="h3" size="lg" className="text-white font-bold">
+          <UrduText as="h3" size="xl" className="text-white">
             {order.novel_title_snapshot}
           </UrduText>
           {order.status === 'rejected' && order.rejected_reason && (

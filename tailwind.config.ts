@@ -65,12 +65,13 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Cormorant Garamond", "serif"],
-        urdu: ["var(--font-urdu)", "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "serif"],
+        urdu: ["var(--font-urdu)", "Noto Nastaliq Urdu", "serif"],
+        arabic: ["var(--font-arabic)", "Amiri", "Noto Naskh Arabic", "serif"],
       },
       lineHeight: {
-        nastaliq: "2.3",
-        "nastaliq-tight": "2.0",
-        "nastaliq-loose": "2.6",
+        nastaliq: "2.1",
+        "nastaliq-tight": "1.8",
+        "nastaliq-loose": "2.4",
       },
       aspectRatio: {
         "book-cover": "2 / 3",

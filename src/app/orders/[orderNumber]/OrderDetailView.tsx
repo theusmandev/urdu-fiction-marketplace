@@ -345,7 +345,7 @@ export function OrderDetailView({
               >
                 {timeline.label}
               </span>
-              <UrduText as="span" size="xs" className="text-amber-400 font-semibold leading-[2.2]">
+              <UrduText as="span" size="sm" className="text-amber-400 py-0">
                 {timeline.urduLabel}
               </UrduText>
             </div>

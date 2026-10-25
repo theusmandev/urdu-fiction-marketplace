@@ -250,7 +250,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                     {/* Metadata & Urdu Text */}
                     <div className="flex-1 min-w-0 space-y-2">
                       <div dir="rtl" className="text-right">
-                        <UrduText as="h3" size="lg" className="text-navy font-bold line-clamp-1 py-0">
+                        <UrduText as="h3" size="xl" className="text-navy line-clamp-1 py-0">
                           {novel.title_urdu}
                         </UrduText>
                       </div>

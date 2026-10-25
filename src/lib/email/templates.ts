@@ -127,7 +127,7 @@ This is an automated system notification.
       margin: 4px 0 0 0;
       font-size: 14px;
       color: #94a3b8;
-      font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', Tahoma, serif;
+      font-family: 'Gulzar', 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', Tahoma, serif;
     }
     .content {
       padding: 32px;
@@ -182,7 +182,7 @@ This is an automated system notification.
       margin-top: 8px;
       font-size: 13px;
       color: #94a3b8;
-      font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', Tahoma, serif;
+      font-family: 'Gulzar', 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', Tahoma, serif;
     }
   </style>
 </head>

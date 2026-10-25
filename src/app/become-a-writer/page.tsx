@@ -50,7 +50,7 @@ export default async function BecomeWriterPage() {
             <h2 className="text-xl font-bold text-white">Application Under Editorial Review</h2>
             <p className="text-sm text-amber-200/90 max-w-lg mx-auto leading-relaxed">
               We have received your application for pen name{' '}
-              <strong className="text-white font-semibold font-urdu text-base">{writerProfile.pen_name_urdu}</strong>{' '}
+              <span className="text-amber-400 font-urdu text-lg">{writerProfile.pen_name_urdu}</span>{' '}
               ({writerProfile.pen_name_english}). Our editorial team reviews sample writings and profiles within 24–48 hours.
             </p>
             <div className="pt-2">

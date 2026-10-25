@@ -63,7 +63,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
       <div className="w-full max-w-md space-y-8 rounded-2xl border border-stone-800 bg-stone-900/80 p-8 shadow-2xl backdrop-blur-xl">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <span className="font-urdu text-3xl font-bold tracking-tight text-amber-500">
+            <span className="font-urdu text-4xl tracking-tight text-amber-500">
               یو این بی پریمیم
             </span>
             <span className="block text-xs uppercase tracking-widest text-stone-400 font-sans mt-0.5">

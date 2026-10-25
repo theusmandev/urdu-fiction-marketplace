@@ -383,7 +383,7 @@ export function ChapterListManager({
 
                     <div className="min-w-0 space-y-1">
                       <div className="flex items-center gap-2">
-                        <UrduText as="span" size="base" className="font-bold text-navy py-0" dir="rtl">
+                        <UrduText as="span" size="lg" className="text-navy py-0" dir="rtl">
                           {chapter.title_urdu}
                         </UrduText>
                       </div>

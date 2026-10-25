@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Cormorant_Garamond, Noto_Nastaliq_Urdu } from "next/font/google";
+import { Plus_Jakarta_Sans, Cormorant_Garamond, Gulzar, Amiri } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { PublicHeader } from "@/components/layout/public-header";
@@ -21,12 +21,20 @@ const serifFont = Cormorant_Garamond({
   weight: ["500", "600", "700"],
 });
 
-// Primary Nastaliq Calligraphic Urdu Font
-const urduFont = Noto_Nastaliq_Urdu({
+// Primary Nastaliq Calligraphic Urdu Font: Gulzar (Only weight 400 exists in Google Font family)
+const urduFont = Gulzar({
   subsets: ["arabic"],
   variable: "--font-urdu",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
+});
+
+// Classical Naskh Arabic Font: Amiri (For Quranic verses and Arabic quotations with full harakat)
+const arabicFont = Amiri({
+  subsets: ["arabic"],
+  variable: "--font-arabic",
+  display: "swap",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -71,7 +79,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sansFont.variable} ${serifFont.variable} ${urduFont.variable}`}
+      className={`${sansFont.variable} ${serifFont.variable} ${urduFont.variable} ${arabicFont.variable}`}
     >
       <body className="min-h-screen bg-background font-sans antialiased text-main flex flex-col selection:bg-accent/30 selection:text-navy">
         <PublicHeader />

@@ -36,11 +36,11 @@ export default async function WriterLayout({
             </div>
 
             <div className="p-4 bg-ivory rounded-xl border border-border text-right space-y-2" dir="rtl">
-              <div className="text-xs font-semibold text-secondary">قلمی نام:</div>
-              <UrduText as="div" size="lg" className="text-navy font-bold">
+              <div className="text-xs text-secondary font-urdu">قلمی نام:</div>
+              <UrduText as="div" size="xl" className="text-navy">
                 {writerProfile.pen_name_urdu}
               </UrduText>
-              <p className="text-xs text-secondary leading-relaxed">
+              <p className="text-xs text-secondary leading-relaxed font-urdu">
                 آپ کی مصنّف کی درخواست اس وقت ہماری ادارتی ٹیم کے زیرِ جائزہ ہے۔ منظوری کے بعد آپ اپنے ناولز شائع کر سکیں گے اور قارئین کی براہِ راست ادائیگیوں کی تصدیق کر سکیں گے۔
               </p>
             </div>

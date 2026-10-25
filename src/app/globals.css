@@ -42,7 +42,8 @@
 
   --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: var(--font-serif), "Cormorant Garamond", Georgia, serif;
-  --font-urdu: var(--font-urdu), "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Urdu Typesetting", serif;
+  --font-urdu: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  --font-arabic: var(--font-arabic), "Amiri", "Noto Naskh Arabic", serif;
 }
 
 :root {
@@ -68,31 +69,43 @@ body {
   flex-direction: column;
 }
 
-/* Nastaliq Urdu Typography Engine */
+/* Urdu Typography Engine (Gulzar Nastaliq) */
 .font-urdu {
-  font-family: var(--font-urdu), "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+input.font-urdu::placeholder,
+textarea.font-urdu::placeholder {
+  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  font-synthesis: none;
+}
+
+/* Arabic / Quranic Typography Engine (Amiri Naskh) */
+.font-arabic {
+  font-family: var(--font-arabic), "Amiri", "Noto Naskh Arabic", serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .urdu-content {
   direction: rtl;
   text-align: right;
   font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif;
-  line-height: 2.3;
-  word-spacing: 0.12em;
+  font-synthesis: none;
+  line-height: 2.1;
+  word-spacing: 0.08em;
 }
 
 .urdu-title {
   direction: rtl;
-  font-family: var(--font-urdu), serif;
-  line-height: 2.1;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
+  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  font-synthesis: none;
+  line-height: 1.9;
 }
 
-/* Ensure Nastaliq diacritics and descenders are never clipped in cards/containers */
+/* Balanced container overflow for Urdu Nastaliq calligraphy */
 .urdu-safe-height {
-  padding-top: 0.35rem;
-  padding-bottom: 0.45rem;
   overflow: visible !important;
 }
 
