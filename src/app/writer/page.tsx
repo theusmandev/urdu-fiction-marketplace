@@ -4,10 +4,13 @@ import { requireWriter } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { unwrapQuery } from '@/lib/supabase/query';
+import type { NovelStatus } from '@/types/database';
 import {
   BookOpen,
   Receipt,
   AlertTriangle,
+  AlertCircle,
   CheckCircle2,
   Clock,
   ArrowUpRight,
@@ -17,38 +20,62 @@ import {
   Layers,
 } from 'lucide-react';
 
+interface RecentNovelSummary {
+  id: string;
+  slug: string;
+  title_urdu: string;
+  title_english: string;
+  status: NovelStatus;
+  cover_url: string | null;
+  price_pkr: number;
+  total_chapters: number;
+}
+
 export default async function WriterDashboardPage() {
   const { user, writerProfile } = await requireWriter('/writer');
   const supabase = await createServerClient();
 
   // Fetch real novel count from Supabase using correct writer_id column
-  const { count: novelCount } = await supabase
+  const novelCountRes = await supabase
     .from('novels')
     .select('id', { count: 'exact', head: true })
     .eq('writer_id', user.id);
+  const { count: novelCount, error: novelCountErr } = unwrapQuery(novelCountRes, {
+    context: 'WriterDashboardPage.novelCount',
+  });
 
   // Fetch real count of orders awaiting writer verification
-  const { count: pendingVerificationCount } = await supabase
+  const pendingOrdersRes = await supabase
     .from('orders')
     .select('id', { count: 'exact', head: true })
     .eq('writer_id', user.id)
     .eq('status', 'payment_submitted');
+  const { count: pendingVerificationCount, error: pendingOrdersErr } = unwrapQuery(pendingOrdersRes, {
+    context: 'WriterDashboardPage.pendingOrders',
+  });
 
   // Fetch active payment methods count
-  const { count: paymentMethodsCount } = await supabase
+  const paymentMethodsRes = await supabase
     .from('writer_payment_methods')
     .select('id', { count: 'exact', head: true })
     .eq('writer_id', user.id)
     .eq('is_active', true);
+  const { count: paymentMethodsCount, error: paymentMethodsErr } = unwrapQuery(paymentMethodsRes, {
+    context: 'WriterDashboardPage.paymentMethods',
+  });
 
   // Fetch recent authored novels (up to 4)
-  const { data: recentNovels } = await supabase
+  const recentNovelsRes = await supabase
     .from('novels')
     .select('id, slug, title_urdu, title_english, status, cover_url, price_pkr, total_chapters')
     .eq('writer_id', user.id)
     .order('created_at', { ascending: false })
     .limit(4);
+  const { data: recentNovels, error: recentNovelsErr } = unwrapQuery<RecentNovelSummary[]>(recentNovelsRes, {
+    context: 'WriterDashboardPage.recentNovels',
+  });
 
+  const queryError = novelCountErr || pendingOrdersErr || paymentMethodsErr || recentNovelsErr;
   const novelsTotal = novelCount ?? 0;
   const pendingOrdersTotal = pendingVerificationCount ?? 0;
   const activePayoutsTotal = paymentMethodsCount ?? 0;
@@ -56,6 +83,15 @@ export default async function WriterDashboardPage() {
 
   return (
     <div className="space-y-8">
+      {queryError && (
+        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <h3 className="font-semibold text-sm">Failed to load dashboard data</h3>
+            <p className="text-xs text-red-400/80 mt-1">{queryError.message}</p>
+          </div>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
