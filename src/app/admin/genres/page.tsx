@@ -47,15 +47,15 @@ export default async function AdminGenresPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
-              <Tag className="w-3.5 h-3.5" />
+            <div className="w-8 h-8 rounded-lg bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin">
+              <Tag className="w-4 h-4" />
             </div>
-            <h1 className="text-xl font-bold text-white">Genre Taxonomy Management</h1>
+            <h1 className="text-xl sm:text-2xl font-serif font-bold text-main">Genre Taxonomy Management</h1>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-muted mt-1">
             Organize Urdu fiction categories, display ordering, localized names, and active marketplace visibility.
           </p>
         </div>
@@ -63,19 +63,19 @@ export default async function AdminGenresPage() {
 
       {/* Error State */}
       {queryError ? (
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
-          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0" />
+        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
             <span>Database Error Loading Genre Taxonomy</span>
           </div>
-          <p className="text-xs text-rose-200/90 leading-relaxed">
+          <p className="text-xs text-rose-800/90 leading-relaxed">
             Unable to retrieve genres or associated counts from the database:
           </p>
-          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (
-            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+            <p className="text-[11px] text-muted italic">Hint: {queryError.hint}</p>
           )}
         </div>
       ) : (

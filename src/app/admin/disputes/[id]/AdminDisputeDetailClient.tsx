@@ -128,41 +128,41 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
   return (
     <div className="space-y-6">
       {/* Back button and title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="space-y-1">
           <Link
             href="/admin/disputes"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-main transition-colors mb-2 font-medium"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Disputes Queue</span>
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-white tracking-tight">
+            <h1 className="text-xl font-serif font-bold text-main tracking-tight">
               Adjudicate Dispute #{dispute.id.slice(0, 8)}
             </h1>
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                 statusMeta.variant === 'warning'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
                   : statusMeta.variant === 'success'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : statusMeta.variant === 'destructive'
-                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+                  ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                  : 'bg-surface-muted text-muted border border-border'
               }`}
             >
               {statusMeta.label}
             </span>
-            <span className="text-xs text-slate-400 font-urdu">{statusMeta.urduLabel}</span>
+            <span className="text-xs text-muted font-urdu">{statusMeta.urduLabel}</span>
           </div>
         </div>
 
         {/* Action button summary */}
         {!isResolved && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-amber-400 font-medium flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
-              <AlertTriangle className="w-4 h-4" />
+            <span className="text-xs text-amber-800 font-medium flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg shadow-sm">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
               <span>Awaiting Administrative Ruling</span>
             </span>
           </div>
@@ -170,8 +170,8 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
       </div>
 
       {outcomeSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5 shadow-sm">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           <span>{outcomeSuccess}</span>
         </div>
       )}
@@ -181,15 +181,15 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
         {/* Left Column (1/3) */}
         <div className="space-y-6">
           {/* Order Details Card */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <div className="rounded-2xl border border-border bg-surface p-5 space-y-4 shadow-card">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <span className="text-xs font-bold text-muted uppercase tracking-wider">
                 Order Snapshot
               </span>
               <Link
                 href={`/admin/orders?search=${encodeURIComponent(order.order_number)}`}
                 target="_blank"
-                className="inline-flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-300"
+                className="inline-flex items-center gap-1 text-[11px] text-accent-admin hover:text-accent-admin-dark font-medium"
               >
                 <span>Full Order</span>
                 <ExternalLink className="w-3 h-3" />
@@ -198,38 +198,38 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500">Order Number:</span>
-                <span className="font-mono font-bold text-white">#{order.order_number}</span>
+                <span className="text-muted">Order Number:</span>
+                <span className="font-mono font-bold text-main">#{order.order_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Novel:</span>
-                <span className="font-medium text-white line-clamp-1">{order.novel_title}</span>
+                <span className="text-muted">Novel:</span>
+                <span className="font-medium text-main line-clamp-1">{order.novel_title}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Amount:</span>
-                <span className="font-mono font-bold text-amber-400">
+                <span className="text-muted">Amount:</span>
+                <span className="font-mono font-bold text-accent-admin">
                   {formatPKR(order.amount_pkr)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Current Order Status:</span>
-                <span className="font-mono font-semibold text-slate-200 uppercase text-[11px]">
+                <span className="text-muted">Current Order Status:</span>
+                <span className="font-mono font-semibold text-main uppercase text-[11px]">
                   {order.status}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Reader:</span>
-                <span className="text-slate-200">{order.reader_display_name}</span>
+                <span className="text-muted">Reader:</span>
+                <span className="text-main font-medium">{order.reader_display_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Author:</span>
-                <span className="text-slate-200">
+                <span className="text-muted">Author:</span>
+                <span className="text-main font-medium">
                   {order.writer_pen_name} ({order.writer_pen_name_urdu})
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Created:</span>
-                <span className="text-slate-400 font-mono text-[11px]">
+                <span className="text-muted">Created:</span>
+                <span className="text-muted font-mono text-[11px]">
                   {new Date(order.created_at).toLocaleString()}
                 </span>
               </div>
@@ -237,22 +237,22 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
           </div>
 
           {/* Dispute Context Card */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block border-b border-slate-800/80 pb-2">
+          <div className="rounded-2xl border border-border bg-surface p-5 space-y-3 shadow-card">
+            <span className="text-xs font-bold text-muted uppercase tracking-wider block border-b border-border pb-2">
               Dispute Reason
             </span>
-            <p className="text-xs text-slate-300 italic leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+            <p className="text-xs text-main italic leading-relaxed bg-surface-muted p-3 rounded-xl border border-border">
               &quot;{dispute.reason}&quot;
             </p>
 
             {dispute.resolution_note && (
-              <div className="space-y-1 pt-2 border-t border-slate-800">
-                <span className="text-[11px] font-bold text-slate-400">Resolution Note:</span>
-                <p className="text-xs text-slate-300 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800">
+              <div className="space-y-1 pt-2 border-t border-border">
+                <span className="text-[11px] font-bold text-muted">Resolution Note:</span>
+                <p className="text-xs text-main bg-surface-muted p-2.5 rounded-xl border border-border">
                   {dispute.resolution_note}
                 </p>
                 {dispute.resolved_at && (
-                  <span className="text-[10px] text-slate-500 font-mono block">
+                  <span className="text-[10px] text-muted font-mono block">
                     Resolved at: {new Date(dispute.resolved_at).toLocaleString()}
                   </span>
                 )}
@@ -261,50 +261,50 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
           </div>
 
           {/* Payment Proofs Submissions */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block border-b border-slate-800/80 pb-2">
+          <div className="rounded-2xl border border-border bg-surface p-5 space-y-3 shadow-card">
+            <span className="text-xs font-bold text-muted uppercase tracking-wider block border-b border-border pb-2">
               Payment Deposit Submissions ({submissions.length})
             </span>
 
             {submissions.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No deposit submissions on record.</p>
+              <p className="text-xs text-muted italic">No deposit submissions on record.</p>
             ) : (
               <div className="space-y-3">
                 {submissions.map((sub, idx) => (
                   <div
                     key={sub.id}
-                    className="p-3 bg-slate-900/60 rounded-lg border border-slate-800 text-xs space-y-2"
+                    className="p-3 bg-surface-muted rounded-xl border border-border text-xs space-y-2"
                   >
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                      <span className="font-bold text-white">Submission #{idx + 1}</span>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                    <div className="flex items-center justify-between border-b border-border pb-1.5">
+                      <span className="font-bold text-main">Submission #{idx + 1}</span>
+                      <span className="text-[10px] text-muted font-mono">
                         {new Date(sub.created_at).toLocaleDateString()}
                       </span>
                     </div>
 
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">TID Reference:</span>
-                        <span className="font-mono font-bold text-amber-400">
+                        <span className="text-muted">TID Reference:</span>
+                        <span className="font-mono font-bold text-accent-admin">
                           {sub.transaction_reference_tid}
                         </span>
                       </div>
                       {sub.sender_account_name && (
                         <div className="flex justify-between">
-                          <span className="text-slate-500">Sender:</span>
-                          <span className="text-slate-300">{sub.sender_account_name}</span>
+                          <span className="text-muted">Sender:</span>
+                          <span className="text-main font-medium">{sub.sender_account_name}</span>
                         </div>
                       )}
                       {sub.paid_amount_claimed_pkr && (
                         <div className="flex justify-between">
-                          <span className="text-slate-500">Claimed Amount:</span>
-                          <span className="font-mono text-slate-300">
+                          <span className="text-muted">Claimed Amount:</span>
+                          <span className="font-mono text-main">
                             {formatPKR(sub.paid_amount_claimed_pkr)}
                           </span>
                         </div>
                       )}
                       {sub.reader_note && (
-                        <div className="text-[11px] text-slate-400 italic pt-1">
+                        <div className="text-[11px] text-muted italic pt-1">
                           Note: &quot;{sub.reader_note}&quot;
                         </div>
                       )}
@@ -316,12 +316,12 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                           type="button"
                           onClick={() => handleInspectProof(sub.screenshot_url)}
                           disabled={loadingProof === sub.screenshot_url}
-                          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-surface-muted text-main border border-border rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 shadow-sm"
                         >
                           {loadingProof === sub.screenshot_url ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-accent-admin" />
                           ) : (
-                            <Eye className="w-3.5 h-3.5 text-amber-400" />
+                            <Eye className="w-3.5 h-3.5 text-accent-admin" />
                           )}
                           <span>Inspect Receipt Image</span>
                         </button>
@@ -337,21 +337,21 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
         {/* Right Column (2/3) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Adjudication Outcome Actions Card */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-6 space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-3">
-              <Scale className="w-5 h-5 text-amber-500" />
+          <div className="rounded-2xl border border-border bg-surface p-6 space-y-4 shadow-card">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <Scale className="w-5 h-5 text-accent-admin" />
               <div>
-                <h2 className="text-sm font-bold text-white">Administrative Adjudication Ruling</h2>
-                <p className="text-[11px] text-slate-400">
+                <h2 className="text-sm font-bold text-main font-serif">Administrative Adjudication Ruling</h2>
+                <p className="text-[11px] text-muted">
                   Select an authoritative ruling. All actions write immutable audit records.
                 </p>
               </div>
             </div>
 
             {isResolved ? (
-              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1">
-                <span className="font-bold text-slate-300">Dispute is Finalized</span>
-                <p className="text-slate-400">
+              <div className="p-4 rounded-xl bg-surface-muted border border-border text-xs space-y-1">
+                <span className="font-bold text-main">Dispute is Finalized</span>
+                <p className="text-muted">
                   This dispute has already been adjudicated with status &apos;{dispute.status}&apos;. No further outcome changes can be applied.
                 </p>
               </div>
@@ -364,13 +364,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     setSelectedOutcome('verify_reader');
                     setOutcomeError(null);
                   }}
-                  className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-left transition-all group cursor-pointer space-y-1.5"
+                  className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                    <ShieldCheck className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>A. Verify for Reader</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[11px] text-emerald-700 leading-relaxed">
                     Deposit verified real. Grants novel access, logs sales ledger sale, and accrues author commission.
                   </p>
                 </button>
@@ -382,13 +382,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     setSelectedOutcome('refund_adjustment');
                     setOutcomeError(null);
                   }}
-                  className="p-4 rounded-xl border border-sky-500/30 bg-sky-500/5 hover:bg-sky-500/10 text-left transition-all group cursor-pointer space-y-1.5"
+                  className="p-4 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 text-sky-400 font-bold text-xs">
-                    <RotateCcw className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-sky-800 font-bold text-xs">
+                    <RotateCcw className="w-4 h-4 text-sky-600" />
                     <span>B. Refund Adjustment</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[11px] text-sky-700 leading-relaxed">
                     Author returned funds off-platform. Logs negative sales ledger adjustment and revokes access.
                   </p>
                 </button>
@@ -400,13 +400,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     setSelectedOutcome('resolve_writer');
                     setOutcomeError(null);
                   }}
-                  className="p-4 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-900 text-left transition-all group cursor-pointer space-y-1.5"
+                  className="p-4 rounded-xl border border-border bg-surface hover:bg-surface-muted text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 text-slate-200 font-bold text-xs">
-                    <CheckCircle2 className="w-4 h-4 text-slate-400" />
+                  <div className="flex items-center gap-2 text-main font-bold text-xs">
+                    <CheckCircle2 className="w-4 h-4 text-muted" />
                     <span>C. Resolve for Writer</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[11px] text-muted leading-relaxed">
                     Payment not verified or fraudulent. Order remains unchanged with zero ledger mutation.
                   </p>
                 </button>
@@ -418,13 +418,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     setSelectedOutcome('close_dispute');
                     setOutcomeError(null);
                   }}
-                  className="p-4 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-900 text-left transition-all group cursor-pointer space-y-1.5"
+                  className="p-4 rounded-xl border border-border bg-surface hover:bg-surface-muted text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 text-slate-400 font-bold text-xs">
-                    <XCircle className="w-4 h-4 text-slate-500" />
+                  <div className="flex items-center gap-2 text-muted font-bold text-xs">
+                    <XCircle className="w-4 h-4 text-muted" />
                     <span>D. Close Dispute</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                  <p className="text-[11px] text-muted leading-relaxed">
                     Dismisses dispute thread without outcome changes or entitlement alterations.
                   </p>
                 </button>
@@ -433,13 +433,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
           </div>
 
           {/* Discussion Thread */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                <FileText className="w-4 h-4 text-slate-400" />
+          <div className="rounded-2xl border border-border bg-surface p-6 space-y-6 shadow-card">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h2 className="text-sm font-bold text-main font-serif flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted" />
                 <span>Investigation Messages ({messages.length})</span>
               </h2>
-              <span className="text-[10px] text-slate-500 font-mono">
+              <span className="text-[10px] text-muted">
                 Immutable chronological log
               </span>
             </div>
@@ -447,7 +447,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
             {/* Messages Listing */}
             <div className="space-y-4">
               {messages.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4 italic">
+                <p className="text-xs text-muted text-center py-4 italic">
                   No messages exchanged on this dispute.
                 </p>
               ) : (
@@ -459,52 +459,52 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                       key={msg.id}
                       className={`p-4 rounded-xl text-xs space-y-2 border ${
                         isAdmin
-                          ? 'bg-purple-950/20 border-purple-800/40'
+                          ? 'bg-indigo-50/70 border-indigo-200 text-indigo-950'
                           : isWriter
-                          ? 'bg-amber-950/15 border-amber-800/30'
-                          : 'bg-slate-900/60 border-slate-800'
+                          ? 'bg-amber-50/60 border-amber-200 text-amber-950'
+                          : 'bg-surface-muted border-border text-main'
                       }`}
                     >
-                      <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-2">
                         <div className="flex items-center gap-2">
                           <span
                             className={`font-bold ${
                               isAdmin
-                                ? 'text-purple-300'
+                                ? 'text-accent-admin'
                                 : isWriter
-                                ? 'text-amber-300'
-                                : 'text-slate-200'
+                                ? 'text-amber-900'
+                                : 'text-main'
                             }`}
                           >
                             {msg.author_name}
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded text-[9px] uppercase font-mono font-bold ${
+                            className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-bold ${
                               isAdmin
-                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                ? 'bg-accent-admin/10 text-accent-admin border border-accent-admin/20'
                                 : isWriter
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                : 'bg-slate-800 text-slate-400 border border-slate-700'
+                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                : 'bg-surface text-muted border border-border'
                             }`}
                           >
                             {msg.author_role}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-500 font-mono">
+                        <span className="text-[10px] text-muted font-mono">
                           {new Date(msg.created_at).toLocaleString()}
                         </span>
                       </div>
 
-                      <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
+                      <p className="leading-relaxed whitespace-pre-wrap">{msg.body}</p>
 
                       {msg.attachment_path && (
                         <div className="pt-1">
                           <button
                             type="button"
                             onClick={() => handleInspectProof(msg.attachment_path!)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 text-[11px] font-semibold border border-slate-700 transition-colors"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface hover:bg-surface-muted text-accent-admin text-[11px] font-semibold border border-border transition-colors shadow-sm"
                           >
-                            <Eye className="w-3 h-3" />
+                            <Eye className="w-3 h-3 text-accent-admin" />
                             <span>View Attachment</span>
                           </button>
                         </div>
@@ -517,14 +517,14 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
 
             {/* Post Admin Reply Form */}
             {!isResolved && (
-              <form onSubmit={handlePostReply} className="space-y-3 pt-4 border-t border-slate-800">
-                <span className="text-xs font-bold text-slate-300">
+              <form onSubmit={handlePostReply} className="space-y-3 pt-4 border-t border-border">
+                <span className="text-xs font-bold text-main">
                   Post Administrative Message / Inquiry
                 </span>
 
                 {replyError && (
-                  <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
+                  <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                     <span>{replyError}</span>
                   </div>
                 )}
@@ -535,13 +535,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     value={replyBody}
                     onChange={(e) => setReplyBody(e.target.value)}
                     placeholder="Enter official inquiry or administrative instruction to reader or author..."
-                    className="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs p-3 rounded-xl focus:outline-none focus:border-amber-500/50 resize-y"
+                    className="w-full bg-surface border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin resize-y"
                   />
                   <div className="flex justify-end">
                     <button
                       type="submit"
                       disabled={isPending || !replyBody.trim()}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs rounded-xl transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-accent-admin hover:bg-accent-admin-dark text-white font-bold text-xs rounded-xl transition-colors disabled:opacity-50 shadow-sm"
                     >
                       {isPending ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -560,11 +560,11 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
 
       {/* Adjudication Outcome Confirmation Modal */}
       {selectedOutcome && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-white">
-                <Scale className="w-4 h-4 text-amber-500" />
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2 text-sm font-bold text-main font-serif">
+                <Scale className="w-4 h-4 text-accent-admin" />
                 <span>
                   Confirm Adjudication:{' '}
                   {selectedOutcome === 'verify_reader'
@@ -579,7 +579,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
               <button
                 type="button"
                 onClick={() => setSelectedOutcome(null)}
-                className="text-slate-400 hover:text-white"
+                className="text-muted hover:text-main"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -589,10 +589,10 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
             <div
               className={`p-3.5 rounded-xl text-xs space-y-1.5 border ${
                 selectedOutcome === 'verify_reader'
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                   : selectedOutcome === 'refund_adjustment'
-                  ? 'bg-sky-500/10 border-sky-500/30 text-sky-300'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  ? 'bg-sky-50 border-sky-200 text-sky-800'
+                  : 'bg-amber-50 border-amber-200 text-amber-800'
               }`}
             >
               <div className="font-bold flex items-center gap-1.5">
@@ -612,22 +612,22 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
             </div>
 
             {outcomeError && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>{outcomeError}</span>
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-300">
-                Administrative Justification Note <span className="text-rose-400">*</span>
+              <label className="block text-xs font-bold text-main">
+                Administrative Justification Note <span className="text-rose-600">*</span>
               </label>
               <textarea
                 rows={3}
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="State the verifiable reason, bank confirmation reference, or policy justification..."
-                className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs p-3 rounded-xl focus:outline-none focus:border-amber-500/50 resize-y"
+                className="w-full bg-surface border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin resize-y"
               />
             </div>
 
@@ -636,7 +636,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                 type="button"
                 onClick={() => setSelectedOutcome(null)}
                 disabled={isPending}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors"
+                className="px-4 py-2 bg-surface hover:bg-surface-muted text-muted hover:text-main border border-border text-xs font-semibold rounded-xl transition-colors"
               >
                 Cancel
               </button>
@@ -646,13 +646,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                 disabled={isPending || !adminNote.trim()}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 ${
                   selectedOutcome === 'verify_reader'
-                    ? 'bg-emerald-500 hover:bg-emerald-400 text-stone-950'
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     : selectedOutcome === 'refund_adjustment'
-                    ? 'bg-sky-500 hover:bg-sky-400 text-stone-950'
+                    ? 'bg-sky-600 hover:bg-sky-700 text-white'
                     : selectedOutcome === 'resolve_writer'
-                    ? 'bg-amber-500 hover:bg-amber-400 text-stone-950'
-                    : 'bg-rose-500 hover:bg-rose-400 text-white'
-                } disabled:opacity-50`}
+                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                    : 'bg-rose-600 hover:bg-rose-700 text-white'
+                } disabled:opacity-50 shadow-sm`}
               >
                 {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>Confirm &amp; Execute Ruling</span>
@@ -664,17 +664,17 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
 
       {/* Proof Lightbox Modal */}
       {lightboxUrl && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4">
           <div className="w-full max-w-3xl flex justify-end pb-2">
             <button
               type="button"
               onClick={() => setLightboxUrl(null)}
-              className="p-2 bg-stone-900 rounded-full text-white hover:bg-stone-800 transition-colors"
+              className="p-2 bg-surface rounded-full text-main hover:bg-surface-muted border border-border transition-colors shadow-lg"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <div className="max-w-3xl max-h-[85vh] overflow-auto bg-stone-950 p-2 rounded-2xl border border-stone-800">
+          <div className="max-w-3xl max-h-[85vh] overflow-auto bg-surface p-2 rounded-2xl border border-border shadow-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={lightboxUrl}

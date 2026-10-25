@@ -21,9 +21,15 @@
   --color-accent: #C39A55;
   --color-accent-light: #D8B474;
   --color-accent-dark: #A37D3B;
+  --color-accent-admin: #4338CA;
+  --color-accent-admin-light: #EEF2FF;
+  --color-accent-admin-dark: #312E81;
+  --color-accent-admin-border: #C7D2FE;
   --color-gold: #C39A55;
 
   --color-main: #202735;
+  --color-text: #202735;
+  --color-text-muted: #6B7280;
   --color-secondary: #6B7280;
   --color-border: #E5E7EB;
   --color-border-dark: #D1D5DB;
@@ -40,6 +46,22 @@
   --color-status-rejected-bg: #FEE2E2;
   --color-status-rejected-border: #FECACA;
 
+  --color-status-success: #059669;
+  --color-status-success-bg: #D1FAE5;
+  --color-status-success-border: #A7F3D0;
+
+  --color-status-warning: #D97706;
+  --color-status-warning-bg: #FEF3C7;
+  --color-status-warning-border: #FDE68A;
+
+  --color-status-danger: #DC2626;
+  --color-status-danger-bg: #FEE2E2;
+  --color-status-danger-border: #FECACA;
+
+  --color-status-info: #2563EB;
+  --color-status-info-bg: #DBEAFE;
+  --color-status-info-border: #BFDBFE;
+
   --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: var(--font-serif), "Cormorant Garamond", Georgia, serif;
   --font-urdu: var(--font-urdu), "Noto Nastaliq Urdu", serif;
@@ -49,6 +71,27 @@
 :root {
   --background: #FAF7F0;
   --foreground: #202735;
+  --surface: #FFFFFF;
+  --surface-muted: #F7F5F0;
+  --border: #E5E7EB;
+  --text: #202735;
+  --text-muted: #6B7280;
+  --accent-admin: #4338CA;
+  --accent-admin-light: #EEF2FF;
+  --accent-admin-dark: #312E81;
+  --accent-admin-border: #C7D2FE;
+  --status-success: #059669;
+  --status-success-bg: #D1FAE5;
+  --status-success-border: #A7F3D0;
+  --status-warning: #D97706;
+  --status-warning-bg: #FEF3C7;
+  --status-warning-border: #FDE68A;
+  --status-danger: #DC2626;
+  --status-danger-bg: #FEE2E2;
+  --status-danger-border: #FECACA;
+  --status-info: #2563EB;
+  --status-info-bg: #DBEAFE;
+  --status-info-border: #BFDBFE;
 }
 
 html {

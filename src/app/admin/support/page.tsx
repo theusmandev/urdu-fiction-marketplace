@@ -69,18 +69,18 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <LifeBuoy className="w-6 h-6 text-purple-400" />
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <LifeBuoy className="w-6 h-6 text-accent-admin" />
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-main">
               Customer Support Helpdesk
             </h1>
-            <span className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full font-mono">
+            <span className="text-xs bg-accent-admin/10 text-accent-admin border border-accent-admin/20 px-2 py-0.5 rounded-full font-mono">
               {totalCount} Total
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted mt-1">
             Respond to reader and author support inquiries, general payment questions, and technical assistance tickets.
           </p>
         </div>
@@ -98,8 +98,8 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                 href={`/admin/support?status=${tab.key}${currentCategory !== 'all' ? `&category=${currentCategory}` : ''}`}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                   isActive
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    ? 'bg-accent-admin text-white shadow-sm'
+                    : 'text-muted hover:text-main hover:bg-surface-muted'
                 }`}
               >
                 {tab.label}
@@ -110,7 +110,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
 
         {/* Category Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto text-xs">
-          <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+          <Filter className="w-3.5 h-3.5 text-muted shrink-0" />
           {categories.map((cat) => {
             const isActive = currentCategory === cat.key;
             return (
@@ -119,8 +119,8 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                 href={`/admin/support?status=${currentStatus}&category=${cat.key}`}
                 className={`px-2.5 py-1 rounded-full text-[11px] whitespace-nowrap border transition-colors ${
                   isActive
-                    ? 'bg-slate-800 text-purple-300 border-purple-500/40 font-bold'
-                    : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:text-white hover:bg-slate-850'
+                    ? 'bg-accent-admin/10 text-accent-admin border-accent-admin/30 font-bold'
+                    : 'bg-surface-muted text-muted border-border hover:text-main hover:bg-surface'
                 }`}
               >
                 {cat.label}
@@ -132,20 +132,20 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
 
       {/* Tickets Table */}
       {requests.length === 0 ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-12 text-center space-y-3">
-          <LifeBuoy className="w-8 h-8 text-slate-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white">No support tickets found</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <div className="rounded-xl border border-border bg-surface p-12 text-center space-y-3 shadow-card">
+          <LifeBuoy className="w-8 h-8 text-muted mx-auto" />
+          <h3 className="text-sm font-bold text-main">No support tickets found</h3>
+          <p className="text-xs text-muted max-w-sm mx-auto">
             {currentStatus !== 'all' || currentCategory !== 'all'
               ? 'No support tickets match the selected filters.'
               : 'There are currently no active support requests in the system.'}
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-border bg-surface overflow-hidden shadow-card">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800 font-mono">
+              <thead className="bg-surface-muted/80 text-muted uppercase tracking-wider text-[11px] border-b border-border font-medium">
                 <tr>
                   <th className="py-3 px-4">Subject / Inquiry</th>
                   <th className="py-3 px-4">User</th>
@@ -155,32 +155,32 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                   <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-border text-main">
                 {requests.map((ticket) => {
                   const meta = getSupportStatusMeta(ticket.status);
 
                   return (
-                    <tr key={ticket.id} className="hover:bg-slate-900/40 transition-colors">
+                    <tr key={ticket.id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Subject */}
                       <td className="py-3.5 px-4 space-y-1">
-                        <div className="font-semibold text-white line-clamp-1">
+                        <div className="font-semibold text-main line-clamp-1">
                           {ticket.subject}
                         </div>
                         {ticket.order_number && (
-                          <span className="font-mono text-[10px] text-amber-400">
+                          <span className="font-mono text-[10px] text-brand-gold">
                             Ref: #{ticket.order_number}
                           </span>
                         )}
                       </td>
 
                       {/* User */}
-                      <td className="py-3.5 px-4 font-medium text-slate-200">
+                      <td className="py-3.5 px-4 font-medium text-main">
                         {ticket.user_name || 'User'}
                       </td>
 
                       {/* Category */}
                       <td className="py-3.5 px-4">
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-muted text-muted border border-border">
                           {ticket.category}
                         </span>
                       </td>
@@ -189,29 +189,29 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                       <td className="py-3.5 px-4 space-y-0.5">
                         <div className="flex items-center gap-1.5">
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                               meta.variant === 'warning'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
                                 : meta.variant === 'success'
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                : 'bg-slate-800 text-slate-400 border border-slate-700'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : 'bg-stone-100 text-stone-600 border-stone-200'
                             }`}
                           >
                             {meta.label}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-urdu">
+                          <span className="text-[10px] text-brand-gold font-urdu">
                             {meta.urduLabel}
                           </span>
                         </div>
                       </td>
 
                       {/* Last Activity */}
-                      <td className="py-3.5 px-4 text-slate-400 space-y-0.5">
+                      <td className="py-3.5 px-4 text-muted space-y-0.5">
                         <div className="flex items-center gap-1 font-mono text-[10px]">
-                          <Clock className="w-3 h-3 text-slate-500" />
+                          <Clock className="w-3 h-3 text-muted" />
                           <span>{new Date(ticket.updated_at).toLocaleDateString()}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono">
+                        <div className="flex items-center gap-1 text-[10px] text-muted font-mono">
                           <MessageSquare className="w-3 h-3" />
                           <span>{ticket.messages_count} msgs</span>
                         </div>
@@ -221,7 +221,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                       <td className="py-3.5 px-4 text-right">
                         <Link
                           href={`/admin/support/${ticket.id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-lg text-xs font-semibold transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-admin/10 hover:bg-accent-admin/20 text-accent-admin border border-accent-admin/30 rounded-lg text-xs font-semibold transition-colors shadow-sm"
                         >
                           <span>Reply</span>
                           <ArrowRight className="w-3 h-3" />
@@ -236,7 +236,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-slate-900/60 border-t border-slate-800 px-4 py-3 flex items-center justify-between text-xs text-slate-400">
+            <div className="bg-surface-muted/60 border-t border-border px-4 py-3 flex items-center justify-between text-xs text-muted">
               <div>
                 Page {currentPage} of {totalPages} ({totalCount} tickets)
               </div>
@@ -244,7 +244,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                 {currentPage > 1 && (
                   <Link
                     href={`/admin/support?status=${currentStatus}&category=${currentCategory}&page=${currentPage - 1}`}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-surface border border-border hover:bg-surface-muted text-main transition-colors shadow-sm"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Link>
@@ -252,7 +252,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                 {currentPage < totalPages && (
                   <Link
                     href={`/admin/support?status=${currentStatus}&category=${currentCategory}&page=${currentPage + 1}`}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-surface border border-border hover:bg-surface-muted text-main transition-colors shadow-sm"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Link>

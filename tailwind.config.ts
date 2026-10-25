@@ -40,12 +40,22 @@ const config: Config = {
           light: "#D8B474",
           dark: "#A37D3B",
         },
+        "accent-admin": {
+          DEFAULT: "#4338CA", // Deep Indigo
+          light: "#EEF2FF",
+          dark: "#312E81",
+          border: "#C7D2FE",
+        },
         gold: {
           DEFAULT: "#C39A55",
           light: "#D8B474",
           dark: "#A37D3B",
         },
         main: "#202735", // Main Text
+        text: {
+          DEFAULT: "#202735",
+          muted: "#6B7280",
+        },
         secondary: "#6B7280", // Secondary Text
         border: "#E5E7EB", // Subtle Border
         
@@ -60,6 +70,18 @@ const config: Config = {
           rejected: "#DC2626",
           rejectedBg: "#FEE2E2",
           rejectedBorder: "#FECACA",
+          success: "#059669",
+          successBg: "#D1FAE5",
+          successBorder: "#A7F3D0",
+          warning: "#D97706",
+          warningBg: "#FEF3C7",
+          warningBorder: "#FDE68A",
+          danger: "#DC2626",
+          dangerBg: "#FEE2E2",
+          dangerBorder: "#FECACA",
+          info: "#2563EB",
+          infoBg: "#DBEAFE",
+          infoBorder: "#BFDBFE",
         },
       },
       fontFamily: {

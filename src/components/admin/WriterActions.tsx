@@ -135,13 +135,13 @@ export function WriterActions({
   return (
     <div className="space-y-4">
       {error && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
           {error}
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
           {successMsg}
         </div>
       )}
@@ -154,7 +154,7 @@ export function WriterActions({
               type="button"
               onClick={() => setActiveDialog('approve')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Approve Writer</span>
@@ -163,7 +163,7 @@ export function WriterActions({
               type="button"
               onClick={() => setActiveDialog('reject')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <XCircle className="w-4 h-4" />
               <span>Reject Application</span>
@@ -176,7 +176,7 @@ export function WriterActions({
             type="button"
             onClick={() => setActiveDialog('suspend')}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
           >
             <AlertOctagon className="w-4 h-4" />
             <span>Suspend Writer</span>
@@ -188,7 +188,7 @@ export function WriterActions({
             type="button"
             onClick={() => setActiveDialog('approve')}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Re-Approve Writer</span>
@@ -199,9 +199,9 @@ export function WriterActions({
           type="button"
           onClick={() => setActiveDialog('terms')}
           disabled={loading}
-          className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+          className="px-4 py-2 rounded-xl bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
         >
-          <Sliders className="w-4 h-4 text-slate-400" />
+          <Sliders className="w-4 h-4 text-muted" />
           <span>Edit Commission Terms</span>
         </button>
       </div>
@@ -249,28 +249,28 @@ export function WriterActions({
 
       {/* Commission Terms Edit Modal */}
       {activeDialog === 'terms' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <form
             onSubmit={handleUpdateTerms}
-            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+            className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin shrink-0">
                 <Sliders className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-main">
                   Custom Commission & Limits
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Changes affect future sales only. Past sales ledger entries remain immutable.
+                <p className="text-xs text-muted mt-1">
+                  Changes affect future sales only.
                 </p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-main block mb-1">
                   Custom Commission Rate (%)
                 </label>
                 <input
@@ -281,15 +281,15 @@ export function WriterActions({
                   value={rateInput}
                   onChange={(e) => setRateInput(e.target.value)}
                   placeholder="Leave blank for platform default (20%)"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                 />
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-muted">
                   Empty = uses platform default rate.
                 </span>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-main block mb-1">
                   Unpaid Commission Limit (PKR)
                 </label>
                 <input
@@ -298,13 +298,13 @@ export function WriterActions({
                   value={limitInput}
                   onChange={(e) => setLimitInput(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Justification Reason <span className="text-rose-400 font-mono">*</span>
+                <label className="text-xs font-semibold text-main block mb-1">
+                  Justification Reason <span className="text-rose-600 font-mono">*</span>
                 </label>
                 <textarea
                   rows={2}
@@ -312,24 +312,24 @@ export function WriterActions({
                   onChange={(e) => setTermsReason(e.target.value)}
                   required
                   placeholder="Reason for rate/threshold adjustment..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-none"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800/80">
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
               <button
                 type="button"
                 onClick={() => setActiveDialog(null)}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700/80 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-main hover:bg-surface border border-border transition-colors disabled:opacity-50 bg-surface-muted"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-accent-admin hover:bg-accent-admin-dark text-white transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
               >
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>Save Terms</span>

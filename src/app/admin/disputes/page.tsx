@@ -62,18 +62,18 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <Scale className="w-6 h-6 text-amber-500" />
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <Scale className="w-6 h-6 text-accent-admin" />
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-main font-serif">
               Disputes Adjudication Desk
             </h1>
-            <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full font-mono">
+            <span className="text-xs bg-accent-admin/10 text-accent-admin border border-accent-admin/20 px-2.5 py-0.5 rounded-full font-mono font-medium">
               {totalCount} Total
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted mt-1">
             Investigate reader payment deposit claims against author rejections. Strictly impartial evidence-based adjudication.
           </p>
         </div>
@@ -81,10 +81,10 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
         <div className="flex items-center gap-2">
           <Link
             href="/admin/refunds"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-main bg-surface hover:bg-surface-muted border border-border transition-colors shadow-sm"
           >
             <span>Refund Queue</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 text-muted" />
           </Link>
         </div>
       </div>
@@ -101,8 +101,8 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                 href={`/admin/disputes?status=${tab.key}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ''}`}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                   isActive
-                    ? 'bg-amber-500 text-stone-950 shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    ? 'bg-accent-admin text-white shadow-sm'
+                    : 'text-muted hover:text-main hover:bg-surface-muted'
                 }`}
               >
                 {tab.label}
@@ -117,18 +117,18 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
             <input type="hidden" name="status" value={currentStatus} />
           )}
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="text"
               name="search"
               defaultValue={currentSearch}
               placeholder="Search order #, author, reader..."
-              className="bg-slate-900 border border-slate-800 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-lg w-64 focus:outline-none focus:border-amber-500/50"
+              className="bg-surface border border-border text-main text-xs pl-9 pr-3 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
             />
           </div>
           <button
             type="submit"
-            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold transition-colors"
+            className="px-3 py-2 bg-surface hover:bg-surface-muted text-main border border-border rounded-lg text-xs font-semibold transition-colors shadow-sm"
           >
             Filter
           </button>
@@ -137,20 +137,20 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
 
       {/* Disputes Table */}
       {disputes.length === 0 ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-12 text-center space-y-3">
-          <Scale className="w-8 h-8 text-slate-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white">No disputes found</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <div className="rounded-2xl border border-border bg-surface p-12 text-center space-y-3 shadow-card">
+          <Scale className="w-8 h-8 text-muted mx-auto" />
+          <h3 className="text-sm font-bold text-main">No disputes found</h3>
+          <p className="text-xs text-muted max-w-sm mx-auto">
             {currentSearch || currentStatus !== 'all'
               ? 'No disputes match your current filter criteria.'
               : 'There are currently no disputes in the platform registry.'}
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 overflow-hidden shadow-sm">
+        <div className="rounded-2xl border border-border bg-surface overflow-hidden shadow-card">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800 font-mono">
+              <thead className="bg-surface-muted text-muted text-[11px] border-b border-border font-medium">
                 <tr>
                   <th className="py-3 px-4">Order / Novel</th>
                   <th className="py-3 px-4">Disputant Parties</th>
@@ -160,20 +160,20 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                   <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-border text-main">
                 {disputes.map((d) => {
                   const meta = getDisputeStatusMeta(d.status);
                   return (
-                    <tr key={d.dispute_id} className="hover:bg-slate-900/40 transition-colors">
+                    <tr key={d.dispute_id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Order / Novel */}
                       <td className="py-3.5 px-4 space-y-0.5">
-                        <div className="font-mono font-bold text-amber-400 text-xs">
+                        <div className="font-mono font-bold text-accent-admin text-xs">
                           #{d.order_number}
                         </div>
-                        <div className="font-medium text-white line-clamp-1">
+                        <div className="font-medium text-main line-clamp-1">
                           {d.novel_title}
                         </div>
-                        <div className="text-[10px] text-slate-500 flex items-center gap-1 font-mono">
+                        <div className="text-[10px] text-muted flex items-center gap-1 font-mono">
                           <Clock className="w-3 h-3" />
                           <span>{new Date(d.created_at).toLocaleDateString()}</span>
                         </div>
@@ -182,30 +182,30 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                       {/* Disputant Parties */}
                       <td className="py-3.5 px-4 space-y-1">
                         <div className="text-[11px]">
-                          <span className="text-slate-500">Reader: </span>
-                          <span className="text-white font-medium">{d.reader_name || 'Reader'}</span>
+                          <span className="text-muted">Reader: </span>
+                          <span className="text-main font-medium">{d.reader_name || 'Reader'}</span>
                         </div>
                         <div className="text-[11px]">
-                          <span className="text-slate-500">Author: </span>
-                          <span className="text-amber-300 font-medium">{d.writer_pen_name || 'Author'}</span>
+                          <span className="text-muted">Author: </span>
+                          <span className="text-brand-gold font-medium">{d.writer_pen_name || 'Author'}</span>
                         </div>
                       </td>
 
                       {/* Reason / Notes */}
                       <td className="py-3.5 px-4 max-w-xs space-y-1">
-                        <p className="line-clamp-2 text-slate-300 italic">
+                        <p className="line-clamp-2 text-main italic">
                           &quot;{d.reason}&quot;
                         </p>
                         {d.messages_count > 0 && (
-                          <div className="inline-flex items-center gap-1 text-[10px] text-slate-400 font-mono">
-                            <MessageSquare className="w-3 h-3 text-slate-500" />
+                          <div className="inline-flex items-center gap-1 text-[10px] text-muted">
+                            <MessageSquare className="w-3 h-3 text-muted" />
                             <span>{d.messages_count} messages</span>
                           </div>
                         )}
                       </td>
 
                       {/* Amount */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-200">
+                      <td className="py-3.5 px-4 font-mono font-bold text-main">
                         {formatPKR(d.amount_pkr)}
                       </td>
 
@@ -215,25 +215,25 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               meta.variant === 'warning'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                ? 'bg-amber-50 text-amber-800 border border-amber-200'
                                 : meta.variant === 'success'
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                 : meta.variant === 'destructive'
-                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                : 'bg-surface-muted text-muted border border-border'
                             }`}
                           >
                             {meta.label}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-urdu">
+                          <span className="text-[10px] text-muted font-urdu">
                             {meta.urduLabel}
                           </span>
                         </div>
 
                         {/* Stagnant > 3 Days Warning Badge */}
                         {d.is_stuck && (
-                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                            <AlertTriangle className="w-3 h-3 text-rose-400 animate-pulse" />
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
+                            <AlertTriangle className="w-3 h-3 text-rose-600 animate-pulse" />
                             <span>STUCK &gt; 3 DAYS</span>
                           </div>
                         )}
@@ -243,7 +243,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                       <td className="py-3.5 px-4 text-right">
                         <Link
                           href={`/admin/disputes/${d.dispute_id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-semibold transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-admin/10 hover:bg-accent-admin/20 text-accent-admin border border-accent-admin/30 rounded-lg text-xs font-semibold transition-colors"
                         >
                           <span>Investigate</span>
                           <ArrowRight className="w-3 h-3" />
@@ -258,7 +258,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="bg-slate-900/60 border-t border-slate-800 px-4 py-3 flex items-center justify-between text-xs text-slate-400">
+            <div className="bg-surface-muted border-t border-border px-4 py-3 flex items-center justify-between text-xs text-muted">
               <div>
                 Showing page {currentPage} of {totalPages} ({totalCount} disputes)
               </div>
@@ -266,7 +266,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                 {currentPage > 1 && (
                   <Link
                     href={`/admin/disputes?status=${currentStatus}&page=${currentPage - 1}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ''}`}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-surface border border-border hover:bg-surface-muted text-main transition-colors shadow-sm"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Link>
@@ -274,7 +274,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                 {currentPage < totalPages && (
                   <Link
                     href={`/admin/disputes?status=${currentStatus}&page=${currentPage + 1}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ''}`}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-surface border border-border hover:bg-surface-muted text-main transition-colors shadow-sm"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Link>

@@ -40,18 +40,18 @@ export default async function AdminInvoicesPage({
   if (queryError) {
     return (
       <div className="space-y-6 max-w-7xl mx-auto py-8">
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
-          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
             <span>Database Error Loading Commission Invoices</span>
           </div>
-          <p className="text-xs text-rose-200/90 leading-relaxed">
+          <p className="text-xs text-rose-800/90 leading-relaxed">
             Unable to retrieve commission invoice statements from the database:
           </p>
-          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (
-            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+            <p className="text-[11px] text-muted italic">Hint: {queryError.hint}</p>
           )}
         </div>
       </div>

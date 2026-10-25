@@ -99,35 +99,35 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <div className="w-7 h-7 rounded-lg bg-accent-admin-light border border-accent-admin-border flex items-center justify-center text-accent-admin">
               <History className="w-3.5 h-3.5" />
             </div>
-            <h1 className="text-xl font-bold text-white">System Audit & Governance Trail</h1>
+            <h1 className="text-xl font-bold text-navy">System Audit Trail</h1>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Immutable, append-only record of all administrative approvals, suspensions, rate modifications, and deletions.
+          <p className="text-xs text-secondary mt-0.5">
+            Record of all administrative approvals, suspensions, rate modifications, and deletions.
           </p>
         </div>
 
-        <div className="text-xs text-slate-500 font-mono">
-          Total Recorded Events: <span className="text-white font-bold">{count || 0}</span>
+        <div className="text-xs text-secondary font-medium">
+          Total Recorded Events: <span className="text-navy font-bold font-mono">{count || 0}</span>
         </div>
       </div>
 
       {/* Filter Toolbar */}
       <form
         method="get"
-        className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3"
+        className="bg-surface p-4 rounded-2xl border border-border shadow-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3"
       >
         {/* Action Type Filter */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+          <label className="text-xs font-semibold text-secondary block mb-1">
             Action Type
           </label>
           <select
             name="action_type"
             defaultValue={actionType}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
           >
             {ACTION_TYPES.map((act) => (
               <option key={act} value={act === 'ALL' ? '' : act}>
@@ -139,13 +139,13 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
 
         {/* Entity Type Filter */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+          <label className="text-xs font-semibold text-secondary block mb-1">
             Entity Type
           </label>
           <select
             name="entity_type"
             defaultValue={entityType}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
           >
             {ENTITY_TYPES.map((ent) => (
               <option key={ent} value={ent === 'ALL' ? '' : ent}>
@@ -157,27 +157,28 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
 
         {/* From Date */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+          <label className="text-xs font-semibold text-secondary block mb-1">
             From Date
           </label>
           <input
             type="date"
             name="from"
             defaultValue={fromDate}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
-          />
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+          >
+          </input>
         </div>
 
         {/* To Date */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+          <label className="text-xs font-semibold text-secondary block mb-1">
             To Date
           </label>
           <input
             type="date"
             name="to"
             defaultValue={toDate}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
           />
         </div>
 
@@ -185,14 +186,14 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
         <div className="flex items-end gap-2">
           <button
             type="submit"
-            className="flex-1 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            className="flex-1 py-1.5 rounded-xl bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
           >
             <Filter className="w-3.5 h-3.5" />
             <span>Filter</span>
           </button>
           <Link
             href="/admin/audit"
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition-colors"
+            className="p-2 rounded-xl bg-surface hover:bg-ivory text-secondary hover:text-navy border border-border transition-colors shadow-xs"
             title="Reset Filters"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -202,28 +203,28 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
 
       {/* Audit Log Results */}
       {queryError ? (
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
-          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0" />
+        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
             <span>Database Error Loading Audit Logs</span>
           </div>
-          <p className="text-xs text-rose-200/90 leading-relaxed">
+          <p className="text-xs text-rose-900 leading-relaxed">
             Unable to retrieve system audit records from the database:
           </p>
-          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (
-            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+            <p className="text-[11px] text-secondary italic">Hint: {queryError.hint}</p>
           )}
         </div>
       ) : !logs || logs.length === 0 ? (
-        <div className="py-16 text-center bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
-          <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
+        <div className="py-16 text-center bg-surface rounded-2xl border border-border shadow-card space-y-2">
+          <div className="w-12 h-12 rounded-full bg-ivory border border-border flex items-center justify-center mx-auto text-secondary">
             <History className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-semibold text-slate-300">No audit log records found</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <h3 className="text-sm font-semibold text-main">No audit log records found</h3>
+          <p className="text-xs text-secondary max-w-sm mx-auto">
             No system actions matched your selected filter criteria.
           </p>
         </div>

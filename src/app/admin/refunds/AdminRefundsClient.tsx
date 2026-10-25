@@ -109,25 +109,25 @@ export function AdminRefundsClient({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <RotateCcw className="w-6 h-6 text-sky-400" />
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <RotateCcw className="w-6 h-6 text-accent-admin" />
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-main">
               Refund Adjustments Queue
             </h1>
-            <span className="text-xs bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded-full font-mono">
+            <span className="text-xs bg-accent-admin/10 text-accent-admin border border-accent-admin/20 px-2 py-0.5 rounded-full font-mono">
               {totalCount} Total
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Review writer requests for off-platform refunds. Approving applies an append-only negative sales ledger row and revokes reader access.
+          <p className="text-xs sm:text-sm text-muted mt-1">
+            Review writer requests for off-platform refunds. Approving applies a negative sales ledger entry and revokes reader access.
           </p>
         </div>
 
         <Link
           href="/admin/disputes"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-main bg-surface-muted hover:bg-surface border border-border transition-colors shadow-sm"
         >
           <span>Disputes Desk</span>
         </Link>
@@ -137,21 +137,21 @@ export function AdminRefundsClient({
         <div
           className={`p-4 rounded-xl text-xs flex items-center gap-2.5 ${
             feedback.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
-              : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
+              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+              : 'bg-rose-50 border border-rose-200 text-rose-700'
           }`}
         >
           {feedback.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           )}
           <span>{feedback.message}</span>
         </div>
       )}
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 overflow-x-auto border-b border-slate-800 pb-2">
+      <div className="flex items-center gap-1 overflow-x-auto border-b border-border pb-2">
         {tabs.map((tab) => {
           const isActive = currentStatus === tab.key;
           return (
@@ -160,8 +160,8 @@ export function AdminRefundsClient({
               href={`/admin/refunds?status=${tab.key}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'bg-sky-500 text-stone-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-accent-admin text-white shadow-sm'
+                  : 'text-muted hover:text-main hover:bg-surface-muted'
               }`}
             >
               {tab.label}
@@ -172,20 +172,20 @@ export function AdminRefundsClient({
 
       {/* Requests Table */}
       {requests.length === 0 ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-12 text-center space-y-3">
-          <RotateCcw className="w-8 h-8 text-slate-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white">No refund requests found</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <div className="rounded-xl border border-border bg-surface p-12 text-center space-y-3 shadow-card">
+          <RotateCcw className="w-8 h-8 text-muted mx-auto" />
+          <h3 className="text-sm font-bold text-main">No refund requests found</h3>
+          <p className="text-xs text-muted max-w-sm mx-auto">
             {currentStatus !== 'all'
               ? `There are no ${currentStatus} refund adjustment requests.`
               : 'No author has submitted a refund adjustment request yet.'}
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-border bg-surface overflow-hidden shadow-card">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800 font-mono">
+              <thead className="bg-surface-muted/80 text-muted uppercase tracking-wider text-[11px] border-b border-border font-medium">
                 <tr>
                   <th className="py-3 px-4">Order / Novel</th>
                   <th className="py-3 px-4">Parties</th>
@@ -195,27 +195,27 @@ export function AdminRefundsClient({
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-border text-main">
                 {requests.map((req) => {
                   const meta = getRefundStatusMeta(req.status);
                   const isPendingReview = req.status === 'pending';
 
                   return (
-                    <tr key={req.id} className="hover:bg-slate-900/40 transition-colors">
+                    <tr key={req.id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Order / Novel */}
                       <td className="py-3.5 px-4 space-y-0.5">
                         <Link
                           href={`/admin/orders?search=${encodeURIComponent(req.order_number)}`}
                           target="_blank"
-                          className="font-mono font-bold text-amber-400 text-xs hover:underline inline-flex items-center gap-1"
+                          className="font-mono font-bold text-brand-gold text-xs hover:underline inline-flex items-center gap-1"
                         >
                           <span>#{req.order_number}</span>
-                          <ExternalLink className="w-3 h-3 text-slate-500" />
+                          <ExternalLink className="w-3 h-3 text-muted" />
                         </Link>
-                        <div className="font-medium text-white line-clamp-1">
+                        <div className="font-medium text-main line-clamp-1">
                           {req.novel_title}
                         </div>
-                        <div className="text-[10px] text-slate-500 flex items-center gap-1 font-mono">
+                        <div className="text-[10px] text-muted flex items-center gap-1 font-mono">
                           <Clock className="w-3 h-3" />
                           <span>{new Date(req.created_at).toLocaleDateString()}</span>
                         </div>
@@ -224,23 +224,23 @@ export function AdminRefundsClient({
                       {/* Parties */}
                       <td className="py-3.5 px-4 space-y-1">
                         <div className="text-[11px]">
-                          <span className="text-slate-500">Author: </span>
-                          <span className="text-amber-300 font-medium">{req.writer_pen_name}</span>
+                          <span className="text-muted">Author: </span>
+                          <span className="text-brand-gold font-medium">{req.writer_pen_name}</span>
                         </div>
                         <div className="text-[11px]">
-                          <span className="text-slate-500">Reader: </span>
-                          <span className="text-white font-medium">{req.reader_name}</span>
+                          <span className="text-muted">Reader: </span>
+                          <span className="text-main font-medium">{req.reader_name}</span>
                         </div>
                       </td>
 
                       {/* Refund Reason & Proof */}
                       <td className="py-3.5 px-4 max-w-xs space-y-1.5">
-                        <p className="text-slate-300 leading-snug">
-                          <span className="font-semibold text-white">Reason: </span>
+                        <p className="text-main leading-snug">
+                          <span className="font-semibold text-main">Reason: </span>
                           {req.reason}
                         </p>
                         {req.evidence_note && (
-                          <p className="text-[11px] text-slate-400 italic">
+                          <p className="text-[11px] text-muted italic">
                             Proof note: &quot;{req.evidence_note}&quot;
                           </p>
                         )}
@@ -250,7 +250,7 @@ export function AdminRefundsClient({
                               type="button"
                               onClick={() => handleInspectProof(req.evidence_path!)}
                               disabled={loadingProof === req.evidence_path}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-400 hover:text-sky-300 transition-colors"
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-admin hover:underline transition-colors"
                             >
                               <Eye className="w-3 h-3" />
                               <span>Inspect Off-Platform Refund Receipt</span>
@@ -260,26 +260,26 @@ export function AdminRefundsClient({
                       </td>
 
                       {/* Amount */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-200">
+                      <td className="py-3.5 px-4 font-mono font-bold text-main">
                         {formatPKR(req.amount_pkr)}
                       </td>
 
                       {/* Status & Review */}
                       <td className="py-3.5 px-4 space-y-1">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                             meta.variant === 'warning'
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              ? 'bg-amber-50 text-amber-800 border-amber-200'
                               : meta.variant === 'success'
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-rose-50 text-rose-700 border-rose-200'
                           }`}
                         >
                           {meta.label}
                         </span>
 
                         {req.admin_note && (
-                          <p className="text-[11px] text-slate-400 italic line-clamp-1">
+                          <p className="text-[11px] text-muted italic line-clamp-1">
                             &quot;{req.admin_note}&quot;
                           </p>
                         )}
@@ -297,7 +297,7 @@ export function AdminRefundsClient({
                                 setAdminNote('');
                                 setFeedback(null);
                               }}
-                              className="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-semibold transition-colors"
+                              className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors shadow-sm"
                             >
                               Approve
                             </button>
@@ -309,13 +309,13 @@ export function AdminRefundsClient({
                                 setAdminNote('');
                                 setFeedback(null);
                               }}
-                              className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors"
+                              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition-colors shadow-sm"
                             >
                               Decline
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-500 font-mono">
+                          <span className="text-[11px] text-muted font-mono">
                             {req.reviewed_at ? new Date(req.reviewed_at).toLocaleDateString() : 'Reviewed'}
                           </span>
                         )}
@@ -329,7 +329,7 @@ export function AdminRefundsClient({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-slate-900/60 border-t border-slate-800 px-4 py-3 flex items-center justify-between text-xs text-slate-400">
+            <div className="bg-surface-muted/60 border-t border-border px-4 py-3 flex items-center justify-between text-xs text-muted">
               <div>
                 Page {currentPage} of {totalPages} ({totalCount} total)
               </div>
@@ -337,7 +337,7 @@ export function AdminRefundsClient({
                 {currentPage > 1 && (
                   <Link
                     href={`/admin/refunds?status=${currentStatus}&page=${currentPage - 1}`}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-surface border border-border hover:bg-surface-muted text-main transition-colors shadow-sm"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Link>
@@ -345,7 +345,7 @@ export function AdminRefundsClient({
                 {currentPage < totalPages && (
                   <Link
                     href={`/admin/refunds?status=${currentStatus}&page=${currentPage + 1}`}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-surface border border-border hover:bg-surface-muted text-main transition-colors shadow-sm"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Link>
@@ -358,11 +358,11 @@ export function AdminRefundsClient({
 
       {/* Confirmation Modal */}
       {activeRequest && actionType && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-white">
-                <RotateCcw className="w-4 h-4 text-sky-400" />
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2 text-sm font-bold text-main">
+                <RotateCcw className="w-4 h-4 text-accent-admin" />
                 <span>
                   {actionType === 'approve'
                     ? `Approve Refund Adjustment — Order #${activeRequest.order_number}`
@@ -375,7 +375,7 @@ export function AdminRefundsClient({
                   setActiveRequest(null);
                   setActionType(null);
                 }}
-                className="text-slate-400 hover:text-white"
+                className="text-muted hover:text-main"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -385,31 +385,31 @@ export function AdminRefundsClient({
             <div
               className={`p-3.5 rounded-xl text-xs space-y-1.5 border ${
                 actionType === 'approve'
-                  ? 'bg-sky-500/10 border-sky-500/30 text-sky-300'
-                  : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                  ? 'bg-amber-50 border-amber-200 text-amber-800'
+                  : 'bg-rose-50 border-rose-200 text-rose-700'
               }`}
             >
               <div className="font-bold flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>Authoritative Ledger Impact</span>
+                <span>Financial Ledger Impact</span>
               </div>
               <p className="leading-relaxed">
                 {actionType === 'approve'
-                  ? `Approving confirms that author ${activeRequest.writer_pen_name} refunded ${formatPKR(activeRequest.amount_pkr)} off-platform. An immutable negative adjustment row will be written to sales_ledger, reducing the author's platform commission debt and revoking reader ${activeRequest.reader_name}'s novel reading access.`
+                  ? `Approving confirms that author ${activeRequest.writer_pen_name} refunded ${formatPKR(activeRequest.amount_pkr)} off-platform. A negative adjustment entry will be written to the sales ledger, reducing the author's platform commission debt and revoking reader ${activeRequest.reader_name}'s novel reading access.`
                   : `Declining dismisses the author's request for platform commission reduction. Reader access and original verified sale remain unchanged.`}
               </p>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-300">
-                Administrative Reason / Review Note <span className="text-rose-400">*</span>
+              <label className="block text-xs font-bold text-main">
+                Administrative Reason / Review Note <span className="text-rose-600">*</span>
               </label>
               <textarea
                 rows={3}
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="State the justification, bank reference, or reason for this ruling..."
-                className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs p-3 rounded-xl focus:outline-none focus:border-sky-500/50 resize-y"
+                className="w-full bg-surface-muted border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-y placeholder-muted"
               />
             </div>
 
@@ -421,7 +421,7 @@ export function AdminRefundsClient({
                   setActionType(null);
                 }}
                 disabled={isPending}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors"
+                className="px-4 py-2 bg-surface-muted hover:bg-surface text-main border border-border text-xs font-semibold rounded-xl transition-colors"
               >
                 Cancel
               </button>
@@ -429,10 +429,10 @@ export function AdminRefundsClient({
                 type="button"
                 onClick={handleExecuteAction}
                 disabled={isPending || !adminNote.trim()}
-                className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm ${
                   actionType === 'approve'
-                    ? 'bg-sky-500 hover:bg-sky-400 text-stone-950'
-                    : 'bg-rose-500 hover:bg-rose-400 text-white'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                    : 'bg-rose-600 hover:bg-rose-500 text-white'
                 } disabled:opacity-50`}
               >
                 {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -447,17 +447,17 @@ export function AdminRefundsClient({
 
       {/* Proof Lightbox Modal */}
       {lightboxUrl && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-4">
           <div className="w-full max-w-3xl flex justify-end pb-2">
             <button
               type="button"
               onClick={() => setLightboxUrl(null)}
-              className="p-2 bg-stone-900 rounded-full text-white hover:bg-stone-800 transition-colors"
+              className="p-2 bg-surface rounded-full text-main hover:bg-surface-muted border border-border transition-colors shadow-lg"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <div className="max-w-3xl max-h-[85vh] overflow-auto bg-stone-950 p-2 rounded-2xl border border-stone-800">
+          <div className="max-w-3xl max-h-[85vh] overflow-auto bg-surface p-2 rounded-2xl border border-border shadow-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={lightboxUrl}

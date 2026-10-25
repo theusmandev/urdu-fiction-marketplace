@@ -212,15 +212,15 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
     <div className="space-y-6">
       {/* Alert Notices */}
       {error && (
-        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-xs text-rose-400 hover:text-white"
+            className="text-xs text-rose-600 hover:text-rose-900"
           >
             ✕
           </button>
@@ -228,15 +228,15 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
       )}
 
       {successMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
             <span>{successMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccessMsg(null)}
-            className="text-xs text-emerald-400 hover:text-white"
+            className="text-xs text-emerald-600 hover:text-emerald-900"
           >
             ✕
           </button>
@@ -245,7 +245,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
       {/* Action Bar */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-muted">
           Showing {genres.length} genre categories. Active genres appear in author novel submission and public catalog filters.
         </p>
 
@@ -256,7 +256,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
             setIsCreateOpen(true);
           }}
           disabled={loading}
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-indigo-600/20"
+          className="px-4 py-2 rounded-xl bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>New Genre</span>
@@ -264,10 +264,10 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
       </div>
 
       {/* Genres List: Table for desktop, cards for mobile */}
-      <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/40">
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+            <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
               <tr>
                 <th className="py-3 px-4 w-14 text-center">Order</th>
                 <th className="py-3 px-4">English Name / Slug</th>
@@ -277,12 +277,12 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
+            <tbody className="divide-y divide-border font-sans">
               {genres.map((genre, idx) => (
-                <tr key={genre.id} className="hover:bg-slate-900/40 transition-colors">
+                <tr key={genre.id} className="hover:bg-surface-muted/50 transition-colors">
                   <td className="py-3 px-4 text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <span className="font-mono text-slate-400 font-bold w-5">
+                      <span className="font-mono text-muted font-bold w-5">
                         {genre.display_order}
                       </span>
                       <div className="flex flex-col gap-0.5">
@@ -290,7 +290,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                           type="button"
                           onClick={() => handleMoveOrder(idx, 'up')}
                           disabled={idx === 0 || loading}
-                          className="text-slate-500 hover:text-white disabled:opacity-20 transition-colors"
+                          className="text-muted hover:text-main disabled:opacity-20 transition-colors"
                           title="Move Up"
                         >
                           <ArrowUp className="w-3 h-3" />
@@ -299,7 +299,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                           type="button"
                           onClick={() => handleMoveOrder(idx, 'down')}
                           disabled={idx === genres.length - 1 || loading}
-                          className="text-slate-500 hover:text-white disabled:opacity-20 transition-colors"
+                          className="text-muted hover:text-main disabled:opacity-20 transition-colors"
                           title="Move Down"
                         >
                           <ArrowDown className="w-3 h-3" />
@@ -309,19 +309,19 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   </td>
 
                   <td className="py-3 px-4">
-                    <div className="font-semibold text-white">{genre.name_english}</div>
-                    <div className="text-[10px] text-slate-500 font-mono">/{genre.slug}</div>
+                    <div className="font-semibold text-main">{genre.name_english}</div>
+                    <div className="text-[10px] text-muted font-mono">/{genre.slug}</div>
                   </td>
 
                   <td className="py-3 px-4">
-                    <UrduText as="div" size="base" className="text-amber-400 font-medium py-0">
+                    <UrduText as="div" size="base" className="text-brand-gold font-medium py-0">
                       {genre.name_urdu}
                     </UrduText>
                   </td>
 
                   <td className="py-3 px-4 font-mono">
-                    <div className="flex items-center gap-1.5 text-slate-300">
-                      <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+                    <div className="flex items-center gap-1.5 text-main">
+                      <BookOpen className="w-3.5 h-3.5 text-muted" />
                       <span>{genre.novel_count} novel{genre.novel_count === 1 ? '' : 's'}</span>
                     </div>
                   </td>
@@ -333,8 +333,8 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                       disabled={loading}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors ${
                         genre.is_active
-                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20'
-                          : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-surface-muted text-muted border border-border hover:bg-surface'
                       }`}
                     >
                       <Power className="w-2.5 h-2.5" />
@@ -348,7 +348,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                         type="button"
                         onClick={() => handleOpenEdit(genre)}
                         disabled={loading}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+                        className="p-1.5 rounded-lg bg-surface hover:bg-surface-muted text-main border border-border transition-colors shadow-sm"
                         title="Edit Genre"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -358,7 +358,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                         type="button"
                         onClick={() => setDeletingGenre(genre)}
                         disabled={loading}
-                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                        className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors shadow-sm"
                         title="Delete Genre"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -377,15 +377,15 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
         {genres.map((genre, idx) => (
           <div
             key={genre.id}
-            className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3"
+            className="bg-surface border border-border rounded-xl p-4 space-y-3 shadow-card"
           >
             <div className="flex items-start justify-between gap-2">
               <div>
-                <div className="font-semibold text-white text-sm">{genre.name_english}</div>
-                <UrduText as="div" size="sm" className="text-amber-400 py-0">
+                <div className="font-semibold text-main text-sm">{genre.name_english}</div>
+                <UrduText as="div" size="sm" className="text-brand-gold py-0">
                   {genre.name_urdu}
                 </UrduText>
-                <div className="text-[10px] text-slate-500 font-mono">/{genre.slug}</div>
+                <div className="text-[10px] text-muted font-mono">/{genre.slug}</div>
               </div>
 
               <button
@@ -394,8 +394,8 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                 disabled={loading}
                 className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 ${
                   genre.is_active
-                    ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-surface-muted text-muted border border-border'
                 }`}
               >
                 <Power className="w-2.5 h-2.5" />
@@ -403,14 +403,14 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-xs text-slate-400 font-mono border-t border-slate-800/60 pt-2">
+            <div className="flex items-center justify-between text-xs text-muted font-mono border-t border-border pt-2">
               <div className="flex items-center gap-1">
                 <span>Order: {genre.display_order}</span>
                 <button
                   type="button"
                   onClick={() => handleMoveOrder(idx, 'up')}
                   disabled={idx === 0 || loading}
-                  className="p-1 text-slate-400 hover:text-white disabled:opacity-20"
+                  className="p-1 text-muted hover:text-main disabled:opacity-20"
                 >
                   ▲
                 </button>
@@ -418,7 +418,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   type="button"
                   onClick={() => handleMoveOrder(idx, 'down')}
                   disabled={idx === genres.length - 1 || loading}
-                  className="p-1 text-slate-400 hover:text-white disabled:opacity-20"
+                  className="p-1 text-muted hover:text-main disabled:opacity-20"
                 >
                   ▼
                 </button>
@@ -427,12 +427,12 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
               <div>{genre.novel_count} novel{genre.novel_count === 1 ? '' : 's'}</div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-800/40">
+            <div className="flex items-center justify-end gap-2 pt-1 border-t border-border">
               <button
                 type="button"
                 onClick={() => handleOpenEdit(genre)}
                 disabled={loading}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold flex items-center gap-1 transition-colors shadow-sm"
               >
                 <Edit2 className="w-3 h-3" />
                 <span>Edit</span>
@@ -442,7 +442,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                 type="button"
                 onClick={() => setDeletingGenre(genre)}
                 disabled={loading}
-                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold flex items-center gap-1 transition-colors shadow-sm"
               >
                 <Trash2 className="w-3 h-3" />
                 <span>Delete</span>
@@ -454,18 +454,18 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
       {/* Create Genre Modal */}
       {isCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <form
             onSubmit={handleCreate}
-            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+            className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin shrink-0">
                 <Tag className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Create New Genre</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h3 className="text-base font-bold text-main font-serif">Create New Genre</h3>
+                <p className="text-xs text-muted mt-0.5">
                   Taxonomy category for novels. English and Urdu names are both required.
                 </p>
               </div>
@@ -473,8 +473,8 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Genre Name (English) <span className="text-rose-400">*</span>
+                <label className="text-xs font-semibold text-main block mb-1">
+                  Genre Name (English) <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -482,13 +482,13 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   value={englishName}
                   onChange={(e) => setEnglishName(e.target.value)}
                   placeholder="e.g. Mystery & Suspense"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Genre Name (Urdu RTL) <span className="text-rose-400">*</span>
+                <label className="text-xs font-semibold text-main block mb-1">
+                  Genre Name (Urdu RTL) <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -497,13 +497,13 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   value={urduName}
                   onChange={(e) => setUrduName(e.target.value)}
                   placeholder="مثلاً: پراسرار اور سسپنس"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-amber-300 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-urdu"
+                  className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-sm text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin font-urdu"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-main block mb-1">
                     Slug (Optional)
                   </label>
                   <input
@@ -511,37 +511,37 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                     placeholder="auto-generated"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                    className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-main block mb-1">
                     Display Order
                   </label>
                   <input
                     type="number"
                     value={displayOrder}
                     onChange={(e) => setDisplayOrder(Number(e.target.value))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                    className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin font-mono"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
               <button
                 type="button"
                 onClick={resetForm}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-muted hover:text-main bg-surface hover:bg-surface-muted border border-border transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-accent-admin hover:bg-accent-admin-dark text-white transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
               >
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>Create Genre</span>
@@ -553,18 +553,18 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
       {/* Edit Genre Modal */}
       {editingGenre && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <form
             onSubmit={handleUpdate}
-            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
+            className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
                 <Edit2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Edit Genre</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h3 className="text-base font-bold text-main font-serif">Edit Genre</h3>
+                <p className="text-xs text-muted mt-0.5">
                   Update taxonomy names, slug, or active marketplace visibility.
                 </p>
               </div>
@@ -572,21 +572,21 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Genre Name (English) <span className="text-rose-400">*</span>
+                <label className="text-xs font-semibold text-main block mb-1">
+                  Genre Name (English) <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={englishName}
                   onChange={(e) => setEnglishName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Genre Name (Urdu RTL) <span className="text-rose-400">*</span>
+                <label className="text-xs font-semibold text-main block mb-1">
+                  Genre Name (Urdu RTL) <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -594,12 +594,12 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   dir="rtl"
                   value={urduName}
                   onChange={(e) => setUrduName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-amber-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-urdu"
+                  className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-sm text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin font-urdu"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-main block mb-1">
                   Slug
                 </label>
                 <input
@@ -607,7 +607,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   required
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                  className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin font-mono"
                 />
               </div>
 
@@ -617,27 +617,27 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                   id="genre-active-checkbox"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="w-4 h-4 rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-indigo-500/50"
+                  className="w-4 h-4 rounded bg-surface border-border text-accent-admin focus:ring-accent-admin"
                 />
-                <label htmlFor="genre-active-checkbox" className="text-xs text-slate-300 font-medium cursor-pointer">
+                <label htmlFor="genre-active-checkbox" className="text-xs text-main font-medium cursor-pointer">
                   Active (visible in submission options and filters)
                 </label>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
               <button
                 type="button"
                 onClick={resetForm}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-muted hover:text-main bg-surface hover:bg-surface-muted border border-border transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-accent-admin hover:bg-accent-admin-dark text-white transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
               >
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>Update Genre</span>
@@ -649,39 +649,39 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
       {/* Delete Confirmation Modal */}
       {deletingGenre && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shrink-0">
                 <Trash2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Delete Genre</h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Are you sure you want to delete <span className="text-white font-semibold">&quot;{deletingGenre.name_english}&quot;</span>?
+                <h3 className="text-base font-bold text-main font-serif">Delete Genre</h3>
+                <p className="text-xs text-muted mt-1">
+                  Are you sure you want to delete <span className="text-main font-semibold">&quot;{deletingGenre.name_english}&quot;</span>?
                 </p>
               </div>
             </div>
 
             {deletingGenre.novel_count > 0 ? (
-              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 space-y-1">
                 <span className="font-bold block">Notice: In-Use Protection</span>
                 <p>
-                  This genre is currently linked to {deletingGenre.novel_count} novel(s). The database blocks deleting in-use genres to prevent orphaned catalog metadata. You should <span className="font-semibold text-white">deactivate</span> it instead.
+                  This genre is currently linked to {deletingGenre.novel_count} novel(s). The database blocks deleting in-use genres to prevent orphaned catalog metadata. You should <span className="font-semibold text-main">deactivate</span> it instead.
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted">
                 This genre is not linked to any novels and can be safely deleted permanently.
               </p>
             )}
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
               <button
                 type="button"
                 onClick={() => setDeletingGenre(null)}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-muted hover:text-main bg-surface hover:bg-surface-muted border border-border transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -689,7 +689,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                 type="button"
                 onClick={handleDelete}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
               >
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>Confirm Delete</span>

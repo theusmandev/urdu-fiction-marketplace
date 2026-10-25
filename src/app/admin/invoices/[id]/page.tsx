@@ -40,24 +40,24 @@ export default async function AdminInvoiceDetailPage({
       <div className="space-y-6 max-w-4xl mx-auto py-8">
         <Link
           href="/admin/invoices"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-main transition-colors font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Invoices</span>
         </Link>
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
-          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0" />
+        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
             <span>Database Error Loading Commission Invoice</span>
           </div>
-          <p className="text-xs text-rose-200/90 leading-relaxed">
+          <p className="text-xs text-rose-800/90 leading-relaxed">
             Unable to retrieve invoice statement from the database:
           </p>
-          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (
-            <p className="text-[11px] text-slate-400 italic">Hint: {queryError.hint}</p>
+            <p className="text-[11px] text-muted italic">Hint: {queryError.hint}</p>
           )}
         </div>
       </div>

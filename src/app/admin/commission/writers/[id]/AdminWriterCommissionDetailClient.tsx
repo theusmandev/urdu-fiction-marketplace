@@ -211,25 +211,25 @@ export function AdminWriterCommissionDetailClient({
   return (
     <div className="space-y-8">
       {/* Top Banner */}
-      <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-surface border border-border rounded-2xl p-6 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <Link
             href="/admin/commission"
-            className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-white mb-2 transition-colors"
+            className="inline-flex items-center text-xs font-semibold text-muted hover:text-main mb-2 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-1.5" />
             Back to Commission Overview
           </Link>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-serif font-bold text-white">
+            <h1 className="text-2xl font-serif font-bold text-main">
               {writer.pen_name_english}
             </h1>
-            <UrduText as="span" size="sm" className="text-slate-400 py-0">
+            <UrduText as="span" size="sm" className="text-muted py-0">
               ({writer.pen_name_urdu})
             </UrduText>
           </div>
-          <p className="text-xs text-slate-400 mt-1 font-mono">
-            Author ID: {writer.id} • Rate: {writer.custom_commission_rate ?? 20}%
+          <p className="text-xs text-muted mt-1">
+            Author ID: <span className="font-mono">{writer.id}</span> • Rate: <span className="font-mono">{writer.custom_commission_rate ?? 20}%</span>
           </p>
         </div>
 
@@ -237,7 +237,7 @@ export function AdminWriterCommissionDetailClient({
           <button
             type="button"
             onClick={handleOpenInvoiceModal}
-            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white shadow-sm transition-colors"
           >
             <FilePlus className="w-4 h-4 mr-1.5" />
             Issue Commission Invoice
@@ -249,60 +249,60 @@ export function AdminWriterCommissionDetailClient({
               setAdjustmentError(null);
               setAdjustmentSuccess(null);
             }}
-            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shadow-sm transition-colors"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-surface-muted text-main border border-border shadow-sm transition-colors"
           >
-            <Sliders className="w-4 h-4 mr-1.5 text-amber-400" />
+            <Sliders className="w-4 h-4 mr-1.5 text-amber-600" />
             Record Adjustment
           </button>
           <Link
             href={`/admin/writers/${writer.id}`}
-            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shadow-sm transition-colors"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-surface-muted text-main border border-border shadow-sm transition-colors"
           >
             <span>Edit Profile & Terms</span>
-            <ExternalLink className="w-3.5 h-3.5 ml-1.5 text-slate-400" />
+            <ExternalLink className="w-3.5 h-3.5 ml-1.5 text-muted" />
           </Link>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-1">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-card space-y-1">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
             Outstanding Commission
           </span>
-          <div className="text-2xl font-bold font-mono text-white">
+          <div className="text-2xl font-bold font-mono text-main">
             {formatPKR2(writer.current_unpaid_commission)}
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-muted">
             Unpaid liability to platform
           </p>
         </div>
 
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-1">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-card space-y-1">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
             Threshold Limit
           </span>
-          <div className="text-2xl font-bold font-mono text-indigo-400">
+          <div className="text-2xl font-bold font-mono text-accent-admin">
             {formatPKR2(writer.unpaid_commission_limit)}
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-muted">
             Pause threshold trigger
           </p>
         </div>
 
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-5 space-y-1">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-card space-y-1">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
             Ordering Status
           </span>
           <div className="pt-1">
             {writer.is_orders_paused_for_commission ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                <AlertTriangle className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                 Reader Orders Paused
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                 Active & Good Standing
               </span>
             )}
@@ -311,35 +311,35 @@ export function AdminWriterCommissionDetailClient({
       </div>
 
       {/* Invoices List for this Writer */}
-      <div className="bg-slate-950/70 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-surface border border-border rounded-2xl shadow-card overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Receipt className="w-4 h-4 text-indigo-400" />
-            <h2 className="font-serif font-bold text-sm text-white">
+            <Receipt className="w-4 h-4 text-accent-admin" />
+            <h2 className="font-serif font-bold text-sm text-main">
               Billing Invoices ({invoices.length})
             </h2>
           </div>
         </div>
 
         {invoices.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 text-xs">
+          <div className="p-8 text-center text-muted text-xs">
             No invoices have been issued for this author yet. Use &quot;Issue Commission Invoice&quot; to bill accrued sales.
           </div>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-border">
             {invoices.map((inv) => (
               <div
                 key={inv.id}
-                className="p-4 hover:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs"
+                className="p-4 hover:bg-surface-muted/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-white">
+                    <span className="font-mono font-bold text-main">
                       {inv.invoice_number}
                     </span>
                     <StatusBadge status={inv.status} size="sm" />
                   </div>
-                  <div className="text-slate-400 text-[11px]">
+                  <div className="text-muted text-[11px]">
                     Period: {formatKarachiDateTime(inv.period_start, false)} —{' '}
                     {formatKarachiDateTime(inv.period_end, false)}
                     {inv.due_date && ` • Due: ${formatKarachiDateTime(inv.due_date, false)}`}
@@ -348,19 +348,19 @@ export function AdminWriterCommissionDetailClient({
 
                 <div className="flex items-center gap-6 justify-between sm:justify-end">
                   <div className="text-right">
-                    <div className="font-mono font-bold text-white">
+                    <div className="font-mono font-bold text-main">
                       {formatPKR2(inv.total_commission_owed_pkr)}
                     </div>
-                    <div className="text-[11px] font-mono text-emerald-400">
+                    <div className="text-[11px] font-mono text-emerald-700 font-semibold">
                       Settled: {formatPKR2(inv.amount_settled_pkr)}
                     </div>
                   </div>
                   <Link
                     href={`/admin/invoices/${inv.id}`}
-                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold"
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold transition-colors"
                   >
                     <span>Inspect</span>
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    <ChevronRight className="w-4 h-4 ml-1 text-muted" />
                   </Link>
                 </div>
               </div>
@@ -370,24 +370,24 @@ export function AdminWriterCommissionDetailClient({
       </div>
 
       {/* Recent Ledger Entries */}
-      <div className="bg-slate-950/70 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-surface border border-border rounded-2xl shadow-card overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-emerald-400" />
-            <h2 className="font-serif font-bold text-sm text-white">
+            <DollarSign className="w-4 h-4 text-emerald-600" />
+            <h2 className="font-serif font-bold text-sm text-main">
               Recent Sales Ledger Entries ({recentLedger.length})
             </h2>
           </div>
         </div>
 
         {recentLedger.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 text-xs">
+          <div className="p-8 text-center text-muted text-xs">
             No sales ledger entries found for this author.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+              <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
                 <tr>
                   <th className="py-2.5 px-3">Date (PKT)</th>
                   <th className="py-2.5 px-3">Type</th>
@@ -397,25 +397,25 @@ export function AdminWriterCommissionDetailClient({
                   <th className="py-2.5 px-3">Notes</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {recentLedger.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-slate-900/50">
-                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">
+                  <tr key={entry.id} className="hover:bg-surface-muted/50 transition-colors">
+                    <td className="py-2.5 px-3 font-mono text-[11px] text-muted whitespace-nowrap">
                       {formatKarachiDateTime(entry.created_at)}
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap">
                       <StatusBadge status={entry.entry_type} size="sm" />
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-300">
+                    <td className="py-2.5 px-3 text-right font-mono text-main">
                       {formatPKR2(entry.gross_amount_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-medium text-rose-400">
+                    <td className="py-2.5 px-3 text-right font-mono font-medium text-rose-700">
                       {formatPKR2(entry.platform_commission_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">
                       {formatPKR2(entry.writer_net_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-slate-400 max-w-xs truncate">
+                    <td className="py-2.5 px-3 text-muted max-w-xs truncate">
                       {entry.notes || '—'}
                     </td>
                   </tr>
@@ -428,19 +428,19 @@ export function AdminWriterCommissionDetailClient({
 
       {/* Invoice Generation Modal */}
       {isInvoiceModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <FilePlus className="w-5 h-5 text-indigo-400" />
-                <h3 className="font-serif font-bold text-lg text-white">
+                <FilePlus className="w-5 h-5 text-accent-admin" />
+                <h3 className="font-serif font-bold text-lg text-main">
                   Generate Commission Invoice
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsInvoiceModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-muted hover:text-main"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -448,14 +448,14 @@ export function AdminWriterCommissionDetailClient({
 
             {invoiceModalSuccess ? (
               <div className="space-y-4">
-                <div className="p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs">
                   {invoiceModalSuccess}
                 </div>
                 <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={() => setIsInvoiceModalOpen(false)}
-                    className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold"
+                    className="px-4 py-2 rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold"
                   >
                     Done
                   </button>
@@ -464,22 +464,22 @@ export function AdminWriterCommissionDetailClient({
             ) : (
               <div className="space-y-4 text-xs">
                 {invoiceModalError && (
-                  <div className="p-3 bg-rose-500/20 border border-rose-500/30 text-rose-300 rounded-xl">
+                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
                     {invoiceModalError}
                   </div>
                 )}
 
                 {/* Billing Period Presets */}
                 <div className="space-y-2">
-                  <label className="block text-slate-300 font-medium">Billing Period Presets</label>
+                  <label className="block text-main font-medium">Billing Period Presets</label>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setMonthPreset('last_month')}
-                      className={`px-3 py-1.5 rounded-lg font-medium ${
+                      className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
                         periodPreset === 'last_month'
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-slate-800 text-slate-300 hover:text-white'
+                          ? 'bg-accent-admin text-white'
+                          : 'bg-surface border border-border text-main hover:bg-surface-muted'
                       }`}
                     >
                       Last Month
@@ -487,10 +487,10 @@ export function AdminWriterCommissionDetailClient({
                     <button
                       type="button"
                       onClick={() => setMonthPreset('this_month')}
-                      className={`px-3 py-1.5 rounded-lg font-medium ${
+                      className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
                         periodPreset === 'this_month'
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-slate-800 text-slate-300 hover:text-white'
+                          ? 'bg-accent-admin text-white'
+                          : 'bg-surface border border-border text-main hover:bg-surface-muted'
                       }`}
                     >
                       This Month
@@ -500,7 +500,7 @@ export function AdminWriterCommissionDetailClient({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-400 mb-1">Period Start (PKT)</label>
+                    <label className="block text-muted mb-1 font-medium">Period Start (PKT)</label>
                     <input
                       type="datetime-local"
                       value={periodStart.slice(0, 16)}
@@ -509,11 +509,11 @@ export function AdminWriterCommissionDetailClient({
                         setPeriodStart(e.target.value ? `${e.target.value}:00+05:00` : '');
                         setPreviewData(null);
                       }}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 mb-1">Period End (PKT)</label>
+                    <label className="block text-muted mb-1 font-medium">Period End (PKT)</label>
                     <input
                       type="datetime-local"
                       value={periodEnd.slice(0, 16)}
@@ -522,7 +522,7 @@ export function AdminWriterCommissionDetailClient({
                         setPeriodEnd(e.target.value ? `${e.target.value}:59+05:00` : '');
                         setPreviewData(null);
                       }}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                     />
                   </div>
                 </div>
@@ -532,49 +532,49 @@ export function AdminWriterCommissionDetailClient({
                     type="button"
                     disabled={isPreviewing || !periodStart || !periodEnd}
                     onClick={handlePreviewInvoice}
-                    className="w-full px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold disabled:opacity-50"
+                    className="w-full px-4 py-2 rounded-lg bg-surface hover:bg-surface-muted text-main border border-border font-semibold transition-colors disabled:opacity-50"
                   >
                     {isPreviewing ? 'Calculating Uninvoiced Lines...' : 'Preview Uninvoiced Transactions'}
                   </button>
                 </div>
 
                 {previewData && (
-                  <div className="space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800 mt-4">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                      <span className="font-semibold text-white">Preview Summary:</span>
-                      <span className="font-mono text-indigo-400 font-bold">
+                  <div className="space-y-3 p-4 bg-surface-muted rounded-xl border border-border mt-4">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
+                      <span className="font-semibold text-main">Preview Summary:</span>
+                      <span className="font-mono text-accent-admin font-bold">
                         {previewData.line_count} entry/entries
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 text-slate-300">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase">Gross Volume:</span>
-                        <div className="font-mono font-medium text-white">
+                        <span className="text-[10px] text-muted uppercase font-semibold">Gross Volume:</span>
+                        <div className="font-mono font-medium text-main">
                           {formatPKR2(previewData.gross_volume_pkr)}
                         </div>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase">Total Commission:</span>
-                        <div className="font-mono font-bold text-rose-400">
+                        <span className="text-[10px] text-muted uppercase font-semibold">Total Commission:</span>
+                        <div className="font-mono font-bold text-rose-700">
                           {formatPKR2(previewData.total_commission_pkr)}
                         </div>
                       </div>
                     </div>
 
                     {previewData.line_count === 0 && (
-                      <p className="text-amber-400 italic text-[11px] pt-1">
+                      <p className="text-amber-700 italic text-[11px] pt-1">
                         No uninvoiced verified sales, refund adjustments, or manual corrections found for this period.
                       </p>
                     )}
                   </div>
                 )}
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
                   <button
                     type="button"
                     onClick={() => setIsInvoiceModalOpen(false)}
-                    className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                    className="px-4 py-2 rounded-lg bg-surface border border-border text-muted hover:text-main"
                   >
                     Cancel
                   </button>
@@ -582,7 +582,7 @@ export function AdminWriterCommissionDetailClient({
                     type="button"
                     disabled={isGenerating || !previewData || previewData.total_commission_pkr <= 0}
                     onClick={handleGenerateInvoice}
-                    className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold disabled:opacity-50"
+                    className="px-5 py-2 rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white font-semibold transition-colors disabled:opacity-50"
                   >
                     {isGenerating ? 'Generating...' : 'Confirm & Issue Invoice'}
                   </button>
@@ -595,19 +595,19 @@ export function AdminWriterCommissionDetailClient({
 
       {/* Manual Adjustment Modal */}
       {isAdjustmentModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 space-y-6 shadow-xl">
+            <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-amber-400" />
-                <h3 className="font-serif font-bold text-lg text-white">
+                <Sliders className="w-5 h-5 text-amber-600" />
+                <h3 className="font-serif font-bold text-lg text-main">
                   Record Commission Adjustment
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsAdjustmentModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-muted hover:text-main"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -615,14 +615,14 @@ export function AdminWriterCommissionDetailClient({
 
             {adjustmentSuccess ? (
               <div className="space-y-4 text-xs">
-                <div className="p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl">
                   {adjustmentSuccess}
                 </div>
                 <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={() => setIsAdjustmentModalOpen(false)}
-                    className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold"
+                    className="px-4 py-2 rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold"
                   >
                     Done
                   </button>
@@ -631,17 +631,17 @@ export function AdminWriterCommissionDetailClient({
             ) : (
               <form onSubmit={handleRecordAdjustment} className="space-y-4 text-xs">
                 {adjustmentError && (
-                  <div className="p-3 bg-rose-500/20 border border-rose-500/30 text-rose-300 rounded-xl">
+                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
                     {adjustmentError}
                   </div>
                 )}
 
-                <p className="text-slate-400">
-                  Inserts an auditable <code className="text-indigo-300">manual_correction</code> row into the append-only sales ledger. Positive amounts increase platform commission (and reduce writer net). Negative amounts credit the writer.
+                <p className="text-muted">
+                  Inserts an auditable <code className="text-accent-admin font-mono">manual_correction</code> row into the sales ledger. Positive amounts increase platform commission liability. Negative amounts credit the writer.
                 </p>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">
+                  <label className="block text-main font-medium mb-1">
                     Commission Adjustment Amount (PKR) *
                   </label>
                   <input
@@ -651,15 +651,15 @@ export function AdminWriterCommissionDetailClient({
                     placeholder="e.g. 500 or -250"
                     value={adjustmentAmount}
                     onChange={(e) => setAdjustmentAmount(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main font-mono focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                   />
-                  <p className="text-[10px] text-slate-500 mt-1">
+                  <p className="text-[10px] text-muted mt-1">
                     Use negative numbers to reduce author commission debt.
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">
+                  <label className="block text-main font-medium mb-1">
                     Mandatory Auditable Reason *
                   </label>
                   <textarea
@@ -668,22 +668,22 @@ export function AdminWriterCommissionDetailClient({
                     placeholder="Explain the operational reason for this adjustment..."
                     value={adjustmentReason}
                     onChange={(e) => setAdjustmentReason(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
                   <button
                     type="button"
                     onClick={() => setIsAdjustmentModalOpen(false)}
-                    className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                    className="px-4 py-2 rounded-lg bg-surface border border-border text-muted hover:text-main"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmittingAdjustment}
-                    className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold disabled:opacity-50"
+                    className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold transition-colors disabled:opacity-50"
                   >
                     {isSubmittingAdjustment ? 'Recording...' : 'Record Adjustment'}
                   </button>

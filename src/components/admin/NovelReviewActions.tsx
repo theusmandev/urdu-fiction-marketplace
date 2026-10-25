@@ -157,34 +157,34 @@ export function NovelReviewActions({
   return (
     <div className="space-y-4">
       {error && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
           {error}
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
+        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
           {successMsg}
         </div>
       )}
 
       {/* Moderation Checklist (Under Review or Reviewing) */}
       {(status === 'under_review' || status === 'draft') && (
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="bg-surface-muted/60 border border-border rounded-xl p-3.5 space-y-2.5">
+          <div className="flex items-center gap-2 text-xs font-bold text-main uppercase tracking-wider">
+            <ShieldCheck className="w-3.5 h-3.5 text-accent-admin" />
             <span>Moderation Pre-Approval Checklist</span>
           </div>
-          <div className="space-y-1.5 text-xs text-slate-300">
+          <div className="space-y-1.5 text-xs text-main">
             <button
               type="button"
               onClick={() => toggleCheck('rights')}
-              className="flex items-center gap-2 w-full text-left hover:text-white transition-colors py-0.5"
+              className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.rights ? (
-                <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <Square className="w-4 h-4 text-slate-500 shrink-0" />
+                <Square className="w-4 h-4 text-muted shrink-0" />
               )}
               <span>Original copyright & author rights declaration verified</span>
             </button>
@@ -192,12 +192,12 @@ export function NovelReviewActions({
             <button
               type="button"
               onClick={() => toggleCheck('content_policy')}
-              className="flex items-center gap-2 w-full text-left hover:text-white transition-colors py-0.5"
+              className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.content_policy ? (
-                <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <Square className="w-4 h-4 text-slate-500 shrink-0" />
+                <Square className="w-4 h-4 text-muted shrink-0" />
               )}
               <span>Adheres to platform guidelines (no copyright infringement or illegal text)</span>
             </button>
@@ -205,12 +205,12 @@ export function NovelReviewActions({
             <button
               type="button"
               onClick={() => toggleCheck('quality')}
-              className="flex items-center gap-2 w-full text-left hover:text-white transition-colors py-0.5"
+              className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.quality ? (
-                <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <Square className="w-4 h-4 text-slate-500 shrink-0" />
+                <Square className="w-4 h-4 text-muted shrink-0" />
               )}
               <span>Urdu typography formatting & chapter sequence inspected</span>
             </button>
@@ -218,18 +218,18 @@ export function NovelReviewActions({
             <button
               type="button"
               onClick={() => toggleCheck('price')}
-              className="flex items-center gap-2 w-full text-left hover:text-white transition-colors py-0.5"
+              className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.price ? (
-                <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <Square className="w-4 h-4 text-slate-500 shrink-0" />
+                <Square className="w-4 h-4 text-muted shrink-0" />
               )}
               <span>Pricing is reasonable and adheres to platform limits</span>
             </button>
           </div>
-          <p className="text-[10px] text-slate-500 italic">
-            All items are informational and will be logged to the immutable audit trail upon approval.
+          <p className="text-[10px] text-muted italic">
+            All checklist items are logged to the audit log upon approval.
           </p>
         </div>
       )}
@@ -243,7 +243,7 @@ export function NovelReviewActions({
               onClick={() => setActiveDialog('approve')}
               disabled={loading || !allChecked}
               title={!allChecked ? 'Complete all checklist items above before approving' : undefined}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Approve & Publish</span>
@@ -252,7 +252,7 @@ export function NovelReviewActions({
               type="button"
               onClick={() => setActiveDialog('reject')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <XCircle className="w-4 h-4" />
               <span>Reject Submission</span>
@@ -266,7 +266,7 @@ export function NovelReviewActions({
               type="button"
               onClick={() => setActiveDialog('suspend')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <AlertOctagon className="w-4 h-4" />
               <span>Suspend Novel</span>
@@ -276,13 +276,13 @@ export function NovelReviewActions({
               type="button"
               onClick={handleToggleFeatured}
               disabled={loading}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 ${
+              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm ${
                 isFeatured
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100'
+                  : 'bg-surface-muted hover:bg-surface text-main border border-border'
               }`}
             >
-              <Star className={`w-4 h-4 ${isFeatured ? 'fill-amber-300 text-amber-300' : 'text-slate-400'}`} />
+              <Star className={`w-4 h-4 ${isFeatured ? 'fill-amber-500 text-amber-600' : 'text-muted'}`} />
               <span>{isFeatured ? 'Un-Feature Novel' : 'Feature on Marketplace'}</span>
             </button>
           </>

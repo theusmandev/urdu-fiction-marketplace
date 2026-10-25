@@ -221,15 +221,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Alert Notices */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-3">
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-xs text-rose-400 hover:text-white"
+            className="text-xs text-rose-600 hover:text-rose-800"
           >
             ✕
           </button>
@@ -237,15 +237,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       )}
 
       {successMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between gap-3">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
             <span>{successMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccessMsg(null)}
-            className="text-xs text-emerald-400 hover:text-white"
+            className="text-xs text-emerald-600 hover:text-emerald-800"
           >
             ✕
           </button>
@@ -253,15 +253,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       )}
 
       {/* Invariant Warning Banner */}
-      <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
-        <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
         <div className="space-y-1 text-xs">
-          <span className="font-bold text-amber-300 block">
-            Financial Invariant & Scope Notice:
+          <span className="font-bold text-amber-900 block">
+            Financial Scope Notice:
           </span>
-          <p className="text-amber-100/90 leading-relaxed">
-            Modifications to the platform commission rate or unpaid limits apply strictly to <strong className="text-white">FUTURE sales and verifications</strong>.
-            Existing orders and historical rows in the immutable <code className="bg-slate-900 px-1 py-0.5 rounded text-amber-300">sales_ledger</code> maintain their locked snapshot rates. Every change produces an append-only audit log row.
+          <p className="text-amber-800 leading-relaxed">
+            Modifications to the platform commission rate or unpaid limits apply strictly to <strong className="text-main">future sales and verifications</strong>.
+            Existing orders and historical entries in the <code className="bg-amber-100/80 px-1 py-0.5 rounded text-amber-900 font-mono">sales_ledger</code> maintain their locked snapshot rates. Every change produces an audit log entry.
           </p>
         </div>
       </div>
@@ -269,15 +269,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       {/* Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Default Commission Rate */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Percent className="w-4 h-4 text-indigo-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Percent className="w-4 h-4 text-accent-admin" />
               <span>Default Platform Commission (%)</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">0.00% – 100.00%</span>
+            <span className="text-[10px] text-muted font-mono">0.00% – 100.00%</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Standard percentage deducted on direct reader-to-writer verified novel orders. (Unless overridden per author).
           </p>
           <div className="relative">
@@ -289,24 +289,24 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={commissionRate}
               onChange={(e) => setCommissionRate(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               %
             </span>
           </div>
         </div>
 
         {/* Default Unpaid Commission Limit */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-600" />
               <span>Unpaid Commission Pause Limit (PKR)</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">Default: 5,000 PKR</span>
+            <span className="text-[10px] text-muted font-mono">Default: 5,000 PKR</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Threshold balance of accrued platform commission. When a writer exceeds this, their order acceptance is automatically paused.
           </p>
           <div className="relative">
@@ -316,24 +316,24 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={unpaidLimit}
               onChange={(e) => setUnpaidLimit(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               PKR
             </span>
           </div>
         </div>
 
         {/* Dispute Window Days */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>Reader Dispute Window (Days)</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">1 – 365 Days</span>
+            <span className="text-[10px] text-muted font-mono">1 – 365 Days</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Timeframe during which a reader can file a payment dispute after an order submission or writer rejection.
           </p>
           <div className="relative">
@@ -344,24 +344,24 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={disputeDays}
               onChange={(e) => setDisputeDays(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               Days
             </span>
           </div>
         </div>
 
         {/* Min Novel Price */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-600" />
               <span>Minimum Novel Price Floor (PKR)</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">Default: 50 PKR</span>
+            <span className="text-[10px] text-muted font-mono">Default: 50 PKR</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Minimum purchase price for novels on the marketplace (no free novels allowed). Whole rupees only.
           </p>
           <div className="relative">
@@ -372,24 +372,24 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               PKR
             </span>
           </div>
         </div>
 
         {/* Max Novel Price */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-rose-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-rose-600" />
               <span>Maximum Novel Price Ceiling (PKR)</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">Platform Cap</span>
+            <span className="text-[10px] text-muted font-mono">Platform Cap</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Upper ceiling for novel listing prices enforced during author manuscript creation and editorial review.
           </p>
           <div className="relative">
@@ -399,24 +399,24 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               PKR
             </span>
           </div>
         </div>
 
         {/* Max Orders Per Hour */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-yellow-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>Max Reader Orders / Hour</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">1 - 100</span>
+            <span className="text-[10px] text-muted font-mono">1 - 100</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Limits how many new orders a single reader can generate per hour to protect writer payment account details from automated scraping.
           </p>
           <input
@@ -426,20 +426,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={maxOrdersPerHour}
             onChange={(e) => setMaxOrdersPerHour(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Max Chapter Reads Per Window */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-cyan-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-accent-admin" />
               <span>Max Chapter Reads / Window</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">1 - 1000</span>
+            <span className="text-[10px] text-muted font-mono">1 - 1000</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Maximum number of distinct chapters an entitled buyer can open within the sliding window before temporary rate limiting triggers.
           </p>
           <input
@@ -449,20 +449,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={maxChapterReads}
             onChange={(e) => setMaxChapterReads(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Chapter Read Window Minutes */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-indigo-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-accent-admin" />
               <span>Chapter Read Window (Minutes)</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">1 - 1440 min</span>
+            <span className="text-[10px] text-muted font-mono">1 - 1440 min</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Duration of the sliding window for tracking reading request frequency and deterring bulk manuscript scrapers.
           </p>
           <input
@@ -472,20 +472,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={chapterReadWindow}
             onChange={(e) => setChapterReadWindow(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Invoice Due Days */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>Invoice Due Days</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">1 – 90 days (Default: 7)</span>
+            <span className="text-[10px] text-muted font-mono">1 – 90 days (Default: 7)</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Standard number of days from issuance until an author commission invoice becomes due.
           </p>
           <input
@@ -495,20 +495,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={invoiceDueDays}
             onChange={(e) => setInvoiceDueDays(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Overdue Grace Days */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-600" />
               <span>Overdue Grace Days</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">0 – 60 days (Default: 3)</span>
+            <span className="text-[10px] text-muted font-mono">0 – 60 days (Default: 3)</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Grace period days permitted past due date before overdue rules allow administrators to pause new orders.
           </p>
           <input
@@ -518,20 +518,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={overdueGraceDays}
             onChange={(e) => setOverdueGraceDays(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Min Dispute Wait Hours */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>Min Dispute Wait Hours</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">0 – 168 hrs (Default: 24)</span>
+            <span className="text-[10px] text-muted font-mono">0 – 168 hrs (Default: 24)</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Mandatory cooldown hours readers must wait after submitting payment before opening a formal dispute.
           </p>
           <input
@@ -541,20 +541,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={minDisputeWaitHours}
             onChange={(e) => setMinDisputeWaitHours(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Verification Reminder Hours */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-indigo-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-accent-admin" />
               <span>Verification Reminder Hours</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">1 – 168 hrs (Default: 12)</span>
+            <span className="text-[10px] text-muted font-mono">1 – 168 hrs (Default: 12)</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Hours after payment submission before the first automated reminder is dispatched to the author.
           </p>
           <input
@@ -564,20 +564,20 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={verificationReminderHours}
             onChange={(e) => setVerificationReminderHours(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Support Email */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3 md:col-span-2">
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 md:col-span-2 shadow-card">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-white flex items-center gap-2">
-              <Mail className="w-4 h-4 text-sky-400" />
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Mail className="w-4 h-4 text-accent-admin" />
               <span>Official Platform Support Email</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">Public Contact</span>
+            <span className="text-[10px] text-muted font-mono">Public Contact</span>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Displayed on error dialogs, dispute resolution instructions, and invoice settlement receipts.
           </p>
           <input
@@ -585,14 +585,14 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={supportEmail}
             onChange={(e) => setSupportEmail(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
       </div>
 
       {/* Save Footer Bar */}
-      <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="text-xs text-slate-500 font-mono flex items-center gap-1.5" suppressHydrationWarning>
+      <div className="bg-surface border border-border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-card">
+        <div className="text-xs text-muted font-mono flex items-center gap-1.5" suppressHydrationWarning>
           <HelpCircle className="w-3.5 h-3.5" />
           <span suppressHydrationWarning>
             Last modified:{' '}
@@ -605,7 +605,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 shadow-lg shadow-indigo-600/20"
+          className="px-6 py-2.5 rounded-xl bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 shadow-sm"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

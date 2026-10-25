@@ -58,11 +58,11 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       {usersError && (
-        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load users</h3>
-            <p className="text-xs text-red-400/80 mt-1">{usersError.message}</p>
+            <p className="text-xs text-rose-600/90 mt-1">{usersError.message}</p>
           </div>
         </div>
       )}
@@ -70,19 +70,19 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <div className="w-7 h-7 rounded-lg bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin">
               <Users className="w-3.5 h-3.5" />
             </div>
-            <h1 className="text-xl font-bold text-white">Platform User Governance</h1>
+            <h1 className="text-xl font-bold text-main">Platform User Governance</h1>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-muted mt-0.5">
             Manage user roles, ban/deactivate accounts, and inspect access permissions across the system.
           </p>
         </div>
       </div>
 
       {/* Filter Tabs & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-950/50 p-2.5 rounded-2xl border border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-surface p-2.5 rounded-2xl border border-border shadow-card">
         <div className="flex overflow-x-auto gap-1 no-scrollbar">
           {ROLE_TABS.map((tab) => {
             const isActive = currentRole === tab.value;
@@ -92,8 +92,8 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                 href={`/admin/users?role=${tab.value}${query ? `&q=${encodeURIComponent(query)}` : ''}`}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-colors ${
                   isActive
-                    ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    ? 'bg-accent-admin text-white shadow-sm'
+                    : 'text-muted hover:text-main hover:bg-surface-muted'
                 }`}
               >
                 {tab.label}
@@ -104,24 +104,24 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
         <form method="get" className="relative w-full md:w-64">
           <input type="hidden" name="role" value={currentRole} />
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             name="q"
             defaultValue={query}
             placeholder="Search email, username..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin transition-colors"
           />
         </form>
       </div>
 
       {filteredUsers.length === 0 ? (
-        <div className="py-16 text-center bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
-          <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
+        <div className="py-16 text-center bg-surface rounded-2xl border border-border shadow-card space-y-2">
+          <div className="w-12 h-12 rounded-full bg-surface-muted border border-border flex items-center justify-center mx-auto text-muted">
             <Users className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-semibold text-slate-300">No users found</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <h3 className="text-sm font-semibold text-main">No users found</h3>
+          <p className="text-xs text-muted max-w-sm mx-auto">
             No profile records matched your current query or role filter.
           </p>
         </div>

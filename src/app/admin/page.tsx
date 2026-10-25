@@ -180,20 +180,20 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Overview Header Banner */}
-      <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-surface border border-border shadow-card rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Operational • Postgres Security Definer
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+              System Active
             </span>
-            <span className="text-xs text-slate-400 font-mono">
-              Live Queues & Moderation Desk
+            <span className="text-xs text-secondary font-medium">
+              Moderation queues, finance and platform settings
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-white mt-1">
+          <h1 className="text-2xl font-bold text-navy mt-1">
             Admin Master Dashboard
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-secondary">
             Real-time actionable moderation queues, financial thresholds, and security audit streams.
           </p>
         </div>
@@ -201,16 +201,16 @@ export default async function AdminDashboardPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/admin/novels"
-            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>Moderate Novels ({underReviewNovelsCount ?? 0})</span>
           </Link>
           <Link
             href="/admin/writers"
-            className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-surface border border-border hover:bg-ivory text-main text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
           >
-            <Feather className="w-3.5 h-3.5" />
+            <Feather className="w-3.5 h-3.5 text-accent-admin" />
             <span>Review Writers ({pendingWritersCount ?? 0})</span>
           </Link>
         </div>
@@ -221,118 +221,118 @@ export default async function AdminDashboardPage() {
         {/* Pending Writers */}
         <Link
           href="/admin/writers?status=pending_approval"
-          className="bg-slate-950/50 border border-slate-800 hover:border-amber-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Writers</span>
-            <Feather className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+            <Feather className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-amber-400 font-mono">
+          <div className="text-xl font-bold text-navy font-mono">
             {pendingWritersCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Awaiting app</p>
+          <p className="text-[10px] text-secondary">Awaiting app</p>
         </Link>
 
         {/* Novels Under Review */}
         <Link
           href="/admin/novels?status=under_review"
-          className="bg-slate-950/50 border border-slate-800 hover:border-rose-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-rose-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Novels</span>
-            <BookOpen className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+            <BookOpen className="w-4 h-4 text-rose-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-rose-400 font-mono">
+          <div className="text-xl font-bold text-navy font-mono">
             {underReviewNovelsCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">{publishedNovelsCount ?? 0} live</p>
+          <p className="text-[10px] text-secondary">{publishedNovelsCount ?? 0} live</p>
         </Link>
 
         {/* Open Disputes */}
         <Link
           href="/admin/disputes"
-          className="bg-slate-950/50 border border-slate-800 hover:border-orange-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-purple-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Disputes</span>
-            <Scale className="w-4 h-4 text-orange-400 group-hover:scale-110 transition-transform" />
+            <Scale className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-orange-400 font-mono">
+          <div className="text-xl font-bold text-navy font-mono">
             {openDisputesCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Open/Review</p>
+          <p className="text-[10px] text-secondary">Open/Review</p>
         </Link>
 
         {/* Pending Refunds */}
         <Link
           href="/admin/refunds"
-          className="bg-slate-950/50 border border-slate-800 hover:border-sky-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-sky-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Refunds</span>
-            <RotateCcw className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
+            <RotateCcw className="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-sky-400 font-mono">
+          <div className="text-xl font-bold text-navy font-mono">
             {pendingRefundsCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Pending review</p>
+          <p className="text-[10px] text-secondary">Pending review</p>
         </Link>
 
         {/* Open Support Tickets */}
         <Link
           href="/admin/support"
-          className="bg-slate-950/50 border border-slate-800 hover:border-purple-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-indigo-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Support</span>
-            <LifeBuoy className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+            <LifeBuoy className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-purple-400 font-mono">
+          <div className="text-xl font-bold text-navy font-mono">
             {openSupportTicketsCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Open inquiries</p>
+          <p className="text-[10px] text-secondary">Open inquiries</p>
         </Link>
 
         {/* Delayed Verifications */}
         <Link
           href="/admin/orders?stuck=true"
-          className="bg-slate-950/50 border border-slate-800 hover:border-yellow-500/50 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Delayed</span>
-            <Clock className="w-4 h-4 text-yellow-400 group-hover:scale-110 transition-transform" />
+            <Clock className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-yellow-400 font-mono">
+          <div className="text-xl font-bold text-amber-700 font-mono">
             {overdueOrdersCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">&gt; 24h unverified</p>
+          <p className="text-[10px] text-secondary">&gt; 24h unverified</p>
         </Link>
 
         {/* Commission Capped Writers */}
-        <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+        <div className="bg-surface border border-border shadow-card rounded-2xl p-3.5 space-y-1">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Near Limit</span>
-            <Flame className="w-4 h-4 text-rose-400" />
+            <Flame className="w-4 h-4 text-rose-600" />
           </div>
-          <div className="text-xl font-bold text-rose-400 font-mono">
+          <div className="text-xl font-bold text-rose-700 font-mono">
             {atRiskWriters.length}
           </div>
-          <p className="text-[10px] text-slate-500">&gt; 80% or paused</p>
+          <p className="text-[10px] text-secondary">&gt; 80% or paused</p>
         </div>
 
         {/* Total Accounts */}
         <Link
           href="/admin/users"
-          className="bg-slate-950/50 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-accent-admin/40 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+          <div className="flex items-center justify-between text-secondary text-xs">
             <span>Users</span>
-            <Users className="w-4 h-4 text-slate-400 group-hover:scale-110 transition-transform" />
+            <Users className="w-4 h-4 text-secondary group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-slate-200 font-mono">
+          <div className="text-xl font-bold text-navy font-mono">
             {totalUsersCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Total registered</p>
+          <p className="text-[10px] text-secondary">Total registered</p>
         </Link>
       </div>
 
@@ -341,63 +341,63 @@ export default async function AdminDashboardPage() {
         {/* Reports Awaiting Confirmation */}
         <Link
           href="/admin/commission/reports"
-          className="bg-slate-950/50 border border-slate-800 hover:border-amber-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Reports Awaiting Confirmation</span>
-            <Clock className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+          <div className="flex items-center justify-between text-secondary text-xs">
+            <span className="font-medium">Reports Awaiting Confirmation</span>
+            <Clock className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-amber-400 font-mono">
+          <div className="text-2xl font-bold text-navy font-mono">
             {pendingReportsCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Author payment receipts to verify</p>
+          <p className="text-[11px] text-secondary">Author payment receipts to verify</p>
         </Link>
 
         {/* Overdue Invoices */}
         <Link
           href="/admin/invoices"
-          className="bg-slate-950/50 border border-slate-800 hover:border-rose-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-rose-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Overdue Invoices</span>
-            <AlertTriangle className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+          <div className="flex items-center justify-between text-secondary text-xs">
+            <span className="font-medium">Overdue Invoices</span>
+            <AlertTriangle className="w-4 h-4 text-rose-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-rose-400 font-mono">
+          <div className="text-2xl font-bold text-navy font-mono">
             {overdueInvoicesCount ?? 0}
           </div>
-          <p className="text-[10px] text-slate-500">Unsettled past due date</p>
+          <p className="text-[11px] text-secondary">Unsettled past due date</p>
         </Link>
 
         {/* Writers Over 80% Limit */}
         <Link
           href="/admin/commission"
-          className="bg-slate-950/50 border border-slate-800 hover:border-purple-500/50 rounded-xl p-4 space-y-1 transition-colors block group"
+          className="bg-surface border border-border shadow-card hover:border-purple-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Writers Over 80% of Limit</span>
-            <Flame className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+          <div className="flex items-center justify-between text-secondary text-xs">
+            <span className="font-medium">Writers Over 80% of Limit</span>
+            <Flame className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-purple-400 font-mono">
+          <div className="text-2xl font-bold text-navy font-mono">
             {atRiskWriters.length}
           </div>
-          <p className="text-[10px] text-slate-500">Threshold alert or paused</p>
+          <p className="text-[11px] text-secondary">Threshold alert or paused</p>
         </Link>
       </div>
 
       {/* Main Grid: Action Queues */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 1. Novels Under Review Queue */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-rose-400" />
-              <h2 className="text-sm font-bold text-white tracking-wide">
+              <BookOpen className="w-4 h-4 text-accent-admin" />
+              <h2 className="text-sm font-bold text-navy tracking-tight">
                 Manuscripts Awaiting Editorial Review
               </h2>
             </div>
             <Link
               href="/admin/novels?status=under_review"
-              className="text-xs text-rose-400 hover:underline flex items-center gap-1"
+              className="text-xs text-accent-admin hover:underline flex items-center gap-1 font-semibold"
             >
               <span>View All</span>
               <ChevronRight className="w-3 h-3" />
@@ -406,18 +406,18 @@ export default async function AdminDashboardPage() {
 
           {!underReviewNovels || underReviewNovels.length === 0 ? (
             <div className="py-10 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-emerald-400">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
-              <p className="text-xs font-semibold text-slate-300">
+              <p className="text-xs font-semibold text-main">
                 Novel moderation queue is clear
               </p>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-secondary">
                 All submitted novels have been processed by editorial team.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-border">
               {underReviewNovels.map((novel) => {
                 const wp = Array.isArray(novel.writer_profiles)
                   ? novel.writer_profiles[0]
@@ -428,19 +428,19 @@ export default async function AdminDashboardPage() {
                     className="py-3 flex items-center justify-between gap-3"
                   >
                     <div>
-                      <div className="text-xs font-semibold text-white">
+                      <div className="text-xs font-semibold text-main">
                         {novel.title_english}
                       </div>
-                      <UrduText as="div" size="xs" className="text-rose-400 py-0">
+                      <UrduText as="div" size="xs" className="text-navy py-0">
                         {novel.title_urdu}
                       </UrduText>
-                      <div className="text-[10px] text-slate-400 font-mono">
+                      <div className="text-[10px] text-secondary">
                         Author: {wp?.pen_name_english || 'Author'} • PKR {novel.price_pkr}
                       </div>
                     </div>
                     <Link
                       href={`/admin/novels/${novel.id}`}
-                      className="text-xs px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded-lg bg-surface hover:bg-ivory text-navy border border-border transition-colors font-semibold shadow-xs"
                     >
                       Review
                     </Link>
@@ -452,17 +452,17 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* 2. Pending Writer Applications Queue */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
-              <Feather className="w-4 h-4 text-amber-400" />
-              <h2 className="text-sm font-bold text-white tracking-wide">
+              <Feather className="w-4 h-4 text-accent-admin" />
+              <h2 className="text-sm font-bold text-navy tracking-tight">
                 Pending Writer Applications
               </h2>
             </div>
             <Link
               href="/admin/writers?status=pending_approval"
-              className="text-xs text-amber-400 hover:underline flex items-center gap-1"
+              className="text-xs text-accent-admin hover:underline flex items-center gap-1 font-semibold"
             >
               <span>View All</span>
               <ChevronRight className="w-3 h-3" />
@@ -471,18 +471,18 @@ export default async function AdminDashboardPage() {
 
           {!pendingWriters || pendingWriters.length === 0 ? (
             <div className="py-10 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-emerald-400">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
-              <p className="text-xs font-semibold text-slate-300">
+              <p className="text-xs font-semibold text-main">
                 No pending author applications
               </p>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-secondary">
                 Reader applications submitted via /become-a-writer will appear here.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-border">
               {pendingWriters.map((writer) => {
                 const profileObj = Array.isArray(writer.profiles)
                   ? writer.profiles[0]
@@ -493,19 +493,19 @@ export default async function AdminDashboardPage() {
                     className="py-3 flex items-center justify-between gap-3"
                   >
                     <div>
-                      <div className="text-xs font-semibold text-white">
+                      <div className="text-xs font-semibold text-main">
                         {writer.pen_name_english}
                       </div>
-                      <UrduText as="div" size="xs" className="text-amber-400 py-0">
+                      <UrduText as="div" size="xs" className="text-navy py-0">
                         {writer.pen_name_urdu}
                       </UrduText>
-                      <div className="text-[10px] text-slate-400 font-mono">
+                      <div className="text-[10px] text-secondary">
                         {profileObj?.email} • Applied {new Date(writer.created_at).toLocaleDateString()}
                       </div>
                     </div>
                     <Link
                       href={`/admin/writers/${writer.id}`}
-                      className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded-lg bg-surface hover:bg-ivory text-navy border border-border transition-colors font-semibold shadow-xs"
                     >
                       Inspect
                     </Link>
@@ -517,17 +517,17 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* 3. Delayed Orders & Commission Overages Strip */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-yellow-400" />
-              <h2 className="text-sm font-bold text-white tracking-wide">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <h2 className="text-sm font-bold text-navy tracking-tight">
                 Delayed Writer Payment Verifications (&gt;24h)
               </h2>
             </div>
             <Link
               href="/admin/orders?stuck=true"
-              className="text-xs text-yellow-400 hover:underline flex items-center gap-1 font-mono"
+              className="text-xs text-amber-700 hover:underline flex items-center gap-1 font-semibold"
             >
               <span>{overdueOrdersCount ?? 0} Flagged</span>
               <ChevronRight className="w-3 h-3" />
@@ -535,30 +535,30 @@ export default async function AdminDashboardPage() {
           </div>
 
           {!overdueOrders || overdueOrders.length === 0 ? (
-            <div className="py-8 text-center text-xs text-slate-400">
+            <div className="py-8 text-center text-xs text-secondary">
               No orders waiting verification past 24 hours.
             </div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-border">
               {overdueOrders.map((ord) => {
                 const wp = Array.isArray(ord.writer_profiles) ? ord.writer_profiles[0] : ord.writer_profiles;
                 return (
                   <div key={ord.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                     <div>
-                      <div className="font-mono text-white font-semibold">
+                      <div className="font-mono text-navy font-semibold">
                         {ord.order_number} • PKR {ord.amount_pkr}
                       </div>
-                      <div className="text-[10px] text-slate-400">
+                      <div className="text-[10px] text-secondary">
                         Novel: {ord.novel_title_snapshot} • Writer: {wp?.pen_name_english || 'Writer'}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-yellow-400 font-mono hidden sm:inline">
+                      <span className="text-[10px] text-secondary hidden sm:inline">
                         {new Date(ord.created_at).toLocaleDateString()}
                       </span>
                       <Link
                         href={`/admin/orders/${ord.id}`}
-                        className="text-xs px-2.5 py-1 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-lg bg-surface hover:bg-ivory text-navy border border-border transition-colors font-semibold shadow-xs"
                       >
                         Inspect
                       </Link>
@@ -571,43 +571,43 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* 4. Writers Near Commission Limit */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-purple-400" />
-              <h2 className="text-sm font-bold text-white tracking-wide">
-                Writers Near/Over Commission Threshold
+              <Flame className="w-4 h-4 text-accent-admin" />
+              <h2 className="text-sm font-bold text-navy tracking-tight">
+                Writers Near or Over Commission Threshold
               </h2>
             </div>
-            <span className="text-xs font-mono text-purple-400">
+            <span className="text-xs font-semibold text-secondary">
               {atRiskWriters.length} Accounts
             </span>
           </div>
 
           {atRiskWriters.length === 0 ? (
-            <div className="py-8 text-center text-xs text-slate-400">
+            <div className="py-8 text-center text-xs text-secondary">
               All writers are within safe commission limits.
             </div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-border">
               {atRiskWriters.map((writer) => (
                 <div key={writer.id} className="py-2.5 flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-semibold text-white">
+                    <div className="font-semibold text-main">
                       {writer.pen_name_english}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-mono">
+                    <div className="text-[10px] text-secondary font-mono">
                       Unpaid: PKR {writer.current_unpaid_commission} / Limit: PKR {writer.unpaid_commission_limit}
                     </div>
                   </div>
                   <div>
                     {writer.is_orders_paused_for_commission ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
-                        ORDERS PAUSED
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+                        Orders Paused
                       </span>
                     ) : (
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
-                        HIGH BALANCE
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                        High Balance
                       </span>
                     )}
                   </div>
@@ -622,17 +622,17 @@ export default async function AdminDashboardPage() {
       <EmailOutboxCard stats={outboxStats} />
 
       {/* Recent Security & Financial Audit Logs Strip */}
-      <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-border pb-3">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-bold text-white tracking-wide">
+            <Activity className="w-4 h-4 text-emerald-600" />
+            <h2 className="text-sm font-bold text-navy tracking-tight">
               Recent Security & Financial Audit Stream
             </h2>
           </div>
           <Link
             href="/admin/audit"
-            className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+            className="text-xs text-accent-admin hover:underline flex items-center gap-1 font-semibold"
           >
             <span>Full Audit Log</span>
             <ChevronRight className="w-3 h-3" />
@@ -640,7 +640,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {!recentAuditLogs || recentAuditLogs.length === 0 ? (
-          <div className="py-8 text-center text-xs text-slate-500">
+          <div className="py-8 text-center text-xs text-secondary">
             Audit ledger initialized. No recent events found.
           </div>
         ) : (
@@ -648,17 +648,17 @@ export default async function AdminDashboardPage() {
             {recentAuditLogs.map((log) => (
               <div
                 key={log.id}
-                className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1 font-mono text-xs"
+                className="p-3 rounded-xl bg-ivory/50 border border-border space-y-1 text-xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-emerald-400 font-bold text-[11px]">
+                  <span className="text-emerald-700 font-bold font-mono text-[11px]">
                     {log.action_type}
                   </span>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[10px] text-secondary">
                     {new Date(log.created_at).toLocaleTimeString()}
                   </span>
                 </div>
-                <div className="text-[10px] text-slate-400 truncate">
+                <div className="text-[10px] text-secondary truncate font-mono">
                   Target: {log.entity_type} #{log.entity_id.slice(0, 8)}...
                 </div>
               </div>

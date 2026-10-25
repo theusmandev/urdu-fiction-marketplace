@@ -73,24 +73,24 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
       <div className="space-y-6 max-w-4xl mx-auto py-8">
         <Link
           href="/admin/writers"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-main transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Authors Directory</span>
         </Link>
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
-          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0" />
+        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 space-y-3">
+          <div className="flex items-center gap-2 font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
             <span>Database Error Loading Author Profile</span>
           </div>
-          <p className="text-xs text-rose-200/90 leading-relaxed">
+          <p className="text-xs text-rose-700 leading-relaxed">
             A database error occurred while retrieving this writer profile:
           </p>
-          <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-900/40 text-xs font-mono text-rose-300">
+          <div className="p-3 rounded-xl bg-white border border-rose-200 text-xs font-mono text-rose-800">
             {writerError.message} {writerError.code ? `(Code: ${writerError.code})` : ''}
           </div>
           {writerError.hint && (
-            <p className="text-[11px] text-slate-400 italic">Hint: {writerError.hint}</p>
+            <p className="text-[11px] text-muted italic">Hint: {writerError.hint}</p>
           )}
         </div>
       </div>
@@ -141,7 +141,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
       <div className="flex items-center justify-between">
         <Link
           href="/admin/writers"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-main transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Writer Directory</span>
@@ -149,7 +149,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
         <div className="flex items-center gap-2">
           <StatusBadge status={writer.status} />
           {writer.is_orders_paused_for_commission && (
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
               Orders Paused (Limit Exceeded)
             </span>
           )}
@@ -157,43 +157,43 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
       </div>
 
       {/* Author Header Card */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl backdrop-blur-sm">
+      <div className="bg-surface border border-border rounded-2xl p-5 md:p-6 shadow-card">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+              <div className="w-12 h-12 rounded-2xl bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin">
                 <Feather className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                <h1 className="text-xl md:text-2xl font-bold text-main tracking-tight">
                   {writer.pen_name_english}
                 </h1>
-                <UrduText as="div" size="lg" className="text-amber-400 font-medium py-0">
+                <UrduText as="div" size="lg" className="text-brand-gold font-medium py-0">
                   {writer.pen_name_urdu}
                 </UrduText>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
               <div className="flex items-center gap-1">
-                <Mail className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-slate-300 font-mono">{profile?.email}</span>
+                <Mail className="w-3.5 h-3.5 text-muted" />
+                <span className="text-main font-mono">{profile?.email}</span>
               </div>
               <div className="flex items-center gap-1">
-                <User className="w-3.5 h-3.5 text-slate-500" />
+                <User className="w-3.5 h-3.5 text-muted" />
                 <span>@{profile?.username || 'no-username'}</span>
-                {profile?.full_name && <span className="text-slate-500">({profile.full_name})</span>}
+                {profile?.full_name && <span className="text-muted">({profile.full_name})</span>}
               </div>
               <div className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                <Calendar className="w-3.5 h-3.5 text-muted" />
                 <span>Joined {new Date(writer.created_at).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
 
           {/* Interactive Actions Component */}
-          <div className="shrink-0 bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800/80">
-            <div className="text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-wider">
+          <div className="shrink-0 bg-surface-muted p-3.5 rounded-2xl border border-border">
+            <div className="text-[11px] font-semibold text-muted mb-2 tracking-wide">
               Administrative Actions
             </div>
             <WriterActions
@@ -211,74 +211,74 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
         {/* Left Column: Agreement & Commission Info */}
         <div className="space-y-6">
           {/* Commission & Limits Card */}
-          <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <Shield className="w-4 h-4 text-indigo-400" />
+          <div className="bg-surface border border-border rounded-2xl p-5 space-y-4 shadow-card">
+            <h2 className="text-sm font-bold text-main flex items-center gap-2">
+              <Shield className="w-4 h-4 text-accent-admin" />
               <span>Commission & Ledger Status</span>
             </h2>
 
             <div className="space-y-3 text-xs font-mono">
-              <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400 font-sans">Applicable Commission:</span>
-                <span className="font-semibold text-white">
+              <div className="flex justify-between items-center py-1.5 border-b border-border">
+                <span className="text-muted font-sans">Applicable Commission:</span>
+                <span className="font-semibold text-main">
                   {writer.custom_commission_rate !== null ? (
-                    <span className="text-amber-400">{writer.custom_commission_rate}% (Custom)</span>
+                    <span className="text-accent-admin font-semibold">{writer.custom_commission_rate}% (Custom)</span>
                   ) : (
-                    <span className="text-slate-300">20.00% (Platform Default)</span>
+                    <span className="text-muted">20.00% (Platform Default)</span>
                   )}
                 </span>
               </div>
 
-              <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400 font-sans">Current Unpaid Balance:</span>
-                <span className="font-bold text-emerald-400">
+              <div className="flex justify-between items-center py-1.5 border-b border-border">
+                <span className="text-muted font-sans">Current Unpaid Balance:</span>
+                <span className="font-bold text-emerald-600 font-mono">
                   PKR {Number(writer.current_unpaid_commission).toLocaleString()}
                 </span>
               </div>
 
-              <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400 font-sans">Unpaid Limit Threshold:</span>
-                <span className="text-slate-200">
+              <div className="flex justify-between items-center py-1.5 border-b border-border">
+                <span className="text-muted font-sans">Unpaid Limit Threshold:</span>
+                <span className="text-main font-semibold">
                   PKR {Number(writer.unpaid_commission_limit).toLocaleString()}
                 </span>
               </div>
 
               <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-400 font-sans">Order Acceptance:</span>
+                <span className="text-muted font-sans">Order Acceptance:</span>
                 <span>
                   {writer.is_orders_paused_for_commission ? (
-                    <span className="text-rose-400 flex items-center gap-1 font-sans font-semibold">
+                    <span className="text-rose-600 flex items-center gap-1 font-sans font-semibold">
                       <AlertTriangle className="w-3.5 h-3.5" /> Paused (Over Limit)
                     </span>
                   ) : (
-                    <span className="text-emerald-400 font-sans font-semibold">Active & Accepting</span>
+                    <span className="text-emerald-600 font-sans font-semibold">Active & Accepting</span>
                   )}
                 </span>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800/80 text-[11px] text-slate-400">
+            <div className="p-3 rounded-xl bg-surface-muted border border-border text-[11px] text-muted">
               Platform rule: If unpaid commission reaches PKR {Number(writer.unpaid_commission_limit).toLocaleString()}, new orders are paused automatically until an invoice settlement is recorded.
             </div>
           </div>
 
           {/* Agreement Acceptance Details */}
-          <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-400" />
+          <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
+            <h2 className="text-sm font-bold text-main flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-accent-admin" />
               <span>Author Terms Agreement</span>
             </h2>
-            <div className="text-xs text-slate-300 space-y-1.5">
+            <div className="text-xs text-main space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-400">Status:</span>
-                <span className={writer.agreement_accepted_at ? 'text-emerald-400 font-semibold' : 'text-amber-400'}>
+                <span className="text-muted">Status:</span>
+                <span className={writer.agreement_accepted_at ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
                   {writer.agreement_accepted_at ? 'Accepted' : 'Pending Acceptance'}
                 </span>
               </div>
               {writer.agreement_accepted_at && (
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Timestamp:</span>
-                  <span className="font-mono text-slate-200">
+                  <span className="text-muted">Timestamp:</span>
+                  <span className="font-mono text-main">
                     {new Date(writer.agreement_accepted_at).toLocaleString()}
                   </span>
                 </div>
@@ -287,21 +287,21 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
           </div>
 
           {/* Author Biographies */}
-          <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <h2 className="text-sm font-bold text-white">Author Bio & Notes</h2>
+          <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
+            <h2 className="text-sm font-bold text-main">Author Bio & Notes</h2>
             {writer.bio_english && (
-              <div className="text-xs text-slate-300">
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-semibold">English</div>
-                <p className="bg-slate-900 p-3 rounded-xl border border-slate-800/60 leading-relaxed">
+              <div className="text-xs text-main">
+                <div className="text-[10px] text-muted uppercase tracking-wider mb-1 font-semibold">English</div>
+                <p className="bg-surface-muted p-3 rounded-xl border border-border leading-relaxed text-muted">
                   {writer.bio_english}
                 </p>
               </div>
             )}
             {writer.bio_urdu && (
-              <div className="text-xs text-slate-300">
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-semibold">Urdu</div>
-                <div className="bg-slate-900 p-3 rounded-xl border border-slate-800/60">
-                  <UrduText as="div" size="sm" className="leading-[2.2] text-slate-200">
+              <div className="text-xs text-main">
+                <div className="text-[10px] text-muted uppercase tracking-wider mb-1 font-semibold">Urdu</div>
+                <div className="bg-surface-muted p-3 rounded-xl border border-border">
+                  <UrduText as="div" size="sm" className="leading-[2.2] text-main">
                     {writer.bio_urdu}
                   </UrduText>
                 </div>
@@ -313,19 +313,19 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
         {/* Right 2 Columns: Payment Methods & Novel Portfolio */}
         <div className="lg:col-span-2 space-y-6">
           {/* Direct Payment Methods (Safe metadata, masked accounts) */}
-          <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div className="bg-surface border border-border rounded-2xl p-5 space-y-4 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-emerald-400" />
+              <h2 className="text-sm font-bold text-main flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-emerald-600" />
                 <span>Registered Payment Methods ({paymentMethods?.length || 0})</span>
               </h2>
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+              <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
                 Account Numbers Masked
               </span>
             </div>
 
             {!paymentMethods || paymentMethods.length === 0 ? (
-              <div className="py-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
+              <div className="py-6 text-center text-xs text-muted border border-dashed border-border rounded-xl">
                 No payout or reader-receiving methods registered by this author yet.
               </div>
             ) : (
@@ -333,39 +333,39 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                 {paymentMethods.map((pm) => (
                   <div
                     key={pm.id}
-                    className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2 relative"
+                    className="p-3.5 rounded-xl bg-surface-muted border border-border space-y-2 relative"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white">
+                      <span className="text-xs font-bold text-main">
                         {METHOD_LABELS[pm.method_type] || pm.method_type}
                       </span>
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                           pm.is_active
-                            ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-slate-800 text-slate-400'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-surface text-muted border border-border'
                         }`}
                       >
                         {pm.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
 
-                    <div className="text-xs font-mono text-slate-300 space-y-0.5">
-                      <div className="text-slate-400 text-[11px] font-sans">
-                        Title: <span className="text-white font-medium">{pm.account_title}</span>
+                    <div className="text-xs font-mono text-main space-y-0.5">
+                      <div className="text-muted text-[11px] font-sans">
+                        Title: <span className="text-main font-medium">{pm.account_title}</span>
                       </div>
                       <div>
-                        Number: <span className="text-amber-400">{maskAccountNumber(pm.account_number_or_iban)}</span>
+                        Number: <span className="text-accent-admin font-semibold">{maskAccountNumber(pm.account_number_or_iban)}</span>
                       </div>
                       {pm.bank_name && (
-                        <div className="text-[11px] text-slate-400 font-sans">
-                          Bank: <span className="text-slate-300">{pm.bank_name}</span>
+                        <div className="text-[11px] text-muted font-sans">
+                          Bank: <span className="text-main">{pm.bank_name}</span>
                         </div>
                       )}
                     </div>
 
                     {pm.instructions_note && (
-                      <div className="text-[10px] text-slate-400 bg-slate-950/60 p-2 rounded-lg border border-slate-800/60 italic">
+                      <div className="text-[10px] text-muted bg-surface p-2 rounded-lg border border-border italic">
                         &quot;{pm.instructions_note}&quot;
                       </div>
                     )}
@@ -376,41 +376,41 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
           </div>
 
           {/* Author Novels Portfolio */}
-          <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div className="bg-surface border border-border rounded-2xl p-5 space-y-4 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-amber-400" />
+              <h2 className="text-sm font-bold text-main flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-brand-gold" />
                 <span>Novels Portfolio ({novels?.length || 0})</span>
               </h2>
             </div>
 
             {!novels || novels.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
+              <div className="py-8 text-center text-xs text-muted border border-dashed border-border rounded-xl">
                 This author has not created any novels yet.
               </div>
             ) : (
-              <div className="divide-y divide-slate-800/60 border border-slate-800 rounded-xl overflow-hidden bg-slate-900/40">
+              <div className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-surface">
                 {novels.map((novel) => (
                   <div
                     key={novel.id}
-                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-900/80 transition-colors"
+                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-surface-muted/50 transition-colors"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-sm">
+                        <span className="font-semibold text-main text-sm">
                           {novel.title_english}
                         </span>
                         <StatusBadge status={novel.status} />
                         {novel.is_featured && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
                             Featured
                           </span>
                         )}
                       </div>
-                      <UrduText as="div" size="sm" className="text-amber-400 py-0">
+                      <UrduText as="div" size="sm" className="text-brand-gold py-0">
                         {novel.title_urdu}
                       </UrduText>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-3 font-mono">
+                      <div className="text-[11px] text-muted flex items-center gap-3 font-mono">
                         <span>PKR {Number(novel.price_pkr).toLocaleString()}</span>
                         <span>•</span>
                         <span>{novel.total_chapters} Chapters</span>
@@ -422,10 +422,10 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                     <div className="shrink-0">
                       <Link
                         href={`/admin/novels/${novel.id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold shadow-sm transition-colors"
                       >
                         <span>Review Novel</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                        <ExternalLink className="w-3.5 h-3.5 text-muted" />
                       </Link>
                     </div>
                   </div>

@@ -71,31 +71,31 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
   return (
     <div className="space-y-6">
       {/* Back button and Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="space-y-1">
           <Link
             href="/admin/support"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-main transition-colors mb-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Support Queue</span>
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-white tracking-tight">
+            <h1 className="text-xl font-bold text-main tracking-tight">
               Ticket #{request.id.slice(0, 8)}: {request.subject}
             </h1>
             <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
                 statusMeta.variant === 'warning'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  ? 'bg-amber-50 text-amber-800 border-amber-200'
                   : statusMeta.variant === 'success'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-stone-100 text-stone-600 border-stone-200'
               }`}
             >
               {statusMeta.label}
             </span>
-            <span className="text-xs text-slate-400 font-urdu">{statusMeta.urduLabel}</span>
+            <span className="text-xs text-brand-gold font-urdu">{statusMeta.urduLabel}</span>
           </div>
         </div>
 
@@ -105,9 +105,9 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
               type="button"
               onClick={handleCloseTicket}
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-main bg-surface-muted hover:bg-surface border border-border transition-colors shadow-sm"
             >
-              <XCircle className="w-3.5 h-3.5 text-slate-400" />
+              <XCircle className="w-3.5 h-3.5 text-muted" />
               <span>Close Ticket</span>
             </button>
           )}
@@ -118,57 +118,57 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
         <div
           className={`p-4 rounded-xl text-xs flex items-center gap-2.5 ${
             feedback.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
-              : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
+              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+              : 'bg-rose-50 border border-rose-200 text-rose-700'
           }`}
         >
           {feedback.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           )}
           <span>{feedback.message}</span>
         </div>
       )}
 
       {/* Ticket Metadata Bar */}
-      <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 flex flex-wrap items-center gap-6 text-xs text-slate-300">
+      <div className="rounded-xl border border-border bg-surface p-4 flex flex-wrap items-center gap-6 text-xs text-main shadow-card">
         <div>
-          <span className="text-slate-500 block text-[10px] uppercase font-mono">User</span>
-          <span className="font-semibold text-white">{request.user_name}</span>
+          <span className="text-muted block text-[10px] uppercase font-mono">User</span>
+          <span className="font-semibold text-main">{request.user_name}</span>
         </div>
         <div>
-          <span className="text-slate-500 block text-[10px] uppercase font-mono">Category</span>
-          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-800 text-purple-300 border border-slate-700">
+          <span className="text-muted block text-[10px] uppercase font-mono">Category</span>
+          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-muted text-accent-admin border border-border">
             {request.category}
           </span>
         </div>
         {request.order_number && (
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase font-mono">Order Reference</span>
+            <span className="text-muted block text-[10px] uppercase font-mono">Order Reference</span>
             <Link
               href={`/admin/orders?search=${encodeURIComponent(request.order_number)}`}
               target="_blank"
-              className="font-mono font-bold text-amber-400 hover:underline inline-flex items-center gap-1"
+              className="font-mono font-bold text-brand-gold hover:underline inline-flex items-center gap-1"
             >
               <span>#{request.order_number}</span>
-              <ExternalLink className="w-3 h-3 text-slate-500" />
+              <ExternalLink className="w-3 h-3 text-muted" />
             </Link>
           </div>
         )}
         <div>
-          <span className="text-slate-500 block text-[10px] uppercase font-mono">Created</span>
-          <span className="font-mono text-slate-400 text-[11px]">
+          <span className="text-muted block text-[10px] uppercase font-mono">Created</span>
+          <span className="font-mono text-muted text-[11px]">
             {new Date(request.created_at).toLocaleString()}
           </span>
         </div>
       </div>
 
       {/* Messages Thread */}
-      <div className="rounded-xl border border-slate-800 bg-slate-950 p-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <LifeBuoy className="w-4 h-4 text-purple-400" />
+      <div className="rounded-xl border border-border bg-surface p-6 space-y-6 shadow-card">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <h2 className="text-sm font-bold text-main flex items-center gap-2">
+            <LifeBuoy className="w-4 h-4 text-accent-admin" />
             <span>Conversation Thread ({messages.length})</span>
           </h2>
         </div>
@@ -181,15 +181,15 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
                 key={msg.id}
                 className={`p-4 rounded-xl text-xs space-y-2 border ${
                   isAdmin
-                    ? 'bg-purple-950/20 border-purple-800/40'
-                    : 'bg-slate-900/60 border-slate-800'
+                    ? 'bg-accent-admin/5 border-accent-admin/20'
+                    : 'bg-surface-muted border-border'
                 }`}
               >
-                <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
                   <div className="flex items-center gap-2">
                     <span
                       className={`font-bold ${
-                        isAdmin ? 'text-purple-300' : 'text-slate-200'
+                        isAdmin ? 'text-accent-admin' : 'text-main'
                       }`}
                     >
                       {msg.author_name}
@@ -197,19 +197,19 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
                     <span
                       className={`px-1.5 py-0.2 rounded text-[9px] uppercase font-mono font-bold ${
                         isAdmin
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                          ? 'bg-accent-admin/10 text-accent-admin border border-accent-admin/20'
+                          : 'bg-surface text-muted border border-border'
                       }`}
                     >
                       {msg.author_role}
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono">
+                  <span className="text-[10px] text-muted font-mono">
                     {new Date(msg.created_at).toLocaleString()}
                   </span>
                 </div>
 
-                <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
+                <p className="text-main leading-relaxed whitespace-pre-wrap">{msg.body}</p>
               </div>
             );
           })}
@@ -217,8 +217,8 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
 
         {/* Reply Box */}
         {!isClosed ? (
-          <form onSubmit={handlePostReply} className="space-y-3 pt-4 border-t border-slate-800">
-            <span className="text-xs font-bold text-slate-300">
+          <form onSubmit={handlePostReply} className="space-y-3 pt-4 border-t border-border">
+            <span className="text-xs font-bold text-main">
               Admin Support Response
             </span>
             <div className="space-y-2">
@@ -227,13 +227,13 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
                 value={replyBody}
                 onChange={(e) => setReplyBody(e.target.value)}
                 placeholder="Type your response to the user..."
-                className="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs p-3 rounded-xl focus:outline-none focus:border-purple-500/50 resize-y"
+                className="w-full bg-surface-muted border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-y placeholder-muted transition-colors"
               />
               <div className="flex justify-end">
                 <button
                   type="submit"
                   disabled={isPending || !replyBody.trim()}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent-admin hover:bg-accent-admin-dark text-white font-bold text-xs rounded-xl transition-colors disabled:opacity-50 shadow-sm"
                 >
                   {isPending ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -246,7 +246,7 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
             </div>
           </form>
         ) : (
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">
+          <div className="p-4 rounded-xl bg-surface-muted border border-border text-xs text-muted text-center">
             This support ticket is closed.
           </div>
         )}

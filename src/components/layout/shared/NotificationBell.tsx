@@ -23,9 +23,9 @@ export function NotificationBell({
   switch (variant) {
     case 'admin':
       defaultStyles =
-        'relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-700';
+        'relative p-2 rounded-lg text-slate-300 hover:text-white hover:bg-navy-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent-admin/40';
       badgeStyles =
-        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm';
+        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-accent-admin text-[10px] font-bold text-white shadow-sm';
       break;
     case 'writer':
       defaultStyles =

@@ -33,7 +33,7 @@ export function LogoutButton({
   switch (variant) {
     case 'admin':
       defaultStyles =
-        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-rose-950/60 hover:text-rose-300 hover:border-rose-800/60 border border-slate-700/80 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+        'flex items-center gap-2.5 w-full px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
       break;
     case 'writer':
       defaultStyles =

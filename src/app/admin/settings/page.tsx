@@ -154,23 +154,23 @@ export default async function AdminSettingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <div className="w-7 h-7 rounded-lg bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin">
               <Settings className="w-3.5 h-3.5" />
             </div>
-            <h1 className="text-xl font-bold text-white">Global Platform Configuration</h1>
+            <h1 className="text-xl font-bold text-main">Global Platform Configuration</h1>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-muted mt-0.5">
             Configure default platform commission, author balance pause limits, dispute windows, and pricing ceilings.
           </p>
         </div>
       </div>
 
       {pageError && (
-        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load platform settings data</h3>
-            <p className="text-xs text-red-400/80 mt-1">{pageError.message}</p>
+            <p className="text-xs text-rose-600/90 mt-1">{pageError.message}</p>
           </div>
         </div>
       )}

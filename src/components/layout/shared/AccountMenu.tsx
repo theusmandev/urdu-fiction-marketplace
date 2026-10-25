@@ -73,7 +73,7 @@ export function AccountMenu({
     if (user.role === 'admin') {
       return {
         label: 'Platform Admin',
-        classes: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+        classes: 'bg-accent-admin-light text-accent-admin-dark border-accent-admin-border font-bold',
       };
     }
     if (user.writerStatus === 'pending_approval') {
@@ -104,13 +104,13 @@ export function AccountMenu({
 
   if (variant === 'admin') {
     triggerButtonStyles =
-      'flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl border border-slate-700/80 bg-slate-800/80 hover:bg-slate-800 hover:border-slate-600 transition-all text-left focus:outline-none focus:ring-2 focus:ring-rose-500/40 cursor-pointer';
+      'flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl border border-navy-light/80 bg-navy/80 hover:bg-navy-light/60 transition-all text-left focus:outline-none focus:ring-2 focus:ring-accent-admin/40 cursor-pointer';
     dropdownPanelStyles =
-      'absolute right-0 top-full mt-2 w-64 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-150';
+      'absolute right-0 top-full mt-2 w-64 bg-surface rounded-2xl shadow-xl border border-border p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-main';
     headerBoxStyles =
-      'px-3 py-2.5 bg-slate-950/80 rounded-xl mb-1.5 border border-slate-800/80';
+      'px-3 py-2.5 bg-ivory/70 rounded-xl mb-1.5 border border-border/60';
     linkItemStyles =
-      'flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-xl transition-colors';
+      'flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors';
   } else if (variant === 'writer') {
     triggerButtonStyles =
       'flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl border border-navy-light/80 bg-navy/80 hover:bg-navy-light/60 transition-all text-left focus:outline-none focus:ring-2 focus:ring-accent/40 cursor-pointer';
@@ -152,7 +152,7 @@ export function AccountMenu({
           <div
             className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-inner ${
               variant === 'admin'
-                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                ? 'bg-accent-admin-light text-accent-admin border border-accent-admin-border'
                 : variant === 'writer'
                 ? 'bg-accent/20 text-accent border border-accent/30'
                 : 'bg-navy text-accent border border-navy-light'
@@ -175,7 +175,7 @@ export function AccountMenu({
           <span
             className={`text-[10px] capitalize leading-tight ${
               variant === 'admin'
-                ? 'text-slate-400 font-mono'
+                ? 'text-slate-400 font-medium'
                 : variant === 'writer'
                 ? 'text-slate-400'
                 : 'text-secondary'
@@ -208,13 +208,13 @@ export function AccountMenu({
                 <img
                   src={user.avatarUrl}
                   alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0"
+                  className="w-8 h-8 rounded-full object-cover border border-border shrink-0"
                 />
               ) : (
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
                     variant === 'admin'
-                      ? 'bg-rose-500/20 text-rose-300'
+                      ? 'bg-accent-admin-light text-accent-admin'
                       : variant === 'writer'
                       ? 'bg-accent/20 text-accent'
                       : 'bg-navy text-accent'
@@ -226,14 +226,14 @@ export function AccountMenu({
               <div className="min-w-0 flex-1">
                 <p
                   className={`text-xs font-bold truncate ${
-                    variant === 'admin' || variant === 'writer'
+                    variant === 'writer'
                       ? 'text-white'
                       : 'text-navy'
                   }`}
                 >
                   {user.name}
                 </p>
-                <p className="text-[11px] text-slate-400 truncate">
+                <p className={`text-[11px] truncate ${variant === 'writer' ? 'text-slate-300' : 'text-secondary'}`}>
                   {user.email}
                 </p>
                 <div className="mt-1">
@@ -248,7 +248,7 @@ export function AccountMenu({
           </div>
 
           {/* Contextual Links */}
-          <div className="space-y-0.5 border-b border-slate-800/60 pb-1 mb-1">
+          <div className="space-y-0.5 border-b border-border/60 pb-1 mb-1">
             {variant === 'admin' ? (
               <>
                 <Link
@@ -256,7 +256,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                  <ShieldAlert className="w-4 h-4 text-accent-admin shrink-0" />
                   <span>Admin Overview</span>
                 </Link>
                 <Link
@@ -264,7 +264,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Settings className="w-4 h-4 text-slate-400 shrink-0" />
+                  <Settings className="w-4 h-4 text-secondary shrink-0" />
                   <span>Platform Settings</span>
                 </Link>
                 <Link
@@ -272,7 +272,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Activity className="w-4 h-4 text-slate-400 shrink-0" />
+                  <Activity className="w-4 h-4 text-secondary shrink-0" />
                   <span>Audit Trail</span>
                 </Link>
                 <Link

@@ -167,16 +167,16 @@ export function PlatformPaymentMethodsManager({
   };
 
   return (
-    <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className="bg-surface border border-border rounded-2xl p-6 shadow-card space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-lg font-serif font-bold text-white">
+            <CreditCard className="w-5 h-5 text-accent-admin" />
+            <h2 className="text-lg font-serif font-bold text-main">
               Official Platform Remittance Accounts
             </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-muted mt-0.5">
             Banking and mobile wallet accounts shown to authors who have an open commission invoice.
           </p>
         </div>
@@ -185,7 +185,7 @@ export function PlatformPaymentMethodsManager({
           id="add-payment-account-btn"
           type="button"
           onClick={handleOpenAdd}
-          className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors cursor-pointer"
+          className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Payment Account
@@ -193,22 +193,22 @@ export function PlatformPaymentMethodsManager({
       </div>
 
       {methods.length === 0 ? (
-        <div className="py-10 text-center space-y-3 bg-slate-900/50 rounded-xl border border-dashed border-slate-800">
-          <div className="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center mx-auto text-slate-400">
+        <div className="py-10 text-center space-y-3 bg-surface-muted/50 rounded-xl border border-dashed border-border">
+          <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center mx-auto text-muted">
             <CreditCard className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-slate-300">
+            <p className="text-xs font-semibold text-main">
               No platform remittance accounts configured yet
             </p>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            <p className="text-xs text-muted max-w-sm mx-auto">
               Authors who have open commission invoices will see a placeholder notice until you add official banking details.
             </p>
           </div>
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors cursor-pointer"
+            className="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white shadow-sm transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Add First Payment Account
@@ -223,33 +223,33 @@ export function PlatformPaymentMethodsManager({
             return (
               <div
                 key={m.id}
-                className={`p-4 rounded-xl border transition-colors ${
+                className={`p-4 rounded-xl border transition-colors shadow-sm ${
                   m.is_active
-                    ? 'bg-slate-900 border-slate-800'
-                    : 'bg-slate-900/40 border-slate-800/40 opacity-60'
+                    ? 'bg-surface border-border'
+                    : 'bg-surface-muted/40 border-border opacity-60'
                 }`}
               >
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                   <div className="flex items-center gap-2">
                     {isBank ? (
-                      <Building className="w-4 h-4 text-indigo-400" />
+                      <Building className="w-4 h-4 text-accent-admin" />
                     ) : isRaast ? (
-                      <Zap className="w-4 h-4 text-amber-400" />
+                      <Zap className="w-4 h-4 text-brand-gold" />
                     ) : (
-                      <Smartphone className="w-4 h-4 text-emerald-400" />
+                      <Smartphone className="w-4 h-4 text-emerald-600" />
                     )}
-                    <span className="font-semibold text-white text-xs uppercase">
+                    <span className="font-semibold text-main text-xs uppercase">
                       {m.bank_name || (isRaast ? 'RAAST P2M' : m.method_type.replace('_', ' '))}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {m.is_active ? (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                         Active
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface-muted text-muted border border-border">
                         Inactive
                       </span>
                     )}
@@ -257,7 +257,7 @@ export function PlatformPaymentMethodsManager({
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(m)}
-                      className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      className="p-1 text-muted hover:text-main transition-colors cursor-pointer"
                       title="Edit Account"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -266,7 +266,7 @@ export function PlatformPaymentMethodsManager({
                       <button
                         type="button"
                         onClick={() => handleDeactivate(m.id)}
-                        className="p-1 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                        className="p-1 text-muted hover:text-rose-600 transition-colors cursor-pointer"
                         title="Deactivate Account"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -277,19 +277,19 @@ export function PlatformPaymentMethodsManager({
 
                 <div className="space-y-1 text-xs">
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase">Title:</span>
-                    <div className="font-medium text-slate-200">{m.account_title}</div>
+                    <span className="text-[10px] text-muted uppercase">Title:</span>
+                    <div className="font-medium text-main">{m.account_title}</div>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase">
+                    <span className="text-[10px] text-muted uppercase">
                       {isBank ? 'Account / IBAN:' : isRaast ? 'Raast ID / IBAN:' : 'Wallet Number:'}
                     </span>
-                    <div className="font-mono text-white font-medium">
+                    <div className="font-mono text-main font-medium">
                       {m.account_number_or_iban}
                     </div>
                   </div>
                   {m.instructions_note && (
-                    <div className="text-[11px] text-slate-400 italic pt-1">
+                    <div className="text-[11px] text-muted italic pt-1">
                       Note: {m.instructions_note}
                     </div>
                   )}
@@ -303,20 +303,20 @@ export function PlatformPaymentMethodsManager({
       {/* Modal for Add / Edit */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsModalOpen(false);
           }}
         >
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="font-serif font-bold text-lg text-white">
+          <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-serif font-bold text-lg text-main">
                 {editingId ? 'Edit Platform Account' : 'Add Platform Account'}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white cursor-pointer"
+                className="text-muted hover:text-main cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -324,13 +324,13 @@ export function PlatformPaymentMethodsManager({
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               {formError && (
-                <div className="p-3 bg-rose-500/20 border border-rose-500/30 text-rose-300 rounded-xl">
+                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl">
                   {formError}
                 </div>
               )}
 
               <div>
-                <label htmlFor="platform-method-type" className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-method-type" className="block text-main font-medium mb-1">
                   Payment Method Type *
                 </label>
                 <select
@@ -341,7 +341,7 @@ export function PlatformPaymentMethodsManager({
                       e.target.value as 'jazzcash' | 'easypaisa' | 'raast' | 'bank_transfer'
                     )
                   }
-                  className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                 >
                   <option value="bank_transfer">Direct Bank Transfer (IBAN)</option>
                   <option value="jazzcash">JazzCash Mobile Wallet</option>
@@ -352,7 +352,7 @@ export function PlatformPaymentMethodsManager({
 
               {methodType === 'bank_transfer' && (
                 <div>
-                  <label htmlFor="platform-bank-name" className="block text-slate-300 font-medium mb-1">
+                  <label htmlFor="platform-bank-name" className="block text-main font-medium mb-1">
                     Bank Name *
                   </label>
                   <input
@@ -362,13 +362,13 @@ export function PlatformPaymentMethodsManager({
                     placeholder="e.g. Meezan Bank, HBL, Bank Alfalah"
                     value={bankName}
                     onChange={(e) => setBankName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                   />
                 </div>
               )}
 
               <div>
-                <label htmlFor="platform-account-title" className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-account-title" className="block text-main font-medium mb-1">
                   Account Title *
                 </label>
                 <input
@@ -378,12 +378,12 @@ export function PlatformPaymentMethodsManager({
                   placeholder="e.g. Urdu Novels Bazaar PVT LTD"
                   value={accountTitle}
                   onChange={(e) => setAccountTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                 />
               </div>
 
               <div>
-                <label htmlFor="platform-account-number" className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-account-number" className="block text-main font-medium mb-1">
                   {methodType === 'bank_transfer'
                     ? 'IBAN / Account Number *'
                     : methodType === 'raast'
@@ -403,12 +403,12 @@ export function PlatformPaymentMethodsManager({
                   }
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main font-mono focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                 />
               </div>
 
               <div>
-                <label htmlFor="platform-instructions-note" className="block text-slate-300 font-medium mb-1">
+                <label htmlFor="platform-instructions-note" className="block text-main font-medium mb-1">
                   Remittance Instructions Note (Optional)
                 </label>
                 <textarea
@@ -417,22 +417,22 @@ export function PlatformPaymentMethodsManager({
                   placeholder="e.g. Mention your Pen Name or Invoice Number in the transfer description..."
                   value={instructionsNote}
                   onChange={(e) => setInstructionsNote(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-800 bg-slate-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-surface-muted text-main hover:bg-surface border border-border cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white font-semibold disabled:opacity-50 cursor-pointer shadow-sm transition-colors"
                 >
                   {isSubmitting ? 'Saving...' : 'Save Account'}
                 </button>
