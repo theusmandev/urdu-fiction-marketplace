@@ -284,15 +284,26 @@ export async function markNotificationsReadAction(
   }
 }
 
-/**
- * Checks a novel's purchase and entitlement status for the current reader
- */
-export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
+export type NovelAccessState =
+  | 'visitor'
+  | 'owner_buyer'
+  | 'pending_verification'
+  | 'rejected'
+  | 'disputed'
+  | 'author'
+  | 'admin';
+
+export interface NovelAccessStatus {
+  state: NovelAccessState;
   signedIn: boolean;
-  isOwnNovel: boolean;
-  isOwned: boolean;
-  openOrderNumber: string | null;
-}> {
+  orderNumber?: string | null;
+  lastReadChapterNumber?: number | null;
+}
+
+/**
+ * Checks a novel's complete access status, entitlement, and reading progress for the current visitor.
+ */
+export async function getNovelAccessStatusAction(novelId: string): Promise<NovelAccessStatus> {
   try {
     const supabase = await createClient();
     const {
@@ -301,14 +312,45 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
 
     if (!user) {
       return {
+        state: 'visitor',
         signedIn: false,
-        isOwnNovel: false,
-        isOwned: false,
-        openOrderNumber: null,
+        orderNumber: null,
+        lastReadChapterNumber: null,
       };
     }
 
-    // 1. Check if novel exists and belongs to current user
+    // 1. Check if user is an administrator
+    const { data: profile, error: profileErr } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (profileErr) {
+      console.error('getNovelAccessStatusAction: profile query error:', profileErr);
+    }
+
+    if (profile?.role === 'admin') {
+      const { data: progress, error: progressErr } = await supabase
+        .from('reader_progress')
+        .select('last_chapter_number')
+        .eq('reader_id', user.id)
+        .eq('novel_id', novelId)
+        .maybeSingle();
+
+      if (progressErr) {
+        console.error('getNovelAccessStatusAction: admin progress query error:', progressErr);
+      }
+
+      return {
+        state: 'admin',
+        signedIn: true,
+        orderNumber: null,
+        lastReadChapterNumber: progress?.last_chapter_number ?? null,
+      };
+    }
+
+    // 2. Check if novel exists and belongs to current author
     const { data: novel, error: novelErr } = await supabase
       .from('novels')
       .select('writer_id')
@@ -316,20 +358,31 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
       .maybeSingle();
 
     if (novelErr) {
-      console.error('getNovelCheckoutStatusAction: novel query error:', novelErr);
+      console.error('getNovelAccessStatusAction: novel query error:', novelErr);
     }
 
     const isOwnNovel = novel?.writer_id === user.id;
     if (isOwnNovel) {
+      const { data: progress, error: progressErr } = await supabase
+        .from('reader_progress')
+        .select('last_chapter_number')
+        .eq('reader_id', user.id)
+        .eq('novel_id', novelId)
+        .maybeSingle();
+
+      if (progressErr) {
+        console.error('getNovelAccessStatusAction: author progress query error:', progressErr);
+      }
+
       return {
+        state: 'author',
         signedIn: true,
-        isOwnNovel: true,
-        isOwned: false,
-        openOrderNumber: null,
+        orderNumber: null,
+        lastReadChapterNumber: progress?.last_chapter_number ?? null,
       };
     }
 
-    // 2. Check if user holds active entitlement
+    // 3. Check if user holds active entitlement (owner_buyer)
     const { data: entitlement, error: entitlementErr } = await supabase
       .from('purchase_entitlements')
       .select('id')
@@ -339,22 +392,33 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
       .maybeSingle();
 
     if (entitlementErr) {
-      console.error('getNovelCheckoutStatusAction: entitlement query error:', entitlementErr);
+      console.error('getNovelAccessStatusAction: entitlement query error:', entitlementErr);
     }
 
     if (entitlement) {
+      const { data: progress, error: progressErr } = await supabase
+        .from('reader_progress')
+        .select('last_chapter_number')
+        .eq('reader_id', user.id)
+        .eq('novel_id', novelId)
+        .maybeSingle();
+
+      if (progressErr) {
+        console.error('getNovelAccessStatusAction: entitlement progress query error:', progressErr);
+      }
+
       return {
+        state: 'owner_buyer',
         signedIn: true,
-        isOwnNovel: false,
-        isOwned: true,
-        openOrderNumber: null,
+        orderNumber: null,
+        lastReadChapterNumber: progress?.last_chapter_number ?? null,
       };
     }
 
-    // 3. Check if user has an open order for this novel
+    // 4. Check if user has an open or pending order for this novel
     const { data: openOrder, error: orderErr } = await supabase
       .from('orders')
-      .select('order_number')
+      .select('order_number, status')
       .eq('reader_id', user.id)
       .eq('novel_id', novelId)
       .in('status', ['pending_payment', 'payment_submitted', 'rejected', 'disputed'])
@@ -363,22 +427,67 @@ export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
       .maybeSingle();
 
     if (orderErr) {
-      console.error('getNovelCheckoutStatusAction: openOrder query error:', orderErr);
+      console.error('getNovelAccessStatusAction: openOrder query error:', orderErr);
     }
 
+    if (openOrder) {
+      if (openOrder.status === 'rejected') {
+        return {
+          state: 'rejected',
+          signedIn: true,
+          orderNumber: openOrder.order_number,
+          lastReadChapterNumber: null,
+        };
+      }
+      if (openOrder.status === 'disputed') {
+        return {
+          state: 'disputed',
+          signedIn: true,
+          orderNumber: openOrder.order_number,
+          lastReadChapterNumber: null,
+        };
+      }
+      return {
+        state: 'pending_verification',
+        signedIn: true,
+        orderNumber: openOrder.order_number,
+        lastReadChapterNumber: null,
+      };
+    }
+
+    // 5. Signed-in prospective buyer (visitor)
     return {
+      state: 'visitor',
       signedIn: true,
-      isOwnNovel: false,
-      isOwned: false,
-      openOrderNumber: openOrder?.order_number || null,
+      orderNumber: null,
+      lastReadChapterNumber: null,
     };
   } catch (err) {
-    console.error('getNovelCheckoutStatusAction caught unexpected error:', err);
+    console.error('getNovelAccessStatusAction caught unexpected error:', err);
     return {
+      state: 'visitor',
       signedIn: false,
-      isOwnNovel: false,
-      isOwned: false,
-      openOrderNumber: null,
+      orderNumber: null,
+      lastReadChapterNumber: null,
     };
   }
 }
+
+/**
+ * Legacy compatibility wrapper around getNovelAccessStatusAction
+ */
+export async function getNovelPurchaseStatusAction(novelId: string): Promise<{
+  signedIn: boolean;
+  isOwnNovel: boolean;
+  isOwned: boolean;
+  openOrderNumber: string | null;
+}> {
+  const access = await getNovelAccessStatusAction(novelId);
+  return {
+    signedIn: access.signedIn,
+    isOwnNovel: access.state === 'author',
+    isOwned: access.state === 'owner_buyer' || access.state === 'author' || access.state === 'admin',
+    openOrderNumber: access.orderNumber ?? null,
+  };
+}
+
