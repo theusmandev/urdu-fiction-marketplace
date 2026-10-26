@@ -119,6 +119,7 @@ export async function POST(req: NextRequest) {
       success: true,
       fileName: file.name,
       fileSize: file.size,
+      rawText: rawText,
       totalChaptersDetected: chapters.length,
       chapters,
     });
