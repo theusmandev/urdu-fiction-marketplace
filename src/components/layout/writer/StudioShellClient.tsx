@@ -134,8 +134,7 @@ export function StudioShellClient({
           </Link>
 
           {/* Breadcrumb / Page Title */}
-          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 border-l border-navy-light pl-3 ml-1">
-            <span>/</span>
+          <div className="hidden sm:flex items-center text-xs border-l border-navy-light pl-3 ml-1">
             <span className="font-semibold text-white">{getPageTitle()}</span>
           </div>
         </div>
