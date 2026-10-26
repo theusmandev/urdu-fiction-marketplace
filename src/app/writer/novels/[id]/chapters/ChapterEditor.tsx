@@ -23,7 +23,9 @@ import {
   Wand2,
   AlertTriangle,
   X,
+  Scissors,
 } from 'lucide-react';
+import { ChapterSplitterWizard } from './ChapterSplitterWizard';
 
 interface ChapterEditorProps {
   novelId: string;
@@ -69,6 +71,16 @@ export function ChapterEditor({
   const [isDirty, setIsDirty] = useState(false);
   const [isCleanerModalOpen, setIsCleanerModalOpen] = useState(false);
   const [optInArabicLetters, setOptInArabicLetters] = useState(false);
+  const [isSplitterModalOpen, setIsSplitterModalOpen] = useState(false);
+
+  // Debounced word count for 200,000+ characters silky responsiveness
+  const [debouncedWordCount, setDebouncedWordCount] = useState(() => countUrduWords(formData.content_urdu));
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedWordCount(countUrduWords(formData.content_urdu));
+    }, 200);
+    return () => clearTimeout(handler);
+  }, [formData.content_urdu]);
 
   // Unsaved changes warning
   useEffect(() => {
@@ -83,7 +95,8 @@ export function ChapterEditor({
   }, [isDirty]);
 
   const charCount = formData.content_urdu.length;
-  const wordCount = countUrduWords(formData.content_urdu);
+  const wordCount = debouncedWordCount;
+  const isNearingLimit = charCount >= 96000 && charCount <= MAX_CHAPTER_CHARACTERS;
   const isOverLimit = charCount > MAX_CHAPTER_CHARACTERS;
   const limitPercentage = Math.min(100, Math.round((charCount / MAX_CHAPTER_CHARACTERS) * 100));
 
@@ -374,6 +387,17 @@ export function ChapterEditor({
               <Wand2 className="w-3.5 h-3.5 text-accent" />
               <span>Clean Text Assistant</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setIsSplitterModalOpen(true)}
+              disabled={!formData.content_urdu.trim()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface border border-border text-navy text-xs font-semibold hover:bg-white transition-colors shadow-xs disabled:opacity-50"
+              title="Divide long episode into discrete chapters"
+            >
+              <Scissors className="w-3.5 h-3.5 text-accent" />
+              <span>Split into Chapters</span>
+            </button>
           </div>
 
           {/* Live Metrics */}
@@ -383,8 +407,8 @@ export function ChapterEditor({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className={isOverLimit ? 'text-rose-600 font-bold' : 'text-secondary'}>
-                <strong className={isOverLimit ? 'text-rose-600' : 'text-navy'}>
+              <span className={isOverLimit ? 'text-rose-600 font-bold' : isNearingLimit ? 'text-amber-700 font-semibold' : 'text-secondary'}>
+                <strong className={isOverLimit ? 'text-rose-600' : isNearingLimit ? 'text-amber-800' : 'text-navy'}>
                   {charCount.toLocaleString()}
                 </strong>{' '}
                 / 120,000 chars
@@ -396,7 +420,7 @@ export function ChapterEditor({
                   className={`h-full transition-all duration-300 ${
                     isOverLimit
                       ? 'bg-rose-600'
-                      : limitPercentage > 90
+                      : limitPercentage >= 80
                       ? 'bg-amber-500'
                       : 'bg-accent'
                   }`}
@@ -427,12 +451,43 @@ export function ChapterEditor({
           </div>
         )}
 
+        {/* Amber Banner when between 80% and 100% (96,000 - 120,000 chars) */}
+        {isNearingLimit && !isOverLimit && (
+          <div className="p-4 bg-amber-50 border-t border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>
+                <strong>Approaching Limit:</strong> This chapter is at {limitPercentage}% of the 120,000-character limit ({charCount.toLocaleString()} chars). You can split it into smaller chapter parts for a better reading experience.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsSplitterModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 shadow-xs"
+            >
+              <Scissors className="w-3.5 h-3.5" />
+              <span>Split into Chapters</span>
+            </button>
+          </div>
+        )}
+
+        {/* Red Banner when over 100% (>120,000 chars, save blocked) */}
         {isOverLimit && (
-          <div className="p-4 bg-rose-50 border-t border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>
-              This chapter exceeds the platform limit of 120,000 characters. Please split this text into multiple chapters.
-            </span>
+          <div className="p-4 bg-rose-50 border-t border-rose-200 text-rose-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>
+                <strong>Limit Exceeded:</strong> This chapter exceeds the platform limit of 120,000 characters ({charCount.toLocaleString()} chars). Saving is blocked until the content is divided.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsSplitterModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 shadow-xs"
+            >
+              <Scissors className="w-3.5 h-3.5" />
+              <span>Split into Chapters</span>
+            </button>
           </div>
         )}
       </div>
@@ -609,6 +664,27 @@ export function ChapterEditor({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Chapter Splitter Wizard */}
+      {isSplitterModalOpen && (
+        <ChapterSplitterWizard
+          novelId={novelId}
+          novelTitleUrdu={novelTitleUrdu}
+          novelTitleEnglish={novelTitleEnglish}
+          isOpen={isSplitterModalOpen}
+          onClose={() => setIsSplitterModalOpen(false)}
+          mode={chapterId ? 'split-existing' : 'import'}
+          existingChapterId={chapterId}
+          existingChapterNumber={formData.chapter_number}
+          initialText={formData.content_urdu}
+          suggestedStartNumber={formData.chapter_number}
+          onSuccess={() => {
+            setIsSplitterModalOpen(false);
+            router.push(`/writer/novels/${novelId}/chapters`);
+            router.refresh();
+          }}
+        />
       )}
     </form>
   );
