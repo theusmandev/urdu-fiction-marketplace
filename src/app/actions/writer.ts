@@ -427,6 +427,12 @@ export async function saveChapterAction(
         .single();
 
       if (updateError) {
+        if (updateError.message.includes('chk_chapters_content_length') || updateError.message.includes('120000')) {
+          return {
+            success: false,
+            error: 'Chapter content exceeds the platform limit of 120,000 characters (max ~20,000 words). Please use the chapter splitter to divide long manuscripts.',
+          };
+        }
         return { success: false, error: updateError.message };
       }
 
@@ -449,6 +455,12 @@ export async function saveChapterAction(
         .single();
 
       if (insertError) {
+        if (insertError.message.includes('chk_chapters_content_length') || insertError.message.includes('120000')) {
+          return {
+            success: false,
+            error: 'Chapter content exceeds the platform limit of 120,000 characters (max ~20,000 words). Please use the chapter splitter to divide long manuscripts.',
+          };
+        }
         return { success: false, error: insertError.message };
       }
 
@@ -541,7 +553,7 @@ export async function reorderChaptersAction(
 }
 
 /**
- * Import chapters batch from parsed manuscript
+ * Atomic Server Action to import multiple chapters via RPC
  */
 export async function importChaptersAction(
   novelId: string,
@@ -550,70 +562,107 @@ export async function importChaptersAction(
     content_urdu: string;
     is_free_preview?: boolean;
     is_published?: boolean;
-  }>
-): Promise<ActionResponse<{ imported_count: number }>> {
+  }>,
+  startNumber?: number | null
+): Promise<ActionResponse<{ imported_count: number; chapters: Array<{ id: string; chapter_number: number; title_urdu: string }> }>> {
   try {
-    const { user } = await requireWriter(`/writer/novels/${novelId}/chapters`);
+    await requireWriter(`/writer/novels/${novelId}/chapters`);
     const supabase = await createClient();
 
-    // Verify novel
-    const { data: novel, error: novelError } = await supabase
-      .from('novels')
-      .select('status, writer_id')
-      .eq('id', novelId)
-      .maybeSingle();
+    const cleanParts = chapters.map((c) => ({
+      title_urdu: cleanUrduText(c.title_urdu),
+      content_urdu: cleanUrduText(c.content_urdu),
+      is_free_preview: Boolean(c.is_free_preview),
+      is_published: Boolean(c.is_published),
+    }));
 
-    if (novelError) {
-      console.error('importChaptersAction: novel lookup error:', novelError);
-      return { success: false, error: novelError.message };
-    }
-
-    if (!novel || novel.writer_id !== user.id) {
-      return { success: false, error: 'Unauthorized.' };
-    }
-
-    if (novel.status === 'under_review' || novel.status === 'suspended') {
-      return { success: false, error: `Chapters cannot be imported while novel is ${novel.status}.` };
-    }
-
-    // Determine highest existing chapter number
-    const { data: existingChapters, error: chaptersError } = await supabase
-      .from('chapters')
-      .select('chapter_number')
-      .eq('novel_id', novelId)
-      .order('chapter_number', { ascending: false })
-      .limit(1);
-
-    if (chaptersError) {
-      console.error('importChaptersAction: existingChapters query error:', chaptersError);
-    }
-
-    let startNumber = (existingChapters && existingChapters[0]?.chapter_number) || 0;
-
-    const rowsToInsert = chapters.map((c) => {
-      startNumber++;
-      return {
-        novel_id: novelId,
-        chapter_number: startNumber,
-        title_urdu: cleanUrduText(c.title_urdu),
-        content_urdu: cleanUrduText(c.content_urdu),
-        is_free_preview: Boolean(c.is_free_preview),
-        is_published: c.is_published ?? true,
-      };
+    const { data, error } = await supabase.rpc('import_chapters', {
+      p_novel_id: novelId,
+      p_start_number: startNumber ?? null,
+      p_parts: cleanParts,
     });
 
-    const { error: insertError } = await supabase
-      .from('chapters')
-      .insert(rowsToInsert);
-
-    if (insertError) {
-      return { success: false, error: insertError.message };
+    if (error) {
+      console.error('importChaptersAction RPC error:', error);
+      if (error.message.includes('120,000') || error.message.includes('chk_chapters_content_length')) {
+        return {
+          success: false,
+          error: 'One or more chapters exceed the 120,000 character limit. Please split oversized chapters before importing.',
+        };
+      }
+      return { success: false, error: error.message };
     }
 
+    const importedChapters = (data as Array<{ id: string; chapter_number: number; title_urdu: string }>) || [];
+
     revalidatePath(`/writer/novels/${novelId}/chapters`);
-    return { success: true, data: { imported_count: rowsToInsert.length } };
+    revalidatePath(`/writer/novels/${novelId}`);
+    return {
+      success: true,
+      data: {
+        imported_count: importedChapters.length,
+        chapters: importedChapters,
+      },
+    };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to import chapters.';
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Atomic Server Action to split an existing chapter into multiple parts via RPC
+ */
+export async function splitChapterAction(
+  novelId: string,
+  chapterId: string,
+  parts: Array<{
+    title_urdu: string;
+    content_urdu: string;
+    is_free_preview?: boolean;
+    is_published?: boolean;
+  }>
+): Promise<ActionResponse<{ parts_count: number; chapters: Array<{ id: string; chapter_number: number; title_urdu: string }> }>> {
+  try {
+    await requireWriter(`/writer/novels/${novelId}/chapters`);
+    const supabase = await createClient();
+
+    const cleanParts = parts.map((p) => ({
+      title_urdu: cleanUrduText(p.title_urdu),
+      content_urdu: cleanUrduText(p.content_urdu),
+      is_free_preview: Boolean(p.is_free_preview),
+      is_published: Boolean(p.is_published),
+    }));
+
+    const { data, error } = await supabase.rpc('split_chapter', {
+      p_chapter_id: chapterId,
+      p_parts: cleanParts,
+    });
+
+    if (error) {
+      console.error('splitChapterAction RPC error:', error);
+      if (error.message.includes('120,000') || error.message.includes('chk_chapters_content_length')) {
+        return {
+          success: false,
+          error: 'One or more parts exceed the 120,000 character limit. Please split oversized parts.',
+        };
+      }
+      return { success: false, error: error.message };
+    }
+
+    const resultChapters = (data as Array<{ id: string; chapter_number: number; title_urdu: string }>) || [];
+
+    revalidatePath(`/writer/novels/${novelId}/chapters`);
+    revalidatePath(`/writer/novels/${novelId}`);
+    return {
+      success: true,
+      data: {
+        parts_count: resultChapters.length,
+        chapters: resultChapters,
+      },
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Failed to split chapter.';
     return { success: false, error: msg };
   }
 }
