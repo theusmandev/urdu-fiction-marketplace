@@ -429,12 +429,12 @@ export function SecureReaderClient({
         {/* ---------------------------------------------------------------- */}
         <div className="mt-12 pt-8 border-t border-current/10 space-y-8">
           {/* Navigation Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 w-full">
             {chapter.previous_chapter_number ? (
               <button
                 type="button"
                 onClick={() => navigateToChapter(chapter.previous_chapter_number)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-current/20 hover:border-amber-500 font-semibold text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-current/20 hover:border-amber-500 font-semibold text-xs transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>پچھلا باب ({chapter.previous_chapter_number})</span>
@@ -447,14 +447,20 @@ export function SecureReaderClient({
               <button
                 type="button"
                 onClick={() => navigateToChapter(chapter.next_chapter_number)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-colors shadow-md shadow-amber-500/10 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-colors shadow-md shadow-amber-500/10 cursor-pointer ml-auto"
               >
                 <span>اگلا باب ({chapter.next_chapter_number})</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
-              // End of Novel State
-              <div className="w-full p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-3">
+              <div />
+            )}
+          </div>
+
+          {/* End of Novel State (Decoupled & Centered Completion Card) */}
+          {!chapter.next_chapter_number && (
+            <div className="w-full max-w-2xl mx-auto mt-10">
+              <div className="w-full p-6 sm:p-8 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-3">
                 <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto">
                   <Sparkles className="w-5 h-5" />
                 </div>
@@ -481,8 +487,8 @@ export function SecureReaderClient({
                   </Link>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </main>
 

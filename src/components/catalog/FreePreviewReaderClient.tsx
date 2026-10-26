@@ -303,7 +303,7 @@ export function FreePreviewReaderClient({
         </div>
 
         {/* End of Preview Support Author Callout */}
-        <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center space-y-4">
+        <div className="w-full max-w-2xl mx-auto mt-10 p-6 sm:p-8 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center space-y-4">
           <UrduText as="h3" size="xl" className="py-0 text-inherit">
             کیا آپ کو یہ پیش منظر پسند آیا؟
           </UrduText>
