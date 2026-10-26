@@ -9,6 +9,8 @@ import type {
 } from "@/types/database";
 import type { CatalogSearchParams } from "@/lib/catalog/params";
 
+import { siteConfig } from "../../config/site.ts";
+
 let cachedPublicClient: SupabaseClient | null = null;
 
 /**
@@ -111,10 +113,14 @@ export async function getPublicGenres(): Promise<PublicGenre[]> {
 
 /**
  * Fetches a single active genre by slug.
+ * Checks public_genres view, falls back to genres table, and resolves via siteConfig.featuredGenres.
+ * Differentiates between a truly missing genre (returns null -> notFound) and an empty genre (returns genre with 0 novels).
  */
 export async function getPublicGenreBySlug(slug: string): Promise<PublicGenre | null> {
   try {
     const supabase = getPublicSupabase();
+
+    // 1. Check public_genres view (includes real-time published_novels_count)
     const { data, error } = await supabase
       .from("public_genres")
       .select("*")
@@ -122,13 +128,60 @@ export async function getPublicGenreBySlug(slug: string): Promise<PublicGenre | 
       .maybeSingle();
 
     if (error) {
-      console.error("[getPublicGenreBySlug] query error:", error.code, error.message);
-      return null;
+      console.error("[getPublicGenreBySlug] public_genres query error:", error.code, error.message);
+    } else if (data) {
+      return data as PublicGenre;
     }
-    if (!data) return null;
-    return data as PublicGenre;
+
+    // 2. Fallback: check core genres table directly in case novel count is 0 or view lag
+    const { data: rawGenre, error: rawError } = await supabase
+      .from("genres")
+      .select("id, slug, name_english, name_urdu, display_order, is_active")
+      .eq("slug", slug)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (rawError) {
+      console.error("[getPublicGenreBySlug] genres table query error:", rawError.code, rawError.message);
+    } else if (rawGenre) {
+      return {
+        id: rawGenre.id,
+        slug: rawGenre.slug,
+        name_english: rawGenre.name_english,
+        name_urdu: rawGenre.name_urdu,
+        display_order: rawGenre.display_order,
+        published_novels_count: 0,
+      };
+    }
+
+    // 3. Fallback: check configured platform featuredGenres in siteConfig
+    const featured = siteConfig.featuredGenres.find((g) => g.slug === slug);
+    if (featured) {
+      return {
+        id: featured.id,
+        slug: featured.slug,
+        name_english: featured.nameEn,
+        name_urdu: featured.nameUrdu,
+        display_order: 99,
+        published_novels_count: 0,
+      };
+    }
+
+    // Truly non-existent genre
+    return null;
   } catch (err) {
     console.error("[getPublicGenreBySlug] unexpected error:", err);
+    const featured = siteConfig.featuredGenres.find((g) => g.slug === slug);
+    if (featured) {
+      return {
+        id: featured.id,
+        slug: featured.slug,
+        name_english: featured.nameEn,
+        name_urdu: featured.nameUrdu,
+        display_order: 99,
+        published_novels_count: 0,
+      };
+    }
     return null;
   }
 }

@@ -469,6 +469,16 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm both functions exist with `prosecdef = true`.
   - Execute automated test suite: `supabase/tests/18_chapter_split_tests.sql` (13/13 PASS).
 
+### 32. `supabase/migrations/0032_seed_missing_featured_genres.sql` [SEED MISSING FEATURED GENRES]
+- **Purpose**: Seeds the featured genres referenced in `siteConfig.featuredGenres` (`action-adventure`, `mystery-thriller`, `historical-epic`, `horror-supernatural`, `philosophical-literary`) into `public.genres` table with `is_active = true`.
+- **Action**: Paste contents of `supabase/migrations/0032_seed_missing_featured_genres.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT slug, name_english, is_active FROM public.genres WHERE slug IN ('action-adventure', 'mystery-thriller', 'historical-epic', 'horror-supernatural', 'philosophical-literary');
+    ```
+    Confirm all 5 genres exist with `is_active = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
