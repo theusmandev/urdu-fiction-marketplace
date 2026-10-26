@@ -137,7 +137,7 @@ export default async function WriterDashboardPage() {
             Welcome back, {writerProfile.pen_name_english}
           </h1>
           <UrduText as="p" size="base" className="text-accent py-0">
-            خوش آمدید، {writerProfile.pen_name_urdu}
+            آپ کے رائٹر ڈیش بورڈ میں خوش آمدید
           </UrduText>
         </div>
 
