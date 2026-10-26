@@ -83,7 +83,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
               setShowNewModal(true);
               setErrorMsg(null);
             }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover transition-colors shadow-sm cursor-pointer shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover transition-colors shadow-sm cursor-pointer shrink-0 min-h-[44px]"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Open New Support Request</span>
@@ -210,7 +210,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as typeof category)}
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-surface border border-border text-main focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold min-h-[44px]"
                 >
                   <option value="order">Order or Payment Issue</option>
                   <option value="payment">General Payment Questions</option>
@@ -231,7 +231,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="Brief summary of your request (max 120 chars)"
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold min-h-[44px]"
                 />
               </div>
 
@@ -251,7 +251,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   placeholder="Explain your issue in detail. Please do NOT include bank account numbers or PINs."
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -263,14 +263,14 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                 <button
                   type="button"
                   onClick={() => setShowNewModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy cursor-pointer"
+                  className="min-h-[44px] px-4 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy cursor-pointer flex items-center justify-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isPending || !subject.trim() || !body.trim()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
                 >
                   {isPending ? (
                     <>

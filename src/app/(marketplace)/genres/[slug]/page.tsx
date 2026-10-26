@@ -171,7 +171,7 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
               <div className="pt-2">
                 <Link
                   href="/novels"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy bg-white hover:bg-ivory border border-border px-4 py-2 rounded-lg shadow-sm"
+                  className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-navy bg-white hover:bg-ivory border border-border px-4 py-2 min-h-[44px] rounded-lg shadow-sm"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Browse All Novels</span>

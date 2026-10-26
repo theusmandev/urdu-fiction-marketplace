@@ -110,7 +110,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setPenNameUrdu(e.target.value)}
             placeholder="مثلاً: نمرہ احمد"
             disabled={isPending}
-            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base leading-[2.2] disabled:opacity-50 transition-colors"
+            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base leading-[2.2] min-h-[44px] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.penNameUrdu && (
             <p className="mt-1 text-xs text-rose-600">{fieldErrors.penNameUrdu[0]}</p>
@@ -130,7 +130,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setPenNameEnglish(e.target.value)}
             placeholder="e.g. Nimra Ahmed"
             disabled={isPending}
-            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.penNameEnglish && (
             <p className="mt-1 text-xs text-rose-600">{fieldErrors.penNameEnglish[0]}</p>
@@ -166,21 +166,21 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setBioEnglish(e.target.value)}
             placeholder="A brief introduction to your literary background..."
             disabled={isPending}
-            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm disabled:opacity-50 transition-colors"
           />
         </div>
       </div>
 
       {/* Agreement Checkbox */}
       <div className="pt-2 border-t border-border">
-        <label className="flex items-start gap-3 cursor-pointer">
+        <label className="flex items-start gap-3 cursor-pointer py-1">
           <input
             type="checkbox"
             required
             checked={acceptAgreement}
             onChange={(e) => setAcceptAgreement(e.target.checked)}
             disabled={isPending}
-            className="mt-1 h-4 w-4 rounded border-border bg-white text-accent focus:ring-accent cursor-pointer"
+            className="mt-1 h-5 w-5 rounded border-border bg-white text-accent focus:ring-accent cursor-pointer shrink-0"
           />
           <span className="text-xs text-secondary leading-normal">
             I confirm that all published Urdu stories are my original work, and I agree to the{' '}
@@ -200,7 +200,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
         <button
           type="submit"
           disabled={isPending || !acceptAgreement}
-          className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px] w-full sm:w-auto"
         >
           {isPending ? (
             <>

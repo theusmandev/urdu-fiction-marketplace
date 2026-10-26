@@ -163,7 +163,7 @@ export default async function WriterProfilePage({
               <UrduText
                 as="h1"
                 size="3xl"
-                className="text-navy font-bold leading-[2.2] py-0"
+                className="text-navy font-normal leading-[2.2] py-0"
               >
                 {writer.pen_name_urdu}
               </UrduText>

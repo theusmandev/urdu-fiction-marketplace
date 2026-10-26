@@ -8,16 +8,16 @@ export function PublicFooter() {
   const currentYear = 2026;
 
   return (
-    <footer className="mt-auto bg-navy text-slate-300 border-t border-navy-light pt-16 pb-12">
+    <footer className="mt-auto bg-navy text-slate-300 border-t border-navy-light pt-12 sm:pt-16 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Main 4-Column Footer Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-700/60">
+        {/* Main Footer Navigation: 2-col on phones, 3-col on tablets, 5-col on desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 pb-12 border-b border-slate-700/60">
           
-          {/* Brand Info & Mission Statement (2 cols on large) */}
-          <div className="lg:col-span-2 space-y-4">
+          {/* Brand Info & Mission Statement (full width on phones/tablets, 2 cols on desktop) */}
+          <div className="col-span-2 sm:col-span-3 lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent text-navy flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-xl bg-accent text-navy flex items-center justify-center font-bold shrink-0">
                 <BookMarked className="w-6 h-6" />
               </div>
               <div>
@@ -38,7 +38,7 @@ export function PublicFooter() {
               {siteConfig.description}
             </p>
 
-            <UrduText size="sm" className="text-slate-400 max-w-md py-1">
+            <UrduText size="sm" className="text-slate-400 max-w-md py-1 font-normal">
               معیاری اور نایاب اردو ناولز کا مستند مرکز، جہاں قارئین براہ راست اپنے پسندیدہ مصنّفین کی سرپرستی کرتے ہیں۔
             </UrduText>
 
@@ -57,16 +57,16 @@ export function PublicFooter() {
           </div>
 
           {/* Column: For Readers */}
-          <div className="space-y-3">
+          <div className="col-span-1 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent font-sans">
               For Readers
             </p>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm">
               {siteConfig.navigation.footer.readers.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="hover:text-white transition-colors flex items-center gap-1 group"
+                    className="hover:text-white transition-colors flex items-center gap-1 group py-1"
                   >
                     <span>{item.title}</span>
                     <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent" />
@@ -77,16 +77,16 @@ export function PublicFooter() {
           </div>
 
           {/* Column: For Writers */}
-          <div className="space-y-3">
+          <div className="col-span-1 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent font-sans">
               For Writers
             </p>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm">
               {siteConfig.navigation.footer.writers.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="hover:text-white transition-colors flex items-center gap-1 group"
+                    className="hover:text-white transition-colors flex items-center gap-1 group py-1"
                   >
                     <span>{item.title}</span>
                     <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent" />
@@ -97,16 +97,16 @@ export function PublicFooter() {
           </div>
 
           {/* Column: Platform & Legal */}
-          <div className="space-y-3">
+          <div className="col-span-2 sm:col-span-1 lg:col-span-1 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent font-sans">
               Trust & Policies
             </p>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm">
               {siteConfig.navigation.footer.legal.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="hover:text-white transition-colors flex items-center gap-1 group"
+                    className="hover:text-white transition-colors flex items-center gap-1 group py-1"
                   >
                     <span>{item.title}</span>
                     <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent" />
@@ -120,8 +120,8 @@ export function PublicFooter() {
 
         {/* Bottom Bar: Copyright & Direct Payment Protection Notice */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-accent" />
+          <div className="flex items-center gap-2 text-center md:text-left">
+            <ShieldCheck className="w-4 h-4 text-accent shrink-0" />
             <span>
               All transactions are direct-to-author with writer receipt verification.
             </span>
@@ -129,7 +129,7 @@ export function PublicFooter() {
 
           <div className="flex items-center gap-1">
             <span>© {currentYear} {siteConfig.brandName}. Built with</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 mx-0.5 inline" />
+            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 mx-0.5 inline shrink-0" />
             <span>for Urdu Literature.</span>
           </div>
         </div>

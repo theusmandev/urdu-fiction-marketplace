@@ -32,7 +32,7 @@ export default async function GenresIndexPage() {
           <UrduText
             as="p"
             size="2xl"
-            className="text-secondary font-bold leading-[2.2] py-0"
+            className="text-secondary font-normal leading-[2.2] py-0"
           >
             اصنافِ ادب اور موضوعات
           </UrduText>
@@ -59,7 +59,7 @@ export default async function GenresIndexPage() {
               <UrduText
                 as="h2"
                 size="xl"
-                className="text-navy group-hover:text-accent font-bold py-0 leading-[2.2]"
+                className="text-navy group-hover:text-accent font-normal py-0 leading-[2.2]"
               >
                 {genre.name_urdu}
               </UrduText>

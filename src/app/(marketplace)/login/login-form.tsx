@@ -126,7 +126,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   disabled={isPending}
-                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
+                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                 />
               </div>
             </div>
@@ -138,7 +138,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-semibold text-accent hover:text-accent-dark transition-colors"
+                  className="text-xs font-semibold text-accent hover:text-accent-dark transition-colors min-h-[36px] flex items-center"
                 >
                   Forgot password?
                 </Link>
@@ -157,7 +157,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   disabled={isPending}
-                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
+                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                 />
               </div>
             </div>
@@ -166,7 +166,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
           >
             {isPending ? (
               <>

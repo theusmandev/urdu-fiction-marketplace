@@ -73,8 +73,8 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
     <div className="rounded-2xl border border-border bg-surface p-5 shadow-card space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="font-mono text-sm font-bold text-accent-admin">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="font-mono text-sm font-bold text-accent-admin break-all">
               {order.order_number}
             </span>
             <StatusBadge status={order.status} />
@@ -95,7 +95,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <UrduText as="h3" size="xl" className="text-navy font-bold leading-[2.2]">
+          <UrduText as="h3" size="xl" className="text-navy leading-[2.2] font-normal">
             {order.novel_title_snapshot}
           </UrduText>
           {order.status === 'rejected' && order.rejected_reason && (
@@ -106,7 +106,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
           {order.latest_submission && (
             <p className="mt-1 text-xs text-secondary flex items-center gap-1.5">
               <span>Reported TID:</span>
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-semibold">
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-semibold break-all">
                 {order.latest_submission.transaction_reference_tid}
               </span>
             </p>
@@ -119,7 +119,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
               type="button"
               onClick={() => handleViewProof(order.latest_submission!.screenshot_path)}
               disabled={loadingProof}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-main hover:bg-surface-muted transition-colors shadow-xs cursor-pointer"
+              className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-main hover:bg-surface-muted transition-colors shadow-xs cursor-pointer"
             >
               {loadingProof ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -132,7 +132,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
 
           <Link
             href={`/orders/${order.order_number}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface hover:bg-surface-muted px-3.5 py-1.5 text-xs font-semibold text-main transition-colors shadow-xs"
+            className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface hover:bg-surface-muted px-4 py-2 text-xs font-semibold text-main transition-colors shadow-xs"
           >
             <span>View Order</span>
             <ArrowUpRight className="h-3.5 w-3.5 text-secondary" />
@@ -141,7 +141,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
           {order.status === 'verified' && (
             <Link
               href={`/orders/${order.order_number}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors shadow-xs"
+              className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-semibold text-white transition-colors shadow-xs"
             >
               <span>Access Novel</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -153,7 +153,7 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
               type="button"
               onClick={handleCancel}
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+              className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
             >
               {isPending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />

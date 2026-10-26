@@ -74,7 +74,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
           <UrduText
             as="p"
             size="xl"
-            className="text-secondary font-bold leading-[2.2] py-0"
+            className="text-secondary font-normal leading-[2.2] py-0"
           >
             معیاری اردو ناولز اور افسانوں کی مکمل فہرست
           </UrduText>
@@ -102,7 +102,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
             <h3 className="text-base font-bold text-navy">
               No novels matched your search criteria
             </h3>
-            <UrduText size="sm" className="text-secondary py-0">
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
               آپ کے مطلوبہ معیار کے مطابق کوئی ناول نہیں ملا۔
             </UrduText>
           </div>
@@ -112,7 +112,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
           </p>
           <Link
             href="/novels"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy bg-white hover:bg-ivory border border-border px-4 py-2 rounded-lg shadow-sm transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy bg-white hover:bg-ivory border border-border px-4 py-2 min-h-[44px] rounded-lg shadow-sm transition-colors"
           >
             <span>Reset All Filters</span>
           </Link>
@@ -138,13 +138,13 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
                   ...params,
                   page: currentPage - 1,
                 })}
-                className="inline-flex items-center gap-1 px-3 py-2 bg-surface hover:bg-ivory border border-border rounded-lg text-main transition-colors"
+                className="inline-flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] bg-surface hover:bg-ivory border border-border rounded-lg text-main transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Previous</span>
               </Link>
             ) : (
-              <span className="inline-flex items-center gap-1 px-3 py-2 text-secondary/40 border border-border/40 rounded-lg cursor-not-allowed">
+              <span className="inline-flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] text-secondary/40 border border-border/40 rounded-lg cursor-not-allowed">
                 <ChevronLeft className="w-4 h-4" />
                 <span>Previous</span>
               </span>
@@ -156,13 +156,13 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
                   ...params,
                   page: currentPage + 1,
                 })}
-                className="inline-flex items-center gap-1 px-3 py-2 bg-surface hover:bg-ivory border border-border rounded-lg text-main transition-colors"
+                className="inline-flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] bg-surface hover:bg-ivory border border-border rounded-lg text-main transition-colors"
               >
                 <span>Next</span>
                 <ChevronRight className="w-4 h-4" />
               </Link>
             ) : (
-              <span className="inline-flex items-center gap-1 px-3 py-2 text-secondary/40 border border-border/40 rounded-lg cursor-not-allowed">
+              <span className="inline-flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] text-secondary/40 border border-border/40 rounded-lg cursor-not-allowed">
                 <span>Next</span>
                 <ChevronRight className="w-4 h-4" />
               </span>

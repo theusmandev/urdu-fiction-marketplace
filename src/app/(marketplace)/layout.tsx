@@ -1,6 +1,7 @@
 import React from 'react';
 import { PublicHeader } from '@/components/layout/public-header';
 import { PublicFooter } from '@/components/layout/public-footer';
+import { BottomNav } from '@/components/layout/BottomNav';
 
 export default function MarketplaceLayout({
   children,
@@ -16,10 +17,14 @@ export default function MarketplaceLayout({
         Skip to main content
       </a>
       <PublicHeader />
-      <main id="main-content" className="flex-1 flex flex-col focus:outline-none">
+      <main
+        id="main-content"
+        className="flex-1 flex flex-col focus:outline-none pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0"
+      >
         {children}
       </main>
       <PublicFooter />
+      <BottomNav />
     </div>
   );
 }

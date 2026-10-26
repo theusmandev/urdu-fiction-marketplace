@@ -154,7 +154,7 @@ export default async function WritersDirectoryPage() {
                     <UrduText
                       as="h3"
                       size="lg"
-                      className="text-navy group-hover:text-accent font-bold py-0 leading-[2.2] truncate"
+                      className="text-navy group-hover:text-accent font-normal py-0 leading-[2.2] truncate"
                     >
                       {writer.pen_name_urdu}
                     </UrduText>

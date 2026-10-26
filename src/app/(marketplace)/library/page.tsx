@@ -126,7 +126,7 @@ export default async function LibraryPage() {
                     <div className="space-y-1">
                       <UrduText
                         size="base"
-                        className="text-navy group-hover:text-brand-gold transition-colors line-clamp-1 py-0 leading-[2.0] sm:leading-[2.1] font-bold text-sm sm:text-base"
+                        className="text-navy group-hover:text-brand-gold transition-colors line-clamp-1 py-0 leading-[2.0] sm:leading-[2.1] font-normal text-sm sm:text-base"
                       >
                         {item.title_urdu}
                       </UrduText>
@@ -180,16 +180,16 @@ export default async function LibraryPage() {
                     <div className="pt-1">
                       <Link
                         href={`/read/${item.novel_slug}/${readChapterNumber}`}
-                        className="w-full py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                        className="w-full py-2 px-2.5 rounded-lg sm:rounded-xl bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm min-h-[44px]"
                       >
                         {item.last_chapter_number && item.last_chapter_number > 0 ? (
                           <>
-                            <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                            <BookOpen className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">Continue (Ch {item.last_chapter_number})</span>
                           </>
                         ) : (
                           <>
-                            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                            <Sparkles className="w-3.5 h-3.5 shrink-0" />
                             <span>Start Reading</span>
                           </>
                         )}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { UrduText } from "@/components/urdu/UrduText";
 import { BuyNovelButton } from "@/components/catalog/BuyNovelButton";
+import { ExpandableSynopsis } from "@/components/catalog/ExpandableSynopsis";
 import {
   getPublicNovelBySlug,
   getPublicNovelChapters,
@@ -18,6 +19,7 @@ import {
   Lock,
   Sparkles,
   ChevronRight,
+  ChevronDown,
   Home,
   Calendar,
   Globe,
@@ -163,7 +165,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-10 pb-28 md:pb-12">
         {/* Breadcrumb Navigation */}
         <nav
           aria-label="Breadcrumbs"
@@ -182,10 +184,11 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
         </nav>
 
         {/* Primary Hero Info Section */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-          {/* Left Column: Constrained 2:3 Cover Image & Buy CTA (4 cols) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-12">
+          {/* Left Column: Cover & Desktop Buy CTA (md: 4-5 cols) */}
           <div className="md:col-span-5 lg:col-span-4 space-y-6 flex flex-col items-center">
-            <div className="relative aspect-[2/3] w-full max-w-[180px] sm:max-w-[220px] md:max-w-[240px] mx-auto rounded-xl overflow-hidden bg-ivory-dark shadow-md border border-border/80">
+            {/* Cover Image (Rendered first on all screens) */}
+            <div className="relative aspect-[2/3] w-full max-w-[180px] sm:max-w-[220px] md:max-w-[240px] mx-auto rounded-xl overflow-hidden bg-ivory-dark shadow-md border border-border/80 shrink-0">
               {/* Book Spine Detail */}
               <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10 pointer-events-none" />
               <div className="absolute inset-y-0 left-3 w-px bg-white/20 z-10 pointer-events-none" />
@@ -208,7 +211,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                     <UrduText
                       as="h2"
                       size="xl"
-                      className="text-white drop-shadow-md leading-[2.2] py-0.5 text-lg sm:text-xl line-clamp-2"
+                      className="text-white drop-shadow-md leading-[2.2] py-0.5 text-lg sm:text-xl line-clamp-2 font-normal"
                     >
                       {novel.title_urdu}
                     </UrduText>
@@ -222,7 +225,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                     <span className="font-serif text-white/80 truncate max-w-[55%]">
                       {novel.writer_pen_name_english || "Author"}
                     </span>
-                    <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%]">
+                    <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%] font-normal">
                       {novel.writer_pen_name_urdu}
                     </UrduText>
                   </div>
@@ -230,8 +233,8 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               )}
             </div>
 
-            {/* Price & Purchase Action Card */}
-            <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4">
+            {/* Desktop Price & Purchase Action Card (hidden on mobile, served by sticky action bar) */}
+            <div className="hidden md:block w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4">
               <div className="flex items-baseline justify-between">
                 <span className="text-xs text-secondary">Price / قیمت:</span>
                 <div>
@@ -264,7 +267,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                 <div className="pt-2">
                   <Link
                     href={`/novels/${novel.slug}/read/${freeChapters[0].chapter_number}`}
-                    className="w-full flex items-center justify-center gap-2 bg-accent/20 hover:bg-accent/30 text-navy font-semibold py-2.5 px-4 rounded-xl transition-colors text-xs text-center"
+                    className="w-full flex items-center justify-center gap-2 bg-accent/20 hover:bg-accent/30 text-navy font-semibold py-2.5 px-4 rounded-xl transition-colors text-xs text-center min-h-[44px]"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Start Free Reading (Chapter {freeChapters[0].chapter_number})</span>
@@ -273,8 +276,8 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               )}
             </div>
 
-            {/* Direct Payment Assurance Box */}
-            <div className="w-full max-w-[280px] mx-auto bg-ivory/60 p-4 rounded-xl border border-border text-xs space-y-2">
+            {/* Desktop Direct Payment Assurance Box */}
+            <div className="hidden md:block w-full max-w-[280px] mx-auto bg-ivory/60 p-4 rounded-xl border border-border text-xs space-y-2">
               <div className="flex items-center gap-1.5 font-semibold text-navy">
                 <ShieldCheck className="w-4 h-4 text-accent shrink-0" />
                 <span>Direct Writer Payment Guarantee</span>
@@ -288,20 +291,20 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
           </div>
 
           {/* Right Column: Title, Metadata, Synopsis, Chapters (8 cols) */}
-          <div className="md:col-span-7 lg:col-span-8 space-y-8">
-            {/* Title & Author Header */}
-            <div className="space-y-4 border-b border-border pb-6">
+          <div className="md:col-span-7 lg:col-span-8 space-y-6 sm:space-y-8">
+            {/* Title & Author Header (Appears directly after cover on mobile) */}
+            <div className="space-y-3 sm:space-y-4 border-b border-border pb-6 text-center md:text-left">
               {/* Genre Badges */}
               {novel.genres && novel.genres.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                   {novel.genres.map((g) => (
                     <Link
                       key={g.id}
                       href={`/genres/${g.slug}`}
-                      className="inline-flex items-center gap-1 text-xs font-medium bg-ivory text-secondary hover:text-navy border border-border px-3 py-1 rounded-full transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-medium bg-ivory text-secondary hover:text-navy border border-border px-3 py-1 rounded-full transition-colors min-h-[32px]"
                     >
                       <span>{g.name_english}</span>
-                      <UrduText as="span" size="xs" className="text-accent py-0">
+                      <UrduText as="span" size="xs" className="text-accent py-0 font-normal">
                         {g.name_urdu}
                       </UrduText>
                     </Link>
@@ -313,19 +316,19 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               <UrduText
                 as="h1"
                 size="4xl"
-                className="text-navy font-bold leading-[2.2] py-1"
+                className="text-navy leading-[2.2] py-1 text-2xl sm:text-4xl font-normal"
               >
                 {novel.title_urdu}
               </UrduText>
 
               {novel.title_english && (
-                <p className="font-serif text-lg text-secondary tracking-wide uppercase font-medium">
+                <p className="font-serif text-base sm:text-lg text-secondary tracking-wide uppercase font-medium">
                   {novel.title_english}
                 </p>
               )}
 
               {/* Author Attribution Byline */}
-              <div className="flex items-center gap-4 text-sm text-secondary pt-2">
+              <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-4 text-sm text-secondary pt-1 sm:pt-2">
                 <span>By / مصنف:</span>
                 <Link
                   href={
@@ -339,15 +342,15 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   <span>
                     {novel.writer_pen_name_english || novel.writer_username || "Author"}
                   </span>
-                  <UrduText as="span" size="sm" className="text-accent py-0">
+                  <UrduText as="span" size="sm" className="text-accent py-0 font-normal">
                     ({novel.writer_pen_name_urdu})
                   </UrduText>
                 </Link>
               </div>
 
               {/* Key Specifications Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
-                <div className="bg-ivory/40 p-3 rounded-xl border border-border/80">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-2 sm:pt-3 text-left">
+                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <BookOpen className="w-3.5 h-3.5 text-accent" />
                     <span>Chapters</span>
@@ -357,7 +360,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   </p>
                 </div>
 
-                <div className="bg-ivory/40 p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <Globe className="w-3.5 h-3.5 text-accent" />
                     <span>Language</span>
@@ -367,7 +370,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   </p>
                 </div>
 
-                <div className="bg-ivory/40 p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <Calendar className="w-3.5 h-3.5 text-accent" />
                     <span>Published</span>
@@ -377,7 +380,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   </p>
                 </div>
 
-                <div className="bg-ivory/40 p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <FileText className="w-3.5 h-3.5 text-accent" />
                     <span>Free Preview</span>
@@ -387,39 +390,53 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   </p>
                 </div>
               </div>
+
+              {/* Free Preview Button on Mobile */}
+              {freeChapters.length > 0 && (
+                <div className="pt-2 md:hidden">
+                  <Link
+                    href={`/novels/${novel.slug}/read/${freeChapters[0].chapter_number}`}
+                    className="w-full flex items-center justify-center gap-2 bg-accent/20 hover:bg-accent/30 text-navy font-semibold py-2.5 px-4 rounded-xl transition-colors text-xs text-center min-h-[44px]"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
+                    <span>Read Free Preview (Ch {freeChapters[0].chapter_number})</span>
+                  </Link>
+                </div>
+              )}
             </div>
 
-            {/* Synopsis Section */}
+            {/* Synopsis Section (Expandable) */}
             {novel.synopsis_urdu && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-serif text-lg font-bold text-navy">
-                    Synopsis / خلاصہِ ناول
-                  </h2>
-                </div>
-                <div className="bg-surface p-5 rounded-2xl border border-border">
-                  <p
-                    dir="rtl"
-                    lang="ur"
-                    className="font-urdu text-base text-main leading-[2.4] text-right"
-                  >
-                    {novel.synopsis_urdu}
-                  </p>
-                </div>
+              <div className="space-y-2.5">
+                <h2 className="font-serif text-lg font-bold text-navy">
+                  Synopsis / خلاصہِ ناول
+                </h2>
+                <ExpandableSynopsis synopsis={novel.synopsis_urdu} />
               </div>
             )}
 
-            {/* Extended Description Section */}
+            {/* Mobile Direct Payment Assurance Compact Card */}
+            <div className="md:hidden bg-ivory/60 p-4 rounded-xl border border-border text-xs space-y-1.5">
+              <div className="flex items-center gap-1.5 font-semibold text-navy">
+                <ShieldCheck className="w-4 h-4 text-accent shrink-0" />
+                <span>Direct Writer Payment Guarantee</span>
+              </div>
+              <p className="text-secondary leading-relaxed text-[11px]">
+                You pay the writer directly via JazzCash, EasyPaisa, or Raast. Access unlocks once verified by the author. Zero platform fees.
+              </p>
+            </div>
+
+            {/* Extended Description Section (if any) */}
             {novel.description_urdu && (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <h2 className="font-serif text-lg font-bold text-navy">
                   About this Novel / تفصیلات
                 </h2>
-                <div className="bg-surface p-5 rounded-2xl border border-border">
+                <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-border">
                   <p
                     dir="rtl"
                     lang="ur"
-                    className="font-urdu text-sm text-secondary leading-[2.3] text-right whitespace-pre-line"
+                    className="font-urdu text-sm text-secondary leading-[2.3] text-right whitespace-pre-line font-normal"
                   >
                     {novel.description_urdu}
                   </p>
@@ -427,76 +444,104 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               </div>
             )}
 
-            {/* Table of Contents & Chapter List */}
-            <div className="space-y-4 pt-4 border-t border-border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-serif text-xl font-bold text-navy">
-                    Table of Contents / ابواب کی فہرست
-                  </h2>
-                  <p className="text-xs text-secondary">
-                    Free preview chapters can be read without purchasing. Paid chapters unlock upon writer payment verification.
-                  </p>
-                </div>
-              </div>
+            {/* Table of Contents: Collapsible List with <details> */}
+            <div className="pt-2">
+              <details
+                className="group bg-surface rounded-2xl border border-border overflow-hidden"
+                open
+              >
+                <summary className="p-4 sm:p-5 flex items-center justify-between cursor-pointer list-none select-none hover:bg-ivory/40 transition-colors min-h-[44px]">
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-serif text-lg sm:text-xl font-bold text-navy">
+                      Table of Contents / ابواب کی فہرست
+                    </h2>
+                    <span className="text-[11px] bg-ivory text-secondary px-2 py-0.5 rounded-full font-semibold border border-border">
+                      {chapters.length} {chapters.length === 1 ? "Chapter" : "Chapters"}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-secondary transition-transform duration-200 group-open:rotate-180" />
+                </summary>
 
-              {chapters.length > 0 ? (
-                <div className="bg-surface rounded-2xl border border-border divide-y divide-border overflow-hidden">
-                  {chapters.map((ch) => {
-                    const isPreview = ch.is_free_preview;
-                    return (
-                      <div
-                        key={ch.id}
-                        className={`p-4 flex items-center justify-between gap-4 transition-colors ${
-                          isPreview ? "hover:bg-ivory/50" : "bg-slate-50/50"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <span className="w-8 h-8 rounded-lg bg-ivory text-secondary flex items-center justify-center font-serif text-xs font-semibold shrink-0">
-                            {ch.chapter_number}
-                          </span>
-
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <UrduText
-                                as="span"
-                                size="sm"
-                                className="font-semibold text-navy leading-[2.2] py-0 truncate"
-                              >
-                                {ch.title_urdu}
-                              </UrduText>
-                            </div>
-                            <span className="text-[11px] text-secondary">
-                              {ch.word_count} words
+                {chapters.length > 0 ? (
+                  <div className="border-t border-border divide-y divide-border">
+                    {chapters.map((ch) => {
+                      const isPreview = ch.is_free_preview;
+                      return (
+                        <div
+                          key={ch.id}
+                          className={`p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors ${
+                            isPreview ? "hover:bg-ivory/50" : "bg-slate-50/50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-ivory text-secondary flex items-center justify-center font-serif text-xs font-semibold shrink-0">
+                              {ch.chapter_number}
                             </span>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <UrduText
+                                  as="span"
+                                  size="sm"
+                                  className="text-navy leading-[2.2] py-0 truncate font-normal"
+                                >
+                                  {ch.title_urdu}
+                                </UrduText>
+                              </div>
+                              <span className="text-[10px] sm:text-[11px] text-secondary">
+                                {ch.word_count} words
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="shrink-0 flex items-center gap-2">
+                            {isPreview ? (
+                              <Link
+                                href={`/novels/${novel.slug}/read/${ch.chapter_number}`}
+                                className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors min-h-[36px]"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Read Free Preview</span>
+                                <span className="sm:hidden">Preview</span>
+                              </Link>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 text-xs text-secondary bg-slate-100 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200">
+                                <Lock className="w-3.5 h-3.5 text-secondary" />
+                                <span className="hidden sm:inline">Paid Chapter</span>
+                                <span className="sm:hidden">Paid</span>
+                              </span>
+                            )}
                           </div>
                         </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center bg-ivory/30 border-t border-dashed border-border text-xs text-secondary">
+                    No published chapters available yet.
+                  </div>
+                )}
+              </details>
+            </div>
+          </div>
+        </div>
 
-                        <div className="shrink-0 flex items-center gap-2">
-                          {isPreview ? (
-                            <Link
-                              href={`/novels/${novel.slug}/read/${ch.chapter_number}`}
-                              className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                            >
-                              <Sparkles className="w-3.5 h-3.5" />
-                              <span>Read Free Preview</span>
-                            </Link>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 text-xs text-secondary bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                              <Lock className="w-3.5 h-3.5 text-secondary" />
-                              <span>Paid Chapter</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="p-8 text-center bg-ivory/30 rounded-xl border border-dashed border-border text-xs text-secondary">
-                  No published chapters available yet.
-                </div>
-              )}
+        {/* Sticky Bottom Action Bar on Phones (md:hidden) */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border p-3 px-4 shadow-lg pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
+            <div>
+              <div className="text-[10px] text-secondary font-medium">Price / قیمت</div>
+              <div className="font-serif text-lg font-bold text-navy leading-tight">
+                {novel.price_pkr < 50 ? "Unavailable" : formatPKR(novel.price_pkr)}
+              </div>
+            </div>
+            <div className="flex-1 max-w-[210px]">
+              <BuyNovelButton
+                novelId={novel.id}
+                novelSlug={novel.slug}
+                pricePkr={novel.price_pkr}
+                compact
+              />
             </div>
           </div>
         </div>

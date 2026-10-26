@@ -218,7 +218,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                       <button
                         type="button"
                         onClick={() => setSelectedProofUrl(sub.screenshot_url)}
-                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors cursor-pointer"
+                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors cursor-pointer min-h-[44px]"
                       >
                         <Eye className="w-3.5 h-3.5 text-brand-gold" />
                         <span>Inspect Receipt Screenshot</span>
@@ -332,7 +332,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                   value={messageBody}
                   onChange={(e) => setMessageBody(e.target.value)}
                   placeholder="Provide clarification, bank transaction remarks, or additional verification details..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-xs text-main placeholder:text-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-base sm:text-xs text-main placeholder:text-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -341,7 +341,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                 <button
                   type="button"
                   onClick={() => setShowUploader(!showUploader)}
-                  className="text-xs text-secondary hover:text-navy transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="text-xs text-secondary hover:text-navy transition-colors flex items-center gap-1.5 cursor-pointer py-1.5 min-h-[44px]"
                 >
                   <Paperclip className="w-3.5 h-3.5 text-brand-gold" />
                   <span>
@@ -368,7 +368,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                 <button
                   type="submit"
                   disabled={isPending || !messageBody.trim()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px] w-full sm:w-auto"
                 >
                   {isPending ? (
                     <>

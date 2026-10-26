@@ -110,7 +110,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   type="button"
                   onClick={handleCloseTicket}
                   disabled={isPending}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors cursor-pointer min-h-[44px] inline-flex items-center"
                 >
                   Mark as Resolved / Close
                 </button>
@@ -198,7 +198,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
                   placeholder="Type your reply here..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-xs text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-base sm:text-xs text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -206,7 +206,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                 <button
                   type="submit"
                   disabled={isPending || !replyBody.trim()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-all shadow-sm cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-all shadow-sm cursor-pointer min-h-[44px] w-full sm:w-auto"
                 >
                   {isPending ? (
                     <>

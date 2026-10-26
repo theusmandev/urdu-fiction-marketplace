@@ -95,7 +95,7 @@ export function ForgotPasswordForm() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     disabled={isPending}
-                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-sm disabled:opacity-50 transition-colors"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                   />
                 </div>
               </div>
@@ -103,7 +103,7 @@ export function ForgotPasswordForm() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
               >
                 {isPending ? (
                   <>
@@ -121,7 +121,7 @@ export function ForgotPasswordForm() {
               <div className="text-center pt-2">
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-navy transition-colors"
+                  className="min-h-[44px] inline-flex items-center justify-center gap-1.5 text-sm font-medium text-secondary hover:text-navy transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back to login</span>

@@ -98,11 +98,11 @@ export function CatalogFilters({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search title in English or Urdu, synopsis, or writer pen name..."
-            className="w-full pl-10 pr-20 py-2.5 text-sm bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-accent/20 transition-all"
+            className="w-full pl-10 pr-20 py-2.5 text-base sm:text-sm min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-accent/20 transition-all"
           />
           <button
             type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold bg-navy text-accent hover:bg-navy-light px-3 py-1 rounded-lg transition-colors cursor-pointer"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-semibold bg-navy text-accent hover:bg-navy-light px-3 py-2 min-h-[36px] rounded-lg transition-colors cursor-pointer"
           >
             Search
           </button>
@@ -117,7 +117,7 @@ export function CatalogFilters({
             id="catalog-sort"
             value={sort}
             onChange={handleSortChange}
-            className="text-xs font-medium bg-ivory/80 border border-border rounded-xl px-3 py-2.5 outline-none text-navy focus:border-accent cursor-pointer"
+            className="text-base sm:text-xs font-medium bg-ivory/80 border border-border rounded-xl px-3 py-2.5 min-h-[44px] outline-none text-navy focus:border-accent cursor-pointer"
           >
             <option value="featured">Featured / سب سے نمایاں</option>
             <option value="newest">Newest Releases / تازہ ترین</option>
@@ -130,7 +130,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer min-h-[44px]"
               title="Reset all filters"
             >
               <X className="w-3.5 h-3.5" />

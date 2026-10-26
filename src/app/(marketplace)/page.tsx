@@ -30,46 +30,52 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-navy via-navy to-[#121c2e] text-white pt-16 pb-24 md:pt-24 md:pb-32">
+      <section className="relative overflow-hidden bg-gradient-to-b from-navy via-navy to-[#121c2e] text-white pt-8 pb-12 sm:pt-16 sm:pb-20 md:pt-24 md:pb-32">
         {/* Subtle decorative geometric overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(#C5A880_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/15 text-xs text-slate-200 shadow-inner">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-8">
+          {/* Trust Badge - hidden on phones to eliminate duplicate badge chrome */}
+          <div className="hidden sm:inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/15 text-xs text-slate-200 shadow-inner">
             <ShieldCheck className="w-4 h-4 text-accent" />
             <span>100% Direct Reader-to-Writer Pakistani Payments</span>
           </div>
 
           {/* Primary Headings with Urdu Nastaliq Elegance */}
-          <div className="space-y-4 max-w-4xl mx-auto">
+          <div className="space-y-3 sm:space-y-4 max-w-4xl mx-auto">
             <UrduText
               as="h1"
               size="4xl"
-              className="text-white drop-shadow-md leading-[2.2] py-2 md:text-5xl"
+              className="text-white drop-shadow-md leading-[2.2] py-1 text-2xl sm:text-4xl md:text-5xl font-normal"
             >
               معیاری اردو فکشن اور ناولز کا مستند ادبی مرکز
             </UrduText>
-            <p className="font-serif text-lg md:text-2xl text-slate-300 max-w-2xl mx-auto font-normal">
-              Direct-to-author fiction marketplace for Urdu lovers. Support
-              independent Pakistani novelists directly via JazzCash, EasyPaisa,
-              and Bank Transfer.
+            <p className="font-serif text-sm sm:text-base md:text-xl text-slate-300 max-w-xl mx-auto font-normal leading-relaxed">
+              Direct reader-to-writer Pakistani fiction marketplace.
             </p>
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          {/* Action CTAs with minimum 44px touch targets */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2 sm:pt-4">
             <Link
               href="/novels"
-              className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-light text-navy font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
+              className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-light text-navy font-semibold px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-xs sm:text-sm min-h-[44px]"
             >
               <BookOpen className="w-4 h-4" />
               <span>Browse Catalog / ناولز دریافت کریں</span>
             </Link>
 
             <Link
+              href="/novels"
+              className="sm:hidden inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-4 py-3 rounded-xl border border-white/20 transition-all text-xs min-h-[44px]"
+            >
+              <span>Explore All</span>
+              <ArrowRight className="w-3.5 h-3.5 text-accent" />
+            </Link>
+
+            <Link
               href="/become-a-writer"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3.5 rounded-xl border border-white/20 transition-all text-sm"
+              className="hidden sm:inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3.5 rounded-xl border border-white/20 transition-all text-sm min-h-[44px]"
             >
               <Feather className="w-4 h-4 text-accent" />
               <span>Sell Your Novels / مصنف بنیں</span>
@@ -195,17 +201,17 @@ export default async function HomePage() {
               </UrduText>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="flex sm:grid overflow-x-auto snap-x snap-mandatory gap-3 pb-3 sm:pb-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
               {genres.map((genre) => (
                 <Link
                   key={genre.id}
                   href={`/genres/${genre.slug}`}
-                  className="group bg-surface hover:bg-navy p-4 rounded-xl border border-border hover:border-navy shadow-sm transition-all duration-200 flex flex-col items-center text-center space-y-1.5"
+                  className="group bg-surface hover:bg-navy p-3.5 sm:p-4 rounded-xl border border-border hover:border-navy shadow-xs transition-all duration-200 flex flex-col items-center text-center space-y-1.5 w-[145px] sm:w-auto shrink-0 snap-start"
                 >
                   <UrduText
                     as="span"
                     size="base"
-                    className="text-navy group-hover:text-accent font-bold py-0 leading-[2.2]"
+                    className="text-navy group-hover:text-accent font-normal py-0 leading-[2.2]"
                   >
                     {genre.name_urdu}
                   </UrduText>
@@ -245,9 +251,11 @@ export default async function HomePage() {
           </div>
 
           {newestNovels.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="flex sm:grid overflow-x-auto snap-x snap-mandatory gap-3 pb-3 sm:pb-0 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
               {newestNovels.map((novel) => (
-                <NovelCard key={novel.id} novel={novel} />
+                <div key={novel.id} className="w-[155px] sm:w-auto shrink-0 snap-start flex">
+                  <NovelCard novel={novel} />
+                </div>
               ))}
             </div>
           ) : (
