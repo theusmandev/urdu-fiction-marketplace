@@ -2380,6 +2380,21 @@ export interface Database {
           username: string;
         }>;
       };
+      import_chapters: {
+        Args: {
+          p_novel_id: string;
+          p_start_number?: number | null;
+          p_parts?: Json;
+        };
+        Returns: Json;
+      };
+      split_chapter: {
+        Args: {
+          p_chapter_id: string;
+          p_parts: Json;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       user_role: UserRole;
