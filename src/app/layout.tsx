@@ -77,9 +77,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${sansFont.variable} ${serifFont.variable} ${urduFont.variable} ${arabicFont.variable}`}
     >
-      <body className="min-h-screen bg-background font-sans antialiased text-main flex flex-col selection:bg-accent/30 selection:text-navy">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-background font-sans antialiased text-main flex flex-col selection:bg-accent/30 selection:text-navy"
+      >
         {children}
       </body>
     </html>

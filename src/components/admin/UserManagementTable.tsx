@@ -142,12 +142,12 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
           <table className="w-full text-left text-xs">
             <thead className="bg-surface-muted/80 border-b border-border text-muted font-medium uppercase tracking-wider text-[10px]">
               <tr>
-                <th className="py-3 px-4">User / Email</th>
-                <th className="py-3 px-4">Username / Full Name</th>
-                <th className="py-3 px-4">Platform Role</th>
-                <th className="py-3 px-4">Account Status</th>
-                <th className="py-3 px-4">Registered Date</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-2.5 px-3 sm:px-4">User / Email</th>
+                <th className="py-2.5 px-3 sm:px-4">Username / Full Name</th>
+                <th className="py-2.5 px-3 sm:px-4">Platform Role</th>
+                <th className="py-2.5 px-3 sm:px-4">Account Status</th>
+                <th className="py-2.5 px-3 sm:px-4">Registered Date</th>
+                <th className="py-2.5 px-3 sm:px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -158,7 +158,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
 
                 return (
                   <tr key={user.id} className="hover:bg-surface-muted/50 transition-colors">
-                    <td className="py-3 px-4 font-mono max-w-[220px]">
+                    <td className="py-2.5 px-3 sm:px-4 font-mono max-w-[220px]">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-main truncate break-all" title={user.email}>{user.email}</span>
                         {isCurrent && (
@@ -170,7 +170,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                       <div className="text-[10px] text-muted truncate break-all" title={user.id}>{user.id}</div>
                     </td>
 
-                    <td className="py-3 px-4 font-sans max-w-[180px]">
+                    <td className="py-2.5 px-3 sm:px-4 font-sans max-w-[180px]">
                       <div className="text-main font-medium truncate break-words" title={user.full_name || 'No full name'}>
                         {user.full_name || 'No full name'}
                       </div>
@@ -179,7 +179,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 font-sans">
+                    <td className="py-2.5 px-3 sm:px-4 font-sans whitespace-nowrap">
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${roleConf.bg} ${roleConf.text}`}
                       >
@@ -188,7 +188,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 font-sans">
+                    <td className="py-2.5 px-3 sm:px-4 font-sans whitespace-nowrap">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
                           user.is_active
@@ -201,11 +201,11 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 text-muted font-sans text-xs">
-                      {new Date(user.created_at).toLocaleDateString()}
+                    <td className="py-2.5 px-3 sm:px-4 text-muted font-sans text-xs whitespace-nowrap">
+                      <span suppressHydrationWarning>{new Date(user.created_at).toLocaleDateString()}</span>
                     </td>
 
-                    <td className="py-3 px-4 text-right font-sans">
+                    <td className="py-2.5 px-3 sm:px-4 text-right font-sans whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(user)}
@@ -267,7 +267,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                     {user.is_active ? 'Active' : 'Deactivated'}
                   </span>
                 </div>
-                <div>Joined {new Date(user.created_at).toLocaleDateString()}</div>
+                <div>Joined <span suppressHydrationWarning>{new Date(user.created_at).toLocaleDateString()}</span></div>
               </div>
 
               <div className="pt-1">

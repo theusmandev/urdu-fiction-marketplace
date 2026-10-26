@@ -187,12 +187,12 @@ export function AdminRefundsClient({
             <table className="w-full text-left text-xs">
               <thead className="bg-surface-muted/80 text-muted uppercase tracking-wider text-[11px] border-b border-border font-medium">
                 <tr>
-                  <th className="py-3 px-4">Order / Novel</th>
-                  <th className="py-3 px-4">Parties</th>
-                  <th className="py-3 px-4">Refund Reason &amp; Proof</th>
-                  <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4">Status &amp; Review</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-2.5 px-3 sm:px-4">Order / Novel</th>
+                  <th className="py-2.5 px-3 sm:px-4">Parties</th>
+                  <th className="py-2.5 px-3 sm:px-4">Refund Reason &amp; Proof</th>
+                  <th className="py-2.5 px-3 sm:px-4">Amount</th>
+                  <th className="py-2.5 px-3 sm:px-4">Status &amp; Review</th>
+                  <th className="py-2.5 px-3 sm:px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-main">
@@ -203,7 +203,7 @@ export function AdminRefundsClient({
                   return (
                     <tr key={req.id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Order / Novel */}
-                      <td className="py-3.5 px-4 space-y-0.5 max-w-[200px]">
+                      <td className="py-2.5 px-3 sm:px-4 space-y-0.5 max-w-[200px]">
                         <Link
                           href={`/admin/orders?search=${encodeURIComponent(req.order_number)}`}
                           target="_blank"
@@ -217,12 +217,12 @@ export function AdminRefundsClient({
                         </div>
                         <div className="text-[10px] text-muted flex items-center gap-1 font-mono whitespace-nowrap">
                           <Clock className="w-3 h-3" />
-                          <span>{new Date(req.created_at).toLocaleDateString()}</span>
+                          <span suppressHydrationWarning>{new Date(req.created_at).toLocaleDateString()}</span>
                         </div>
                       </td>
 
                       {/* Parties */}
-                      <td className="py-3.5 px-4 space-y-1 max-w-[180px]">
+                      <td className="py-2.5 px-3 sm:px-4 space-y-1 max-w-[180px]">
                         <div className="text-[11px]">
                           <span className="text-muted">Author: </span>
                           <span className="text-brand-gold font-medium truncate inline-block max-w-[120px] align-bottom" title={req.writer_pen_name}>
@@ -238,7 +238,7 @@ export function AdminRefundsClient({
                       </td>
 
                       {/* Refund Reason & Proof */}
-                      <td className="py-3.5 px-4 max-w-xs space-y-1.5 break-words">
+                      <td className="py-2.5 px-3 sm:px-4 max-w-xs space-y-1.5 break-words">
                         <p className="text-main leading-snug">
                           <span className="font-semibold text-main">Reason: </span>
                           {req.reason}
@@ -264,12 +264,12 @@ export function AdminRefundsClient({
                       </td>
 
                       {/* Amount */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-main">
+                      <td className="py-2.5 px-3 sm:px-4 font-mono font-bold text-main whitespace-nowrap">
                         {formatPKR(req.amount_pkr)}
                       </td>
 
                       {/* Status & Review */}
-                      <td className="py-3.5 px-4 space-y-1">
+                      <td className="py-2.5 px-3 sm:px-4 space-y-1 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                             meta.variant === 'warning'

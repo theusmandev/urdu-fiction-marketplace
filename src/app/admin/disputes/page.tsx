@@ -152,12 +152,12 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
             <table className="w-full text-left text-xs">
               <thead className="bg-surface-muted text-muted text-[11px] border-b border-border font-medium">
                 <tr>
-                  <th className="py-3 px-4">Order / Novel</th>
-                  <th className="py-3 px-4">Disputant Parties</th>
-                  <th className="py-3 px-4">Reason / Notes</th>
-                  <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4">Status &amp; Urgency</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                  <th className="py-2.5 px-3 sm:px-4">Order / Novel</th>
+                  <th className="py-2.5 px-3 sm:px-4">Disputant Parties</th>
+                  <th className="py-2.5 px-3 sm:px-4">Reason / Notes</th>
+                  <th className="py-2.5 px-3 sm:px-4">Amount</th>
+                  <th className="py-2.5 px-3 sm:px-4">Status &amp; Urgency</th>
+                  <th className="py-2.5 px-3 sm:px-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-main">
@@ -166,7 +166,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                   return (
                     <tr key={d.dispute_id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Order / Novel */}
-                      <td className="py-3.5 px-4 space-y-0.5 max-w-[200px]">
+                      <td className="py-2.5 px-3 sm:px-4 space-y-0.5 max-w-[200px]">
                         <div className="font-mono font-bold text-accent-admin text-xs whitespace-nowrap">
                           #{d.order_number}
                         </div>
@@ -175,12 +175,12 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                         </div>
                         <div className="text-[10px] text-muted flex items-center gap-1 font-mono whitespace-nowrap">
                           <Clock className="w-3 h-3" />
-                          <span>{new Date(d.created_at).toLocaleDateString()}</span>
+                          <span suppressHydrationWarning>{new Date(d.created_at).toLocaleDateString()}</span>
                         </div>
                       </td>
 
                       {/* Disputant Parties */}
-                      <td className="py-3.5 px-4 space-y-1 max-w-[180px]">
+                      <td className="py-2.5 px-3 sm:px-4 space-y-1 max-w-[180px]">
                         <div className="text-[11px]">
                           <span className="text-muted">Reader: </span>
                           <span className="text-main font-medium truncate inline-block max-w-[120px] align-bottom" title={d.reader_name || 'Reader'}>
@@ -196,7 +196,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                       </td>
 
                       {/* Reason / Notes */}
-                      <td className="py-3.5 px-4 max-w-xs space-y-1 break-words">
+                      <td className="py-2.5 px-3 sm:px-4 max-w-xs space-y-1 break-words">
                         <p className="line-clamp-2 text-main italic">
                           &quot;{d.reason}&quot;
                         </p>
@@ -209,12 +209,12 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                       </td>
 
                       {/* Amount */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-main">
+                      <td className="py-2.5 px-3 sm:px-4 font-mono font-bold text-main whitespace-nowrap">
                         {formatPKR(d.amount_pkr)}
                       </td>
 
                       {/* Status & Urgency */}
-                      <td className="py-3.5 px-4 space-y-1.5">
+                      <td className="py-2.5 px-3 sm:px-4 space-y-1.5 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -244,7 +244,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                       </td>
 
                       {/* Action */}
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-2.5 px-3 sm:px-4 text-right whitespace-nowrap">
                         <Link
                           href={`/admin/disputes/${d.dispute_id}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-admin/10 hover:bg-accent-admin/20 text-accent-admin border border-accent-admin/30 rounded-lg text-xs font-semibold transition-colors"

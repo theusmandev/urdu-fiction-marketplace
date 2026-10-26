@@ -159,12 +159,12 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
               <table className="w-full text-left text-xs">
                 <thead className="bg-surface-muted border-b border-border text-muted font-semibold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="py-3 px-4">Author / Pen Name</th>
-                    <th className="py-3 px-4">Account / Email</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Commission Terms</th>
-                    <th className="py-3 px-4">Unpaid Balance</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-2.5 px-3 sm:px-4">Author / Pen Name</th>
+                    <th className="py-2.5 px-3 sm:px-4">Account / Email</th>
+                    <th className="py-2.5 px-3 sm:px-4">Status</th>
+                    <th className="py-2.5 px-3 sm:px-4">Commission Terms</th>
+                    <th className="py-2.5 px-3 sm:px-4">Unpaid Balance</th>
+                    <th className="py-2.5 px-3 sm:px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -172,7 +172,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                     const profile = Array.isArray(writer.profiles) ? writer.profiles[0] : writer.profiles;
                     return (
                       <tr key={writer.id} className="hover:bg-surface-muted/50 transition-colors">
-                        <td className="py-3 px-4 font-sans max-w-[180px]">
+                        <td className="py-2.5 px-3 sm:px-4 font-sans max-w-[180px]">
                           <div className="font-semibold text-main truncate break-words" title={writer.pen_name_english}>
                             {writer.pen_name_english}
                           </div>
@@ -180,16 +180,16 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                             {writer.pen_name_urdu}
                           </UrduText>
                         </td>
-                        <td className="py-3 px-4 max-w-[200px]">
+                        <td className="py-2.5 px-3 sm:px-4 max-w-[200px]">
                           <div className="text-main font-mono truncate break-all" title={profile?.email}>{profile?.email}</div>
                           <div className="text-[10px] text-muted font-sans truncate">
                             {profile?.full_name || 'No name'}
                           </div>
                         </td>
-                        <td className="py-3 px-4 font-sans">
+                        <td className="py-2.5 px-3 sm:px-4 font-sans whitespace-nowrap">
                           <StatusBadge status={writer.status} />
                         </td>
-                        <td className="py-3 px-4 font-sans text-main">
+                        <td className="py-2.5 px-3 sm:px-4 font-sans text-main whitespace-nowrap">
                           {writer.custom_commission_rate !== null ? (
                             <span className="text-accent-admin font-mono font-semibold">
                               {writer.custom_commission_rate}% (Custom)
@@ -198,7 +198,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                             <span className="text-muted">20% (Default)</span>
                           )}
                         </td>
-                        <td className="py-3 px-4 font-mono">
+                        <td className="py-2.5 px-3 sm:px-4 font-mono whitespace-nowrap">
                           <div className="text-main font-semibold">
                             PKR {writer.current_unpaid_commission}
                           </div>
@@ -206,13 +206,13 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                             Limit: PKR {writer.unpaid_commission_limit}
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-right font-sans">
+                        <td className="py-2.5 px-3 sm:px-4 text-right font-sans whitespace-nowrap">
                           <Link
                             href={`/admin/writers/${writer.id}`}
                             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold shadow-sm transition-colors"
                           >
                             <span>Manage</span>
-                            <ChevronRight className="w-3 h-3 text-muted" />
+                            <ChevronRight className="w-3.5 h-3.5 text-muted" />
                           </Link>
                         </td>
                       </tr>

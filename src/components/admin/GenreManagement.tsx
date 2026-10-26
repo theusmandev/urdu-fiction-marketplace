@@ -269,18 +269,18 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
           <table className="w-full text-left text-xs">
             <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
               <tr>
-                <th className="py-3 px-4 w-14 text-center">Order</th>
-                <th className="py-3 px-4">English Name / Slug</th>
-                <th className="py-3 px-4">Urdu Title</th>
-                <th className="py-3 px-4">Assigned Novels</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-2.5 px-3 sm:px-4 w-14 text-center">Order</th>
+                <th className="py-2.5 px-3 sm:px-4">English Name / Slug</th>
+                <th className="py-2.5 px-3 sm:px-4">Urdu Title</th>
+                <th className="py-2.5 px-3 sm:px-4">Assigned Novels</th>
+                <th className="py-2.5 px-3 sm:px-4">Status</th>
+                <th className="py-2.5 px-3 sm:px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-sans">
               {genres.map((genre, idx) => (
                 <tr key={genre.id} className="hover:bg-surface-muted/50 transition-colors">
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-2.5 px-3 sm:px-4 text-center">
                     <div className="flex items-center justify-center gap-1">
                       <span className="font-mono text-muted font-bold w-5">
                         {genre.display_order}
@@ -308,25 +308,25 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                     </div>
                   </td>
 
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-3 sm:px-4">
                     <div className="font-semibold text-main">{genre.name_english}</div>
                     <div className="text-[10px] text-muted font-mono">/{genre.slug}</div>
                   </td>
 
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-3 sm:px-4">
                     <UrduText as="div" size="base" className="text-brand-gold font-medium py-0">
                       {genre.name_urdu}
                     </UrduText>
                   </td>
 
-                  <td className="py-3 px-4 font-mono">
+                  <td className="py-2.5 px-3 sm:px-4 font-mono whitespace-nowrap">
                     <div className="flex items-center gap-1.5 text-main">
                       <BookOpen className="w-3.5 h-3.5 text-muted" />
                       <span>{genre.novel_count} novel{genre.novel_count === 1 ? '' : 's'}</span>
                     </div>
                   </td>
 
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-3 sm:px-4 whitespace-nowrap">
                     <button
                       type="button"
                       onClick={() => handleToggleActive(genre)}
@@ -342,7 +342,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
                     </button>
                   </td>
 
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-2.5 px-3 sm:px-4 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         type="button"

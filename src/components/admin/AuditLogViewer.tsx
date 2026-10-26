@@ -86,11 +86,11 @@ export function AuditLogViewer({
           <table className="w-full text-left text-xs">
             <thead className="bg-ivory/80 border-b border-border text-secondary font-semibold uppercase tracking-wider text-[11px]">
               <tr>
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Action</th>
-                <th className="py-3 px-4">Entity</th>
-                <th className="py-3 px-4">Actor</th>
-                <th className="py-3 px-4 text-right">Details</th>
+                <th className="py-2.5 px-3 w-[170px]">Timestamp</th>
+                <th className="py-2.5 px-3 w-[150px]">Action</th>
+                <th className="py-2.5 px-3 w-[160px]">Entity</th>
+                <th className="py-2.5 px-3">Actor</th>
+                <th className="py-2.5 px-3 text-right w-[130px] shrink-0">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -98,13 +98,13 @@ export function AuditLogViewer({
                 const actorEmail = entry.profiles?.email || entry.actor_id || 'System';
                 return (
                   <tr key={entry.id} className="hover:bg-ivory/50 transition-colors">
-                    <td className="py-3 px-4 text-secondary whitespace-nowrap text-xs font-mono">
-                      {new Date(entry.created_at).toLocaleString()}
+                    <td className="py-2.5 px-3 text-secondary whitespace-nowrap text-xs font-mono w-[170px]">
+                      <span suppressHydrationWarning>{new Date(entry.created_at).toLocaleString()}</span>
                     </td>
 
-                    <td className="py-3 px-4 whitespace-nowrap">
+                    <td className="py-2.5 px-3 whitespace-nowrap w-[150px]">
                       <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
+                        className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
                           entry.action_type
                         )}`}
                       >
@@ -112,19 +112,19 @@ export function AuditLogViewer({
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 font-sans max-w-[180px]">
-                      <div className="font-semibold text-main capitalize">{entry.entity_type}</div>
+                    <td className="py-2.5 px-3 font-sans w-[160px]">
+                      <div className="font-semibold text-main capitalize text-xs truncate">{entry.entity_type}</div>
                       <div
-                        className="text-[11px] text-secondary font-mono truncate max-w-[160px] break-all"
+                        className="text-[11px] text-secondary font-mono truncate max-w-[150px] break-all"
                         title={entry.entity_id}
                       >
                         {entry.entity_id}
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 font-sans max-w-[200px]">
+                    <td className="py-2.5 px-3 font-sans min-w-0">
                       <div
-                        className="text-main truncate max-w-[180px] font-mono text-xs break-all"
+                        className="text-main truncate max-w-[170px] font-mono text-xs break-all"
                         title={actorEmail}
                       >
                         {actorEmail}
@@ -134,11 +134,11 @@ export function AuditLogViewer({
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 text-right font-sans whitespace-nowrap">
+                    <td className="py-2.5 px-3 text-right font-sans whitespace-nowrap w-[130px] shrink-0">
                       <button
                         type="button"
                         onClick={() => setSelectedEntry(entry)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface hover:bg-ivory text-main border border-border text-xs font-semibold transition-colors shadow-xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface hover:bg-ivory text-main border border-border text-xs font-semibold transition-colors shadow-xs cursor-pointer whitespace-nowrap shrink-0"
                       >
                         <Code className="w-3.5 h-3.5 text-accent-admin" />
                         <span>Inspect JSON</span>
@@ -169,7 +169,7 @@ export function AuditLogViewer({
                 >
                   {entry.action_type}
                 </span>
-                <span className="text-[11px] text-secondary font-mono">
+                <span suppressHydrationWarning className="text-[11px] text-secondary font-mono">
                   {new Date(entry.created_at).toLocaleDateString()}
                 </span>
               </div>

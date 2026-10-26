@@ -160,7 +160,7 @@ export function AdminShellClient({
   };
 
   return (
-    <div className="min-h-screen bg-ivory text-main flex flex-col font-sans overflow-x-hidden">
+    <div className="h-screen w-full overflow-hidden bg-ivory text-main flex flex-col font-sans">
       {/* Skip to Content Link (Accessibility) */}
       <a
         href="#admin-main-content"
@@ -169,8 +169,8 @@ export function AdminShellClient({
         Skip to main content
       </a>
 
-      {/* Top Bar */}
-      <header className="bg-navy text-white sticky top-0 z-40 h-16 border-b border-navy-light flex items-center justify-between px-4 sm:px-6 shadow-md">
+      {/* Top Bar (Fixed at top, zero scroll) */}
+      <header className="bg-navy text-white shrink-0 z-30 h-14 sm:h-16 border-b border-navy-light flex items-center justify-between px-4 sm:px-6 shadow-md">
         <div className="flex items-center gap-3">
           {/* Mobile Drawer Toggle */}
           <button
@@ -234,17 +234,17 @@ export function AdminShellClient({
         </div>
       </header>
 
-      {/* Main Body Shell (Sidebar + Content) */}
-      <div className="flex-1 flex w-full relative min-w-0 overflow-x-hidden">
+      {/* Main Body Shell (Flush Sidebar + Scrollable Content) */}
+      <div className="flex-1 min-h-0 w-full flex overflow-hidden">
         {/* Desktop Fixed Left Sidebar */}
         <aside
-          className={`hidden lg:flex flex-col border-r border-border bg-surface sticky top-16 h-[calc(100vh-4rem)] transition-all duration-200 z-30 ${
+          className={`hidden lg:flex flex-col border-r border-border bg-surface h-full shrink-0 transition-all duration-200 z-20 ${
             isCollapsed ? 'w-20' : 'w-64'
           }`}
           aria-label="Admin Navigation"
         >
           {/* Sidebar Collapse Toggle Button */}
-          <div className="p-3 border-b border-border flex items-center justify-between">
+          <div className="p-2.5 sm:p-3 border-b border-border flex items-center justify-between shrink-0">
             {!isCollapsed && (
               <span className="text-[11px] font-semibold uppercase tracking-wider text-secondary">
                 Navigation
@@ -265,12 +265,12 @@ export function AdminShellClient({
             </button>
           </div>
 
-          {/* Grouped Navigation Links */}
-          <nav className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar">
+          {/* Grouped Navigation Links (Compact padding so all 11 items fit comfortably) */}
+          <nav className="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1">
             {navSections.map((section) => (
-              <div key={section.title} className="space-y-1">
+              <div key={section.title} className="space-y-0.5">
                 {!isCollapsed && (
-                  <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">
+                  <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-secondary mt-3 mb-1 first:mt-0">
                     {section.title}
                   </div>
                 )}
@@ -284,7 +284,7 @@ export function AdminShellClient({
                         href={item.href}
                         aria-current={active ? 'page' : undefined}
                         title={isCollapsed ? item.label : undefined}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
+                        className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[13px] font-medium transition-all group ${
                           active
                             ? 'bg-accent-admin text-white font-semibold shadow-sm'
                             : 'text-secondary hover:text-navy hover:bg-ivory'
@@ -302,7 +302,7 @@ export function AdminShellClient({
                         )}
                         {!isCollapsed && typeof item.badge === 'number' && item.badge > 0 && (
                           <span
-                            className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full border ${
+                            className={`px-1.5 py-0.2 text-[10px] font-bold rounded-full border ${
                               active
                                 ? 'bg-white/20 text-white border-white/30'
                                 : item.badgeColor || 'bg-amber-50 text-amber-800 border-amber-200'
@@ -320,10 +320,10 @@ export function AdminShellClient({
           </nav>
 
           {/* Sidebar Bottom Footer */}
-          <div className="p-3 border-t border-border bg-ivory/60 text-xs">
+          <div className="p-2.5 sm:p-3 border-t border-border bg-ivory/60 text-xs shrink-0">
             <Link
               href="/"
-              className={`flex items-center gap-2.5 text-secondary hover:text-navy px-3 py-2 rounded-xl transition-colors ${
+              className={`flex items-center gap-2.5 text-secondary hover:text-navy px-3 py-1.5 rounded-xl transition-colors ${
                 isCollapsed ? 'justify-center' : ''
               }`}
               title="Return to Marketplace"
@@ -334,13 +334,15 @@ export function AdminShellClient({
           </div>
         </aside>
 
-        {/* Main Admin Content Container */}
+        {/* Main Admin Content Container (Sole scrollable container on desktop) */}
         <main
           id="admin-main-content"
           tabIndex={-1}
-          className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto focus:outline-none overflow-x-hidden"
+          className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 focus:outline-none"
         >
-          {children}
+          <div className="max-w-7xl mx-auto w-full">
+            {children}
+          </div>
         </main>
       </div>
 

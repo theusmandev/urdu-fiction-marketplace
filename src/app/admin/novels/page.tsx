@@ -186,12 +186,12 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
               <table className="w-full text-left text-xs">
                 <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
                   <tr>
-                    <th className="py-3 px-4">Novel Title (EN / UR)</th>
-                    <th className="py-3 px-4">Author</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Price / Chapters</th>
-                    <th className="py-3 px-4">Rights Declared</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                    <th className="py-2.5 px-3 sm:px-4">Novel Title (EN / UR)</th>
+                    <th className="py-2.5 px-3 sm:px-4">Author</th>
+                    <th className="py-2.5 px-3 sm:px-4">Status</th>
+                    <th className="py-2.5 px-3 sm:px-4">Price / Chapters</th>
+                    <th className="py-2.5 px-3 sm:px-4">Rights Declared</th>
+                    <th className="py-2.5 px-3 sm:px-4 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -208,7 +208,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                           isUnderReview ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-surface-muted/50'
                         }`}
                       >
-                        <td className="py-3.5 px-4 max-w-[220px]">
+                        <td className="py-2.5 px-3 sm:px-4 max-w-[220px]">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-main truncate break-words" title={novel.title_english}>{novel.title_english}</span>
                             {novel.is_featured && (
@@ -222,7 +222,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                           </UrduText>
                         </td>
 
-                        <td className="py-3.5 px-4 max-w-[180px]">
+                        <td className="py-2.5 px-3 sm:px-4 max-w-[180px]">
                           <div className="text-main font-medium truncate break-words" title={writer?.pen_name_english || 'Unknown'}>
                             {writer?.pen_name_english || 'Unknown'}
                           </div>
@@ -231,16 +231,16 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                           </UrduText>
                         </td>
 
-                        <td className="py-3.5 px-4">
+                        <td className="py-2.5 px-3 sm:px-4 whitespace-nowrap">
                           <StatusBadge status={novel.status} />
                         </td>
 
-                        <td className="py-3.5 px-4 font-mono">
+                        <td className="py-2.5 px-3 sm:px-4 font-mono whitespace-nowrap">
                           <div className="text-main font-bold">PKR {Number(novel.price_pkr).toLocaleString()}</div>
                           <div className="text-[10px] text-muted">{novel.total_chapters} chapters</div>
                         </td>
 
-                        <td className="py-3.5 px-4 font-mono">
+                        <td className="py-2.5 px-3 sm:px-4 font-mono whitespace-nowrap">
                           {novel.rights_declaration_accepted ? (
                             <span className="text-[11px] text-emerald-700 font-sans flex items-center gap-1 font-medium">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" /> Accepted
@@ -252,7 +252,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                           )}
                         </td>
 
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-2.5 px-3 sm:px-4 text-right whitespace-nowrap">
                           <Link
                             href={`/admin/novels/${novel.id}`}
                             className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm ${

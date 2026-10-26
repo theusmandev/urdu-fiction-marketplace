@@ -187,14 +187,14 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
             <table className="w-full text-left text-xs text-main">
               <thead className="bg-surface-muted/80 border-b border-border text-[11px] font-medium text-muted uppercase tracking-wider">
                 <tr>
-                  <th className="px-4 py-3">Order Number</th>
-                  <th className="px-4 py-3">Novel</th>
-                  <th className="px-4 py-3">Reader</th>
-                  <th className="px-4 py-3">Writer</th>
-                  <th className="px-4 py-3">Amount</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Created</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-3 py-2.5">Order Number</th>
+                  <th className="px-3 py-2.5">Novel</th>
+                  <th className="px-3 py-2.5">Reader</th>
+                  <th className="px-3 py-2.5">Writer</th>
+                  <th className="px-3 py-2.5">Amount</th>
+                  <th className="px-3 py-2.5">Status</th>
+                  <th className="px-3 py-2.5">Created</th>
+                  <th className="px-3 py-2.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -207,7 +207,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
 
                   return (
                     <tr key={order.id} className="hover:bg-surface-muted/50 transition-colors">
-                      <td className="px-4 py-3.5 font-mono font-bold text-main whitespace-nowrap">
+                      <td className="px-3 py-2.5 font-mono font-bold text-main whitespace-nowrap">
                         <Link
                           href={`/admin/orders/${order.id}`}
                           className="hover:text-accent-admin transition-colors flex items-center gap-1.5"
@@ -216,10 +216,10 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                           <ExternalLink className="w-3 h-3 text-muted" />
                         </Link>
                       </td>
-                      <td className="px-4 py-3.5 max-w-[200px] truncate font-medium text-main" title={order.novel_title}>
+                      <td className="px-3 py-2.5 max-w-[180px] truncate font-medium text-main" title={order.novel_title}>
                         {order.novel_title}
                       </td>
-                      <td className="px-4 py-3.5 max-w-[180px]">
+                      <td className="px-3 py-2.5 max-w-[160px]">
                         <div className="flex flex-col">
                           <span className="font-semibold text-main truncate break-words" title={order.reader_display_name}>
                             {order.reader_display_name}
@@ -231,13 +231,13 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-main max-w-[160px] truncate break-words" title={order.writer_pen_name}>
+                      <td className="px-3 py-2.5 text-main max-w-[140px] truncate break-words" title={order.writer_pen_name}>
                         {order.writer_pen_name}
                       </td>
-                      <td className="px-4 py-3.5 font-mono font-semibold text-emerald-700 whitespace-nowrap">
+                      <td className="px-3 py-2.5 font-mono font-semibold text-emerald-700 whitespace-nowrap">
                         {formatPKR(order.amount_pkr)}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span
                             className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg}`}
@@ -257,13 +257,13 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-[11px] text-muted font-mono whitespace-nowrap">
-                        {new Date(order.created_at).toLocaleDateString()}
+                      <td className="px-3 py-2.5 text-[11px] text-muted font-mono whitespace-nowrap">
+                        <span suppressHydrationWarning>{new Date(order.created_at).toLocaleDateString()}</span>
                       </td>
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                      <td className="px-3 py-2.5 text-right whitespace-nowrap">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="px-3 py-1.5 rounded-lg bg-surface-muted hover:bg-surface text-main font-semibold text-xs border border-border transition-colors inline-flex items-center gap-1 shadow-sm"
+                          className="px-2.5 py-1 rounded-lg bg-surface-muted hover:bg-surface text-main font-semibold text-xs border border-border transition-colors inline-flex items-center gap-1 shadow-sm"
                         >
                           <span>Inspect</span>
                           <ChevronRight className="w-3.5 h-3.5" />
@@ -332,7 +332,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                   )}
 
                   <div className="pt-2 border-t border-border flex items-center justify-between">
-                    <span className="text-[10px] text-muted font-mono">
+                    <span suppressHydrationWarning className="text-[10px] text-muted font-mono">
                       {new Date(order.created_at).toLocaleDateString()}
                     </span>
                     <Link
