@@ -184,8 +184,8 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
         {/* Primary Hero Info Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
           {/* Left Column: Constrained 2:3 Cover Image & Buy CTA (4 cols) */}
-          <div className="md:col-span-5 lg:col-span-4 space-y-6">
-            <div className="relative aspect-[2/3] w-full max-w-[180px] sm:max-w-[220px] md:max-w-[240px] mx-auto md:mx-0 rounded-xl overflow-hidden bg-ivory-dark shadow-md border border-border/80">
+          <div className="md:col-span-5 lg:col-span-4 space-y-6 flex flex-col items-center">
+            <div className="relative aspect-[2/3] w-full max-w-[180px] sm:max-w-[220px] md:max-w-[240px] mx-auto rounded-xl overflow-hidden bg-ivory-dark shadow-md border border-border/80">
               {/* Book Spine Detail */}
               <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10 pointer-events-none" />
               <div className="absolute inset-y-0 left-3 w-px bg-white/20 z-10 pointer-events-none" />
@@ -231,7 +231,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
             </div>
 
             {/* Price & Purchase Action Card */}
-            <div className="bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4">
+            <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4">
               <div className="flex items-baseline justify-between">
                 <span className="text-xs text-secondary">Price / قیمت:</span>
                 <div>
@@ -264,9 +264,9 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                 <div className="pt-2">
                   <Link
                     href={`/novels/${novel.slug}/read/${freeChapters[0].chapter_number}`}
-                    className="w-full flex items-center justify-center gap-2 bg-accent/20 hover:bg-accent/30 text-navy font-semibold py-2.5 px-4 rounded-xl transition-colors text-xs"
+                    className="w-full flex items-center justify-center gap-2 bg-accent/20 hover:bg-accent/30 text-navy font-semibold py-2.5 px-4 rounded-xl transition-colors text-xs text-center"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-accent" />
+                    <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Start Free Reading (Chapter {freeChapters[0].chapter_number})</span>
                   </Link>
                 </div>
@@ -274,7 +274,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
             </div>
 
             {/* Direct Payment Assurance Box */}
-            <div className="bg-ivory/60 p-4 rounded-xl border border-border text-xs space-y-2">
+            <div className="w-full max-w-[280px] mx-auto bg-ivory/60 p-4 rounded-xl border border-border text-xs space-y-2">
               <div className="flex items-center gap-1.5 font-semibold text-navy">
                 <ShieldCheck className="w-4 h-4 text-accent shrink-0" />
                 <span>Direct Writer Payment Guarantee</span>
