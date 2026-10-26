@@ -87,37 +87,37 @@ export function CatalogFilters({
     Boolean(maxPrice);
 
   return (
-    <div className="space-y-4 bg-surface p-4 sm:p-5 rounded-2xl border border-border shadow-sm">
+    <div className="space-y-4 bg-surface p-4 sm:p-5 rounded-2xl border border-border shadow-sm w-full max-w-full min-w-0 overflow-hidden">
       {/* Top Search & Controls Row */}
-      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between w-full min-w-0">
         {/* Search Input */}
-        <form onSubmit={handleSearchSubmit} className="relative flex-1">
+        <form onSubmit={handleSearchSubmit} className="relative flex-1 min-w-0 flex items-center">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary pointer-events-none" />
           <input
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search title in English or Urdu, synopsis, or writer pen name..."
-            className="w-full pl-10 pr-20 py-2.5 text-base sm:text-sm min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-accent/20 transition-all"
+            className="w-full min-w-0 pl-10 pr-20 py-2.5 text-base sm:text-sm min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-accent/20 transition-all"
           />
           <button
             type="submit"
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-semibold bg-navy text-accent hover:bg-navy-light px-3 py-2 min-h-[36px] rounded-lg transition-colors cursor-pointer"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-semibold bg-navy text-accent hover:bg-navy-light px-3 py-2 min-h-[36px] rounded-lg transition-colors cursor-pointer shrink-0"
           >
             Search
           </button>
         </form>
 
         {/* Sort Selector */}
-        <div className="flex items-center gap-2">
-          <label htmlFor="catalog-sort" className="text-xs text-secondary whitespace-nowrap">
+        <div className="flex items-center gap-2 w-full lg:w-auto min-w-0">
+          <label htmlFor="catalog-sort" className="text-xs text-secondary whitespace-nowrap shrink-0">
             Sort by:
           </label>
           <select
             id="catalog-sort"
             value={sort}
             onChange={handleSortChange}
-            className="text-base sm:text-xs font-medium bg-ivory/80 border border-border rounded-xl px-3 py-2.5 min-h-[44px] outline-none text-navy focus:border-accent cursor-pointer"
+            className="flex-1 lg:w-56 min-w-0 truncate text-base sm:text-xs font-medium bg-ivory/80 border border-border rounded-xl px-3 py-2.5 min-h-[44px] outline-none text-navy focus:border-accent cursor-pointer"
           >
             <option value="featured">Featured / سب سے نمایاں</option>
             <option value="newest">Newest Releases / تازہ ترین</option>
@@ -130,7 +130,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer min-h-[44px]"
+              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer min-h-[44px] shrink-0"
               title="Reset all filters"
             >
               <X className="w-3.5 h-3.5" />
@@ -142,15 +142,15 @@ export function CatalogFilters({
 
       {/* Genre Filter Pills */}
       {genres.length > 0 && (
-        <div className="pt-2 border-t border-border/60">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-xs font-medium text-secondary whitespace-nowrap mr-1">
+        <div className="pt-2 border-t border-border/60 w-full min-w-0">
+          <div className="flex md:flex-wrap items-center gap-2 overflow-x-auto md:overflow-x-visible max-w-full w-full min-w-0 pb-1.5 md:pb-0 scrollbar-none">
+            <span className="text-xs font-medium text-secondary whitespace-nowrap mr-1 shrink-0">
               Genres:
             </span>
             <button
               type="button"
               onClick={() => handleGenreClick("")}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer shrink-0 ${
                 !selectedGenre
                   ? "bg-navy text-accent shadow-sm"
                   : "bg-ivory/60 hover:bg-ivory text-secondary hover:text-navy border border-border/80"
@@ -166,14 +166,14 @@ export function CatalogFilters({
                   key={g.id}
                   type="button"
                   onClick={() => handleGenreClick(g.slug)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer shrink-0 ${
                     active
                       ? "bg-navy text-accent shadow-sm"
                       : "bg-ivory/60 hover:bg-ivory text-secondary hover:text-navy border border-border/80"
                   }`}
                 >
                   <span>{g.name_english}</span>
-                  <UrduText as="span" size="xs" className="text-accent py-0">
+                  <UrduText as="span" size="xs" className="opacity-80 py-0 font-normal">
                     {g.name_urdu}
                   </UrduText>
                   {g.published_novels_count > 0 && (
@@ -193,8 +193,8 @@ export function CatalogFilters({
       )}
 
       {/* Active Search & Count Summary */}
-      <div className="flex items-center justify-between text-xs text-secondary pt-1">
-        <span>
+      <div className="flex items-center justify-between text-xs text-secondary pt-1 w-full min-w-0">
+        <span className="truncate">
           Showing {totalCount} {totalCount === 1 ? "novel" : "novels"}
           {selectedGenre && ` in ${genres.find((g) => g.slug === selectedGenre)?.name_english || selectedGenre}`}
           {q && ` matching "${q}"`}

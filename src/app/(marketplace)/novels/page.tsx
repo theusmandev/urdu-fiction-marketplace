@@ -59,22 +59,22 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
   const currentPage = params.page;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0 py-10 space-y-8">
       {/* Page Header */}
-      <div className="space-y-3 border-b border-border pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+      <div className="space-y-3 border-b border-border pb-6 w-full min-w-0">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 min-w-0">
+          <div className="min-w-0">
+            <span className="text-xs font-semibold text-accent uppercase tracking-wider block">
               Literary Catalog
             </span>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-navy">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-navy truncate">
               Explore All Urdu Novels
             </h1>
           </div>
           <UrduText
             as="p"
             size="xl"
-            className="text-secondary font-normal leading-[2.2] py-0"
+            className="text-secondary font-normal leading-[2.2] py-0 shrink-0 text-left md:text-right"
           >
             معیاری اردو ناولز اور افسانوں کی مکمل فہرست
           </UrduText>
@@ -90,13 +90,13 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
 
       {/* Novel Cards Grid */}
       {novels.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full min-w-0">
           {novels.map((novel) => (
             <NovelCard key={novel.id} novel={novel} />
           ))}
         </div>
       ) : (
-        <div className="p-16 text-center bg-ivory/50 rounded-2xl border border-dashed border-border space-y-4">
+        <div className="p-16 text-center bg-ivory/50 rounded-2xl border border-dashed border-border space-y-4 w-full min-w-0">
           <BookMarked className="w-12 h-12 text-secondary/70 mx-auto" />
           <div className="space-y-1">
             <h3 className="text-base font-bold text-navy">
@@ -123,7 +123,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
       {totalPages > 1 && (
         <nav
           aria-label="Catalog Pagination"
-          className="pt-8 border-t border-border flex items-center justify-between gap-4 text-xs font-medium"
+          className="pt-8 border-t border-border flex items-center justify-between gap-4 text-xs font-medium w-full min-w-0"
         >
           <div>
             <span className="text-secondary">

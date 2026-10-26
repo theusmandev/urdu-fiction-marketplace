@@ -32,10 +32,10 @@ interface NovelCardProps {
 
 export function NovelCard({ novel }: NovelCardProps) {
   return (
-    <article className="group relative bg-surface rounded-xl sm:rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-accent/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden cursor-pointer">
+    <article className="group relative bg-surface h-full flex flex-col overflow-hidden rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-accent/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
       
-      {/* Constrained 3:4 Aspect Ratio Cover Container */}
-      <div className="relative aspect-[3/4] max-h-48 sm:max-h-56 w-full overflow-hidden bg-ivory-dark">
+      {/* Constrained 2:3 Aspect Ratio Cover Container - locked shrink-0 */}
+      <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-stone-100">
         {/* Editorial Book Spine Visual Styling */}
         <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-black/10 to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 left-2.5 w-px bg-white/20 z-10 pointer-events-none" />
@@ -50,14 +50,14 @@ export function NovelCard({ novel }: NovelCardProps) {
           </div>
 
           {/* Top Badges */}
-          <div className="flex items-center justify-between gap-1.5 z-10 pointer-events-none">
+          <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-1.5 pointer-events-none z-20">
             {novel.hasFreePreview && (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-white/90 backdrop-blur-sm text-navy px-2 py-0.5 rounded-full shadow-xs">
                 <Sparkles className="w-2.5 h-2.5 text-accent" />
                 <span>Free Preview</span>
               </span>
             )}
-            <span className="text-[10px] font-medium bg-black/40 backdrop-blur-sm text-white/90 px-2 py-0.5 rounded-full ml-auto truncate max-w-[65%]">
+            <span className="text-[10px] font-medium bg-black/40 backdrop-blur-sm text-white/90 px-2 py-0.5 rounded-full ml-auto max-w-[75%] truncate">
               {novel.genreEn}
             </span>
           </div>
@@ -67,7 +67,7 @@ export function NovelCard({ novel }: NovelCardProps) {
             <UrduText
               as="h2"
               size="base"
-              className="text-white drop-shadow-md py-0.5 leading-[2.0] sm:leading-[2.1] text-base sm:text-lg line-clamp-2"
+              className="text-white drop-shadow-md py-0.5 leading-[2.0] sm:leading-[2.1] text-base sm:text-lg line-clamp-1"
             >
               {novel.titleUrdu}
             </UrduText>
@@ -79,7 +79,7 @@ export function NovelCard({ novel }: NovelCardProps) {
           {/* Bottom Cover Author Callout */}
           <div className="border-t border-white/20 pt-1.5 z-10 flex items-center justify-between text-[10px] pointer-events-none">
             <span className="font-serif text-white/80 truncate max-w-[55%]">{novel.authorNameEn}</span>
-            <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%]">
+            <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%] font-normal">
               {novel.authorNameUrdu}
             </UrduText>
           </div>
@@ -87,7 +87,7 @@ export function NovelCard({ novel }: NovelCardProps) {
       </div>
 
       {/* Card Content & Details (Compact without synopsis bloat) */}
-      <div className="p-2.5 sm:p-3.5 flex-1 flex flex-col justify-between gap-2">
+      <div className="p-3.5 flex-1 flex flex-col justify-between gap-2 min-w-0">
         
         {/* Title & Transliteration */}
         <div className="space-y-1">

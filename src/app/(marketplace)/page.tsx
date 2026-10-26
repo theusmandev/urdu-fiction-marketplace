@@ -166,7 +166,7 @@ export default async function HomePage() {
           </div>
 
           {featuredNovels.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full min-w-0">
               {featuredNovels.map((novel, idx) => (
                 <NovelCard key={novel.id} novel={novel} priority={idx < 3} />
               ))}
@@ -188,7 +188,7 @@ export default async function HomePage() {
       {/* BROWSE BY GENRE */}
       {genres.length > 0 && (
         <section className="py-16 bg-ivory/40 border-y border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 min-w-0">
             <div className="text-center space-y-2">
               <span className="text-xs font-semibold text-accent uppercase tracking-wider">
                 Taxonomy & Themes
@@ -201,7 +201,7 @@ export default async function HomePage() {
               </UrduText>
             </div>
 
-            <div className="flex sm:grid overflow-x-auto snap-x snap-mandatory gap-3 pb-3 sm:pb-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex sm:grid overflow-x-auto snap-x snap-mandatory gap-3 pb-3 sm:pb-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 w-full min-w-0">
               {genres.map((genre) => (
                 <Link
                   key={genre.id}
@@ -231,8 +231,8 @@ export default async function HomePage() {
 
       {/* NEWEST RELEASES */}
       <section className="py-16 md:py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4 min-w-0">
             <div>
               <span className="text-xs font-semibold text-accent uppercase tracking-wider">
                 Fresh Stories
@@ -243,7 +243,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/novels?sort=newest"
-              className="text-xs font-semibold text-accent hover:text-accent-dark transition-colors inline-flex items-center gap-1"
+              className="text-xs font-semibold text-accent hover:text-accent-dark transition-colors inline-flex items-center gap-1 shrink-0"
             >
               <span>Explore all new releases</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -251,9 +251,9 @@ export default async function HomePage() {
           </div>
 
           {newestNovels.length > 0 ? (
-            <div className="flex sm:grid overflow-x-auto snap-x snap-mandatory gap-3 pb-3 sm:pb-0 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex sm:grid overflow-x-auto snap-x snap-mandatory gap-3 pb-3 sm:pb-0 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 w-full min-w-0">
               {newestNovels.map((novel) => (
-                <div key={novel.id} className="w-[155px] sm:w-auto shrink-0 snap-start flex">
+                <div key={novel.id} className="w-[155px] sm:w-auto shrink-0 snap-start flex flex-col h-full">
                   <NovelCard novel={novel} />
                 </div>
               ))}

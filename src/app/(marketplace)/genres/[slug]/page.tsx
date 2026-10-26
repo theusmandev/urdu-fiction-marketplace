@@ -154,7 +154,7 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
           </div>
 
           {novels.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full min-w-0">
               {novels.map((novel) => (
                 <NovelCard key={novel.id} novel={novel} />
               ))}

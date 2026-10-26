@@ -16,10 +16,10 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
     <article
       itemScope
       itemType="https://schema.org/Book"
-      className="group relative bg-surface rounded-xl sm:rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-accent/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden cursor-pointer"
+      className="group relative bg-surface h-full flex flex-col overflow-hidden rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-accent/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
     >
-      {/* Constrained 2:3 Aspect Ratio Cover Container */}
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-ivory-dark">
+      {/* Constrained 2:3 Aspect Ratio Cover Container - locked shrink-0 */}
+      <div className="relative w-full aspect-[2/3] shrink-0 overflow-hidden bg-stone-100">
         {/* Book Spine Visual Styling */}
         <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/30 via-black/10 to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 left-2.5 w-px bg-white/20 z-10 pointer-events-none" />
@@ -32,7 +32,7 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
             fill
             priority={priority}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105 pointer-events-none"
+            className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 pointer-events-none"
             itemProp="image"
           />
         ) : (
@@ -46,7 +46,7 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
               <UrduText
                 as="h3"
                 size="base"
-                className="text-white drop-shadow-md py-0.5 leading-[2.0] sm:leading-[2.1] text-base sm:text-lg line-clamp-2 font-normal"
+                className="text-white drop-shadow-md py-0.5 leading-[2.0] sm:leading-[2.1] text-base sm:text-lg line-clamp-1 font-normal"
                 itemProp="name"
               >
                 {novel.title_urdu}
@@ -71,52 +71,50 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
         )}
 
         {/* Top Badges Overlay */}
-        <div className="absolute top-2 inset-x-2 flex items-center justify-between gap-1.5 z-20 pointer-events-none">
+        <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-1.5 pointer-events-none z-20">
           {novel.is_featured && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-accent text-navy px-2 py-0.5 rounded-full shadow-xs">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-accent text-navy px-2 py-0.5 rounded-full shadow-xs shrink-0">
               <Sparkles className="w-2.5 h-2.5" />
               <span>Featured</span>
             </span>
           )}
           {novel.genres && novel.genres.length > 0 && (
-            <span className="text-[10px] font-medium bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded-full ml-auto truncate max-w-[65%]">
+            <span className="text-[10px] font-medium bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded-full ml-auto max-w-[75%] truncate">
               {novel.genres[0].name_english}
             </span>
           )}
         </div>
       </div>
 
-      {/* Card Content & Details (Compact without synopsis bloat) */}
-      <div className="p-2.5 sm:p-3.5 flex-1 flex flex-col justify-between gap-2">
-        <div className="space-y-1">
+      {/* Card Body - Equal height flex child */}
+      <div className="flex-1 flex flex-col justify-between p-3.5 min-w-0 gap-2">
+        <div className="space-y-1 min-w-0">
           <Link
             href={`/novels/${novel.slug}`}
-            className="group-hover:text-accent transition-colors block after:absolute after:inset-0 after:z-10 focus:outline-none"
+            className="group-hover:text-accent transition-colors block after:absolute after:inset-0 after:z-10 focus:outline-none min-w-0"
             aria-label={`View novel ${novel.title_english || novel.title_urdu}`}
           >
             <UrduText
               as="h2"
               size="base"
-              className="text-navy group-hover:text-accent leading-[2.0] sm:leading-[2.1] py-0 line-clamp-2 text-base sm:text-lg transition-colors font-normal"
+              className="text-navy group-hover:text-accent leading-[2.2] py-0 line-clamp-1 text-base sm:text-lg transition-colors font-normal"
             >
               {novel.title_urdu}
             </UrduText>
-            {novel.title_english && (
-              <p className="font-serif text-xs text-secondary group-hover:text-navy/80 tracking-wider uppercase line-clamp-1 transition-colors">
-                {novel.title_english}
-              </p>
-            )}
+            <p className="font-serif text-xs text-secondary group-hover:text-navy/80 tracking-wider uppercase line-clamp-1 transition-colors min-h-[1rem]">
+              {novel.title_english || "\u00A0"}
+            </p>
           </Link>
 
           {/* Author Byline */}
-          <div className="flex items-center justify-between text-[11px] sm:text-xs text-secondary pt-0.5 relative z-20 pointer-events-none">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs text-secondary pt-0.5 relative z-20 pointer-events-none min-w-0">
             <Link
               href={
                 novel.writer_username
                   ? `/writers/${novel.writer_username}`
                   : `/novels/${novel.slug}`
               }
-              className="hover:text-navy transition-colors flex items-center gap-1 min-w-0 pointer-events-auto"
+              className="hover:text-navy transition-colors flex items-center gap-1 min-w-0 flex-1 pointer-events-auto"
             >
               <Feather className="w-3 h-3 text-accent shrink-0" />
               <span className="font-medium truncate">
@@ -130,9 +128,9 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
                     ? `/writers/${novel.writer_username}`
                     : `/novels/${novel.slug}`
                 }
-                className="hover:text-navy transition-colors shrink-0 ml-1 pointer-events-auto"
+                className="hover:text-navy transition-colors shrink-0 ml-1 pointer-events-auto max-w-[45%]"
               >
-                <UrduText as="span" size="xs" className="text-secondary/90 hover:text-navy py-0">
+                <UrduText as="span" size="xs" className="text-secondary/90 hover:text-navy py-0 truncate block font-normal">
                   {novel.writer_pen_name_urdu}
                 </UrduText>
               </Link>
@@ -141,8 +139,8 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
         </div>
 
         {/* Footer: Chapter count & Price */}
-        <div className="pt-2 mt-1 border-t border-border flex items-center justify-between text-xs pointer-events-none">
-          <div className="flex items-center gap-1 text-secondary text-[11px] sm:text-xs">
+        <div className="pt-2 mt-1 border-t border-border flex items-center justify-between text-xs pointer-events-none min-w-0">
+          <div className="flex items-center gap-1 text-secondary text-[11px] sm:text-xs min-w-0">
             <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-accent shrink-0" />
             <span className="truncate">
               {novel.total_chapters}{" "}
