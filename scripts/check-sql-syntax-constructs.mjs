@@ -7,11 +7,16 @@
 // 2. Fails if any .sql file contains format(...) with format specifiers other than
 //    %s, %I, %L, %%, or valid width/position forms (e.g. %1$s, %-10s).
 //    PostgreSQL format() does NOT support printf specifiers like %.2f, %d, %f, %i.
+// 3. Fails if any test fixture INSERT is missing required NOT NULL columns.
+// 4. Fails if any migration creating a trigger function omits REVOKE EXECUTE.
+// 5. Fails if any PL/pgSQL block (DO $$ ... $$ or CREATE FUNCTION body) uses an
+//    undeclared variable as an INTO target, := target, or FOR loop variable.
 //
 // SCAN POLICY:
 //   - All migrations (0001+) and all test files (supabase/tests/**/*.sql) are scanned.
 //   - Known historical violations in applied migrations (0001-0022) must be explicitly
 //     documented in HISTORICAL_EXCEPTIONS with who fixes them.
+//   - Applied migration undeclared variable findings are reported rather than edited.
 //   - SQL line comments (-- ...) are stripped before matching.
 
 import { readFileSync, readdirSync, statSync } from 'fs';
@@ -144,12 +149,87 @@ function stripLineComments(text) {
 }
 
 // ---------------------------------------------------------------------------
+// PL/pgSQL parsing helpers for Guard 5
+// ---------------------------------------------------------------------------
+const BUILTIN_PLPGSQL_VARS = new Set([
+  'new', 'old', 'tg_name', 'tg_when', 'tg_level', 'tg_op',
+  'tg_relid', 'tg_relname', 'tg_table_name', 'tg_table_schema',
+  'tg_nargs', 'tg_argv', 'found', 'sqlerrm', 'sqlstate'
+]);
+
+function maskCommentsAndStrings(code) {
+  let res = code.replace(/--[^\n]*/g, m => ' '.repeat(m.length));
+  res = res.replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '));
+  res = res.replace(/'(?:[^']|'')*'/g, m => m.replace(/[^\n]/g, ' '));
+  return res;
+}
+
+function extractParams(paramStr) {
+  const params = new Set();
+  if (!paramStr) return params;
+  const clean = paramStr.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const parts = clean.split(',');
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const tokens = trimmed.split(/\s+/).filter(Boolean);
+    let idx = 0;
+    if (['in', 'out', 'inout', 'variadic'].includes(tokens[0]?.toLowerCase())) {
+      idx = 1;
+    }
+    if (tokens[idx]) {
+      const name = tokens[idx].toLowerCase().replace(/["'`]/g, '');
+      params.add(name);
+    }
+  }
+  return params;
+}
+
+function extractDeclaredVars(declareBlock) {
+  const declared = new Set();
+  if (!declareBlock) return declared;
+  const statements = declareBlock.split(';');
+  for (const stmt of statements) {
+    const trimmed = stmt.trim();
+    if (!trimmed) continue;
+    const m = trimmed.match(/^([a-zA-Z_][a-zA-Z0-9_]*)/);
+    if (m) {
+      const name = m[1].toLowerCase();
+      if (!['declare', 'begin', 'cursor'].includes(name)) {
+        declared.add(name);
+      }
+    }
+  }
+  return declared;
+}
+
+function computeParenDepths(str) {
+  const depths = new Int32Array(str.length);
+  let depth = 0;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === '(') {
+      depth++;
+      depths[i] = depth;
+    } else if (ch === ')') {
+      depths[i] = depth;
+      if (depth > 0) depth--;
+    } else {
+      depths[i] = depth;
+    }
+  }
+  return depths;
+}
+
+// ---------------------------------------------------------------------------
 // Scan for violations
 // ---------------------------------------------------------------------------
 const constructViolations = [];
 const formatViolations = [];
 const fixtureViolations = [];
 const triggerPrivilegeViolations = [];
+const undeclaredVariableViolations = [];
+const historicalUndeclaredViolations = [];
 const historicalAllowedCounts = {};
 
 for (const filePath of files) {
@@ -292,6 +372,134 @@ for (const filePath of files) {
       }
     }
   }
+
+  // 5. Scan PL/pgSQL blocks for undeclared variable targets (:=, INTO, FOR)
+  const isAppliedMigration = (() => {
+    const m = rel.match(/^supabase\/migrations\/(\d+)_/);
+    return m ? parseInt(m[1], 10) <= 22 : false;
+  })();
+
+  const maskedFull = maskCommentsAndStrings(raw);
+  const blockRegex = /(?:(\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+(?:[a-zA-Z0-9_]+\.)?([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)[\s\S]*?\bAS\s+(\$[a-zA-Z0-9_]*\$))|(\bDO\s+(?:LANGUAGE\s+[a-zA-Z0-9_]+\s+)?(\$[a-zA-Z0-9_]*\$)))/gi;
+
+  let bMatch;
+  while ((bMatch = blockRegex.exec(raw)) !== null) {
+    const isFunction = Boolean(bMatch[1]);
+    const fnName = isFunction ? bMatch[2] : 'DO_BLOCK';
+    const paramStr = isFunction ? bMatch[3] : '';
+    const tag = isFunction ? bMatch[4] : bMatch[6];
+    const startIndex = bMatch.index + bMatch[0].length;
+
+    const endTagIndex = raw.indexOf(tag, startIndex);
+    if (endTagIndex === -1) continue;
+
+    const maskedBody = maskedFull.slice(startIndex, endTagIndex);
+
+    // Skip if LANGUAGE sql
+    const context = raw.slice(Math.max(0, bMatch.index - 50), Math.min(raw.length, endTagIndex + tag.length + 50));
+    if (/\bLANGUAGE\s+sql\b/i.test(context)) {
+      continue;
+    }
+
+    const declared = new Set(BUILTIN_PLPGSQL_VARS);
+    if (isFunction) {
+      for (const p of extractParams(paramStr)) declared.add(p);
+    }
+
+    const declareMatch = maskedBody.match(/\bDECLARE\b([\s\S]*?)\bBEGIN\b/i);
+    if (declareMatch) {
+      for (const v of extractDeclaredVars(declareMatch[1])) declared.add(v);
+    }
+
+    const forRegex = /\bFOR\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+\bIN\b/gi;
+    let forMatch;
+    const loopVars = new Set();
+    while ((forMatch = forRegex.exec(maskedBody)) !== null) {
+      loopVars.add(forMatch[1].toLowerCase());
+    }
+
+    const inScope = new Set([...declared, ...loopVars]);
+    const parenDepths = computeParenDepths(maskedBody);
+
+    // Check := targets
+    const assignRegex = /\b([a-zA-Z_][a-zA-Z0-9_]*)(?:\.[a-zA-Z0-9_]+|\[[^\]]+\])*\s*:=/g;
+    let aMatch;
+    while ((aMatch = assignRegex.exec(maskedBody)) !== null) {
+      const targetVar = aMatch[1].toLowerCase();
+      // Skip if in DECLARE section
+      if (declareMatch && aMatch.index < declareMatch.index + declareMatch[0].length) {
+        continue;
+      }
+      // Skip named parameters inside function calls: func(param := val)
+      if (parenDepths[aMatch.index] > 0) {
+        continue;
+      }
+      if (!inScope.has(targetVar)) {
+        const offset = startIndex + aMatch.index;
+        const before = raw.slice(0, offset);
+        const lineNum = before.split('\n').length;
+        const col = offset - before.lastIndexOf('\n');
+        const lineText = rawLines[lineNum - 1]?.trim() ?? '';
+        const violation = {
+          file: rel,
+          line: lineNum,
+          col,
+          block: fnName,
+          target: targetVar,
+          kind: ':=',
+          reason: `Target "${targetVar}" assigned via := is not declared in the DECLARE list of ${fnName} (or in scope).`,
+          text: lineText
+        };
+        if (isAppliedMigration) {
+          historicalUndeclaredViolations.push(violation);
+        } else {
+          undeclaredVariableViolations.push(violation);
+        }
+      }
+    }
+
+    // Check INTO targets
+    const intoRegex = /\bINTO\s+(?:STRICT\s+)?([^;]+?)(?:\bFROM\b|\bWHERE\b|\bRETURNING\b|;|\bLOOP\b|\bHAVING\b|\bGROUP\b|\bORDER\b|\bLIMIT\b|\bWINDOW\b)/gi;
+    let iMatch;
+    while ((iMatch = intoRegex.exec(maskedBody)) !== null) {
+      const beforeInto = maskedBody.slice(Math.max(0, iMatch.index - 30), iMatch.index);
+      if (/\bINSERT\s+$/i.test(beforeInto)) continue;
+      const targetText = iMatch[1].trim();
+      if (/^(?:TEMP|TEMPORARY)\s+TABLE\b/i.test(targetText)) continue;
+
+      const targets = targetText.split(',');
+      for (const t of targets) {
+        const trimmed = t.trim();
+        if (!trimmed) continue;
+        const varMatch = trimmed.match(/^([a-zA-Z_][a-zA-Z0-9_]*)/);
+        if (varMatch) {
+          const varName = varMatch[1].toLowerCase();
+          if (!inScope.has(varName)) {
+            const offset = startIndex + iMatch.index;
+            const before = raw.slice(0, offset);
+            const lineNum = before.split('\n').length;
+            const col = offset - before.lastIndexOf('\n');
+            const lineText = rawLines[lineNum - 1]?.trim() ?? '';
+            const violation = {
+              file: rel,
+              line: lineNum,
+              col,
+              block: fnName,
+              target: varName,
+              kind: 'INTO',
+              reason: `Target "${varName}" in INTO clause is not declared in the DECLARE list of ${fnName} (or in scope).`,
+              text: lineText
+            };
+            if (isAppliedMigration) {
+              historicalUndeclaredViolations.push(violation);
+            } else {
+              undeclaredVariableViolations.push(violation);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 // Check if any historical file exceeded its allowed count
@@ -312,10 +520,19 @@ for (const [file, exp] of Object.entries(HISTORICAL_EXCEPTIONS)) {
 // ---------------------------------------------------------------------------
 // Report
 // ---------------------------------------------------------------------------
-const totalViolations = constructViolations.length + formatViolations.length + fixtureViolations.length + triggerPrivilegeViolations.length;
+const totalViolations = constructViolations.length + formatViolations.length + fixtureViolations.length + triggerPrivilegeViolations.length + undeclaredVariableViolations.length;
+
+if (historicalUndeclaredViolations.length > 0) {
+  console.log(`\n⚠️  Found ${historicalUndeclaredViolations.length} undeclared variable finding(s) in applied migrations (reported only, not editable):`);
+  for (const v of historicalUndeclaredViolations) {
+    console.log(`  ${v.file}:${v.line}:${v.col}  [${v.block}] Undeclared ${v.kind} target: "${v.target}"`);
+    console.log(`    ${v.text}`);
+    console.log(`    → ${v.reason}\n`);
+  }
+}
 
 if (totalViolations === 0) {
-  console.log(`✅  check:sql PASSED — No forbidden pg_catalog.<construct>, invalid format() specifiers, trigger privilege leaks, or test fixture NOT NULL omissions found.`);
+  console.log(`✅  check:sql PASSED — No forbidden pg_catalog.<construct>, invalid format() specifiers, trigger privilege leaks, test fixture NOT NULL omissions, or undeclared PL/pgSQL variable targets found.`);
   console.log(`   Scanned : ${files.length} SQL file(s) (all migrations & test suites)`);
   for (const file of Object.keys(HISTORICAL_EXCEPTIONS)) {
     console.log(`   Documented historical exception: ${file} (${historicalAllowedCounts[file] || 0} occurrences — fixed in 0023)`);
@@ -325,7 +542,7 @@ if (totalViolations === 0) {
   }
   process.exit(0);
 } else {
-  console.error(`\n❌  check:sql FAILED — Found ${totalViolations} SQL syntax / format / fixture / trigger violation(s):\n`);
+  console.error(`\n❌  check:sql FAILED — Found ${totalViolations} SQL syntax / format / fixture / trigger / undeclared-variable violation(s):\n`);
 
   if (constructViolations.length > 0) {
     console.error(`--- Schema Qualification Violations (${constructViolations.length}) ---`);
@@ -362,10 +579,20 @@ if (totalViolations === 0) {
     }
   }
 
+  if (undeclaredVariableViolations.length > 0) {
+    console.error(`--- Undeclared PL/pgSQL Variables (${undeclaredVariableViolations.length}) ---`);
+    for (const v of undeclaredVariableViolations) {
+      console.error(`  ${v.file}:${v.line}:${v.col}  [${v.block}] Undeclared ${v.kind} target: "${v.target}"`);
+      console.error(`    ${v.text}`);
+      console.error(`    → ${v.reason}\n`);
+    }
+  }
+
   console.error('Rules:');
   console.error('  1. SQL syntax constructs (coalesce, nullif, greatest, least, trim, current_user, etc.) must NEVER be schema-qualified.');
   console.error('  2. PostgreSQL format() only supports %s, %I, %L, %%, and positional/width modifiers. Format numbers with %s and to_char() / explicit casts.');
   console.error('  3. In test fixtures (supabase/tests/), INSERT statements on orders, payment_submissions, purchase_entitlements, sales_ledger, and commission_invoices must supply all mandatory NOT NULL columns without default.');
   console.error('  4. Any migration creating a trigger function (RETURNS trigger) must contain REVOKE EXECUTE ON FUNCTION ... FROM PUBLIC, anon, authenticated (or the pg_proc dynamic trigger revocation loop).');
+  console.error('  5. Every identifier used as an INTO target, := target, or FOR loop variable in PL/pgSQL must be declared in the block DECLARE list (or function parameter / loop variable).');
   process.exit(1);
 }
