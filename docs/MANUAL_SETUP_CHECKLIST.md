@@ -444,6 +444,31 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm `"platform_payment_methods_admin_all"` appears.
 
+### 31. `supabase/migrations/0031_chapter_import_and_split_rpcs.sql` [WRITER-CONTROLLED CHAPTER IMPORT & SPLIT RPCs]
+- **Purpose**: Implements atomic chapter import and split RPCs with sold-content protection, lossless text preservation, and unique constraint collision prevention:
+  - **RPC `public.import_chapters(p_novel_id uuid, p_start_number integer, p_parts jsonb)`**:
+    - Restricted to novel author (approved writer) or admin.
+    - Validates parts (non-empty content, <= 120,000 chars, title length 1-200, at most 60 parts per call).
+    - Prevents target chapter number collisions.
+    - Inserts all parts as drafts (`is_published = false`) in a single transaction.
+    - Auto-computes word count and updates novel chapter counts via existing triggers.
+    - Writes audit log row.
+  - **RPC `public.split_chapter(p_chapter_id uuid, p_parts jsonb)`**:
+    - Restricted to novel author (approved writer) or admin.
+    - Locks chapter row with `FOR UPDATE` (idempotent against double clicks).
+    - Enforces sold-content invariant: If novel is published and has active purchase entitlements, only unpublished chapters or the last chapter may be split/replaced; middle chapters on sold novels are rejected.
+    - Validates text preservation: normalizes whitespace in concatenated parts and original content to guarantee lossless preservation.
+    - Safely shifts following chapter numbers via two-step temporary offset (+1,000,000) to prevent `(novel_id, chapter_number)` unique constraint collision.
+    - Replaces original chapter with first part, creates subsequent parts, records snapshot in `chapter_revisions`, and writes audit log.
+- **Action**: Paste contents of `supabase/migrations/0031_chapter_import_and_split_rpcs.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('import_chapters', 'split_chapter');
+    ```
+    Confirm both functions exist with `prosecdef = true`.
+  - Execute automated test suite: `supabase/tests/18_chapter_split_tests.sql` (13/13 PASS).
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -552,6 +577,10 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/12_runtime_smoke.sql` (Comprehensive 15-step end-to-end transactional runtime smoke test)
    - `supabase/tests/13_client_attack_matrix.sql` (Exhaustive 46-vector client privilege escalation attack matrix)
    - `supabase/tests/14_admin_read_access.sql` (Admin moderation read access and reader/writer/anon isolation matrix)
+   - `supabase/tests/15_rpc_signature_check.sql`
+   - `supabase/tests/16_frontend_columns_check.sql`
+   - `supabase/tests/17_sensitive_column_exposure.sql`
+   - `supabase/tests/18_chapter_split_tests.sql` (Writer chapter import & split transactional security and integrity tests)
 3. Run automated Node.js unit tests:
    ```bash
    npm test
