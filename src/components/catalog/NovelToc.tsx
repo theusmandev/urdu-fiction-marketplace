@@ -215,6 +215,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                   onClick={(e) => handleOpenLockedModal(ch, e)}
                   aria-haspopup="dialog"
                   aria-expanded={selectedLockedChapter?.chapter_number === ch.chapter_number}
+                  aria-disabled="true"
                   aria-label={`Chapter ${ch.chapter_number}: ${ch.title_urdu}. Paid chapter, click for unlock details.`}
                   className="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 min-h-[44px] bg-slate-50/50 hover:bg-slate-100/70 transition-colors cursor-pointer group/locked"
                 >
