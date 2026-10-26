@@ -160,7 +160,7 @@ export function AdminShellClient({
   };
 
   return (
-    <div className="min-h-screen bg-ivory text-main flex flex-col font-sans">
+    <div className="min-h-screen bg-ivory text-main flex flex-col font-sans overflow-x-hidden">
       {/* Skip to Content Link (Accessibility) */}
       <a
         href="#admin-main-content"
@@ -235,7 +235,7 @@ export function AdminShellClient({
       </header>
 
       {/* Main Body Shell (Sidebar + Content) */}
-      <div className="flex-1 flex w-full relative">
+      <div className="flex-1 flex w-full relative min-w-0 overflow-x-hidden">
         {/* Desktop Fixed Left Sidebar */}
         <aside
           className={`hidden lg:flex flex-col border-r border-border bg-surface sticky top-16 h-[calc(100vh-4rem)] transition-all duration-200 z-30 ${
@@ -338,7 +338,7 @@ export function AdminShellClient({
         <main
           id="admin-main-content"
           tabIndex={-1}
-          className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto focus:outline-none"
+          className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto focus:outline-none overflow-x-hidden"
         >
           {children}
         </main>

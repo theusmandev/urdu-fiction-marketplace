@@ -82,7 +82,7 @@ export function AuditLogViewer({
     <div className="space-y-4">
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-        <div className="overflow-x-auto">
+        <div className="w-full overflow-x-auto rounded-lg">
           <table className="w-full text-left text-xs">
             <thead className="bg-ivory/80 border-b border-border text-secondary font-semibold uppercase tracking-wider text-[11px]">
               <tr>
@@ -102,7 +102,7 @@ export function AuditLogViewer({
                       {new Date(entry.created_at).toLocaleString()}
                     </td>
 
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 whitespace-nowrap">
                       <span
                         className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
                           entry.action_type
@@ -112,15 +112,21 @@ export function AuditLogViewer({
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 font-sans">
+                    <td className="py-3 px-4 font-sans max-w-[180px]">
                       <div className="font-semibold text-main capitalize">{entry.entity_type}</div>
-                      <div className="text-[11px] text-secondary font-mono truncate max-w-[160px]">
+                      <div
+                        className="text-[11px] text-secondary font-mono truncate max-w-[160px] break-all"
+                        title={entry.entity_id}
+                      >
                         {entry.entity_id}
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 font-sans">
-                      <div className="text-main truncate max-w-[180px] font-mono text-xs">
+                    <td className="py-3 px-4 font-sans max-w-[200px]">
+                      <div
+                        className="text-main truncate max-w-[180px] font-mono text-xs break-all"
+                        title={actorEmail}
+                      >
                         {actorEmail}
                       </div>
                       <div className="text-[11px] text-secondary capitalize">
@@ -128,7 +134,7 @@ export function AuditLogViewer({
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 text-right font-sans">
+                    <td className="py-3 px-4 text-right font-sans whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => setSelectedEntry(entry)}
@@ -175,7 +181,7 @@ export function AuditLogViewer({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-secondary font-medium">Actor:</span>
-                  <span className="font-mono text-main text-[11px] truncate max-w-[180px]">
+                  <span className="font-mono text-main text-[11px] truncate max-w-[180px] break-all">
                     {actorEmail}
                   </span>
                 </div>
@@ -246,7 +252,7 @@ export function AuditLogViewer({
                       {selectedEntry.entity_type}
                     </span>
                   </div>
-                  <h3 className="text-sm font-semibold text-navy font-mono mt-1">
+                  <h3 className="text-sm font-semibold text-navy font-mono mt-1 break-all">
                     Entity ID: {selectedEntry.entity_id}
                   </h3>
                   <div className="text-xs text-secondary flex items-center gap-2">
@@ -273,7 +279,7 @@ export function AuditLogViewer({
                 <div className="grid grid-cols-2 gap-2 text-secondary text-xs">
                   <div>
                     Email:{' '}
-                    <span className="text-main font-mono">
+                    <span className="text-main font-mono break-all">
                       {selectedEntry.profiles?.email || 'N/A'}
                     </span>
                   </div>
@@ -283,7 +289,7 @@ export function AuditLogViewer({
                       {selectedEntry.actor_role || selectedEntry.profiles?.role || 'N/A'}
                     </span>
                   </div>
-                  <div className="col-span-2 truncate font-mono text-[11px]">
+                  <div className="col-span-2 truncate font-mono text-[11px] break-all">
                     Actor ID: {selectedEntry.actor_id || 'System Automated'}
                   </div>
                 </div>

@@ -183,7 +183,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
       ) : (
         <div className="space-y-3">
           {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto bg-surface border border-border rounded-2xl shadow-card">
+          <div className="hidden md:block w-full overflow-x-auto bg-surface border border-border rounded-2xl shadow-card">
             <table className="w-full text-left text-xs text-main">
               <thead className="bg-surface-muted/80 border-b border-border text-[11px] font-medium text-muted uppercase tracking-wider">
                 <tr>
@@ -207,7 +207,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
 
                   return (
                     <tr key={order.id} className="hover:bg-surface-muted/50 transition-colors">
-                      <td className="px-4 py-3.5 font-mono font-bold text-main">
+                      <td className="px-4 py-3.5 font-mono font-bold text-main whitespace-nowrap">
                         <Link
                           href={`/admin/orders/${order.id}`}
                           className="hover:text-accent-admin transition-colors flex items-center gap-1.5"
@@ -216,28 +216,28 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                           <ExternalLink className="w-3 h-3 text-muted" />
                         </Link>
                       </td>
-                      <td className="px-4 py-3.5 max-w-[200px] truncate font-medium text-main">
+                      <td className="px-4 py-3.5 max-w-[200px] truncate font-medium text-main" title={order.novel_title}>
                         {order.novel_title}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5 max-w-[180px]">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-main">
+                          <span className="font-semibold text-main truncate break-words" title={order.reader_display_name}>
                             {order.reader_display_name}
                           </span>
                           {order.reader_username && (
-                            <span className="text-[10px] text-muted font-mono">
+                            <span className="text-[10px] text-muted font-mono truncate">
                               @{order.reader_username}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-main">
+                      <td className="px-4 py-3.5 text-main max-w-[160px] truncate break-words" title={order.writer_pen_name}>
                         {order.writer_pen_name}
                       </td>
-                      <td className="px-4 py-3.5 font-mono font-semibold text-emerald-700">
+                      <td className="px-4 py-3.5 font-mono font-semibold text-emerald-700 whitespace-nowrap">
                         {formatPKR(order.amount_pkr)}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span
                             className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg}`}

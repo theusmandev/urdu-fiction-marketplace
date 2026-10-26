@@ -182,7 +182,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
         <>
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-            <div className="overflow-x-auto">
+            <div className="w-full overflow-x-auto rounded-lg">
               <table className="w-full text-left text-xs">
                 <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
                   <tr>
@@ -208,25 +208,25 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                           isUnderReview ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-surface-muted/50'
                         }`}
                       >
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 max-w-[220px]">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-main">{novel.title_english}</span>
+                            <span className="font-semibold text-main truncate break-words" title={novel.title_english}>{novel.title_english}</span>
                             {novel.is_featured && (
-                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-medium shrink-0">
                                 <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
                               </span>
                             )}
                           </div>
-                          <UrduText as="div" size="xs" className="text-brand-gold py-0">
+                          <UrduText as="div" size="xs" className="text-brand-gold py-0 truncate">
                             {novel.title_urdu}
                           </UrduText>
                         </td>
 
-                        <td className="py-3.5 px-4">
-                          <div className="text-main font-medium">
+                        <td className="py-3.5 px-4 max-w-[180px]">
+                          <div className="text-main font-medium truncate break-words" title={writer?.pen_name_english || 'Unknown'}>
                             {writer?.pen_name_english || 'Unknown'}
                           </div>
-                          <UrduText as="div" size="xs" className="text-muted py-0 font-normal">
+                          <UrduText as="div" size="xs" className="text-muted py-0 font-normal truncate">
                             {writer?.pen_name_urdu || ''}
                           </UrduText>
                         </td>

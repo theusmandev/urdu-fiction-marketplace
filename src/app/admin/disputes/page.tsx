@@ -148,7 +148,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
         </div>
       ) : (
         <div className="rounded-2xl border border-border bg-surface overflow-hidden shadow-card">
-          <div className="overflow-x-auto">
+          <div className="w-full overflow-x-auto rounded-lg">
             <table className="w-full text-left text-xs">
               <thead className="bg-surface-muted text-muted text-[11px] border-b border-border font-medium">
                 <tr>
@@ -166,33 +166,37 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                   return (
                     <tr key={d.dispute_id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Order / Novel */}
-                      <td className="py-3.5 px-4 space-y-0.5">
-                        <div className="font-mono font-bold text-accent-admin text-xs">
+                      <td className="py-3.5 px-4 space-y-0.5 max-w-[200px]">
+                        <div className="font-mono font-bold text-accent-admin text-xs whitespace-nowrap">
                           #{d.order_number}
                         </div>
-                        <div className="font-medium text-main line-clamp-1">
+                        <div className="font-medium text-main line-clamp-1 break-words" title={d.novel_title}>
                           {d.novel_title}
                         </div>
-                        <div className="text-[10px] text-muted flex items-center gap-1 font-mono">
+                        <div className="text-[10px] text-muted flex items-center gap-1 font-mono whitespace-nowrap">
                           <Clock className="w-3 h-3" />
                           <span>{new Date(d.created_at).toLocaleDateString()}</span>
                         </div>
                       </td>
 
                       {/* Disputant Parties */}
-                      <td className="py-3.5 px-4 space-y-1">
+                      <td className="py-3.5 px-4 space-y-1 max-w-[180px]">
                         <div className="text-[11px]">
                           <span className="text-muted">Reader: </span>
-                          <span className="text-main font-medium">{d.reader_name || 'Reader'}</span>
+                          <span className="text-main font-medium truncate inline-block max-w-[120px] align-bottom" title={d.reader_name || 'Reader'}>
+                            {d.reader_name || 'Reader'}
+                          </span>
                         </div>
                         <div className="text-[11px]">
                           <span className="text-muted">Author: </span>
-                          <span className="text-brand-gold font-medium">{d.writer_pen_name || 'Author'}</span>
+                          <span className="text-brand-gold font-medium truncate inline-block max-w-[120px] align-bottom" title={d.writer_pen_name || 'Author'}>
+                            {d.writer_pen_name || 'Author'}
+                          </span>
                         </div>
                       </td>
 
                       {/* Reason / Notes */}
-                      <td className="py-3.5 px-4 max-w-xs space-y-1">
+                      <td className="py-3.5 px-4 max-w-xs space-y-1 break-words">
                         <p className="line-clamp-2 text-main italic">
                           &quot;{d.reason}&quot;
                         </p>

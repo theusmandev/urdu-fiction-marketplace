@@ -516,7 +516,7 @@ export function AdminInvoiceDetailClient({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="w-full overflow-x-auto rounded-lg">
           <table className="w-full text-xs text-left">
             <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
               <tr>
@@ -536,13 +536,13 @@ export function AdminInvoiceDetailClient({
                   <td className="py-2.5 px-3 font-mono text-[11px] text-muted whitespace-nowrap">
                     {formatKarachiDateTime(l.created_at)}
                   </td>
-                  <td className="py-2.5 px-3 font-mono text-main">
+                  <td className="py-2.5 px-3 font-mono text-main whitespace-nowrap">
                     {l.order_number || '—'}
                   </td>
-                  <td className="py-2.5 px-3 text-main font-medium">
+                  <td className="py-2.5 px-3 text-main font-medium max-w-[180px] truncate break-words" title={l.novel_title}>
                     {l.novel_title}
                   </td>
-                  <td className="py-2.5 px-3 text-muted">
+                  <td className="py-2.5 px-3 text-muted max-w-[150px] truncate break-words" title={l.reader_display_name}>
                     {l.reader_display_name}
                   </td>
                   <td className="py-2.5 px-3 whitespace-nowrap">

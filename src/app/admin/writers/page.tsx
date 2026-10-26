@@ -155,7 +155,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
         <>
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-            <div className="overflow-x-auto">
+            <div className="w-full overflow-x-auto rounded-lg">
               <table className="w-full text-left text-xs">
                 <thead className="bg-surface-muted border-b border-border text-muted font-semibold uppercase tracking-wider text-[10px]">
                   <tr>
@@ -172,17 +172,17 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                     const profile = Array.isArray(writer.profiles) ? writer.profiles[0] : writer.profiles;
                     return (
                       <tr key={writer.id} className="hover:bg-surface-muted/50 transition-colors">
-                        <td className="py-3 px-4 font-sans">
-                          <div className="font-semibold text-main">
+                        <td className="py-3 px-4 font-sans max-w-[180px]">
+                          <div className="font-semibold text-main truncate break-words" title={writer.pen_name_english}>
                             {writer.pen_name_english}
                           </div>
-                          <UrduText as="div" size="xs" className="text-brand-gold py-0 font-normal">
+                          <UrduText as="div" size="xs" className="text-brand-gold py-0 font-normal truncate">
                             {writer.pen_name_urdu}
                           </UrduText>
                         </td>
-                        <td className="py-3 px-4">
-                          <div className="text-main font-mono">{profile?.email}</div>
-                          <div className="text-[10px] text-muted font-sans">
+                        <td className="py-3 px-4 max-w-[200px]">
+                          <div className="text-main font-mono truncate break-all" title={profile?.email}>{profile?.email}</div>
+                          <div className="text-[10px] text-muted font-sans truncate">
                             {profile?.full_name || 'No name'}
                           </div>
                         </td>

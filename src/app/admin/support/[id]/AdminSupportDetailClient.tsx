@@ -80,8 +80,8 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Support Queue</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-main tracking-tight">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-xl font-bold text-main tracking-tight break-words">
               Ticket #{request.id.slice(0, 8)}: {request.subject}
             </h1>
             <span
@@ -135,7 +135,7 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
       <div className="rounded-xl border border-border bg-surface p-4 flex flex-wrap items-center gap-6 text-xs text-main shadow-card">
         <div>
           <span className="text-muted block text-[10px] uppercase font-mono">User</span>
-          <span className="font-semibold text-main">{request.user_name}</span>
+          <span className="font-semibold text-main break-all">{request.user_name}</span>
         </div>
         <div>
           <span className="text-muted block text-[10px] uppercase font-mono">Category</span>
@@ -209,7 +209,7 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
                   </span>
                 </div>
 
-                <p className="text-main leading-relaxed whitespace-pre-wrap">{msg.body}</p>
+                <p className="text-main leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{msg.body}</p>
               </div>
             );
           })}

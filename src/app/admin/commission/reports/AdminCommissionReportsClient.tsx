@@ -187,14 +187,14 @@ export function AdminCommissionReportsClient({
             {filteredReports.map((r) => (
               <div
                 key={r.id}
-                className="p-4 hover:bg-ivory/50 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs transition-colors"
+                className="p-4 hover:bg-ivory/50 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs transition-colors min-w-0"
               >
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono font-bold text-navy text-sm">
                       {formatPKR2(r.amount_pkr)}
                     </span>
-                    <span className="font-mono text-[11px] text-secondary">
+                    <span className="font-mono text-[11px] text-secondary break-all">
                       TID: {r.transaction_reference}
                     </span>
                     <StatusBadge status={`report_${r.status}`} size="sm" />
@@ -205,7 +205,7 @@ export function AdminCommissionReportsClient({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 text-main">
+                  <div className="flex flex-wrap items-center gap-2 text-main">
                     <span className="font-semibold text-main">
                       {r.writer_pen_name}
                     </span>
@@ -215,12 +215,12 @@ export function AdminCommissionReportsClient({
                       </span>
                     )}
                     <span className="text-secondary">•</span>
-                    <span className="font-mono text-accent-admin font-medium">
+                    <span className="font-mono text-accent-admin font-medium break-all">
                       Invoice: {r.invoice_number}
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-secondary">
+                  <div className="text-[11px] text-secondary break-words">
                     Reported on: {formatKarachiDateTime(r.created_at)}
                     {r.writer_note && ` • Note: ${r.writer_note}`}
                   </div>

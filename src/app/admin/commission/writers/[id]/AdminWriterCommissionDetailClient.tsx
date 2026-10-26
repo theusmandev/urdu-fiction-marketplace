@@ -385,7 +385,7 @@ export function AdminWriterCommissionDetailClient({
             No sales ledger entries found for this author.
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="w-full overflow-x-auto rounded-lg">
             <table className="w-full text-xs text-left">
               <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
                 <tr>
@@ -406,16 +406,16 @@ export function AdminWriterCommissionDetailClient({
                     <td className="py-2.5 px-3 whitespace-nowrap">
                       <StatusBadge status={entry.entry_type} size="sm" />
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-main">
+                    <td className="py-2.5 px-3 text-right font-mono text-main whitespace-nowrap">
                       {formatPKR2(entry.gross_amount_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-medium text-rose-700">
+                    <td className="py-2.5 px-3 text-right font-mono font-medium text-rose-700 whitespace-nowrap">
                       {formatPKR2(entry.platform_commission_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700 whitespace-nowrap">
                       {formatPKR2(entry.writer_net_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-muted max-w-xs truncate">
+                    <td className="py-2.5 px-3 text-muted max-w-xs truncate break-words" title={entry.notes || undefined}>
                       {entry.notes || '—'}
                     </td>
                   </tr>

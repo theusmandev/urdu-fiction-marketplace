@@ -138,7 +138,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-        <div className="overflow-x-auto">
+        <div className="w-full overflow-x-auto rounded-lg">
           <table className="w-full text-left text-xs">
             <thead className="bg-surface-muted/80 border-b border-border text-muted font-medium uppercase tracking-wider text-[10px]">
               <tr>
@@ -158,20 +158,20 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
 
                 return (
                   <tr key={user.id} className="hover:bg-surface-muted/50 transition-colors">
-                    <td className="py-3 px-4 font-mono">
+                    <td className="py-3 px-4 font-mono max-w-[220px]">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-main">{user.email}</span>
+                        <span className="font-semibold text-main truncate break-all" title={user.email}>{user.email}</span>
                         {isCurrent && (
-                          <span className="px-1.5 py-0.2 rounded text-[10px] font-sans font-bold bg-accent-admin/10 text-accent-admin border border-accent-admin/20">
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-sans font-bold bg-accent-admin/10 text-accent-admin border border-accent-admin/20 shrink-0">
                             You
                           </span>
                         )}
                       </div>
-                      <div className="text-[10px] text-muted">{user.id}</div>
+                      <div className="text-[10px] text-muted truncate break-all" title={user.id}>{user.id}</div>
                     </td>
 
-                    <td className="py-3 px-4 font-sans">
-                      <div className="text-main font-medium">
+                    <td className="py-3 px-4 font-sans max-w-[180px]">
+                      <div className="text-main font-medium truncate break-words" title={user.full_name || 'No full name'}>
                         {user.full_name || 'No full name'}
                       </div>
                       <div className="text-[11px] text-muted font-mono">

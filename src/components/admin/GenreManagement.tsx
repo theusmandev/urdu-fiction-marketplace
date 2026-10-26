@@ -265,7 +265,7 @@ export function GenreManagement({ initialGenres }: GenreManagementProps) {
 
       {/* Genres List: Table for desktop, cards for mobile */}
       <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-        <div className="overflow-x-auto">
+        <div className="w-full overflow-x-auto rounded-lg">
           <table className="w-full text-left text-xs">
             <thead className="bg-surface-muted border-b border-border text-muted font-medium text-[11px]">
               <tr>

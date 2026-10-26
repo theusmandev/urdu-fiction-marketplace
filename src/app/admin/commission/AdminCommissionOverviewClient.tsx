@@ -211,7 +211,7 @@ export function AdminCommissionOverviewClient({
 
       {/* Writers Overview Table */}
       <div className="bg-surface border border-border shadow-card rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="w-full overflow-x-auto rounded-lg">
           <table className="w-full text-xs text-left">
             <thead className="bg-ivory/80 border-b border-border text-secondary font-semibold uppercase tracking-wider text-[11px]">
               <tr>
@@ -243,11 +243,11 @@ export function AdminCommissionOverviewClient({
                       key={w.writer_id}
                       className="hover:bg-ivory/50 transition-colors"
                     >
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-main">
+                      <td className="py-3 px-4 max-w-[180px]">
+                        <div className="font-semibold text-main truncate break-words" title={w.pen_name_english}>
                           {w.pen_name_english}
                         </div>
-                        <UrduText as="div" size="xs" className="text-navy py-0">
+                        <UrduText as="div" size="xs" className="text-navy py-0 truncate">
                           {w.pen_name_urdu}
                         </UrduText>
                       </td>
@@ -389,13 +389,13 @@ export function AdminCommissionOverviewClient({
                       {overduePreview.overdue_invoices.map((item) => (
                         <div
                           key={item.invoice_id}
-                          className="py-2 flex items-center justify-between text-secondary"
+                          className="py-2 flex items-center justify-between text-secondary gap-2"
                         >
-                          <div>
-                            <span className="font-medium text-main">{item.writer_pen_name}</span>
-                            <span className="text-secondary text-[11px] ml-2 font-mono">Inv: {item.invoice_number}</span>
+                          <div className="truncate min-w-0 flex-1">
+                            <span className="font-medium text-main truncate">{item.writer_pen_name}</span>
+                            <span className="text-secondary text-[11px] ml-2 font-mono break-all">Inv: {item.invoice_number}</span>
                           </div>
-                          <span className="text-[11px] font-mono text-rose-700 font-semibold">
+                          <span className="text-[11px] font-mono text-rose-700 font-semibold whitespace-nowrap shrink-0">
                             Due: {formatPKR2(item.remaining_owed_pkr)} ({item.days_past_grace}d past grace)
                           </span>
                         </div>

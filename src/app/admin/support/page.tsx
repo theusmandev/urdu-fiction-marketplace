@@ -143,7 +143,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
         </div>
       ) : (
         <div className="rounded-xl border border-border bg-surface overflow-hidden shadow-card">
-          <div className="overflow-x-auto">
+          <div className="w-full overflow-x-auto rounded-lg">
             <table className="w-full text-left text-xs">
               <thead className="bg-surface-muted/80 text-muted uppercase tracking-wider text-[11px] border-b border-border font-medium">
                 <tr>
@@ -162,31 +162,31 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                   return (
                     <tr key={ticket.id} className="hover:bg-surface-muted/50 transition-colors">
                       {/* Subject */}
-                      <td className="py-3.5 px-4 space-y-1">
-                        <div className="font-semibold text-main line-clamp-1">
+                      <td className="py-3.5 px-4 space-y-1 max-w-xs">
+                        <div className="font-semibold text-main line-clamp-1 break-words" title={ticket.subject}>
                           {ticket.subject}
                         </div>
                         {ticket.order_number && (
-                          <span className="font-mono text-[10px] text-brand-gold">
+                          <span className="font-mono text-[10px] text-brand-gold break-all">
                             Ref: #{ticket.order_number}
                           </span>
                         )}
                       </td>
 
                       {/* User */}
-                      <td className="py-3.5 px-4 font-medium text-main">
+                      <td className="py-3.5 px-4 font-medium text-main max-w-[180px] truncate break-words" title={ticket.user_name || 'User'}>
                         {ticket.user_name || 'User'}
                       </td>
 
                       {/* Category */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-muted text-muted border border-border">
                           {ticket.category}
                         </span>
                       </td>
 
                       {/* Status */}
-                      <td className="py-3.5 px-4 space-y-0.5">
+                      <td className="py-3.5 px-4 space-y-0.5 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -206,7 +206,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                       </td>
 
                       {/* Last Activity */}
-                      <td className="py-3.5 px-4 text-muted space-y-0.5">
+                      <td className="py-3.5 px-4 text-muted space-y-0.5 whitespace-nowrap">
                         <div className="flex items-center gap-1 font-mono text-[10px]">
                           <Clock className="w-3 h-3 text-muted" />
                           <span>{new Date(ticket.updated_at).toLocaleDateString()}</span>
@@ -218,7 +218,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                       </td>
 
                       {/* Action */}
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <Link
                           href={`/admin/support/${ticket.id}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-admin/10 hover:bg-accent-admin/20 text-accent-admin border border-accent-admin/30 rounded-lg text-xs font-semibold transition-colors shadow-sm"
