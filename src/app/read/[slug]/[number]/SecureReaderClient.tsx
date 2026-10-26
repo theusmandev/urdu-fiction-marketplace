@@ -12,9 +12,11 @@ import {
   type ReaderTheme,
   type ReaderFontSize,
   type ReaderLineHeight,
+  type ReaderParagraphSpacing,
   DEFAULT_READER_PREFERENCES,
   buildWatermarkPattern,
 } from '@/lib/reader/schemas';
+import { ChapterBody } from '@/components/reader/ChapterBody';
 import { saveReadingProgressAction } from '@/app/actions/reader';
 import {
   ArrowLeft,
@@ -48,6 +50,7 @@ export function SecureReaderClient({
   const [theme, setTheme] = useState<ReaderTheme>(DEFAULT_READER_PREFERENCES.theme);
   const [fontSize, setFontSize] = useState<ReaderFontSize>(DEFAULT_READER_PREFERENCES.fontSize);
   const [lineHeight, setLineHeight] = useState<ReaderLineHeight>(DEFAULT_READER_PREFERENCES.lineHeight);
+  const [paragraphSpacing, setParagraphSpacing] = useState<ReaderParagraphSpacing>(DEFAULT_READER_PREFERENCES.paragraphSpacing);
 
   // UI Drawer / Overlay States
   const [tocOpen, setTocOpen] = useState(false);
@@ -69,6 +72,7 @@ export function SecureReaderClient({
           if (['light', 'dark', 'sepia'].includes(parsed.theme)) setTheme(parsed.theme);
           if (['sm', 'base', 'lg', 'xl', '2xl'].includes(parsed.fontSize)) setFontSize(parsed.fontSize);
           if (['normal', 'relaxed', 'loose'].includes(parsed.lineHeight)) setLineHeight(parsed.lineHeight);
+          if (['compact', 'normal', 'wide'].includes(parsed.paragraphSpacing)) setParagraphSpacing(parsed.paragraphSpacing);
         }, 0);
       }
     } catch {
@@ -78,18 +82,20 @@ export function SecureReaderClient({
 
   // Save preferences to localStorage on change
   const updatePreference = (
-    key: 'theme' | 'fontSize' | 'lineHeight',
+    key: 'theme' | 'fontSize' | 'lineHeight' | 'paragraphSpacing',
     val: string
   ) => {
     if (key === 'theme') setTheme(val as ReaderTheme);
     if (key === 'fontSize') setFontSize(val as ReaderFontSize);
     if (key === 'lineHeight') setLineHeight(val as ReaderLineHeight);
+    if (key === 'paragraphSpacing') setParagraphSpacing(val as ReaderParagraphSpacing);
 
     try {
       const current = {
         theme: key === 'theme' ? val : theme,
         fontSize: key === 'fontSize' ? val : fontSize,
         lineHeight: key === 'lineHeight' ? val : lineHeight,
+        paragraphSpacing: key === 'paragraphSpacing' ? val : paragraphSpacing,
       };
       localStorage.setItem('unb_reader_prefs', JSON.stringify(current));
     } catch {
@@ -182,19 +188,6 @@ export function SecureReaderClient({
     sepia: 'bg-[#F4ECD8]/90 border-[#E2D5BA]/80 backdrop-blur-md text-[#4A3B2C]',
   }[theme];
 
-  const fontSizeClasses = {
-    sm: 'text-base sm:text-lg',
-    base: 'text-lg sm:text-xl',
-    lg: 'text-xl sm:text-2xl',
-    xl: 'text-2xl sm:text-3xl',
-    '2xl': 'text-3xl sm:text-4xl',
-  }[fontSize];
-
-  const lineHeightClasses = {
-    normal: 'leading-[2.0]',
-    relaxed: 'leading-[2.4]',
-    loose: 'leading-[2.8]',
-  }[lineHeight];
 
   // Watermark pattern
   const watermarkText = buildWatermarkPattern(chapter.watermark_code, readerId);
@@ -332,7 +325,7 @@ export function SecureReaderClient({
                   </div>
 
                   {/* Line Height Selector */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 mb-3">
                     <label className="text-[11px] font-semibold opacity-70 block">Line Spacing</label>
                     <div className="grid grid-cols-3 gap-1.5 text-xs font-medium">
                       {(['normal', 'relaxed', 'loose'] as ReaderLineHeight[]).map((lh) => (
@@ -347,6 +340,27 @@ export function SecureReaderClient({
                           }`}
                         >
                           {lh}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Paragraph Spacing Selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold opacity-70 block">Paragraph Spacing</label>
+                    <div className="grid grid-cols-3 gap-1.5 text-xs font-medium">
+                      {(['compact', 'normal', 'wide'] as ReaderParagraphSpacing[]).map((ps) => (
+                        <button
+                          key={ps}
+                          type="button"
+                          onClick={() => updatePreference('paragraphSpacing', ps)}
+                          className={`py-1.5 rounded-lg border text-center capitalize transition-all ${
+                            paragraphSpacing === ps
+                              ? 'border-amber-500 font-bold bg-amber-500/10'
+                              : 'border-current/15 opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          {ps}
                         </button>
                       ))}
                     </div>
@@ -401,12 +415,13 @@ export function SecureReaderClient({
 
         {/* Chapter Body Content (RTL Urdu Nastaliq) */}
         <article className="relative">
-          <UrduText
-            as="div"
-            className={`text-justify select-none font-normal transition-all duration-150 ${fontSizeClasses} ${lineHeightClasses}`}
-          >
-            {chapter.content_urdu}
-          </UrduText>
+          <ChapterBody
+            text={chapter.content_urdu}
+            fontSize={fontSize}
+            lineHeight={lineHeight}
+            paragraphSpacing={paragraphSpacing}
+            userSelect="none"
+          />
         </article>
 
         {/* ---------------------------------------------------------------- */}

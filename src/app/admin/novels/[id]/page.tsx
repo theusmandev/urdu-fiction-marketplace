@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { UrduText } from '@/components/urdu/UrduText';
+import { ChapterBody } from '@/components/reader/ChapterBody';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { NovelReviewActions } from '@/components/admin/NovelReviewActions';
 import {
@@ -401,13 +402,12 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
 
                 <div className="p-5 md:p-6 border-t border-border bg-surface-muted/30">
                   <div className="max-w-3xl mx-auto py-2">
-                    <UrduText
-                      as="div"
-                      size="lg"
-                      className="leading-[2.4] text-main whitespace-pre-wrap select-text text-justify"
-                    >
-                      {chapter.content_urdu}
-                    </UrduText>
+                    <ChapterBody
+                      text={chapter.content_urdu}
+                      fontSize="lg"
+                      lineHeight="relaxed"
+                      userSelect="text"
+                    />
                   </div>
                 </div>
               </details>

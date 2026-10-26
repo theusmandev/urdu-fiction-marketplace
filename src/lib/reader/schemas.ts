@@ -6,23 +6,27 @@ import { z } from 'zod';
 export type ReaderTheme = 'light' | 'dark' | 'sepia';
 export type ReaderFontSize = 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 export type ReaderLineHeight = 'normal' | 'relaxed' | 'loose';
+export type ReaderParagraphSpacing = 'compact' | 'normal' | 'wide';
 
 export interface ReaderPreferences {
   theme: ReaderTheme;
   fontSize: ReaderFontSize;
   lineHeight: ReaderLineHeight;
+  paragraphSpacing: ReaderParagraphSpacing;
 }
 
 export const DEFAULT_READER_PREFERENCES: ReaderPreferences = {
   theme: 'light',
   fontSize: 'lg',
   lineHeight: 'relaxed',
+  paragraphSpacing: 'normal',
 };
 
 export const readerPreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'sepia']).default('light'),
   fontSize: z.enum(['sm', 'base', 'lg', 'xl', '2xl']).default('lg'),
   lineHeight: z.enum(['normal', 'relaxed', 'loose']).default('relaxed'),
+  paragraphSpacing: z.enum(['compact', 'normal', 'wide']).default('normal'),
 });
 
 /**

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
+import { ChapterBody } from "@/components/reader/ChapterBody";
 import type { PublicFreePreviewChapter, PublicNovel, PublicNovelChapterMeta } from "@/types/database";
 import {
   ArrowLeft,
@@ -127,19 +128,6 @@ export function FreePreviewReaderClient({
     dark: "bg-[#1E293B]/90 border-[#334155] text-[#E2E8F0]",
   }[theme];
 
-  const fontSizeClass = {
-    sm: "text-base sm:text-lg",
-    base: "text-lg sm:text-xl",
-    lg: "text-xl sm:text-2xl",
-    xl: "text-2xl sm:text-3xl",
-    "2xl": "text-3xl sm:text-4xl",
-  }[fontSize];
-
-  const lineHeightClass = {
-    normal: "leading-[2.2]",
-    relaxed: "leading-[2.6]",
-    loose: "leading-[3.0]",
-  }[lineHeight];
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${themeClasses} pb-24`}>
@@ -272,12 +260,13 @@ export function FreePreviewReaderClient({
         </div>
 
         {/* Chapter Text Body */}
-        <article
-          dir="rtl"
-          lang="ur"
-          className={`font-urdu ${fontSizeClass} ${lineHeightClass} text-right whitespace-pre-line select-text`}
-        >
-          {chapter.content_urdu}
+        <article className="relative">
+          <ChapterBody
+            text={chapter.content_urdu}
+            fontSize={fontSize}
+            lineHeight={lineHeight}
+            userSelect="text"
+          />
         </article>
 
         {/* Chapter Navigation Footer */}

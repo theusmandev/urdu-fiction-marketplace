@@ -8,7 +8,10 @@ import {
   cleanUrduText,
   countUrduWords,
   hasArabicLetterForms,
+  joinBrokenLines,
+  countLinesAndParagraphs,
 } from '@/lib/text/clean-urdu';
+import { ChapterBody } from '@/components/reader/ChapterBody';
 import { MAX_CHAPTER_CHARACTERS } from '@/lib/text/manuscript-parser';
 import { saveChapterAction } from '@/app/actions/writer';
 import type { ChapterFormInput } from '@/lib/writer/schemas';
@@ -24,6 +27,7 @@ import {
   AlertTriangle,
   X,
   Scissors,
+  RotateCcw,
 } from 'lucide-react';
 import { ChapterSplitterWizard } from './ChapterSplitterWizard';
 
@@ -71,6 +75,8 @@ export function ChapterEditor({
   const [isDirty, setIsDirty] = useState(false);
   const [isCleanerModalOpen, setIsCleanerModalOpen] = useState(false);
   const [optInArabicLetters, setOptInArabicLetters] = useState(false);
+  const [optInJoinLines, setOptInJoinLines] = useState(false);
+  const [undoState, setUndoState] = useState<{ content: string; label: string } | null>(null);
   const [isSplitterModalOpen, setIsSplitterModalOpen] = useState(false);
 
   // Debounced word count for 200,000+ characters silky responsiveness
@@ -96,6 +102,7 @@ export function ChapterEditor({
 
   const charCount = formData.content_urdu.length;
   const wordCount = debouncedWordCount;
+  const { lines: lineCount, paragraphs: paragraphCount } = countLinesAndParagraphs(formData.content_urdu);
   const isNearingLimit = charCount >= 96000 && charCount <= MAX_CHAPTER_CHARACTERS;
   const isOverLimit = charCount > MAX_CHAPTER_CHARACTERS;
   const limitPercentage = Math.min(100, Math.round((charCount / MAX_CHAPTER_CHARACTERS) * 100));
@@ -116,6 +123,18 @@ export function ChapterEditor({
   };
 
   /**
+   * Reverts previous text alteration
+   */
+  const handleUndo = () => {
+    if (!undoState) return;
+    setFormData((prev) => ({ ...prev, content_urdu: undoState.content }));
+    setIsDirty(true);
+    setHelperNotice(`Reverted: ${undoState.label}`);
+    setUndoState(null);
+    setTimeout(() => setHelperNotice(null), 3500);
+  };
+
+  /**
    * Reads clipboard text, runs safe cleanUrduText, and pastes into content area.
    * Safe only: never converts Arabic letters silently.
    */
@@ -127,8 +146,15 @@ export function ChapterEditor({
         return;
       }
 
+      const beforeLines = text.split('\n').length;
       // Safe clean only (never converts Arabic letters silently)
       const cleaned = cleanUrduText(text, { normalizeArabicLetters: false });
+      const afterLines = cleaned.split('\n').length;
+
+      setUndoState({
+        content: formData.content_urdu,
+        label: 'Paste Cleaned Text',
+      });
 
       setFormData((prev) => {
         const existing = prev.content_urdu;
@@ -139,19 +165,19 @@ export function ChapterEditor({
       setIsDirty(true);
       if (hasArabicLetterForms(text)) {
         setHelperNotice(
-          'Pasted with safe cleaning. Arabic orthography preserved. To convert Arabic letters (ي, ك, ة) to Urdu forms, open Clean Text Assistant.'
+          `Cleaned Urdu text pasted (${beforeLines} lines -> ${afterLines} lines). Arabic letters preserved. To convert Arabic forms (ي, ك, ة), use Clean Text Assistant.`
         );
       } else {
-        setHelperNotice('Cleaned Urdu text successfully pasted from clipboard!');
+        setHelperNotice(`Cleaned Urdu text pasted (${beforeLines} lines -> ${afterLines} lines).`);
       }
-      setTimeout(() => setHelperNotice(null), 4000);
+      setTimeout(() => setHelperNotice(null), 4500);
     } catch {
       setHelperNotice('Unable to access clipboard. Please paste manually into the editor.');
     }
   };
 
   /**
-   * Opens the Clean Text Assistant modal to review before/after and opt-in to letter normalization
+   * Opens the Clean Text Assistant modal to review before/after and opt-in to letter normalization / line joining
    */
   const handleOpenCleanerModal = () => {
     if (!formData.content_urdu || formData.content_urdu.trim().length === 0) {
@@ -160,6 +186,7 @@ export function ChapterEditor({
       return;
     }
     setOptInArabicLetters(false);
+    setOptInJoinLines(false);
     setIsCleanerModalOpen(true);
   };
 
@@ -401,9 +428,13 @@ export function ChapterEditor({
           </div>
 
           {/* Live Metrics */}
-          <div className="flex items-center gap-4 text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
             <div className="text-secondary">
               <strong className="text-navy">{wordCount.toLocaleString()}</strong> words
+            </div>
+
+            <div className="text-secondary">
+              Lines: <strong className="text-navy">{lineCount.toLocaleString()}</strong>, paragraphs: <strong className="text-navy">{paragraphCount.toLocaleString()}</strong>
             </div>
 
             <div className="flex items-center gap-2">
@@ -430,6 +461,21 @@ export function ChapterEditor({
             </div>
           </div>
         </div>
+
+        {/* Undo notification bar */}
+        {undoState && (
+          <div className="mx-4 mt-3 p-2.5 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between text-xs text-slate-800 animate-in fade-in">
+            <span>Action completed: <strong>{undoState.label}</strong></span>
+            <button
+              type="button"
+              onClick={handleUndo}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white border border-slate-300 font-semibold text-navy hover:bg-slate-50 transition-colors shadow-xs"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Undo</span>
+            </button>
+          </div>
+        )}
 
         {/* Textarea Area */}
         <div className="p-4" dir="rtl">
@@ -560,74 +606,128 @@ export function ChapterEditor({
                 </div>
                 <ul className="list-disc pl-5 space-y-0.5 text-emerald-800 text-[11px]">
                   <li>Unicode NFC normalization and invisible bidi control character removal (preserves ZWNJ/ZWJ).</li>
-                  <li>Collapses redundant horizontal whitespace and excess blank lines.</li>
+                  <li>Preserves every line break (\n) and blank line. Clamps runs of 3+ blank lines to 2.</li>
+                  <li>Collapses repeated horizontal whitespace (spaces & tabs) inside a line without joining lines.</li>
                   <li>Converts Western numbers and non-Quranic digits to Urdu digits.</li>
                 </ul>
               </div>
 
-              {/* Opt-in Arabic Letters Checkbox */}
-              <div className="p-4 rounded-xl border border-border bg-white space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={optInArabicLetters}
-                    onChange={(e) => setOptInArabicLetters(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent mt-0.5"
-                  />
-                  <div>
-                    <span className="text-xs font-semibold text-main block">
-                      Convert Arabic letter forms to Urdu forms (ي/ى → ی, ك → ک, ة → ہ)
-                    </span>
-                    <span className="text-[11px] text-secondary block mt-0.5">
-                      Standardizes Arabic keyboard input into Urdu calligraphy characters.
-                    </span>
-                  </div>
-                </label>
-
-                {optInArabicLetters && (
-                  <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              {/* Options Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Opt-in Arabic Letters Checkbox */}
+                <div className="p-3.5 rounded-xl border border-border bg-white space-y-2">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={optInArabicLetters}
+                      onChange={(e) => setOptInArabicLetters(e.target.checked)}
+                      className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent mt-0.5"
+                    />
                     <div>
-                      <strong className="block">Warning:</strong>
-                      <span>Arabic quotations, Quranic verses, and duas may have their orthography altered if this option is selected.</span>
+                      <span className="text-xs font-semibold text-main block">
+                        Normalize Arabic letter forms (ي/ى → ی, ك → ک, ة → ہ)
+                      </span>
+                      <span className="text-[11px] text-secondary block mt-0.5">
+                        Standardizes Arabic keyboard layout characters into Urdu forms.
+                      </span>
+                    </div>
+                  </label>
+
+                  {optInArabicLetters && (
+                    <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-start gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                      <span>Warning: Quranic verses and Arabic quotations will have their orthography altered.</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Opt-in Join Broken Lines Checkbox */}
+                <div className="p-3.5 rounded-xl border border-border bg-white space-y-2">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={optInJoinLines}
+                      onChange={(e) => setOptInJoinLines(e.target.checked)}
+                      className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent mt-0.5"
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-main block">
+                        Join broken lines (PDF / hard-wrap repair)
+                      </span>
+                      <span className="text-[11px] text-secondary block mt-0.5">
+                        Joins lines broken mid-sentence. Strictly preserves lines ending in punctuation (۔ ؟ ! &ldquo; &rdquo;), headings, scene breaks (****), and blank lines.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Live Before / After Preview */}
+              {(() => {
+                let transformed = cleanUrduText(formData.content_urdu, {
+                  normalizeArabicLetters: optInArabicLetters,
+                });
+                if (optInJoinLines) {
+                  transformed = joinBrokenLines(transformed);
+                }
+                const beforeStats = countLinesAndParagraphs(formData.content_urdu);
+                const afterStats = countLinesAndParagraphs(transformed);
+
+                return (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-semibold text-main">
+                      <span>Live Preview (Line Count & Formatting Comparison)</span>
+                      <span className="text-[11px] font-mono text-navy font-bold px-2 py-0.5 rounded bg-accent/20">
+                        {beforeStats.lines} lines → {afterStats.lines} lines ({afterStats.paragraphs} paras)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      {/* Before */}
+                      <div className="p-3.5 rounded-xl border border-border bg-ivory/50 space-y-2 flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-secondary block">
+                            Before (Current Text):
+                          </span>
+                          <span className="text-[10px] font-mono text-secondary">
+                            {beforeStats.lines} lines • {beforeStats.paragraphs} paras
+                          </span>
+                        </div>
+                        <div className="h-56 overflow-y-auto p-3 bg-white/80 rounded-lg border border-border/60">
+                          <ChapterBody
+                            text={formData.content_urdu.slice(0, 1200) || 'کوئی متن موجود نہیں۔'}
+                            fontSize="sm"
+                            lineHeight="relaxed"
+                            paragraphSpacing="compact"
+                            userSelect="text"
+                          />
+                        </div>
+                      </div>
+
+                      {/* After */}
+                      <div className="p-3.5 rounded-xl border border-accent/40 bg-accent/5 space-y-2 flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-accent block">
+                            After (Cleaned Output):
+                          </span>
+                          <span className="text-[10px] font-mono text-accent font-bold">
+                            {afterStats.lines} lines • {afterStats.paragraphs} paras
+                          </span>
+                        </div>
+                        <div className="h-56 overflow-y-auto p-3 bg-white/90 rounded-lg border border-accent/20">
+                          <ChapterBody
+                            text={transformed.slice(0, 1200) || 'کوئی متن موجود نہیں۔'}
+                            fontSize="sm"
+                            lineHeight="relaxed"
+                            paragraphSpacing="compact"
+                            userSelect="text"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* Before / After Preview */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-main">
-                  <span>Live Preview (First 400 characters)</span>
-                  <span className="text-[11px] text-secondary font-normal">
-                    {optInArabicLetters ? 'Arabic Letter Forms Converted' : 'Safe Normalization Only'}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  {/* Before */}
-                  <div className="p-3.5 rounded-xl border border-border bg-ivory/50 space-y-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-secondary block">
-                      Before (Original Text):
-                    </span>
-                    <UrduText as="p" size="sm" className="text-main leading-[2.2] py-0 line-clamp-6" dir="rtl">
-                      {formData.content_urdu.slice(0, 400) || 'کوئی متن موجود نہیں۔'}
-                    </UrduText>
-                  </div>
-
-                  {/* After */}
-                  <div className="p-3.5 rounded-xl border border-accent/30 bg-accent/5 space-y-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent block">
-                      After (Cleaned Output):
-                    </span>
-                    <UrduText as="p" size="sm" className="text-navy leading-[2.2] py-0 line-clamp-6" dir="rtl">
-                      {cleanUrduText(formData.content_urdu.slice(0, 400), {
-                        normalizeArabicLetters: optInArabicLetters,
-                      }) || 'کوئی متن موجود نہیں۔'}
-                    </UrduText>
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
             </div>
 
             {/* Modal Footer */}
@@ -643,18 +743,27 @@ export function ChapterEditor({
               <button
                 type="button"
                 onClick={() => {
-                  const cleaned = cleanUrduText(formData.content_urdu, {
+                  let cleaned = cleanUrduText(formData.content_urdu, {
                     normalizeArabicLetters: optInArabicLetters,
                   });
+                  if (optInJoinLines) {
+                    cleaned = joinBrokenLines(cleaned);
+                  }
+                  const beforeStats = countLinesAndParagraphs(formData.content_urdu);
+                  const afterStats = countLinesAndParagraphs(cleaned);
+
+                  setUndoState({
+                    content: formData.content_urdu,
+                    label: optInJoinLines ? 'Clean Text + Join Lines' : 'Clean Text',
+                  });
+
                   setFormData((prev) => ({ ...prev, content_urdu: cleaned }));
                   setIsDirty(true);
                   setIsCleanerModalOpen(false);
                   setHelperNotice(
-                    optInArabicLetters
-                      ? 'Manuscript text normalized (Arabic letter forms converted to Urdu).'
-                      : 'Manuscript text safely normalized (Quranic & Arabic orthography preserved).'
+                    `Applied text cleaning (${beforeStats.lines} lines -> ${afterStats.lines} lines).`
                   );
-                  setTimeout(() => setHelperNotice(null), 3500);
+                  setTimeout(() => setHelperNotice(null), 4000);
                 }}
                 className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-light shadow-sm"
               >

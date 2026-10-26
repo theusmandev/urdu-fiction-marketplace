@@ -140,7 +140,7 @@ BEGIN
         id, reader_id, novel_id, order_id, is_revoked, granted_at
     ) VALUES (
         v_entitlement_id, v_reader_id, v_novel_sold_id, v_order_id, false, now()
-    ) ON CONFLICT (reader_id, novel_id) DO NOTHING;
+    ) ON CONFLICT (id) DO NOTHING;
 
 
     -- ==========================================================================

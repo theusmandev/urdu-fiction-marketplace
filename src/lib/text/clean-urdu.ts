@@ -171,23 +171,148 @@ export function cleanUrduText(
     text = normalizeArabicLetterForms(text);
   }
 
-  // 5. Replace Windows/Mac line breaks with standard Unix newlines
-  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  // 5. Replace Windows/Mac line breaks and Unicode line/paragraph separators (U+2028, U+2029) with standard Unix newlines
+  text = text.replace(/\r\n/g, '\n').replace(/[\r\u2028\u2029]/g, '\n');
 
-  // 6. Collapse repeated horizontal whitespace (spaces & tabs) to a single space
+  // 6. Collapse repeated horizontal whitespace (spaces & tabs) INSIDE a line to a single space
   text = text.replace(/[^\S\n]+/g, ' ');
 
-  // 7. Remove trailing and leading spaces from individual lines
+  // 7. Remove trailing spaces from individual lines
   text = text
     .split('\n')
-    .map((line) => line.trim())
+    .map((line) => line.trimEnd())
     .join('\n');
 
-  // 8. Collapse more than two consecutive newlines to maximum of two
-  text = text.replace(/\n{3,}/g, '\n\n');
+  // 8. Clamp runs of 3+ blank lines to 2 (max 3 consecutive \n = 2 blank lines)
+  text = text.replace(/\n{4,}/g, '\n\n\n');
 
-  // 9. Final trim
+  // 9. Final trim (strips leading and trailing empty lines from whole document)
   return text.trim();
+}
+
+/**
+ * Detects whether a single line is a standalone scene break.
+ * Consists solely of divider/ornament symbols and spaces:
+ * e.g., ***, ****, * * *, ---, ___, •••, ❖, ✦, ~~~, etc.
+ * Lines containing alphanumeric words alongside these symbols are NOT scene breaks.
+ */
+export function isSceneBreakLine(line: string | null | undefined): boolean {
+  if (!line) return false;
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+
+  // Single decorative glyphs
+  if (/^[❖✦◆■★☆]$/.test(trimmed)) {
+    return true;
+  }
+
+  // Standalone divider lines made of ornament symbols and spaces
+  // Symbols allowed: * _ - ~ • = ═ # ─ ━
+  const sceneCharsOnly = /^[\s*_\-~•❖✦◆■★☆=═#─━]+$/;
+  if (!sceneCharsOnly.test(trimmed)) {
+    return false;
+  }
+
+  // Count non-whitespace characters (at least 2 symbols)
+  const symbolCount = trimmed.replace(/\s/g, '').length;
+  return symbolCount >= 2;
+}
+
+/**
+ * Opt-in tool to join mid-sentence broken lines (e.g. text copied from hard-wrapped PDFs or text files).
+ * Joins consecutive non-empty lines unless:
+ * - The previous line ends with sentence-ending punctuation: ۔, ؟, !, ", ”, ', ’, », or )
+ * - The current line is a heading or scene break.
+ * Blank lines (paragraph breaks) are strictly preserved.
+ */
+export function joinBrokenLines(text: string | null | undefined): string {
+  if (!text) return '';
+
+  const normalized = text
+    .replace(/\r\n/g, '\n')
+    .replace(/[\r\u2028\u2029]/g, '\n');
+
+  const lines = normalized.split('\n');
+  const result: string[] = [];
+  let buffer = '';
+
+  const isHeading = (line: string): boolean => {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    if (/^#{1,6}\s+/.test(trimmed)) return true;
+    if (
+      /^(?:باب|قسط|فصل)(?:\s+(?:نمبر)?)?\s*([0-9۰-۹ایک|دو|تین|چار|پانچ|چھ|سات|آٹھ|نو|دس|گیارہ|بارہ|پہلا|دوسرا|تیسرا|چوتھا|پانچواں|چھٹا|ساتواں|آٹھواں|نواں|دسواں|اول|دوم|سوم|چہارم]+)?\s*[:\-\.\–]?/i.test(
+        trimmed
+      )
+    ) {
+      return true;
+    }
+    if (/^(?:chapter|part|episode)\s+[0-9ivxlcdm]+/i.test(trimmed)) return true;
+    return false;
+  };
+
+  const endsWithSentencePunctuation = (line: string): boolean => {
+    const trimmed = line.trim();
+    return /[۔؟!\"”\'’»\)]$/.test(trimmed);
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (trimmed === '') {
+      if (buffer.length > 0) {
+        result.push(buffer);
+        buffer = '';
+      }
+      result.push('');
+      continue;
+    }
+
+    if (isSceneBreakLine(trimmed) || isHeading(trimmed)) {
+      if (buffer.length > 0) {
+        result.push(buffer);
+        buffer = '';
+      }
+      result.push(trimmed);
+      continue;
+    }
+
+    if (buffer === '') {
+      buffer = trimmed;
+    } else {
+      if (endsWithSentencePunctuation(buffer)) {
+        result.push(buffer);
+        buffer = trimmed;
+      } else {
+        buffer = `${buffer} ${trimmed}`;
+      }
+    }
+  }
+
+  if (buffer.length > 0) {
+    result.push(buffer);
+  }
+
+  return result.join('\n');
+}
+
+/**
+ * Counts total lines and non-empty paragraph blocks in text.
+ */
+export function countLinesAndParagraphs(text: string | null | undefined): {
+  lines: number;
+  paragraphs: number;
+} {
+  if (!text || text.trim() === '') {
+    return { lines: 0, paragraphs: 0 };
+  }
+  const lines = text.split('\n').length;
+  const paragraphs = text
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0 && !isSceneBreakLine(p)).length;
+  return { lines, paragraphs };
 }
 
 /**
