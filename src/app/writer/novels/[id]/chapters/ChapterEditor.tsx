@@ -30,6 +30,25 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { ChapterSplitterWizard } from './ChapterSplitterWizard';
+import { useDraftSync } from '@/lib/drafts/sync-engine';
+import {
+  getLocalDraft,
+  deleteLocalDraft,
+  type LocalDraft,
+} from '@/lib/drafts/local-store';
+import {
+  acquireDraftTabLock,
+  type TabLockHandle,
+} from '@/lib/drafts/tab-lock';
+import { DraftStatusChip } from '@/components/drafts/DraftStatusChip';
+import { DraftConflictModal } from '@/components/drafts/DraftConflictModal';
+import { DraftRestoreModal } from '@/components/drafts/DraftRestoreModal';
+import { DeviceDraftsModal } from '@/components/drafts/DeviceDraftsModal';
+import { TabConflictBanner } from '@/components/drafts/TabConflictBanner';
+import {
+  discardDraftAction,
+  getLiveChapterStatusAction,
+} from '@/app/actions/drafts';
 
 interface ChapterEditorProps {
   novelId: string;
@@ -43,8 +62,10 @@ interface ChapterEditorProps {
     content_urdu: string;
     is_free_preview: boolean;
     is_published: boolean;
+    updated_at?: string;
   };
   suggestedChapterNumber: number;
+  userId?: string;
 }
 
 export function ChapterEditor({
@@ -55,6 +76,7 @@ export function ChapterEditor({
   chapterId,
   initialData,
   suggestedChapterNumber,
+  userId,
 }: ChapterEditorProps) {
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -78,6 +100,73 @@ export function ChapterEditor({
   const [optInJoinLines, setOptInJoinLines] = useState(false);
   const [undoState, setUndoState] = useState<{ content: string; label: string } | null>(null);
   const [isSplitterModalOpen, setIsSplitterModalOpen] = useState(false);
+
+  // Draft Sync, Tab Lock & Modals
+  const activeUserId = userId || 'writer_session';
+  const draftSync = useDraftSync({
+    userId: activeUserId,
+    novelId,
+    chapterId: chapterId ?? null,
+    initialTitle: formData.title_urdu,
+    initialContent: formData.content_urdu,
+    initialChapterNumber: formData.chapter_number,
+    baseChapterUpdatedAt: initialData?.updated_at ?? null,
+    enabled: true,
+  });
+
+  const [isLockedByOtherTab, setIsLockedByOtherTab] = useState(false);
+  const tabLockRef = useRef<TabLockHandle | null>(null);
+
+  const [dismissedConflictRevision, setDismissedConflictRevision] = useState<number | null>(null);
+  const isConflictModalOpen =
+    draftSync.syncStatus === 'conflict' &&
+    draftSync.conflictData !== null &&
+    dismissedConflictRevision !== draftSync.conflictData.server_revision;
+
+  const [isDeviceDraftsModalOpen, setIsDeviceDraftsModalOpen] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [localDraftToRestore, setLocalDraftToRestore] = useState<LocalDraft | null>(null);
+
+  // Tab lock lifecycle
+  useEffect(() => {
+    let mounted = true;
+    acquireDraftTabLock(draftSync.clientKey, () => {
+      if (mounted) setIsLockedByOtherTab(true);
+    }).then((handle) => {
+      if (!mounted) {
+        handle.release();
+        return;
+      }
+      tabLockRef.current = handle;
+      setIsLockedByOtherTab(!handle.isHolder);
+    });
+
+    return () => {
+      mounted = false;
+      tabLockRef.current?.release();
+    };
+  }, [draftSync.clientKey]);
+
+  const handleTakeOver = () => {
+    tabLockRef.current?.takeOver();
+    setIsLockedByOtherTab(false);
+  };
+
+  // Restore on open: compare local draft with server live data
+  useEffect(() => {
+    if (!userId) return;
+    getLocalDraft(draftSync.clientKey, userId).then((local) => {
+      if (!local) return;
+      const initialText = initialData?.content_urdu || '';
+      const initialTitle = initialData?.title_urdu || '';
+      // If local draft has content differing from live initial data
+      if (local.content !== initialText || local.title !== initialTitle) {
+        setLocalDraftToRestore(local);
+        setIsRestoreModalOpen(true);
+      }
+    });
+  }, [draftSync.clientKey, userId, initialData]);
+
 
   // Debounced word count for 200,000+ characters silky responsiveness
   const [debouncedWordCount, setDebouncedWordCount] = useState(() => countUrduWords(formData.content_urdu));
@@ -108,7 +197,11 @@ export function ChapterEditor({
   const limitPercentage = Math.min(100, Math.round((charCount / MAX_CHAPTER_CHARACTERS) * 100));
 
   const handleChange = <K extends keyof ChapterFormInput>(field: K, value: ChapterFormInput[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value };
+      draftSync.notifyChange(next.title_urdu, next.content_urdu, next.chapter_number);
+      return next;
+    });
     setIsDirty(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -127,7 +220,11 @@ export function ChapterEditor({
    */
   const handleUndo = () => {
     if (!undoState) return;
-    setFormData((prev) => ({ ...prev, content_urdu: undoState.content }));
+    setFormData((prev) => {
+      const next = { ...prev, content_urdu: undoState.content };
+      draftSync.notifyChange(next.title_urdu, next.content_urdu, next.chapter_number);
+      return next;
+    });
     setIsDirty(true);
     setHelperNotice(`Reverted: ${undoState.label}`);
     setUndoState(null);
@@ -159,6 +256,7 @@ export function ChapterEditor({
       setFormData((prev) => {
         const existing = prev.content_urdu;
         const newContent = existing ? `${existing}\n\n${cleaned}` : cleaned;
+        draftSync.notifyChange(prev.title_urdu, newContent, prev.chapter_number);
         return { ...prev, content_urdu: newContent };
       });
 
@@ -197,10 +295,29 @@ export function ChapterEditor({
       return;
     }
 
+    if (isLockedByOtherTab) {
+      setErrorMessage('This chapter is currently open and being edited in another tab. Please take over editing before saving.');
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
     setSuccessMessage(null);
     setFieldErrors({});
+
+    // Warn if live chapter changed since base
+    if (chapterId && initialData?.updated_at) {
+      const checkRes = await getLiveChapterStatusAction(chapterId);
+      if (checkRes.success && checkRes.data && checkRes.data.updated_at !== initialData.updated_at) {
+        const proceed = window.confirm(
+          'This chapter was edited elsewhere since you started. Saving now will overwrite those changes. Do you want to proceed?'
+        );
+        if (!proceed) {
+          setIsSubmitting(false);
+          return;
+        }
+      }
+    }
 
     const res = await saveChapterAction(novelId, {
       ...formData,
@@ -215,6 +332,17 @@ export function ChapterEditor({
     } else {
       setIsDirty(false);
       setSuccessMessage('Chapter saved successfully.');
+
+      // Discard cloud draft and clear local draft on successful live save
+      try {
+        await discardDraftAction(draftSync.clientKey);
+        if (userId) {
+          await deleteLocalDraft(draftSync.clientKey, userId);
+        }
+      } catch (err) {
+        console.error('Draft cleanup error:', err);
+      }
+
       setTimeout(() => {
         router.push(`/writer/novels/${novelId}/chapters`);
       }, 700);
@@ -223,6 +351,9 @@ export function ChapterEditor({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
+      {/* Multi-Tab Lock Warning Banner */}
+      <TabConflictBanner isLocked={isLockedByOtherTab} onTakeOver={handleTakeOver} />
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex items-center gap-3">
@@ -427,13 +558,22 @@ export function ChapterEditor({
             </button>
           </div>
 
-          {/* Live Metrics */}
-          <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
+          {/* Live Metrics & Draft Sync Status Chip */}
+          <div className="flex flex-wrap items-center gap-3 text-xs font-medium">
+            <DraftStatusChip
+              status={draftSync.syncStatus}
+              lastSyncedAt={draftSync.lastSyncedAt}
+              onSyncNow={draftSync.forceSyncNow}
+              onOpenDeviceDrafts={() => setIsDeviceDraftsModalOpen(true)}
+              onOpenConflictModal={() => setDismissedConflictRevision(null)}
+              isLockedByOtherTab={isLockedByOtherTab}
+            />
+
             <div className="text-secondary">
               <strong className="text-navy">{wordCount.toLocaleString()}</strong> words
             </div>
 
-            <div className="text-secondary">
+            <div className="text-secondary hidden sm:block">
               Lines: <strong className="text-navy">{lineCount.toLocaleString()}</strong>, paragraphs: <strong className="text-navy">{paragraphCount.toLocaleString()}</strong>
             </div>
 
@@ -484,9 +624,12 @@ export function ChapterEditor({
             dir="rtl"
             rows={18}
             value={formData.content_urdu}
+            readOnly={isLockedByOtherTab}
             onChange={(e) => handleChange('content_urdu', e.target.value)}
             placeholder="باب کا مکمل متن یہاں تحریر کریں یا 'Paste Cleaned Text' پر کلک کریں..."
-            className="w-full p-4 rounded-xl border border-border bg-ivory text-main font-urdu text-lg leading-[2.2] focus:outline-none focus:ring-2 focus:ring-accent resize-y transition-colors min-h-[420px]"
+            className={`w-full p-4 rounded-xl border border-border bg-ivory text-main font-urdu text-lg leading-[2.2] focus:outline-none focus:ring-2 focus:ring-accent resize-y transition-colors min-h-[420px] ${
+              isLockedByOtherTab ? 'opacity-60 bg-slate-100 cursor-not-allowed' : ''
+            }`}
             required
           />
         </div>
@@ -792,6 +935,98 @@ export function ChapterEditor({
             setIsSplitterModalOpen(false);
             router.push(`/writer/novels/${novelId}/chapters`);
             router.refresh();
+          }}
+        />
+      )}
+
+      {/* Draft Restore Modal */}
+      {isRestoreModalOpen && localDraftToRestore && (
+        <DraftRestoreModal
+          isOpen={isRestoreModalOpen}
+          onRestore={() => {
+            setFormData((prev) => ({
+              ...prev,
+              title_urdu: localDraftToRestore.title,
+              content_urdu: localDraftToRestore.content,
+            }));
+            draftSync.notifyChange(
+              localDraftToRestore.title,
+              localDraftToRestore.content,
+              formData.chapter_number
+            );
+            setIsDirty(true);
+            setIsRestoreModalOpen(false);
+            setHelperNotice('Restored unsynced draft from this device.');
+          }}
+          onDiscard={async () => {
+            if (userId) {
+              await deleteLocalDraft(draftSync.clientKey, userId);
+            }
+            setIsRestoreModalOpen(false);
+            setHelperNotice('Discarded unsynced local draft.');
+          }}
+          localUpdatedAt={localDraftToRestore.updatedAt}
+          localCharCount={localDraftToRestore.content.length}
+          liveCharCount={formData.content_urdu.length}
+          localTitle={localDraftToRestore.title}
+          localContent={localDraftToRestore.content}
+          liveContent={formData.content_urdu}
+        />
+      )}
+
+      {/* Draft Conflict Modal */}
+      {isConflictModalOpen && draftSync.conflictData && (
+        <DraftConflictModal
+          isOpen={isConflictModalOpen}
+          onClose={() => setDismissedConflictRevision(draftSync.conflictData?.server_revision ?? null)}
+          localContent={formData.content_urdu}
+          localTitle={formData.title_urdu}
+          serverContent={draftSync.conflictData.content_urdu}
+          serverTitle={draftSync.conflictData.title_urdu || ''}
+          serverRevision={draftSync.conflictData.server_revision}
+          serverUpdatedAt={draftSync.conflictData.server_updated_at}
+          serverDeviceLabel={draftSync.conflictData.device_label}
+          onKeepMine={async () => {
+            await draftSync.resolveKeepMine();
+            setDismissedConflictRevision(null);
+            setHelperNotice('Overwrote cloud draft with this device version.');
+          }}
+          onKeepServer={async () => {
+            const serverRes = await draftSync.resolveKeepServer();
+            if (serverRes) {
+              setFormData((prev) => ({
+                ...prev,
+                title_urdu: serverRes.title,
+                content_urdu: serverRes.content,
+              }));
+            }
+            setDismissedConflictRevision(null);
+            setHelperNotice('Loaded server version. Your local copy was safely archived.');
+          }}
+          onCopyToNewDraft={async () => {
+            await draftSync.copyMineToNewDraft();
+            setDismissedConflictRevision(null);
+            setHelperNotice('Local copy saved to a new draft slot.');
+          }}
+        />
+      )}
+
+      {/* Device Drafts List Modal */}
+      {isDeviceDraftsModalOpen && userId && (
+        <DeviceDraftsModal
+          isOpen={isDeviceDraftsModalOpen}
+          onClose={() => setIsDeviceDraftsModalOpen(false)}
+          userId={userId}
+          novelId={novelId}
+          onRestoreDraft={(draft) => {
+            setFormData((prev) => ({
+              ...prev,
+              title_urdu: draft.title,
+              content_urdu: draft.content,
+            }));
+            draftSync.notifyChange(draft.title, draft.content, formData.chapter_number);
+            setIsDirty(true);
+            setHelperNotice(`Restored draft from ${new Date(draft.updatedAt).toLocaleTimeString()}`);
           }}
         />
       )}

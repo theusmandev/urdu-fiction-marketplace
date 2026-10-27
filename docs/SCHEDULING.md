@@ -12,6 +12,7 @@ Because UNB Premium operates on a serverless Next.js architecture, background ta
 | :--- | :--- | :--- |
 | `POST /api/cron/send-emails` | Every 1-5 minutes | Claims pending batches from `email_outbox` table, renders branded templates, dispatches via SMTP/Nodemailer, and records delivery statuses. |
 | `POST /api/cron/reminders` | Hourly (or 2x daily) | Invokes `run_scheduled_reminders()` database RPC to send verification nudges to writers (>12h), overdue invoice warnings, and stagnant dispute alerts (>3 days). |
+| `POST /api/cron/purge-drafts` | Daily (e.g. 03:00 UTC) | Invokes `purge_old_chapter_drafts(90)` database RPC to clean up stale drafts (>90 days inactive) and expired rate limit rows. |
 
 ---
 

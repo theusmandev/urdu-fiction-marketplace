@@ -96,6 +96,7 @@ export default async function NovelChaptersPage({ params }: ChaptersPageProps) {
       <ChapterListManager
         novel={novelChecklist}
         initialChapters={chapters}
+        userId={user.id}
       />
     </div>
   );

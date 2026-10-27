@@ -94,8 +94,10 @@ export default async function EditChapterPage({ params }: EditChapterPageProps) 
         content_urdu: chapter.content_urdu,
         is_free_preview: chapter.is_free_preview,
         is_published: chapter.is_published,
+        updated_at: chapter.updated_at,
       }}
       suggestedChapterNumber={chapter.chapter_number}
+      userId={user.id}
     />
   );
 }

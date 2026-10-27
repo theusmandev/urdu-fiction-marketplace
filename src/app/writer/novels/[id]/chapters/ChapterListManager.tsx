@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UrduText } from '@/components/urdu/UrduText';
@@ -30,21 +30,38 @@ import {
   BookOpen,
   Sparkles,
 } from 'lucide-react';
+import { listLocalDraftsForNovel, type LocalDraft } from '@/lib/drafts/local-store';
 
 interface ChapterListManagerProps {
   novel: NovelChecklistData;
   initialChapters: ChapterRow[];
+  userId?: string;
 }
 
 export function ChapterListManager({
   novel,
   initialChapters,
+  userId,
 }: ChapterListManagerProps) {
   const router = useRouter();
 
   const [chapters, setChapters] = useState<ChapterRow[]>(initialChapters);
+  const [activeDrafts, setActiveDrafts] = useState<LocalDraft[]>([]);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return;
+    listLocalDraftsForNovel(userId, novel.id)
+      .then((drafts) => setActiveDrafts(drafts))
+      .catch(() => {});
+  }, [userId, novel.id]);
+
+  const draftChapterIds = new Set(activeDrafts.map((d) => d.chapterId).filter(Boolean));
+  const draftChapterNums = new Set(activeDrafts.map((d) => d.chapterNumber).filter(Boolean));
+  const unsavedNewDrafts = activeDrafts.filter(
+    (d) => !d.chapterId && (!d.chapterNumber || !chapters.some((c) => c.chapter_number === d.chapterNumber))
+  );
 
   // Deletion modal state
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -306,6 +323,25 @@ export function ChapterListManager({
           )}
         </div>
 
+        {/* Unsaved New Chapter Draft Banner */}
+        {unsavedNewDrafts.length > 0 && (
+          <div className="p-3 bg-amber-500/10 border-b border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+              <span className="text-navy font-medium">
+                New chapter draft in progress: <strong>{unsavedNewDrafts[0].title || 'Untitled Draft'}</strong> ({unsavedNewDrafts[0].content.length.toLocaleString()} chars saved on device)
+              </span>
+            </div>
+            <Link
+              href={`/writer/novels/${novel.id}/chapters/new`}
+              className="font-semibold text-accent hover:underline flex items-center gap-1 self-end sm:self-auto"
+            >
+              <span>Continue writing</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
+        )}
+
         {chapters.length === 0 ? (
           <div className="p-12 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-ivory border border-border flex items-center justify-center mx-auto text-secondary">
@@ -382,10 +418,15 @@ export function ChapterListManager({
                     </div>
 
                     <div className="min-w-0 space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <UrduText as="span" size="lg" className="text-navy py-0" dir="rtl">
                           {chapter.title_urdu}
                         </UrduText>
+                        {(draftChapterIds.has(chapter.id) || draftChapterNums.has(chapter.chapter_number)) && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                            Draft in progress
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-2 text-[11px] text-secondary">

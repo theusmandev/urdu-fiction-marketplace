@@ -373,6 +373,22 @@ export interface ChapterRevisionRow {
   created_at: string;
 }
 
+export interface ChapterDraftRow {
+  id: string;
+  writer_id: string;
+  novel_id: string;
+  chapter_id: string | null;
+  client_key: string;
+  title_urdu: string | null;
+  content_urdu: string;
+  chapter_number: number | null;
+  base_chapter_updated_at: string | null;
+  server_revision: number;
+  device_label: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ReaderProgressRow {
   reader_id: string;
   novel_id: string;
@@ -1115,6 +1131,26 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<ChapterRevisionRow>;
+        Relationships: [];
+      };
+      chapter_drafts: {
+        Row: ChapterDraftRow;
+        Insert: {
+          id?: string;
+          writer_id: string;
+          novel_id: string;
+          chapter_id?: string | null;
+          client_key: string;
+          title_urdu?: string | null;
+          content_urdu: string;
+          chapter_number?: number | null;
+          base_chapter_updated_at?: string | null;
+          server_revision?: number;
+          device_label?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<ChapterDraftRow>;
         Relationships: [];
       };
       reader_progress: {
@@ -2392,6 +2428,53 @@ export interface Database {
         Args: {
           p_chapter_id: string;
           p_parts: Json;
+        };
+        Returns: Json;
+      };
+      upsert_chapter_draft: {
+        Args: {
+          p_novel_id: string;
+          p_chapter_id?: string | null;
+          p_client_key: string;
+          p_title_urdu?: string | null;
+          p_content_urdu: string;
+          p_chapter_number?: number | null;
+          p_base_chapter_updated_at?: string | null;
+          p_expected_server_revision?: number | null;
+          p_device_label?: string | null;
+        };
+        Returns: Json;
+      };
+      get_chapter_draft: {
+        Args: {
+          p_client_key: string;
+        };
+        Returns: Json;
+      };
+      list_my_chapter_drafts: {
+        Args: {
+          p_novel_id?: string | null;
+        };
+        Returns: Json;
+      };
+      discard_chapter_draft: {
+        Args: {
+          p_client_key: string;
+        };
+        Returns: Json;
+      };
+      resolve_chapter_draft_conflict: {
+        Args: {
+          p_client_key: string;
+          p_choice: string;
+          p_content_urdu?: string | null;
+          p_title_urdu?: string | null;
+        };
+        Returns: Json;
+      };
+      purge_old_chapter_drafts: {
+        Args: {
+          p_days?: number | null;
         };
         Returns: Json;
       };

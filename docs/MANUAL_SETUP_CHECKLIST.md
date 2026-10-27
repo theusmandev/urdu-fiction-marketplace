@@ -479,6 +479,27 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     ```
     Confirm all 5 genres exist with `is_active = true`.
 
+### 33. `supabase/migrations/0033_chapter_drafts.sql` [OFFLINE-TOLERANT AUTOSAVE & CHAPTER DRAFTS STORE]
+- **Purpose**: Implements isolated chapter draft storage, sliding-window rate limiting, optimistic concurrency control, and draft lifecycle management:
+  - **Table `public.chapter_drafts`**: Stores chapter autosaves isolated from `public.chapters` (`(id, writer_id, novel_id, chapter_id, client_key, title_urdu, content_urdu, chapter_number, base_chapter_updated_at, server_revision, device_label, created_at, updated_at)`).
+  - **Table `public.chapter_draft_rate_limits`**: Sliding hourly sync rate limiter per writer (240 syncs/hr).
+  - **RPCs**:
+    - `upsert_chapter_draft`: Atomic draft upsert with optimistic concurrency check, length validation (<= 120,000 chars), per-writer limits (max 100 drafts), and hourly rate limiting.
+    - `get_chapter_draft`: Fetches draft content and revision for calling writer.
+    - `list_my_chapter_drafts`: Lightweight metadata listing for all drafts of caller.
+    - `discard_chapter_draft`: Deletes draft and logs to audit log.
+    - `resolve_chapter_draft_conflict`: Resolves version conflict (`keep_mine` / `keep_server`).
+    - `purge_old_chapter_drafts`: Retention cleanup (default 30 days) restricted to admins and scheduled cron workers.
+  - **Security & Privileges**: RLS enabled with direct table write/read grants strictly revoked from `anon` and `authenticated` (RPC-only).
+- **Action**: Paste contents of `supabase/migrations/0033_chapter_drafts.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('upsert_chapter_draft', 'get_chapter_draft', 'list_my_chapter_drafts', 'discard_chapter_draft', 'resolve_chapter_draft_conflict', 'purge_old_chapter_drafts');
+    ```
+    Confirm all 6 functions exist with `prosecdef = true`.
+  - Execute automated test suite: `supabase/tests/19_chapter_drafts_tests.sql` (15/15 PASS).
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -591,6 +612,7 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/16_frontend_columns_check.sql`
    - `supabase/tests/17_sensitive_column_exposure.sql`
    - `supabase/tests/18_chapter_split_tests.sql` (Writer chapter import & split transactional security and integrity tests)
+   - `supabase/tests/19_chapter_drafts_tests.sql` (Chapter drafts & autosave isolation, concurrency, rate limits, and security tests)
 3. Run automated Node.js unit tests:
    ```bash
    npm test

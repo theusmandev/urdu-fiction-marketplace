@@ -72,6 +72,7 @@ export default async function NewChapterPage({ params }: NewChapterPageProps) {
       novelTitleUrdu={novel.title_urdu}
       novelStatus={novel.status}
       suggestedChapterNumber={nextChapterNumber}
+      userId={user.id}
     />
   );
 }
