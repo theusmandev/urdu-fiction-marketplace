@@ -23,6 +23,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Heart,
 } from 'lucide-react';
 import { AccountMenu, NotificationBell } from '../shared';
 import type { ProfileRow } from '@/types/database';
@@ -33,6 +34,7 @@ export interface AdminBadgeCounts {
   pendingReportsCount: number;
   pendingWritersCount: number;
   underReviewNovelsCount: number;
+  flaggedTipsCount?: number;
 }
 
 interface NavItem {
@@ -71,6 +73,13 @@ export function AdminShellClient({
       items: [
         { href: '/admin', label: 'Overview', icon: LayoutDashboard },
         { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+        {
+          href: '/admin/tips',
+          label: 'Tips (Say Thanks)',
+          icon: Heart,
+          badge: counts.flaggedTipsCount,
+          badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+        },
         {
           href: '/admin/disputes',
           label: 'Disputes',

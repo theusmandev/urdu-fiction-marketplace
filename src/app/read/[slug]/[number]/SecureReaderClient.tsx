@@ -17,6 +17,7 @@ import {
   buildWatermarkPattern,
 } from '@/lib/reader/schemas';
 import { ChapterBody } from '@/components/reader/ChapterBody';
+import { TipCard } from '@/components/tips/TipCard';
 import { saveReadingProgressAction } from '@/app/actions/reader';
 import {
   ArrowLeft,
@@ -423,6 +424,11 @@ export function SecureReaderClient({
             userSelect="none"
           />
         </article>
+
+        {/* Reader Appreciation (Tip Jar) */}
+        <div className="mt-12 mb-6">
+          <TipCard novelId={chapter.novel_id} />
+        </div>
 
         {/* ---------------------------------------------------------------- */}
         {/* 4. CHAPTER END / BOTTOM NAVIGATION                               */}

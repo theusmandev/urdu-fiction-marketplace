@@ -95,6 +95,20 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Check if this identifier is a tip receipt (reader, writer, or admin)
+  if (!isAuthorized) {
+    const { data: canAccessTip, error: tipErr } = await supabase.rpc(
+      'can_access_tip_proof',
+      { p_folder_name: orderId, p_action: 'select' }
+    );
+
+    if (tipErr) {
+      console.error('signed-url route: tip proof lookup error:', tipErr);
+    } else if (canAccessTip) {
+      isAuthorized = true;
+    }
+  }
+
   // If not direct owner/reader/writer, check if caller is an admin
   if (!isAuthorized) {
     const { data: profile, error: profileErr } = await supabase

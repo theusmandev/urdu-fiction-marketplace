@@ -82,11 +82,12 @@ export default async function WriterLayout({
     );
   }
 
-  // Fetch pending verification count, active disputes count, and unread notification count
+  // Fetch pending verification count, active disputes count, unread notifications, and pending tips count
   const [
     pendingVerificationRes,
     disputesRes,
     notificationsRes,
+    tipSummaryRes,
   ] = await Promise.all([
     supabase
       .from('orders')
@@ -99,6 +100,7 @@ export default async function WriterLayout({
       .eq('orders.writer_id' as 'order_id', user.id)
       .in('status', ['open', 'under_review']),
     supabase.rpc('get_my_unread_notification_count'),
+    supabase.rpc('get_my_tip_summary'),
   ]);
 
   const { count: pendingVerificationCount } = unwrapQuery(
@@ -113,12 +115,17 @@ export default async function WriterLayout({
     notificationsRes,
     'WriterLayout.unreadNotifications'
   );
+  const { data: tipSummary } = unwrapQuery<{ pending_confirmation_count?: number }>(
+    tipSummaryRes,
+    'WriterLayout.tipSummary'
+  );
 
   return (
     <StudioShellClient
       profile={profile}
       writerProfile={writerProfile}
       pendingVerificationCount={pendingVerificationCount ?? 0}
+      pendingTipsCount={tipSummary?.pending_confirmation_count ?? 0}
       openDisputesCount={openDisputesCount ?? 0}
       unreadNotificationsCount={unreadNotificationsCount ?? 0}
     >

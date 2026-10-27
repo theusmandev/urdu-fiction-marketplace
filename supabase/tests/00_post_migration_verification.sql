@@ -157,7 +157,7 @@ DECLARE
     v_has   boolean;
     v_err_count integer := 0;
 
-    -- Authoritative 29 tables from migrations 0001–0020
+    -- Authoritative tables from migrations 0001–0034
     v_expected_tables text[] := ARRAY[
         'profiles', 'writer_profiles', 'writer_payment_methods', 'genres', 'novels',
         'novel_genres', 'chapters', 'chapter_revisions', 'reader_progress', 'chapter_reads',
@@ -166,7 +166,8 @@ DECLARE
         'platform_payment_methods', 'commission_payment_reports', 'disputes',
         'dispute_messages', 'refund_requests', 'support_requests', 'support_messages',
         'notifications', 'notification_preferences', 'email_outbox', 'audit_logs',
-        'platform_settings'
+        'platform_settings', 'chapter_drafts', 'chapter_draft_rate_limits',
+        'writer_tip_settings', 'tips'
     ];
 
     -- Append-only tables (must have immutability triggers)
@@ -199,7 +200,8 @@ DECLARE
         'search_public_novels',
         'get_public_novel_chapters',
         'has_novel_entitlement',
-        'is_admin'
+        'is_admin',
+        'get_tip_options'
     ];
 
     -- Authenticated-only workflow RPCs (must exist; must NOT be anon-executable)
@@ -213,7 +215,13 @@ DECLARE
         'open_dispute', 'resolve_dispute_for_reader_verify',
         'resolve_dispute_refund', 'resolve_dispute_for_writer',
         'close_dispute', 'request_refund', 'approve_refund_request',
-        'reject_refund_request', 'update_platform_settings'
+        'reject_refund_request', 'update_platform_settings',
+        'set_my_tip_settings', 'get_my_tip_settings', 'create_tip',
+        'submit_tip_payment', 'cancel_tip', 'confirm_tip_received',
+        'mark_tip_not_received', 'get_my_tips', 'get_tip_by_number', 'get_my_received_tips',
+        'get_my_tip_summary', 'hide_tip_message', 'report_tip_message',
+        'admin_remove_tip_message', 'admin_list_tips', 'admin_get_tip',
+        'admin_review_tip', 'can_access_tip_proof'
     ];
 
     v_tbl text;

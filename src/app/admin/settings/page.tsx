@@ -33,6 +33,12 @@ export default async function AdminSettingsPage() {
         min_dispute_wait_hours,
         verification_reminder_hours,
         support_email,
+        tips_enabled,
+        tip_min_pkr,
+        tip_max_pkr,
+        max_tips_per_hour,
+        tip_daily_cap_pkr_per_reader,
+        tip_confirm_reminder_hours,
         updated_at
       `)
       .eq('id', 1)
@@ -57,6 +63,12 @@ export default async function AdminSettingsPage() {
     min_dispute_wait_hours?: number;
     verification_reminder_hours?: number;
     support_email: string;
+    tips_enabled?: boolean;
+    tip_min_pkr?: number;
+    tip_max_pkr?: number;
+    max_tips_per_hour?: number;
+    tip_daily_cap_pkr_per_reader?: number;
+    tip_confirm_reminder_hours?: number;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 

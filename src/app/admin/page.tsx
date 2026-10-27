@@ -20,6 +20,7 @@ import {
   Scale,
   RotateCcw,
   LifeBuoy,
+  Sparkles,
 } from 'lucide-react';
 
 function getTwentyFourHoursAgoIso(): string {
@@ -44,6 +45,8 @@ export default async function AdminDashboardPage() {
     { count: pendingRefundsCount },
     { count: openSupportTicketsCount },
     outboxStatsRes,
+    flaggedTipsRes,
+    totalTipsRes,
   ] = await Promise.all([
     supabase.from('writer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending_approval'),
     supabase.from('novels').select('id', { count: 'exact', head: true }).eq('status', 'under_review'),
@@ -59,7 +62,20 @@ export default async function AdminDashboardPage() {
     supabase.from('refund_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('support_requests').select('id', { count: 'exact', head: true }).eq('status', 'open'),
     getOutboxStatsAction(),
+    supabase.rpc('admin_list_tips', { p_flagged_only: true, p_limit: 1 }),
+    supabase.rpc('admin_list_tips', { p_limit: 1 }),
   ]);
+
+  const { data: flaggedData } = unwrapQuery<{ items: unknown[]; total: number }>(
+    flaggedTipsRes,
+    'AdminDashboard.flaggedTips'
+  );
+  const { data: totalTipsData } = unwrapQuery<{ items: unknown[]; total: number }>(
+    totalTipsRes,
+    'AdminDashboard.totalTips'
+  );
+  const flaggedTipsCount = flaggedData?.total ?? 0;
+  const totalTipsCount = totalTipsData?.total ?? 0;
 
   const outboxStats: EmailOutboxStats = (outboxStatsRes.success && outboxStatsRes.data) ? outboxStatsRes.data : {
     pending_count: 0,
@@ -217,7 +233,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Top Queues Metrics Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-3">
         {/* Pending Writers */}
         <Link
           href="/admin/writers?status=pending_approval"
@@ -308,6 +324,21 @@ export default async function AdminDashboardPage() {
           <p className="text-[10px] text-secondary">&gt; 24h unverified</p>
         </Link>
 
+        {/* Tips Review Queue */}
+        <Link
+          href="/admin/tips?flagged=true"
+          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+        >
+          <div className="flex items-center justify-between text-secondary text-xs">
+            <span>Tips Queue</span>
+            <Sparkles className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-xl font-bold text-navy font-mono">
+            {flaggedTipsCount}
+          </div>
+          <p className="text-[10px] text-secondary">{totalTipsCount} total tips</p>
+        </Link>
+
         {/* Commission Capped Writers */}
         <div className="bg-surface border border-border shadow-card rounded-2xl p-3.5 space-y-1">
           <div className="flex items-center justify-between text-secondary text-xs">
@@ -336,8 +367,8 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      {/* Commission Operations Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Commission & Operations Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Reports Awaiting Confirmation */}
         <Link
           href="/admin/commission/reports"
@@ -381,6 +412,23 @@ export default async function AdminDashboardPage() {
             {atRiskWriters.length}
           </div>
           <p className="text-[11px] text-secondary">Threshold alert or paused</p>
+        </Link>
+
+        {/* Tips Review Queue */}
+        <Link
+          href="/admin/tips?flagged=true"
+          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
+        >
+          <div className="flex items-center justify-between text-secondary text-xs">
+            <span className="font-medium">Tips to Review</span>
+            <Sparkles className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-2xl font-bold text-navy font-mono">
+            {flaggedTipsCount}
+          </div>
+          <p className="text-[11px] text-secondary">
+            {flaggedTipsCount === 0 ? 'Review queue clear' : 'Suspicious pattern or duplicate TID'}
+          </p>
         </Link>
       </div>
 

@@ -103,6 +103,18 @@ export default function TermsPage() {
             strictly prohibited.
           </p>
         </section>
+
+        <section className="space-y-2">
+          <h2 className="font-serif text-base sm:text-lg font-bold text-navy">
+            6. Reader Appreciation Gifts (&quot;Tips&quot;) — Draft, Pending Legal Review
+          </h2>
+          <p>
+            Readers may voluntarily send direct monetary gifts (&quot;Tips&quot;) to eligible authors as a token of appreciation. Tips are 100% voluntary, non-refundable gifts. A tip unlocks no novel, chapter, digital file, or special platform privilege.
+          </p>
+          <p>
+            UNB Premium charges 0% platform commission on tips and never receives, touches, or holds tip funds. Readers transfer tips directly to the author&apos;s verified payment account outside the platform. Authors may never solicit, demand, or promise content or privileges in exchange for tips.
+          </p>
+        </section>
       </div>
 
       {/* Footer Banner */}

@@ -8,6 +8,7 @@ import { NovelAccessProvider } from "@/components/catalog/NovelAccessContext";
 import { NovelAccessPanel } from "@/components/catalog/NovelAccessPanel";
 import { NovelPaymentGuarantee } from "@/components/catalog/NovelPaymentGuarantee";
 import { NovelToc } from "@/components/catalog/NovelToc";
+import { TipCard } from "@/components/tips/TipCard";
 import { ExpandableSynopsis } from "@/components/catalog/ExpandableSynopsis";
 import {
   getPublicNovelBySlug,
@@ -388,6 +389,11 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                 pricePkr={novel.price_pkr}
                 chapters={chapters}
               />
+            </div>
+
+            {/* Reader Appreciation (Tip Jar) */}
+            <div className="pt-8 pb-4">
+              <TipCard writerId={novel.writer_id} novelId={novel.id} />
             </div>
           </div>
         </div>

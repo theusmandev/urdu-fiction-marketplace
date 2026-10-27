@@ -28,6 +28,7 @@ export default async function AdminLayout({
     { count: pendingWritersCount },
     { count: underReviewNovelsCount },
     { data: unreadNotificationsCount },
+    flaggedTipsRes,
   ] = await Promise.all([
     supabase
       .from('disputes')
@@ -50,7 +51,10 @@ export default async function AdminLayout({
       .select('id', { count: 'exact', head: true })
       .eq('status', 'under_review'),
     supabase.rpc('get_my_unread_notification_count'),
+    supabase.rpc('admin_list_tips', { p_flagged_only: true, p_limit: 1 }),
   ]);
+
+  const flaggedData = flaggedTipsRes.data as { total?: number } | null;
 
   const counts = {
     openDisputesCount: openDisputesCount ?? 0,
@@ -58,6 +62,7 @@ export default async function AdminLayout({
     pendingReportsCount: pendingReportsCount ?? 0,
     pendingWritersCount: pendingWritersCount ?? 0,
     underReviewNovelsCount: underReviewNovelsCount ?? 0,
+    flaggedTipsCount: flaggedData?.total ?? 0,
   };
 
   return (

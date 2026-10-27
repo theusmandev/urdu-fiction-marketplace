@@ -68,6 +68,19 @@ export default function WriterAgreementPage() {
               You agree to inspect bank receipts submitted by readers in good faith within 24–48 hours. Falsely confirming unreceived funds or unfairly rejecting valid reader deposits constitutes a breach of platform integrity and may trigger administrative dispute intervention.
             </p>
           </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-navy flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              5. Reader Appreciation Gifts (&quot;Tips&quot;) — Draft, Pending Legal Review
+            </h2>
+            <p>
+              Eligible authors may opt in to accept voluntary reader appreciation gifts (&quot;Tips&quot;). Tips are non-refundable voluntary gifts from readers. UNB Premium takes 0% commission on tips and never holds or processes tip funds.
+            </p>
+            <p>
+              Tips unlock no content. Authors are strictly prohibited from demanding tips, locking content behind tips, conditioning releases on tips, or substituting tips for book sales. Any such attempt constitutes a material breach of this Agreement.
+            </p>
+          </section>
         </div>
 
         <div className="pt-6 border-t border-border text-center">

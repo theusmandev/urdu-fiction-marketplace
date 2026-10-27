@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { ChapterBody } from "@/components/reader/ChapterBody";
+import { TipCard } from "@/components/tips/TipCard";
 import type { PublicFreePreviewChapter, PublicNovel, PublicNovelChapterMeta } from "@/types/database";
 import {
   ArrowLeft,
@@ -321,6 +322,13 @@ export function FreePreviewReaderClient({
             </Link>
           </div>
         </div>
+
+        {/* Reader Appreciation (Tip Jar) at end of free preview */}
+        {!nextChapter && (
+          <div className="pt-4 pb-8">
+            <TipCard writerId={novel.writer_id} novelId={novel.id} />
+          </div>
+        )}
       </main>
     </div>
   );

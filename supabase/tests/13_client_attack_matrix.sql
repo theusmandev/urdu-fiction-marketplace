@@ -1199,6 +1199,36 @@ BEGIN
         INSERT INTO attack_matrix_results VALUES (v_test_id, 'Storage Privacy', 'reader_b', 'storage.objects', 'Reader B lists Reader A payment proof', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
     END;
 
+    -- 5.8 Reader B attempts direct INSERT INTO public.tips
+    v_test_id := 508;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_reader_b::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        INSERT INTO public.tips (
+            tip_number, reader_id, writer_id, amount_pkr, payment_instructions_snapshot
+        ) VALUES (
+            'TIP-ATTACK-01', v_reader_b, v_writer_a, 100, '{}'::jsonb
+        );
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Client Attack Matrix', 'reader_b', 'tips', 'Direct INSERT into public.tips', 'FAIL', 'MUTATION_SUCCEEDED', 'CRITICAL: Direct client INSERT allowed on tips table');
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Client Attack Matrix', 'reader_b', 'tips', 'Direct INSERT into public.tips', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
+    END;
+
+    -- 5.9 Reader B attempts direct INSERT/UPDATE on public.writer_tip_settings
+    v_test_id := 509;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_reader_b::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        INSERT INTO public.writer_tip_settings (
+            writer_id, enabled
+        ) VALUES (
+            v_writer_a, true
+        );
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Client Attack Matrix', 'reader_b', 'writer_tip_settings', 'Direct INSERT into public.writer_tip_settings', 'FAIL', 'MUTATION_SUCCEEDED', 'CRITICAL: Direct client INSERT allowed on writer_tip_settings');
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Client Attack Matrix', 'reader_b', 'writer_tip_settings', 'Direct INSERT into public.writer_tip_settings', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
+    END;
+
     RESET ROLE;
     PERFORM set_config('request.jwt.claims', '', true);
 END;

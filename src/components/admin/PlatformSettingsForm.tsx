@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   AlertCircle,
   HelpCircle,
+  Heart,
 } from 'lucide-react';
 
 interface PlatformSettingsFormProps {
@@ -32,6 +33,12 @@ interface PlatformSettingsFormProps {
     verification_reminder_hours?: number;
     supportEmail?: string;
     support_email: string;
+    tips_enabled?: boolean;
+    tip_min_pkr?: number;
+    tip_max_pkr?: number;
+    max_tips_per_hour?: number;
+    tip_daily_cap_pkr_per_reader?: number;
+    tip_confirm_reminder_hours?: number;
     updated_at: string;
   };
 }
@@ -82,6 +89,14 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
     (initialSettings.verification_reminder_hours ?? 12).toString()
   );
   const [supportEmail, setSupportEmail] = useState(initialSettings.support_email);
+
+  // Tip Jar Platform Controls
+  const [tipsEnabled, setTipsEnabled] = useState(initialSettings.tips_enabled ?? true);
+  const [tipMinPkr, setTipMinPkr] = useState((initialSettings.tip_min_pkr ?? 20).toString());
+  const [tipMaxPkr, setTipMaxPkr] = useState((initialSettings.tip_max_pkr ?? 5000).toString());
+  const [maxTipsPerHour, setMaxTipsPerHour] = useState((initialSettings.max_tips_per_hour ?? 5).toString());
+  const [tipDailyCap, setTipDailyCap] = useState((initialSettings.tip_daily_cap_pkr_per_reader ?? 10000).toString());
+  const [tipConfirmReminderHours, setTipConfirmReminderHours] = useState((initialSettings.tip_confirm_reminder_hours ?? 48).toString());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +196,29 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       return;
     }
 
+    // Tip validations
+    const parsedTipMin = Number(tipMinPkr);
+    const parsedTipMax = Number(tipMaxPkr);
+    const parsedMaxTipsPerHour = Number(maxTipsPerHour);
+    const parsedTipDailyCap = Number(tipDailyCap);
+    const parsedTipConfirmReminderHours = Number(tipConfirmReminderHours);
+
+    if (isNaN(parsedTipMin) || parsedTipMin < 1 || !Number.isInteger(parsedTipMin)) {
+      setError('Minimum tip must be a whole rupee amount of at least 1 PKR.');
+      setLoading(false);
+      return;
+    }
+    if (isNaN(parsedTipMax) || parsedTipMax < 1 || !Number.isInteger(parsedTipMax)) {
+      setError('Maximum tip must be a whole rupee amount.');
+      setLoading(false);
+      return;
+    }
+    if (parsedTipMin > parsedTipMax) {
+      setError('Minimum tip cannot exceed maximum tip.');
+      setLoading(false);
+      return;
+    }
+
     if (!supportEmail || !supportEmail.includes('@')) {
       setError('Please provide a valid support email address.');
       setLoading(false);
@@ -202,6 +240,12 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         minDisputeWaitHours: parsedMinDisputeWaitHours,
         verificationReminderHours: parsedVerificationReminderHours,
         supportEmail: supportEmail.trim(),
+        tipsEnabled,
+        tipMinPkr: parsedTipMin,
+        tipMaxPkr: parsedTipMax,
+        maxTipsPerHour: parsedMaxTipsPerHour,
+        tipDailyCapPkrPerReader: parsedTipDailyCap,
+        tipConfirmReminderHours: parsedTipConfirmReminderHours,
       });
 
       if (!res.success) {
@@ -586,6 +630,149 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             value={supportEmail}
             onChange={(e) => setSupportEmail(e.target.value)}
             className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+          />
+        </div>
+
+        {/* Tip Jar Platform Controls Heading */}
+        <div className="md:col-span-2 pt-4 border-t border-border flex items-center gap-2">
+          <Heart className="w-5 h-5 text-amber-600 fill-amber-500/20" />
+          <h3 className="text-sm font-bold text-navy font-serif">Tip Jar Platform Controls</h3>
+        </div>
+
+        {/* Global Kill Switch */}
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 md:col-span-2 shadow-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="text-xs font-bold text-main flex items-center gap-2">
+                <Heart className="w-4 h-4 text-amber-600" />
+                <span>Tips Enabled Globally (Kill Switch)</span>
+              </label>
+              <p className="text-xs text-muted leading-relaxed mt-1">
+                When disabled, all reader tipping cards and submission flows are globally paused across the platform.
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={tipsEnabled}
+                onChange={(e) => setTipsEnabled(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600" />
+            </label>
+          </div>
+        </div>
+
+        {/* Tip Min / Max Bounds */}
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-amber-600" />
+              <span>Platform Minimum Tip (PKR)</span>
+            </label>
+            <span className="text-[10px] text-muted font-mono">Default: 20</span>
+          </div>
+          <p className="text-xs text-muted leading-relaxed">
+            Global absolute lower floor permitted for any single appreciation gift.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="50000"
+            required
+            value={tipMinPkr}
+            onChange={(e) => setTipMinPkr(e.target.value)}
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main font-mono"
+          />
+        </div>
+
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-amber-600" />
+              <span>Platform Maximum Tip (PKR)</span>
+            </label>
+            <span className="text-[10px] text-muted font-mono">Default: 5000</span>
+          </div>
+          <p className="text-xs text-muted leading-relaxed">
+            Global absolute upper ceiling permitted for any single appreciation gift.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="50000"
+            required
+            value={tipMaxPkr}
+            onChange={(e) => setTipMaxPkr(e.target.value)}
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main font-mono"
+          />
+        </div>
+
+        {/* Hourly Tip Limit & Daily Cap */}
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span>Max Tips Per Hour (Per Reader)</span>
+            </label>
+            <span className="text-[10px] text-muted font-mono">Default: 5</span>
+          </div>
+          <p className="text-xs text-muted leading-relaxed">
+            Sliding-window velocity rate limit preventing spam tipping.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            required
+            value={maxTipsPerHour}
+            onChange={(e) => setMaxTipsPerHour(e.target.value)}
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main font-mono"
+          />
+        </div>
+
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-amber-600" />
+              <span>Daily Tip Cap (PKR Per Reader)</span>
+            </label>
+            <span className="text-[10px] text-muted font-mono">Default: 10,000</span>
+          </div>
+          <p className="text-xs text-muted leading-relaxed">
+            Rolling 24-hour total cumulative tipping volume limit per reader across all authors.
+          </p>
+          <input
+            type="number"
+            min="100"
+            max="500000"
+            required
+            value={tipDailyCap}
+            onChange={(e) => setTipDailyCap(e.target.value)}
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main font-mono"
+          />
+        </div>
+
+        {/* Tip Confirm Reminder Hours */}
+        <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 md:col-span-2 shadow-card">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-main flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span>Tip Confirmation Reminder Hours</span>
+            </label>
+            <span className="text-[10px] text-muted font-mono">Default: 48 hrs</span>
+          </div>
+          <p className="text-xs text-muted leading-relaxed">
+            Hours after reader payment submission before the scheduled worker sends a verification reminder to the author.
+          </p>
+          <input
+            type="number"
+            min="1"
+            max="168"
+            required
+            value={tipConfirmReminderHours}
+            onChange={(e) => setTipConfirmReminderHours(e.target.value)}
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main font-mono"
           />
         </div>
       </div>

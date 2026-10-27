@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { NovelCard } from "@/components/catalog/NovelCard";
+import { WriterProfileTipButton } from "@/components/tips/WriterProfileTipButton";
 import {
   getPublicWriterByUsername,
   getNovelsByWriter,
@@ -189,13 +190,18 @@ export default async function WriterProfilePage({
               </p>
             )}
 
-            <div className="flex items-center gap-4 text-xs text-secondary pt-1">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-secondary pt-1">
               <div className="flex items-center gap-1.5 font-medium text-navy">
                 <BookOpen className="w-3.5 h-3.5 text-accent" />
                 <span>
                   {novels.length} {novels.length === 1 ? "Published Novel" : "Published Novels"}
                 </span>
               </div>
+            </div>
+
+            {/* Writer Appreciation (Tip Jar) Button */}
+            <div className="pt-2">
+              <WriterProfileTipButton writerId={writer.id} />
             </div>
           </div>
         </div>

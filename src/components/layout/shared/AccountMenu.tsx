@@ -12,6 +12,7 @@ import {
   Settings,
   ExternalLink,
   Activity,
+  Heart,
 } from 'lucide-react';
 import { LogoutButton } from './LogoutButton';
 import type { UserRole, WriterStatus } from '@/types/database';
@@ -374,6 +375,14 @@ export function AccountMenu({
                 >
                   <ShoppingBag className="w-4 h-4 text-secondary shrink-0" />
                   <span>My Orders</span>
+                </Link>
+                <Link
+                  href="/tips"
+                  onClick={() => setIsOpen(false)}
+                  className={linkItemStyles}
+                >
+                  <Heart className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>My Tips</span>
                 </Link>
                 <Link
                   href="/account"

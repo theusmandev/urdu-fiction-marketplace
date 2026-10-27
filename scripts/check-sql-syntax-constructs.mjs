@@ -46,6 +46,7 @@ const FORBIDDEN_CONSTRUCTS = [
   { pattern: /\bpg_catalog\.localtime\b/gi,         name: 'pg_catalog.localtime',      reason: 'localtime is a SQL special keyword value — write plain: localtime' },
   { pattern: /\bpg_catalog\.localtimestamp\b/gi,    name: 'pg_catalog.localtimestamp', reason: 'localtimestamp is a SQL special keyword value — write plain: localtimestamp' },
   { pattern: /\bpg_catalog\.user\b/gi,              name: 'pg_catalog.user',           reason: '"user" is an alias for current_user — write plain: current_user' },
+  { pattern: /\bpg_catalog\.substring\s*\([^)]*\bfrom\b/gi, name: 'pg_catalog.substring(...from...)', reason: 'pg_catalog.substring does not support SQL keyword FROM/FOR syntax; use standard arguments pg_catalog.substring(str, pos, len) or pg_catalog.right(str, n)' },
 ];
 
 // ---------------------------------------------------------------------------

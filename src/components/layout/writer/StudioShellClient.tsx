@@ -19,6 +19,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Heart,
 } from 'lucide-react';
 import { AccountMenu, NotificationBell } from '../shared';
 import type { ProfileRow, WriterProfileRow } from '@/types/database';
@@ -28,6 +29,7 @@ export interface StudioShellClientProps {
   profile: ProfileRow;
   writerProfile: WriterProfileRow;
   pendingVerificationCount?: number;
+  pendingTipsCount?: number;
   openDisputesCount?: number;
   unreadNotificationsCount?: number;
 }
@@ -37,6 +39,7 @@ export function StudioShellClient({
   profile,
   writerProfile,
   pendingVerificationCount = 0,
+  pendingTipsCount = 0,
   openDisputesCount = 0,
   unreadNotificationsCount = 0,
 }: StudioShellClientProps) {
@@ -52,6 +55,13 @@ export function StudioShellClient({
       label: 'Verify Payments',
       icon: CreditCard,
       badge: pendingVerificationCount,
+      badgeColor: 'bg-amber-500 text-stone-950 font-bold',
+    },
+    {
+      href: '/writer/tips',
+      label: 'Tips (Say Thanks)',
+      icon: Heart,
+      badge: pendingTipsCount,
       badgeColor: 'bg-amber-500 text-stone-950 font-bold',
     },
     {

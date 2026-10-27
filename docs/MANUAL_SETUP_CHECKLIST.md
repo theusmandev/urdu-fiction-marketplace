@@ -500,6 +500,32 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm all 6 functions exist with `prosecdef = true`.
   - Execute automated test suite: `supabase/tests/19_chapter_drafts_tests.sql` (15/15 PASS).
 
+### 34. `supabase/migrations/0034_tips.sql` [TIP JAR / READER APPRECIATION (PHASE 1)]
+- **Purpose**: Implements isolated direct-payment reader-to-author appreciation tips with 0% platform commission:
+  - **Table `public.writer_tip_settings`**: Per-author opt-in, custom presets (Chai/Mithai/Eidi), thank-you message, and optional custom bounds.
+  - **Table `public.tips`**: Isolated direct payment tip record (`TIP-YYYYMMDD-XXXXXXXX`) with TID verification, duplicate TID flagging, review flags, and a partial unique index allowing at most 3 open tips per (reader_id, writer_id).
+  - **Platform Settings & Rules**: Adds `tips_enabled` (kill switch), `tip_min_pkr` (20), `tip_max_pkr` (5000), `max_tips_per_hour` (5), `tip_daily_cap_pkr_per_reader` (10000), `tip_confirm_reminder_hours` (48), and `use_for_tips` flag on `writer_payment_methods`.
+  - **Atomic RPCs**:
+    - `get_tip_options`: Returns masked payment methods and author tip configuration.
+    - `set_my_tip_settings` / `get_my_tip_settings`: Author self-configuration.
+    - `create_tip`: Enforces hourly limits, daily caps, open tip bounds, and snapshots payment instructions.
+    - `submit_tip_payment`: Validates TID, checks duplicates, computes review flags, and enqueues notification.
+    - `cancel_tip`: Reader cancels pending tip.
+    - `confirm_tip_received` / `mark_tip_not_received`: Author/admin confirms deposit or flags deposit as missing with custom thank-you reply.
+    - `get_my_tips` / `get_my_received_tips`: Reader history and author queue (anonymous reader identity strictly protected).
+    - `get_my_tip_summary`: Private author analytics of confirmed tips.
+    - `hide_tip_message` / `report_tip_message` / `admin_remove_tip_message`: Message moderation.
+    - `admin_list_tips` / `admin_get_tip` / `admin_review_tip`: Administrator inspection and review queue.
+  - **Financial Invariant**: Creates ZERO rows in `sales_ledger`, ZERO rows in `purchase_entitlements`, and ZERO changes to writer commission balances.
+- **Action**: Paste contents of `supabase/migrations/0034_tips.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**:
+  - Run:
+    ```sql
+    SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('get_tip_options', 'create_tip', 'submit_tip_payment', 'confirm_tip_received', 'get_my_tips', 'get_my_received_tips');
+    ```
+    Confirm all functions exist with `prosecdef = true`.
+  - Execute automated test suite: `supabase/tests/20_tips_tests.sql` (23/23 PASS).
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -613,6 +639,7 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/17_sensitive_column_exposure.sql`
    - `supabase/tests/18_chapter_split_tests.sql` (Writer chapter import & split transactional security and integrity tests)
    - `supabase/tests/19_chapter_drafts_tests.sql` (Chapter drafts & autosave isolation, concurrency, rate limits, and security tests)
+   - `supabase/tests/20_tips_tests.sql` (Tip jar & reader appreciation isolation, bounds, rate limits, review flags, and privacy tests)
 3. Run automated Node.js unit tests:
    ```bash
    npm test

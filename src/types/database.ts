@@ -89,7 +89,94 @@ export interface PlatformSettingsRow {
   min_dispute_wait_hours: number;
   verification_reminder_hours: number;
   support_email: string;
+  tips_enabled?: boolean;
+  tip_min_pkr?: number;
+  tip_max_pkr?: number;
+  max_tips_per_hour?: number;
+  tip_daily_cap_pkr_per_reader?: number;
+  tip_confirm_reminder_hours?: number;
   updated_at: string;
+}
+
+export type TipStatus =
+  | 'pending_payment'
+  | 'payment_submitted'
+  | 'confirmed'
+  | 'not_received'
+  | 'cancelled'
+  | 'expired';
+
+export type TipMessageStatus =
+  | 'visible'
+  | 'hidden_by_writer'
+  | 'removed_by_admin';
+
+export interface WriterTipSettingsRow {
+  writer_id: string;
+  enabled: boolean;
+  thank_you_message: string;
+  preset_amounts: number[];
+  min_amount: number | null;
+  max_amount: number | null;
+  updated_at: string;
+}
+
+export interface TipRow {
+  id: string;
+  tip_number: string;
+  reader_id: string;
+  writer_id: string;
+  novel_id: string | null;
+  chapter_id: string | null;
+  amount_pkr: number;
+  currency: string;
+  status: TipStatus;
+  payment_instructions_snapshot: Json;
+  payment_method_id: string | null;
+  transaction_reference_tid: string | null;
+  normalized_tid: string | null;
+  is_duplicate_tid_flagged: boolean;
+  screenshot_path: string | null;
+  sender_account_name: string | null;
+  reader_message: string | null;
+  is_anonymous: boolean;
+  message_status: TipMessageStatus;
+  writer_reply: string | null;
+  review_flag: string | null;
+  open_slot: number | null;
+  confirmed_at: string | null;
+  not_received_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TipOptionsPayload {
+  tips_enabled: boolean;
+  writer_enabled?: boolean;
+  writer_id?: string;
+  writer_pen_name?: string;
+  writer_pen_name_urdu?: string;
+  thank_you_message?: string;
+  preset_amounts?: number[];
+  min_amount_pkr?: number;
+  max_amount_pkr?: number;
+  can_tip: boolean;
+  reason?: string | null;
+  payment_methods?: Array<{
+    id: string;
+    method_type: PaymentMethodType;
+    bank_name: string | null;
+    masked_label: string;
+    instructions_note: string | null;
+  }>;
+}
+
+export interface TipSummaryPayload {
+  writer_id: string;
+  confirmed_tips_count: number;
+  confirmed_total_pkr: number;
+  unique_supporters_count: number;
+  pending_confirmation_count: number;
 }
 
 export interface ChapterReadsRow {
@@ -312,6 +399,7 @@ export interface WriterPaymentMethodRow {
   bank_name: string | null;
   instructions_note: string | null;
   is_active: boolean;
+  use_for_tips?: boolean;
   created_at: string;
 }
 
@@ -1513,6 +1601,52 @@ export interface Database {
         Row: PublicFreePreviewChapter;
         Relationships: [];
       };
+      writer_tip_settings: {
+        Row: WriterTipSettingsRow;
+        Insert: {
+          writer_id: string;
+          enabled?: boolean;
+          thank_you_message?: string;
+          preset_amounts?: number[];
+          min_amount?: number | null;
+          max_amount?: number | null;
+          updated_at?: string;
+        };
+        Update: Partial<WriterTipSettingsRow>;
+        Relationships: [];
+      };
+      tips: {
+        Row: TipRow;
+        Insert: {
+          id?: string;
+          tip_number: string;
+          reader_id: string;
+          writer_id: string;
+          novel_id?: string | null;
+          chapter_id?: string | null;
+          amount_pkr: number;
+          currency?: string;
+          status?: TipStatus;
+          payment_instructions_snapshot: Json;
+          payment_method_id?: string | null;
+          transaction_reference_tid?: string | null;
+          is_duplicate_tid_flagged?: boolean;
+          screenshot_path?: string | null;
+          sender_account_name?: string | null;
+          reader_message?: string | null;
+          is_anonymous?: boolean;
+          message_status?: TipMessageStatus;
+          writer_reply?: string | null;
+          review_flag?: string | null;
+          open_slot?: number | null;
+          confirmed_at?: string | null;
+          not_received_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<TipRow>;
+        Relationships: [];
+      };
     };
     Functions: {
       is_admin: {
@@ -1728,6 +1862,12 @@ export interface Database {
           p_verification_reminder_hours?: number;
           p_unpaid_commission_threshold_pkr?: number;
           p_payment_verification_window_hours?: number;
+          p_tips_enabled?: boolean;
+          p_tip_min_pkr?: number;
+          p_tip_max_pkr?: number;
+          p_max_tips_per_hour?: number;
+          p_tip_daily_cap_pkr_per_reader?: number;
+          p_tip_confirm_reminder_hours?: number;
         };
         Returns: {
           success: boolean;
@@ -2477,6 +2617,146 @@ export interface Database {
           p_days?: number | null;
         };
         Returns: Json;
+      };
+      get_tip_options: {
+        Args: {
+          p_writer_id?: string | null;
+          p_novel_id?: string | null;
+          p_chapter_id?: string | null;
+        };
+        Returns: Json;
+      };
+      set_my_tip_settings: {
+        Args: {
+          p_enabled: boolean;
+          p_thank_you_message: string;
+          p_preset_amounts: number[];
+          p_min_amount?: number | null;
+          p_max_amount?: number | null;
+        };
+        Returns: Json;
+      };
+      get_my_tip_settings: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      create_tip: {
+        Args: {
+          p_writer_id: string;
+          p_amount_pkr: number;
+          p_payment_method_id: string;
+          p_novel_id?: string | null;
+          p_chapter_id?: string | null;
+          p_message?: string | null;
+          p_is_anonymous?: boolean;
+        };
+        Returns: Json;
+      };
+      submit_tip_payment: {
+        Args: {
+          p_tip_id: string;
+          p_tid: string;
+          p_screenshot_path?: string | null;
+          p_sender_name?: string | null;
+        };
+        Returns: Json;
+      };
+      cancel_tip: {
+        Args: {
+          p_tip_id: string;
+        };
+        Returns: Json;
+      };
+      confirm_tip_received: {
+        Args: {
+          p_tip_id: string;
+          p_reply?: string | null;
+        };
+        Returns: Json;
+      };
+      mark_tip_not_received: {
+        Args: {
+          p_tip_id: string;
+          p_note?: string | null;
+        };
+        Returns: Json;
+      };
+      get_my_tips: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      get_tip_by_number: {
+        Args: {
+          p_tip_number: string;
+        };
+        Returns: Json;
+      };
+      get_my_received_tips: {
+        Args: {
+          p_status?: string | null;
+          p_limit?: number | null;
+          p_offset?: number | null;
+        };
+        Returns: Json;
+      };
+      get_my_tip_summary: {
+        Args: {
+          p_from?: string | null;
+          p_to?: string | null;
+        };
+        Returns: Json;
+      };
+      hide_tip_message: {
+        Args: {
+          p_tip_id: string;
+          p_hidden: boolean;
+        };
+        Returns: Json;
+      };
+      report_tip_message: {
+        Args: {
+          p_tip_id: string;
+          p_reason: string;
+        };
+        Returns: Json;
+      };
+      admin_remove_tip_message: {
+        Args: {
+          p_tip_id: string;
+          p_reason: string;
+        };
+        Returns: Json;
+      };
+      admin_list_tips: {
+        Args: {
+          p_status?: string | null;
+          p_search?: string | null;
+          p_flagged_only?: boolean;
+          p_limit?: number | null;
+          p_offset?: number | null;
+        };
+        Returns: Json;
+      };
+      admin_get_tip: {
+        Args: {
+          p_tip_id: string;
+        };
+        Returns: Json;
+      };
+      admin_review_tip: {
+        Args: {
+          p_tip_id: string;
+          p_action: string;
+          p_notes: string;
+        };
+        Returns: Json;
+      };
+      can_access_tip_proof: {
+        Args: {
+          p_folder_name: string;
+          p_action: string;
+        };
+        Returns: boolean;
       };
     };
     Enums: {

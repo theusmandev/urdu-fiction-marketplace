@@ -22,6 +22,7 @@ import {
   HelpCircle,
   Users,
   Grid,
+  Heart,
 } from "lucide-react";
 import { AccountMenu, NotificationBell, LogoutButton } from "./shared";
 import {
@@ -617,6 +618,15 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                   >
                     <ShoppingBag className="w-4 h-4 text-secondary shrink-0" />
                     <span>My Orders</span>
+                  </Link>
+
+                  <Link
+                    href="/tips"
+                    onClick={closeMobileMenu}
+                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-main hover:text-navy hover:bg-ivory transition-colors"
+                  >
+                    <Heart className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>My Tips</span>
                   </Link>
 
                   <Link

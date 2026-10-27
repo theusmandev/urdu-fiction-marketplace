@@ -113,10 +113,45 @@ export const platformSettingsSchema = z
       .max(168, 'Verification reminder hours cannot exceed 168 hours')
       .default(12),
     supportEmail: z.string().trim().email('Please enter a valid support email address'),
+    tipsEnabled: z.boolean().default(true),
+    tipMinPkr: z.coerce
+      .number()
+      .int('Minimum tip must be a whole number')
+      .min(1, 'Minimum tip must be at least 1 PKR')
+      .max(50000, 'Minimum tip cannot exceed 50,000 PKR')
+      .default(20),
+    tipMaxPkr: z.coerce
+      .number()
+      .int('Maximum tip must be a whole number')
+      .min(1, 'Maximum tip must be at least 1 PKR')
+      .max(50000, 'Maximum tip cannot exceed 50,000 PKR')
+      .default(5000),
+    maxTipsPerHour: z.coerce
+      .number()
+      .int('Max tips per hour must be a whole number')
+      .min(1, 'Max tips per hour must be at least 1')
+      .max(100, 'Max tips per hour cannot exceed 100')
+      .default(5),
+    tipDailyCapPkrPerReader: z.coerce
+      .number()
+      .int('Daily tip cap must be a whole number')
+      .min(100, 'Daily tip cap must be at least 100 PKR')
+      .max(500000, 'Daily tip cap cannot exceed 500,000 PKR')
+      .default(10000),
+    tipConfirmReminderHours: z.coerce
+      .number()
+      .int('Tip reminder hours must be a whole number')
+      .min(1, 'Tip reminder hours must be between 1 and 168')
+      .max(168, 'Tip reminder hours cannot exceed 168 hours')
+      .default(48),
   })
   .refine((data) => data.minNovelPricePkr <= data.maxNovelPricePkr, {
     message: 'Minimum novel price cannot exceed maximum novel price',
     path: ['minNovelPricePkr'],
+  })
+  .refine((data) => data.tipMinPkr <= data.tipMaxPkr, {
+    message: 'Minimum tip cannot exceed maximum tip',
+    path: ['tipMinPkr'],
   });
 
 export const writerCommissionTermsSchema = z.object({

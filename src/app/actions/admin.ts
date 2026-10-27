@@ -374,6 +374,12 @@ export async function adminUpdatePlatformSettingsAction(formData: {
   minDisputeWaitHours?: number;
   verificationReminderHours?: number;
   supportEmail: string;
+  tipsEnabled?: boolean;
+  tipMinPkr?: number;
+  tipMaxPkr?: number;
+  maxTipsPerHour?: number;
+  tipDailyCapPkrPerReader?: number;
+  tipConfirmReminderHours?: number;
 }): Promise<ActionResult> {
   await requireRole('admin', '/admin');
   const parsed = platformSettingsSchema.safeParse(formData);
@@ -396,6 +402,12 @@ export async function adminUpdatePlatformSettingsAction(formData: {
     p_overdue_grace_days: parsed.data.overdueGraceDays,
     p_min_dispute_wait_hours: parsed.data.minDisputeWaitHours,
     p_verification_reminder_hours: parsed.data.verificationReminderHours,
+    p_tips_enabled: parsed.data.tipsEnabled,
+    p_tip_min_pkr: parsed.data.tipMinPkr,
+    p_tip_max_pkr: parsed.data.tipMaxPkr,
+    p_max_tips_per_hour: parsed.data.maxTipsPerHour,
+    p_tip_daily_cap_pkr_per_reader: parsed.data.tipDailyCapPkrPerReader,
+    p_tip_confirm_reminder_hours: parsed.data.tipConfirmReminderHours,
   });
 
   if (error) {
