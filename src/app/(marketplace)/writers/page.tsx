@@ -120,11 +120,11 @@ export default async function WritersDirectoryPage() {
               Authors Directory
             </span>
             <h2 className="font-serif text-2xl md:text-3xl font-bold text-navy">
-              Published Pakistani Authors
+              Published Authors
             </h2>
           </div>
           <UrduText size="base" className="text-secondary py-0">
-            پلیٹ فارم کے تصدیق شدہ ناول نگار
+            پلیٹ فارم کے منظور شدہ ناول نگار
           </UrduText>
         </div>
 

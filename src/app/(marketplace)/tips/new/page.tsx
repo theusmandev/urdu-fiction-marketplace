@@ -33,7 +33,7 @@ export default async function NewTipPage({ searchParams }: NewTipPageProps) {
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
         <Link href="/tips" className="hover:text-navy transition-colors">
-          My Tips
+          My Thanks
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
         <span className="text-navy font-semibold">{TIP_CARD_COPY.title}</span>

@@ -59,7 +59,7 @@ export function StudioShellClient({
     },
     {
       href: '/writer/tips',
-      label: 'Tips (Say Thanks)',
+      label: 'Thanks received',
       icon: Heart,
       badge: pendingTipsCount,
       badgeColor: 'bg-amber-500 text-stone-950 font-bold',

@@ -162,9 +162,9 @@ export const tipsCopy = {
   },
 
   writer: {
-    title: 'Say Thanks (Tip Jar)',
-    titleUrdu: 'شکریہ (ٹپ جار)',
-    pageTitle: 'Reader Appreciation & Tips',
+    title: 'Thanks received',
+    titleUrdu: 'موصول شکریے',
+    pageTitle: 'Thanks received / موصول شکریے',
     pageSubtitle: 'Readers who love your stories can send you a voluntary direct gift with 0% platform fee.',
     reminderBannerTitle: 'Voluntary Reader Gifts — Not a Substitute for Book Sales',
     reminderBannerBody: 'Tips are optional gifts and unlock nothing. Asking readers to tip instead of purchasing novels is strictly against the Writer Agreement.',

@@ -127,7 +127,7 @@ export default async function WriterDashboardPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-              Verified Author
+              Approved author
             </span>
             <span className="text-xs text-secondary">
               ID: {user.id.slice(0, 8)}...

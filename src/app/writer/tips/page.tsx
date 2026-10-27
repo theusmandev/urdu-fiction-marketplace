@@ -11,7 +11,7 @@ import type {
 } from '@/types/database';
 
 export const metadata: Metadata = {
-  title: 'Appreciation Tips | Writer Studio | UNB Premium',
+  title: 'Thanks Received | Writer Studio | UNB Premium',
   description: 'Manage reader tips, verification queue, presets, and private monthly gift totals.',
 };
 

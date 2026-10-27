@@ -208,7 +208,7 @@ export function WriterProfileForm({
           {/* Urdu Bio */}
           <div className="space-y-1.5" dir="rtl">
             <label className="block text-xs font-semibold text-main text-right">
-              مصنف کا تعارف (اردو بایو)
+              مصنف کا تعارف
             </label>
             <textarea
               dir="rtl"

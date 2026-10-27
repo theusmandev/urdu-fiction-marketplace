@@ -12,7 +12,7 @@ interface TipDetailPageProps {
 export async function generateMetadata({ params }: TipDetailPageProps) {
   const { tipNumber } = await params;
   return {
-    title: `Tip ${tipNumber} | UNB Premium`,
+    title: `Thanks ${tipNumber} | UNB Premium`,
     description: 'Direct author appreciation gift status and payment details.',
   };
 }

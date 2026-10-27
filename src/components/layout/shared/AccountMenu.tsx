@@ -85,7 +85,7 @@ export function AccountMenu({
     }
     if (user.isWriter || user.role === 'writer') {
       return {
-        label: 'Verified Author',
+        label: 'Approved author',
         classes: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
       };
     }
@@ -322,6 +322,14 @@ export function AccountMenu({
                   <span>My Orders</span>
                 </Link>
                 <Link
+                  href="/writer/tips"
+                  onClick={() => setIsOpen(false)}
+                  className={linkItemStyles}
+                >
+                  <Heart className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Thanks received</span>
+                </Link>
+                <Link
                   href="/account"
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
@@ -382,7 +390,7 @@ export function AccountMenu({
                   className={linkItemStyles}
                 >
                   <Heart className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>My Tips</span>
+                  <span>My Thanks</span>
                 </Link>
                 <Link
                   href="/account"

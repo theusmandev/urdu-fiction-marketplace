@@ -17,6 +17,7 @@ import {
   Save,
   Loader2,
   EyeOff,
+  X,
 } from 'lucide-react';
 import { UrduText } from '@/components/urdu/UrduText';
 import { createClient } from '@/lib/supabase/browser';
@@ -87,6 +88,7 @@ export function WriterTipsClient({
   const [maxAmount, setMaxAmount] = useState<string>(initialSettings.max_amount?.toString() || '');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [settingsFeedback, setSettingsFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showReaderStepsModal, setShowReaderStepsModal] = useState(false);
 
   // Modal states for tip confirmation / rejection
   const [confirmingTip, setConfirmingTip] = useState<WriterReceivedTipItem | null>(null);
@@ -661,24 +663,43 @@ export function WriterTipsClient({
             <div className="lg:col-span-7 space-y-6">
               {/* Enable Switch */}
               <div className="p-6 rounded-2xl bg-surface border border-border/80 shadow-xs space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-sm font-semibold text-main">
-                      {WRITER_STUDIO_COPY.enableSwitchLabel}
-                    </h2>
-                    <p className="text-xs text-secondary mt-0.5">
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="text-sm font-semibold text-main">
+                        {WRITER_STUDIO_COPY.enableSwitchLabel}
+                      </h2>
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                          enabled
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                            : 'bg-stone-200 text-stone-700 dark:bg-stone-800 dark:text-stone-300 border-stone-300 dark:border-stone-700'
+                        }`}
+                      >
+                        {enabled ? 'ON • فعال' : 'OFF • غیر فعال'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-secondary mt-1">
                       {WRITER_STUDIO_COPY.enableSwitchDesc}
                     </p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={enabled}
-                      onChange={(e) => setEnabled(e.target.checked)}
-                      className="sr-only peer"
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={enabled}
+                    onClick={() => setEnabled(!enabled)}
+                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-amber-500/40 ${
+                      enabled ? 'bg-amber-600' : 'bg-slate-300 dark:bg-slate-700'
+                    }`}
+                  >
+                    <span className="sr-only">Accept reader appreciation tips</span>
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        enabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600" />
-                  </label>
+                  </button>
                 </div>
               </div>
 
@@ -832,10 +853,11 @@ export function WriterTipsClient({
                 </p>
 
                 <textarea
+                  dir="auto"
                   value={thankYouMessage}
                   onChange={(e) => setThankYouMessage(e.target.value.slice(0, 500))}
                   rows={3}
-                  className="w-full p-3 rounded-xl border border-border bg-surface text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 resize-none font-urdu"
+                  className="w-full p-3 rounded-xl border border-border bg-surface text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 resize-none font-urdu leading-[2.2] text-start"
                   placeholder="شکریہ! آپ کی پزیرائی کا بہت شکریہ۔"
                 />
               </div>
@@ -876,17 +898,40 @@ export function WriterTipsClient({
 
             {/* Right 5 cols: Live Reader Preview */}
             <div className="lg:col-span-5 space-y-4">
-              <div className="text-xs font-semibold text-secondary uppercase tracking-wider">
-                Live Reader Preview
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
+                  Live Reader Preview
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowReaderStepsModal(true)}
+                  className="text-xs font-medium text-amber-800 dark:text-amber-300 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>See reader&apos;s steps</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
               </div>
 
               {/* Preview card mock */}
-              <div className="rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-5 shadow-xs text-main space-y-4 pointer-events-none opacity-95">
+              <div
+                role="img"
+                aria-label="Non-interactive visual preview of reader appreciation card"
+                className={`relative rounded-2xl border border-amber-200/80 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-5 shadow-xs text-main space-y-4 pointer-events-none select-none overflow-hidden transition-opacity duration-200 ${
+                  enabled ? 'opacity-100' : 'opacity-40 grayscale-25'
+                }`}
+              >
+                {/* Preview Ribbon */}
+                <div className="absolute top-3 right-3">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-amber-200/80 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 px-2 py-0.5 rounded-full border border-amber-300/80 dark:border-amber-700">
+                    PREVIEW • پیش منظر
+                  </span>
+                </div>
+
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0">
                     <Heart className="w-4 h-4 fill-amber-600/30" />
                   </div>
-                  <div>
+                  <div className="pr-16">
                     <h3 className="font-semibold text-sm">Say thanks to {writerPenName}</h3>
                     <UrduText as="p" size="xs" className="text-secondary py-0">
                       یہ کہانی پسند آئی؟ مصنف کو شکریہ کہیں
@@ -902,8 +947,8 @@ export function WriterTipsClient({
                         key={amt}
                         className="py-2 px-1 text-center rounded-lg border border-border/60 bg-surface/80 text-xs"
                       >
-                        <div className="font-medium">{meta?.name || 'Tip'}</div>
-                        <div className="font-bold">PKR {amt}</div>
+                        <div className="font-medium text-[11px] text-secondary">{meta?.name || 'Tip'}</div>
+                        <div className="font-bold text-main">PKR {amt}</div>
                       </div>
                     );
                   })}
@@ -913,10 +958,22 @@ export function WriterTipsClient({
                   Optional. The whole amount goes directly to the author; UNB Premium takes no share.
                 </div>
 
-                <div className="w-full py-2 rounded-xl bg-amber-700 text-white font-medium text-xs text-center">
+                <div className="w-full py-2.5 rounded-xl bg-amber-700 text-white font-medium text-xs text-center cursor-default pointer-events-none shadow-none">
                   Continue • آگے بڑھیں
                 </div>
               </div>
+
+              {/* Dimmed Notice when tips are off */}
+              {!enabled && (
+                <div className="p-3 rounded-xl bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-center space-y-0.5">
+                  <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+                    Tips are off — readers do not see this card
+                  </p>
+                  <UrduText as="p" size="xs" className="text-stone-500 dark:text-stone-400 py-0">
+                    ٹپس غیر فعال ہیں — قارئین کو یہ کارڈ نظر نہیں آئے گا
+                  </UrduText>
+                </div>
+              )}
             </div>
           </div>
         </form>
@@ -989,14 +1046,20 @@ export function WriterTipsClient({
 
             <form onSubmit={handleSubmitConfirm} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1">
-                  Thank-you note to the reader (Urdu or English)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-secondary">
+                    Thank-you note to the reader (Urdu or English)
+                  </label>
+                  <span className="text-[11px] text-secondary">
+                    {confirmReplyText.length} / 500
+                  </span>
+                </div>
                 <textarea
+                  dir="auto"
                   value={confirmReplyText}
                   onChange={(e) => setConfirmReplyText(e.target.value.slice(0, 500))}
                   rows={3}
-                  className="w-full p-3 rounded-xl border border-border bg-surface text-sm focus:outline-hidden font-urdu resize-none"
+                  className="w-full p-3 rounded-xl border border-border bg-surface text-sm focus:outline-hidden font-urdu leading-[2.2] text-start resize-none"
                   placeholder="شکریہ! آپ کی پزیرائی کا بہت شکریہ۔"
                 />
               </div>
@@ -1075,6 +1138,90 @@ export function WriterTipsClient({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* STATIC 3-STEP READER FLOW MODAL (Safe Preview, No Network)           */}
+      {/* ==================================================================== */}
+      {showReaderStepsModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="reader-steps-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div className="w-full max-w-lg rounded-3xl bg-surface border border-border p-6 sm:p-7 shadow-2xl space-y-6">
+            <div className="flex items-start justify-between gap-3 border-b border-border/60 pb-4">
+              <div>
+                <h3 id="reader-steps-modal-title" className="font-bold font-serif text-lg text-main">
+                  How Readers See &amp; Send Appreciation
+                </h3>
+                <UrduText as="p" size="xs" className="text-secondary py-0">
+                  قاری کے لیے شکریہ بھیجنے کے ۳ مراحل
+                </UrduText>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowReaderStepsModal(false)}
+                className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-secondary">
+              {/* Step 1 */}
+              <div className="p-4 rounded-2xl bg-surface-elevated border border-border/60 space-y-2">
+                <div className="flex items-center gap-2 font-semibold text-main">
+                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
+                    1
+                  </span>
+                  <span>Step 1: Reader Selects Amount &amp; Message</span>
+                </div>
+                <p className="leading-relaxed">
+                  The reader picks an appreciation preset (e.g. PKR 250 Mithai) or custom amount, selects your payment channel (JazzCash, EasyPaisa, or Bank), and optionally writes a warm encouragement note.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="p-4 rounded-2xl bg-surface-elevated border border-border/60 space-y-2">
+                <div className="flex items-center gap-2 font-semibold text-main">
+                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
+                    2
+                  </span>
+                  <span>Step 2: Direct Transfer &amp; TID Submission</span>
+                </div>
+                <p className="leading-relaxed">
+                  The reader opens their banking app, transfers the exact amount directly to your account number, and submits the Transaction Reference (TID) and screenshot.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="p-4 rounded-2xl bg-surface-elevated border border-border/60 space-y-2">
+                <div className="flex items-center gap-2 font-semibold text-main">
+                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
+                    3
+                  </span>
+                  <span>Step 3: You Confirm Receipt &amp; Reply</span>
+                </div>
+                <p className="leading-relaxed">
+                  The tip arrives in your Studio Queue. Once you confirm the deposit in your account statement, your configured thank-you message is delivered directly to the reader.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowReaderStepsModal(false)}
+                className="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-semibold cursor-pointer"
+              >
+                Got it • سمجھ گیا
+              </button>
+            </div>
           </div>
         </div>
       )}

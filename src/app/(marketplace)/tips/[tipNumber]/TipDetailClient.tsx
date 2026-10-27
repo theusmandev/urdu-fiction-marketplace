@@ -207,7 +207,7 @@ export function TipDetailClient({
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
         <Link href="/tips" className="hover:text-navy transition-colors">
-          My Tips
+          My Thanks
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
         <span className="font-mono text-navy font-semibold">{tip.tip_number}</span>

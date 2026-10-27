@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldShowTipCard, getTipStatusMeta } from '../src/lib/tips/state.ts';
-import type { TipStatus } from '../src/types/database.ts';
+import { shouldShowTipCard, getTipStatusMeta, resolveTipCardState } from '../src/lib/tips/state.ts';
+import type { TipStatus, TipOptionsPayload } from '../src/types/database.ts';
 
 test('Tip Jar UI State & Visibility Helpers', async (t) => {
   await t.test('shouldShowTipCard respects all product rules and invariants', () => {
@@ -65,5 +65,115 @@ test('Tip Jar UI State & Visibility Helpers', async (t) => {
     assert.equal(formatSenderName('Usman Ali', true), 'Anonymous');
     assert.equal(formatSenderName(null, false), 'Reader');
     assert.equal(formatSenderName(null, true), 'Anonymous');
+  });
+
+  await t.test('resolveTipCardState maps all 8 required visibility and error states accurately', () => {
+    const validPayload: TipOptionsPayload = {
+      tips_enabled: true,
+      writer_enabled: true,
+      writer_id: 'writer-123',
+      can_tip: true,
+      preset_amounts: [100, 250, 500],
+      min_amount_pkr: 20,
+      max_amount_pkr: 5000,
+      payment_methods: [
+        {
+          id: 'pm-1',
+          method_type: 'easypaisa',
+          bank_name: null,
+          masked_label: 'Easypaisa (•••• 1234)',
+          instructions_note: null,
+        },
+      ],
+    };
+
+    // State 1: Signed-out user
+    const signedOutState = resolveTipCardState({
+      isUserSignedIn: false,
+      currentUserId: null,
+      targetWriterId: 'writer-123',
+      payload: validPayload,
+      currentPath: '/writers/nimra-ahmed',
+    });
+    assert.equal(signedOutState.status, 'sign_in_required');
+    if (signedOutState.status === 'sign_in_required') {
+      assert.ok(signedOutState.loginUrl.includes('/auth/login?next='));
+    }
+
+    // State 2: Valid reader
+    const readerState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-456',
+      userRole: 'reader',
+      targetWriterId: 'writer-123',
+      payload: validPayload,
+    });
+    assert.equal(readerState.status, 'ready');
+
+    // State 3: Author on own profile (self-tipping blocked, private settings note shown)
+    const authorOwnState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'writer-123',
+      userRole: 'writer',
+      targetWriterId: 'writer-123',
+      payload: validPayload,
+    });
+    assert.equal(authorOwnState.status, 'author_own_profile');
+    if (authorOwnState.status === 'author_own_profile') {
+      assert.equal(authorOwnState.settingsHref, '/writer/tips');
+    }
+
+    // State 4: Admin viewing profile as admin
+    const adminState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'admin-999',
+      userRole: 'admin',
+      targetWriterId: 'writer-123',
+      payload: validPayload,
+    });
+    assert.equal(adminState.status, 'admin_hidden');
+
+    // State 5: Tips disabled by writer
+    const writerDisabledState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-456',
+      userRole: 'reader',
+      targetWriterId: 'writer-123',
+      payload: { ...validPayload, writer_enabled: false },
+    });
+    assert.equal(writerDisabledState.status, 'disabled_by_writer');
+
+    // State 6: Platform kill switch active
+    const killSwitchState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-456',
+      userRole: 'reader',
+      targetWriterId: 'writer-123',
+      payload: { ...validPayload, tips_enabled: false },
+    });
+    assert.equal(killSwitchState.status, 'kill_switch_active');
+
+    // State 7: Rate-limited
+    const rateLimitedState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-456',
+      userRole: 'reader',
+      targetWriterId: 'writer-123',
+      payload: { ...validPayload, can_tip: false, reason: 'Hourly tip limit reached. Please wait before sending another tip.' },
+    });
+    assert.equal(rateLimitedState.status, 'rate_limited');
+
+    // State 8: Network / Database error
+    const errorState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-456',
+      userRole: 'reader',
+      targetWriterId: 'writer-123',
+      queryError: { code: 'PGRST500', message: 'Database connection failed' },
+    });
+    assert.equal(errorState.status, 'error');
+    if (errorState.status === 'error') {
+      assert.equal(errorState.code, 'PGRST500');
+    }
   });
 });

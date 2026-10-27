@@ -38,7 +38,7 @@ export async function generateMetadata({
   const title = `${writer.pen_name_urdu} (${writer.pen_name_english}) — Author Profile`;
   const description =
     writer.bio_urdu ||
-    `Read digital Urdu novels by Pakistani author ${writer.pen_name_english} (${writer.pen_name_urdu}). Support directly via JazzCash and EasyPaisa.`;
+    `Read digital Urdu novels by author ${writer.pen_name_english} (${writer.pen_name_urdu}). Support directly via JazzCash and EasyPaisa.`;
 
   return {
     title,
@@ -65,6 +65,14 @@ export default async function WriterProfilePage({
   if (!writer) {
     notFound();
   }
+
+  const bioUrdu = writer.bio_urdu?.trim() || "";
+  const bioEnglish = writer.bio_english?.trim() || "";
+  const hasBioUrdu = bioUrdu.length > 0;
+  const hasBioEnglish = bioEnglish.length > 0;
+  const isIdenticalBio = hasBioUrdu && hasBioEnglish && bioUrdu === bioEnglish;
+  const isUrduScript = /[\u0600-\u06FF]/.test(bioUrdu || bioEnglish);
+  const hasAnyBio = hasBioUrdu || hasBioEnglish;
 
   const novels = await getNovelsByWriter(writer.id);
 
@@ -150,44 +158,96 @@ export default async function WriterProfilePage({
           )}
 
           <div className="space-y-3 min-w-0 flex-1">
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-accent/20 text-accent-dark px-2.5 py-0.5 rounded-full border border-accent/30">
                   <CheckCircle2 className="w-3 h-3 text-accent" />
-                  <span>Verified Pakistani Author</span>
+                  <span>Approved author</span>
                 </span>
                 <span className="text-xs text-secondary">
                   @{writer.username}
                 </span>
               </div>
 
-              <UrduText
-                as="h1"
-                size="3xl"
-                className="text-navy font-normal leading-[2.2] py-0"
-              >
-                {writer.pen_name_urdu}
-              </UrduText>
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0 pt-0.5">
+                <UrduText
+                  as="h1"
+                  size="2xl"
+                  className="text-navy font-normal leading-[1.8] py-0"
+                >
+                  {writer.pen_name_urdu}
+                </UrduText>
 
-              <h2 className="font-serif text-lg font-semibold text-secondary">
-                {writer.pen_name_english}
-              </h2>
+                <h2 className="font-serif text-base font-semibold text-secondary">
+                  ({writer.pen_name_english})
+                </h2>
+              </div>
             </div>
 
-            {writer.bio_urdu && (
-              <p
-                dir="rtl"
-                lang="ur"
-                className="font-urdu text-sm text-main leading-[2.3] text-right"
-              >
-                {writer.bio_urdu}
-              </p>
-            )}
+            {hasAnyBio && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-ivory/60 border border-border/70 space-y-3">
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-accent-dark">
+                    About the author
+                  </span>
+                  <UrduText as="span" size="sm" className="text-secondary py-0">
+                    مصنف کا تعارف
+                  </UrduText>
+                </div>
 
-            {writer.bio_english && (
-              <p className="text-xs text-secondary leading-relaxed">
-                {writer.bio_english}
-              </p>
+                {isIdenticalBio ? (
+                  isUrduScript ? (
+                    <p
+                      dir="rtl"
+                      lang="ur"
+                      className="font-urdu text-sm text-main leading-[2.2] text-right"
+                    >
+                      {bioUrdu}
+                    </p>
+                  ) : (
+                    <p
+                      dir="ltr"
+                      lang="en"
+                      className="text-xs text-secondary leading-relaxed text-left"
+                    >
+                      {bioEnglish}
+                    </p>
+                  )
+                ) : hasBioEnglish && hasBioUrdu ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p
+                      dir="ltr"
+                      lang="en"
+                      className="text-xs text-secondary leading-relaxed text-left"
+                    >
+                      {bioEnglish}
+                    </p>
+                    <p
+                      dir="rtl"
+                      lang="ur"
+                      className="font-urdu text-sm text-main leading-[2.2] text-right md:border-l md:border-border/50 md:pl-4"
+                    >
+                      {bioUrdu}
+                    </p>
+                  </div>
+                ) : hasBioUrdu ? (
+                  <p
+                    dir="rtl"
+                    lang="ur"
+                    className="font-urdu text-sm text-main leading-[2.2] text-right"
+                  >
+                    {bioUrdu}
+                  </p>
+                ) : hasBioEnglish ? (
+                  <p
+                    dir="ltr"
+                    lang="en"
+                    className="text-xs text-secondary leading-relaxed text-left"
+                  >
+                    {bioEnglish}
+                  </p>
+                ) : null}
+              </div>
             )}
 
             <div className="flex flex-wrap items-center gap-4 text-xs text-secondary pt-1">

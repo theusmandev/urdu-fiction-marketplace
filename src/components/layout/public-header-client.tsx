@@ -626,7 +626,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                     className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-main hover:text-navy hover:bg-ivory transition-colors"
                   >
                     <Heart className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>My Tips</span>
+                    <span>My Thanks</span>
                   </Link>
 
                   <Link

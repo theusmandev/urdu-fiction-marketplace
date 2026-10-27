@@ -32,7 +32,7 @@ interface ReaderTipItem {
 }
 
 export const metadata = {
-  title: 'My Tips | UNB Premium',
+  title: 'My Thanks | UNB Premium',
   description: 'View your appreciation gifts sent directly to Urdu fiction authors.',
 };
 
@@ -56,7 +56,7 @@ export default async function MyTipsPage() {
           <span>Home</span>
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
-        <span className="text-navy font-semibold">My Tips</span>
+        <span className="text-navy font-semibold">My Thanks</span>
       </nav>
 
       {/* Header */}
@@ -66,9 +66,9 @@ export default async function MyTipsPage() {
             <div className="p-2 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300">
               <Heart className="w-5 h-5 fill-amber-600/30" />
             </div>
-            <h1 className="text-2xl font-bold font-serif text-main">My Tips</h1>
+            <h1 className="text-2xl font-bold font-serif text-main">My Thanks</h1>
             <UrduText as="span" size="sm" className="text-secondary py-0">
-              شکریہ کے پیغامات
+              میرے شکریے
             </UrduText>
           </div>
           <p className="text-xs text-secondary max-w-lg">
@@ -99,9 +99,11 @@ export default async function MyTipsPage() {
       {/* Empty State */}
       {!tipsError && tips.length === 0 && (
         <EmptyState
-          title="No tips sent yet"
+          icon={Heart}
+          title="No thanks sent yet"
+          titleUrdu="ابھی تک آپ نے کسی مصنف کو شکریہ نہیں بھیجا"
           description="When you read a story that touches your heart, you can say thanks to the author with a direct appreciation gift."
-          actionLabel="Explore Masterworks"
+          actionLabel="Browse novels"
           actionHref="/novels"
         />
       )}

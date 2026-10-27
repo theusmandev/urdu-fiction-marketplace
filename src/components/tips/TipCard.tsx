@@ -1,13 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Heart, Sparkles, HelpCircle, AlertCircle, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import {
+  Heart,
+  Sparkles,
+  HelpCircle,
+  AlertCircle,
+  Loader2,
+  X,
+  RotateCw,
+  ArrowRight,
+  Info,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/browser';
 import { UrduText } from '@/components/urdu/UrduText';
 import { HowTipsWorkModal } from './HowTipsWorkModal';
 import { TIP_CARD_COPY, PRESET_LABELS, HOW_TIPS_WORK } from '@/lib/copy/tips';
 import { validateTipAmount, validateTipMessage } from '@/lib/tips/validation';
+import { resolveTipCardState, type TipCardState } from '@/lib/tips/state';
 import type { TipOptionsPayload } from '@/types/database';
 
 interface TipCardProps {
@@ -15,6 +27,8 @@ interface TipCardProps {
   novelId?: string | null;
   chapterId?: string | null;
   className?: string;
+  isModal?: boolean;
+  onClose?: () => void;
   onTipCreated?: (tipNumber: string) => void;
 }
 
@@ -23,13 +37,14 @@ export function TipCard({
   novelId = null,
   chapterId = null,
   className = '',
+  isModal = false,
+  onClose,
   onTipCreated,
 }: TipCardProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
-  const [options, setOptions] = useState<TipOptionsPayload | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [cardState, setCardState] = useState<TipCardState>({ status: 'loading' });
 
   // Form state
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -41,33 +56,22 @@ export function TipCard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
+    const supabase = createClient();
 
-    async function loadTipOptions() {
-      try {
-        const supabase = createClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+    supabase.auth
+      .getSession()
+      .then(async ({ data: { session } }) => {
+        if (!isMounted) return;
 
-        if (!session?.user) {
-          if (isMounted) setLoading(false);
-          return; // Signed-out readers do not see tip card
-        }
-
-        const currentUserId = session.user.id;
-        if (isMounted) {
-          setUserId(currentUserId);
-          setUserRole(session.user.user_metadata?.role || 'reader');
-        }
-
-        // Rule: Writer cannot tip themselves
-        if (writerId && currentUserId === writerId) {
-          if (isMounted) setLoading(false);
-          return;
-        }
+        const currentUserId = session?.user?.id || null;
+        const userRole =
+          session?.user?.user_metadata?.role ||
+          session?.user?.app_metadata?.role ||
+          (session?.user ? 'reader' : null);
 
         const { data, error } = await supabase.rpc('get_tip_options', {
           p_writer_id: writerId || null,
@@ -75,47 +79,65 @@ export function TipCard({
           p_chapter_id: chapterId || null,
         });
 
+        if (!isMounted) return;
+
         if (error) {
-          console.error('get_tip_options error:', error);
-          if (isMounted) setLoading(false);
-          return;
+          console.error('[TipCard:get_tip_options]', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+          });
         }
 
-        const payload = data as unknown as TipOptionsPayload;
-        if (!payload || !payload.tips_enabled || !payload.writer_enabled || !payload.can_tip) {
-          if (isMounted) setLoading(false);
-          return;
-        }
+        const payload = data as unknown as TipOptionsPayload | null;
 
-        if (payload.writer_id && payload.writer_id === currentUserId) {
-          if (isMounted) setLoading(false);
-          return;
-        }
+        const resolved = resolveTipCardState({
+          isUserSignedIn: Boolean(session?.user),
+          currentUserId,
+          userRole,
+          targetWriterId: writerId || payload?.writer_id || null,
+          payload,
+          queryError: error ? { code: error.code, message: error.message } : null,
+          currentPath: pathname || '/tips/new',
+        });
 
-        if (isMounted) {
-          setOptions(payload);
-          const presets = payload.preset_amounts || [100, 250, 500];
-          setSelectedAmount(presets[0] || 100);
+        setCardState(resolved);
+        setLoading(false);
 
-          if (payload.payment_methods && payload.payment_methods.length > 0) {
-            setSelectedMethodId(payload.payment_methods[0].id);
+        if (resolved.status === 'ready') {
+          const presets = resolved.options.preset_amounts || [100, 250, 500];
+          setSelectedAmount((prev) => (prev ? prev : presets[0] || 100));
+
+          if (resolved.options.payment_methods && resolved.options.payment_methods.length > 0) {
+            setSelectedMethodId((prev) => (prev ? prev : resolved.options.payment_methods![0].id));
           }
-          setLoading(false);
         }
-      } catch (err) {
-        console.error('Failed to load tip options:', err);
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    loadTipOptions();
+      })
+      .catch((err: unknown) => {
+        if (!isMounted) return;
+        console.error('[TipCard:loadTipOptions] Unexpected error:', err);
+        const msg = err instanceof Error ? err.message : 'Failed to connect to platform';
+        setCardState({
+          status: 'error',
+          message: msg,
+          messageUrdu: 'سرور سے رابطہ قائم نہیں ہو سکا۔ برائے مہربانی دوبارہ کوشش کریں۔',
+        });
+        setLoading(false);
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [writerId, novelId, chapterId]);
+  }, [writerId, novelId, chapterId, pathname, refreshKey]);
 
-  // If loading, render minimal skeleton preserving layout
+  const handleRetry = () => {
+    setLoading(true);
+    setErrorMessage(null);
+    setRefreshKey((k) => k + 1);
+  };
+
+  // Loading skeleton
   if (loading) {
     return (
       <div
@@ -133,14 +155,191 @@ export function TipCard({
     );
   }
 
-  // If tips cannot be shown for this writer or user
-  if (!options || !userId || userId === writerId || userRole === 'admin') {
+  // Author viewing own profile/novel
+  if (cardState.status === 'author_own_profile') {
+    return (
+      <div
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-300/60 dark:border-amber-800/60 bg-amber-50/50 dark:bg-amber-950/20 p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-semibold text-sm">
+            <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span>Author View • مصنف کا منظر</span>
+          </div>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-secondary leading-relaxed">{cardState.message}</p>
+        <UrduText as="p" size="xs" className="text-secondary/90 py-0">
+          {cardState.messageUrdu}
+        </UrduText>
+        <div className="pt-1">
+          <Link
+            href={cardState.settingsHref}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold transition-colors min-h-[44px]"
+          >
+            <span>Open Tip Settings</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin browsing as admin
+  if (cardState.status === 'admin_hidden') {
+    return (
+      <div
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-border/80 bg-surface p-4 text-xs text-secondary flex items-center justify-between ${className}`}
+      >
+        <span>{cardState.message}</span>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Sign in required
+  if (cardState.status === 'sign_in_required') {
+    return (
+      <div
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-6 shadow-xs text-main space-y-4 text-center ${className}`}
+      >
+        {onClose && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        <div className="w-12 h-12 rounded-2xl bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 flex items-center justify-center mx-auto shadow-xs">
+          <Heart className="w-6 h-6 fill-amber-600/30" />
+        </div>
+        <div className="space-y-1">
+          <h3 className="font-semibold text-base text-main">{TIP_CARD_COPY.title}</h3>
+          <p className="text-xs text-secondary">{cardState.message}</p>
+          <UrduText as="p" size="xs" className="text-secondary/90 py-0">
+            {cardState.messageUrdu}
+          </UrduText>
+        </div>
+        <Link
+          href={cardState.loginUrl}
+          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold transition-colors min-h-[44px] shadow-xs"
+        >
+          <span>Sign In to Say Thanks</span>
+          <span className="font-urdu text-sm py-0">لاگ ان کریں</span>
+        </Link>
+      </div>
+    );
+  }
+
+  // Informational business state (disabled by writer, platform paused, ineligible, limit reached)
+  if (
+    cardState.status === 'disabled_by_writer' ||
+    cardState.status === 'kill_switch_active' ||
+    cardState.status === 'writer_ineligible' ||
+    cardState.status === 'no_payment_methods' ||
+    cardState.status === 'rate_limited' ||
+    cardState.status === 'daily_cap_exceeded'
+  ) {
+    return (
+      <div
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-semibold text-sm">
+            <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span>Notice • اطلاع</span>
+          </div>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-secondary leading-relaxed">{cardState.message}</p>
+        <UrduText as="p" size="xs" className="text-secondary/90 py-0">
+          {cardState.messageUrdu}
+        </UrduText>
+      </div>
+    );
+  }
+
+  // Query/Network error with retry button
+  if (cardState.status === 'error') {
+    return (
+      <div
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 text-rose-900 dark:text-rose-200 font-semibold text-sm">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <span>Unable to Load • خرابی</span>
+          </div>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">{cardState.message}</p>
+        <UrduText as="p" size="xs" className="text-rose-800/80 dark:text-rose-300/80 py-0">
+          {cardState.messageUrdu}
+        </UrduText>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface border border-rose-300 hover:bg-rose-50 text-rose-900 dark:text-rose-200 text-xs font-semibold transition-colors min-h-[44px] cursor-pointer"
+          >
+            <RotateCw className="w-3.5 h-3.5" />
+            <span>Try Again • دوبارہ کوشش کریں</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Ready State: Interactive Tip Form
+  if (cardState.status !== 'ready') {
     return null;
   }
 
+  const options = cardState.options;
   const minAmount = options.min_amount_pkr ?? 20;
   const maxAmount = options.max_amount_pkr ?? 5000;
-  const presets = options.preset_amounts || [100, 250, 500];
+  const presets: number[] = options.preset_amounts || [100, 250, 500];
 
   const handleSelectPreset = (amount: number) => {
     setIsCustom(false);
@@ -217,7 +416,12 @@ export function TipCard({
       });
 
       if (error) {
-        console.error('create_tip error:', error);
+        console.error('[TipCard:create_tip]', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
         setErrorMessage(error.message || TIP_CARD_COPY.errors.failedToCreate);
         setIsSubmitting(false);
         return;
@@ -236,17 +440,19 @@ export function TipCard({
         router.push(`/tips/${res.tip_number}`);
       }
     } catch (err: unknown) {
-      console.error('Failed to submit tip:', err);
+      console.error('[TipCard:submitTip] Unexpected error:', err);
       const msg = err instanceof Error ? err.message : TIP_CARD_COPY.errors.failedToCreate;
       setErrorMessage(msg);
       setIsSubmitting(false);
     }
   };
 
+  const paddingClasses = isModal ? 'p-4 sm:p-5' : 'p-5 sm:p-7';
+
   return (
     <>
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-5 sm:p-7 shadow-xs text-main transition-all ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] ${paddingClasses} shadow-xs text-main transition-all ${className}`}
         id="tip-card"
       >
         {/* Header */}
@@ -256,7 +462,7 @@ export function TipCard({
               <Heart className="w-5 h-5 fill-amber-600/30 dark:fill-amber-400/30" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-baseline gap-2">
                 <h3 className="font-semibold text-base sm:text-lg text-main">
                   {TIP_CARD_COPY.title}
                 </h3>
@@ -270,15 +476,27 @@ export function TipCard({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1 text-xs text-secondary hover:text-main transition-colors py-1 px-2 rounded-lg hover:bg-amber-100/40 dark:hover:bg-amber-900/20 min-h-[44px]"
-            title={HOW_TIPS_WORK.title}
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">How it works</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-1 text-xs text-secondary hover:text-main transition-colors py-1 px-2 rounded-lg hover:bg-amber-100/40 dark:hover:bg-amber-900/20 min-h-[44px]"
+              title={HOW_TIPS_WORK.title}
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">How it works</span>
+            </button>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 rounded-lg text-secondary hover:text-main min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Form */}
@@ -289,7 +507,7 @@ export function TipCard({
               Select appreciation amount (PKR)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {presets.map((preset) => {
+              {presets.map((preset: number) => {
                 const meta = PRESET_LABELS[preset as keyof typeof PRESET_LABELS];
                 const isSelected = !isCustom && selectedAmount === preset;
 
@@ -326,86 +544,109 @@ export function TipCard({
                 }`}
               >
                 <span className="text-xs font-medium">{TIP_CARD_COPY.customLabel}</span>
+                <span className="text-xs text-secondary font-mono">Other</span>
                 <UrduText as="span" size="xs" className="text-[10px] text-secondary py-0">
                   {TIP_CARD_COPY.customLabelUrdu}
                 </UrduText>
               </button>
             </div>
 
-            {/* Custom Input */}
+            {/* Custom Amount Input Field */}
             {isCustom && (
-              <div className="mt-3">
-                <div className="relative rounded-xl border border-amber-300 dark:border-amber-800 bg-surface overflow-hidden focus-within:ring-2 focus-within:ring-amber-500/30">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-secondary">
+              <div className="mt-3 p-3 rounded-xl bg-surface/80 border border-amber-300/80 dark:border-amber-800/80 space-y-2 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between text-xs text-secondary">
+                  <span>Enter amount</span>
+                  <span>
+                    Min: {minAmount} • Max: {maxAmount} PKR
+                  </span>
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-secondary font-mono">
                     PKR
                   </span>
                   <input
                     type="text"
                     inputMode="numeric"
+                    pattern="[0-9]*"
                     value={customInput}
                     onChange={handleCustomChange}
-                    placeholder={`Between ${minAmount} and ${maxAmount}`}
-                    className="w-full pl-12 pr-4 py-2.5 text-sm bg-transparent outline-hidden min-h-[44px]"
+                    placeholder={`e.g. ${presets[0] || 100}`}
+                    className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-border bg-surface text-main font-semibold text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30"
                     autoFocus
                   />
                 </div>
-                <p className="text-[11px] text-secondary mt-1">
-                  Min PKR {minAmount} • Max PKR {maxAmount}
-                </p>
               </div>
             )}
           </div>
 
-          {/* Payment Method Selector (if multiple accounts available) */}
-          {options.payment_methods && options.payment_methods.length > 0 && (
-            <div>
-              <label className="block text-xs font-medium text-secondary mb-1.5">
-                Author&apos;s receiving account
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {options.payment_methods.map((method) => {
-                  const isSelected = selectedMethodId === method.id;
-                  return (
-                    <button
-                      key={method.id}
-                      type="button"
-                      onClick={() => setSelectedMethodId(method.id)}
-                      className={`text-left p-3 rounded-xl border text-xs transition-all min-h-[44px] flex items-center justify-between ${
-                        isSelected
-                          ? 'border-amber-500 bg-amber-100/50 dark:bg-amber-900/30 font-medium'
-                          : 'border-border/60 bg-surface/50 hover:bg-surface'
-                      }`}
-                    >
-                      <span className="capitalize">{method.masked_label}</span>
-                      {isSelected && <span className="text-amber-700 dark:text-amber-400 font-bold">✓</span>}
-                    </button>
-                  );
-                })}
-              </div>
+          {/* Payment Method Selector */}
+          <div>
+            <label className="block text-xs font-medium text-secondary mb-2">
+              Pay directly to author via
+            </label>
+            <div className="space-y-2">
+              {options.payment_methods?.map((pm: NonNullable<TipOptionsPayload['payment_methods']>[number]) => {
+                const isSelected = selectedMethodId === pm.id;
+                return (
+                  <label
+                    key={pm.id}
+                    className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer select-none transition-all ${
+                      isSelected
+                        ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 text-main'
+                        : 'border-border/60 bg-surface/70 hover:bg-amber-50/30 text-secondary'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        value={pm.id}
+                        checked={isSelected}
+                        onChange={() => setSelectedMethodId(pm.id)}
+                        className="text-amber-600 focus:ring-amber-500/30"
+                      />
+                      <div>
+                        <span className="text-xs font-semibold capitalize text-main">
+                          {pm.bank_name || pm.method_type.replace('_', ' ')}
+                        </span>
+                        <span className="text-xs text-secondary ml-2 font-mono">
+                          {pm.masked_label}
+                        </span>
+                        {pm.instructions_note && (
+                          <span className="block text-[11px] text-secondary mt-0.5">
+                            {pm.instructions_note}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
             </div>
-          )}
+          </div>
 
-          {/* Reader Appreciation Message */}
+          {/* Reader Message (Optional Note) */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-medium text-secondary">
                 Optional note of encouragement
               </label>
-              <span className="text-[11px] text-secondary">
+              <span className="text-[11px] text-secondary font-mono">
                 {readerMessage.length} / 300
               </span>
             </div>
             <textarea
+              dir="auto"
               value={readerMessage}
               onChange={(e) => setReaderMessage(e.target.value.slice(0, 300))}
               placeholder="Add a warm word of appreciation... / مصنف کے لیے حوصلہ افزا پیغام لکھیں"
               rows={2}
-              className="w-full p-3 rounded-xl border border-border/60 bg-surface/70 text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 resize-none"
+              className="w-full p-3 rounded-xl border border-border/60 bg-surface/70 text-sm font-urdu leading-[2.2] text-start focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 resize-none"
             />
           </div>
 
           {/* Anonymous Option */}
-          <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <label className="flex items-center gap-2.5 cursor-pointer select-none min-h-[44px]">
             <input
               type="checkbox"
               checked={isAnonymous}
@@ -452,9 +693,10 @@ export function TipCard({
             ) : (
               <>
                 <span>{TIP_CARD_COPY.continueButton}</span>
-                <UrduText as="span" size="sm" className="py-0 inline">
+                <span className="text-white/60"> • </span>
+                <span className="font-urdu text-sm py-0 inline">
                   {TIP_CARD_COPY.continueButtonUrdu}
-                </UrduText>
+                </span>
               </>
             )}
           </button>

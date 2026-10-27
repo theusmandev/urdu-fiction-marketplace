@@ -89,3 +89,149 @@ export function getTipStatusMeta(status: TipStatus): TipStatusMeta {
       };
   }
 }
+
+export type TipCardState =
+  | { status: 'loading' }
+  | { status: 'author_own_profile'; message: string; messageUrdu: string; settingsHref: string }
+  | { status: 'admin_hidden'; message: string }
+  | { status: 'sign_in_required'; message: string; messageUrdu: string; loginUrl: string }
+  | { status: 'kill_switch_active'; message: string; messageUrdu: string }
+  | { status: 'disabled_by_writer'; message: string; messageUrdu: string }
+  | { status: 'writer_ineligible'; message: string; messageUrdu: string }
+  | { status: 'no_payment_methods'; message: string; messageUrdu: string }
+  | { status: 'rate_limited'; message: string; messageUrdu: string }
+  | { status: 'daily_cap_exceeded'; message: string; messageUrdu: string }
+  | { status: 'error'; message: string; messageUrdu: string; code?: string }
+  | { status: 'ready'; options: import('@/types/database').TipOptionsPayload };
+
+export interface ResolveTipCardStateParams {
+  isUserSignedIn: boolean;
+  currentUserId?: string | null;
+  userRole?: string | null;
+  targetWriterId?: string | null;
+  payload?: import('@/types/database').TipOptionsPayload | null;
+  queryError?: { code?: string; message?: string } | null;
+  currentPath?: string;
+}
+
+export function resolveTipCardState({
+  isUserSignedIn,
+  currentUserId,
+  userRole,
+  targetWriterId,
+  payload,
+  queryError,
+  currentPath = '/tips/new',
+}: ResolveTipCardStateParams): TipCardState {
+  // 1. Author viewing own content / profile
+  if (currentUserId && targetWriterId && currentUserId === targetWriterId) {
+    return {
+      status: 'author_own_profile',
+      message: "Readers see a 'Say thanks' button here.",
+      messageUrdu: 'قارئین کو یہاں شکریہ کا بٹن نظر آتا ہے۔',
+      settingsHref: '/writer/tips',
+    };
+  }
+
+  // 2. Admin viewing as admin
+  if (userRole === 'admin') {
+    return {
+      status: 'admin_hidden',
+      message: 'Appreciation tipping is not available when browsing as admin.',
+    };
+  }
+
+  // 3. Database / RPC query error
+  if (queryError) {
+    return {
+      status: 'error',
+      message: queryError.message || 'Unable to load appreciation options.',
+      messageUrdu: 'شکریہ کے اختیارات لوڈ نہیں ہو سکے۔ برائے مہربانی دوبارہ کوشش کریں۔',
+      code: queryError.code,
+    };
+  }
+
+  // 4. Signed out reader
+  if (!isUserSignedIn) {
+    return {
+      status: 'sign_in_required',
+      message: 'Sign in to say thanks to the author.',
+      messageUrdu: 'مصنف کو شکریہ کہنے کے لیے لاگ ان کریں۔',
+      loginUrl: `/auth/login?next=${encodeURIComponent(currentPath)}`,
+    };
+  }
+
+  // If no payload received yet
+  if (!payload) {
+    return {
+      status: 'error',
+      message: 'Appreciation options unavailable.',
+      messageUrdu: 'شکریہ کے اختیارات فی الوقت دستیاب نہیں ہیں۔',
+    };
+  }
+
+  // 5. Global kill switch off
+  if (!payload.tips_enabled) {
+    return {
+      status: 'kill_switch_active',
+      message: 'Reader appreciation tips are temporarily paused platform-wide.',
+      messageUrdu: 'پلیٹ فارم پر شکریہ کے تحائف فی الوقت عارضی طور پر موقوف ہیں۔',
+    };
+  }
+
+  // 6. Writer disabled tips
+  if (payload.writer_enabled === false) {
+    return {
+      status: 'disabled_by_writer',
+      message: 'The author has currently turned off appreciation tips.',
+      messageUrdu: 'مصنف نے فی الوقت شکریہ کا آپشن بند کر رکھا ہے۔',
+    };
+  }
+
+  // 7. Writer not eligible (e.g. suspended or pending)
+  if (!payload.can_tip && payload.reason?.includes('not eligible')) {
+    return {
+      status: 'writer_ineligible',
+      message: 'This author is not currently eligible to receive appreciation gifts.',
+      messageUrdu: 'یہ مصنف فی الوقت تحائف وصول کرنے کے اہل نہیں ہیں۔',
+    };
+  }
+
+  // 8. No active payment methods
+  if (!payload.can_tip && (payload.reason?.includes('no active payment') || !payload.payment_methods || payload.payment_methods.length === 0)) {
+    return {
+      status: 'no_payment_methods',
+      message: 'The author has not yet configured active payment accounts for appreciation.',
+      messageUrdu: 'مصنف نے ابھی تک کوئی فعال ادائیگی اکاؤنٹ ترتیب نہیں دیا۔',
+    };
+  }
+
+  // 9. Specific business limits in reason
+  if (!payload.can_tip && payload.reason) {
+    if (payload.reason.includes('Hourly tip limit') || payload.reason.includes('rate limit')) {
+      return {
+        status: 'rate_limited',
+        message: 'Hourly tip limit reached. Please wait before sending another tip.',
+        messageUrdu: 'فی گھنٹہ شکریہ بھیجنے کی حد مکمل ہو چکی ہے۔ برائے مہربانی کچھ دیر بعد کوشش کریں۔',
+      };
+    }
+    if (payload.reason.includes('Daily tipping cap') || payload.reason.includes('daily')) {
+      return {
+        status: 'daily_cap_exceeded',
+        message: 'Daily appreciation limit reached for your account. Please try again tomorrow.',
+        messageUrdu: 'روزانہ شکریہ بھیجنے کی حد مکمل ہو چکی ہے۔ برائے مہربانی کل دوبارہ تشریف لائیں۔',
+      };
+    }
+    return {
+      status: 'error',
+      message: payload.reason,
+      messageUrdu: 'شکریہ کا عمل شروع نہیں ہو سکا۔',
+    };
+  }
+
+  // 10. Ready
+  return {
+    status: 'ready',
+    options: payload,
+  };
+}
