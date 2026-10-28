@@ -26,6 +26,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { AccountMenu, NotificationBell } from '../shared';
+import { AdminPalettePreview } from '@/components/admin/AdminPalettePreview';
 import type { ProfileRow } from '@/types/database';
 
 export interface AdminBadgeCounts {
@@ -445,6 +446,7 @@ export function AdminShellClient({
           />
         </div>
       )}
+      <AdminPalettePreview role="admin" />
     </div>
   );
 }

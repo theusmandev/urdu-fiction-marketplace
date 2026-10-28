@@ -2,6 +2,7 @@ import React from 'react';
 import { PublicHeader } from '@/components/layout/public-header';
 import { PublicFooter } from '@/components/layout/public-footer';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { AdminPalettePreview } from '@/components/admin/AdminPalettePreview';
 
 export default function MarketplaceLayout({
   children,
@@ -28,6 +29,7 @@ export default function MarketplaceLayout({
       </main>
       <PublicFooter />
       <BottomNav />
+      <AdminPalettePreview />
     </div>
   );
 }

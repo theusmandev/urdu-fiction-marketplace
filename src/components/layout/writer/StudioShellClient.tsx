@@ -22,6 +22,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { AccountMenu, NotificationBell } from '../shared';
+import { AdminPalettePreview } from '@/components/admin/AdminPalettePreview';
 import type { ProfileRow, WriterProfileRow } from '@/types/database';
 
 export interface StudioShellClientProps {
@@ -386,6 +387,7 @@ export function StudioShellClient({
           </div>
         </main>
       </div>
+      <AdminPalettePreview role={profile.role} />
     </div>
   );
 }

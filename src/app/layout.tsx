@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans, Cormorant_Garamond, Gulzar, Amiri } from "next/font/
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { DevFloatingPaletteSwitcher } from "@/components/dev/DevFloatingPaletteSwitcher";
+import { getSitePalette } from "@/lib/settings/site-palette";
+import { getPaletteThemeColor } from "@/lib/settings/palette";
 
 // Primary Latin UI Font: Clean, high-legibility sans-serif for prices, TIDs, dashboards
 const sansFont = Plus_Jakarta_Sans({
@@ -70,24 +72,28 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const palette = await getSitePalette();
+  const metaThemeColor = getPaletteThemeColor(palette);
+
   return (
     <html
       lang="en"
-      data-palette="A"
+      data-palette={palette}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${sansFont.variable} ${serifFont.variable} ${urduFont.variable} ${arabicFont.variable}`}
     >
       <head>
+        <meta name="theme-color" content={metaThemeColor} />
         {process.env.NODE_ENV === "development" && (
           <script
             dangerouslySetInnerHTML={{
-              __html: `(function(){try{var p=localStorage.getItem("unb_dev_palette");if(p==="A"||p==="B"||p==="C"){document.documentElement.setAttribute("data-palette",p);}}catch(e){}})();`,
+              __html: `(function(){try{var p=localStorage.getItem("unb_dev_palette");if(p==="A"||p==="B"||p==="C"||p==="ivory_ink"||p==="paper_teal"||p==="cream_maroon"){document.documentElement.setAttribute("data-palette",p);}}catch(e){}})();`,
             }}
           />
         )}

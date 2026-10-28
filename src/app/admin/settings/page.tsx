@@ -4,6 +4,8 @@ import { createServerClient } from '@/lib/supabase/server';
 import { unwrapSingleQuery } from '@/lib/supabase/query';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
+import { AdminAppearanceCard } from '@/components/admin/AdminAppearanceCard';
+import { isSitePalette, type SitePalette } from '@/lib/settings/palette';
 import { Settings, AlertCircle } from 'lucide-react';
 import type { PlatformPaymentMethodRow } from '@/types/database';
 
@@ -39,6 +41,9 @@ export default async function AdminSettingsPage() {
         max_tips_per_hour,
         tip_daily_cap_pkr_per_reader,
         tip_confirm_reminder_hours,
+        site_palette,
+        site_palette_updated_at,
+        site_palette_updated_by,
         updated_at
       `)
       .eq('id', 1)
@@ -69,6 +74,9 @@ export default async function AdminSettingsPage() {
     max_tips_per_hour?: number;
     tip_daily_cap_pkr_per_reader?: number;
     tip_confirm_reminder_hours?: number;
+    site_palette?: string;
+    site_palette_updated_at?: string | null;
+    site_palette_updated_by?: string | null;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
@@ -160,6 +168,35 @@ export default async function AdminSettingsPage() {
 
   const pageError = settingsError || paymentLoadError;
 
+  let lastPaletteUpdatedBy: { name: string; username?: string | null } | null = null;
+  if (rawSettings?.site_palette_updated_by) {
+    const updatedByRes = await supabase
+      .from('profiles')
+      .select('full_name, username')
+      .eq('id', rawSettings.site_palette_updated_by)
+      .maybeSingle();
+
+    const { data: updatedByProfile, error: updatedByError } = unwrapSingleQuery<{
+      full_name: string | null;
+      username: string | null;
+    }>(updatedByRes, {
+      context: 'AdminSettingsPage.site_palette_updated_by',
+    });
+
+    if (updatedByError) {
+      console.warn('[AdminSettingsPage] Failed to fetch palette updater profile:', updatedByError.message);
+    } else if (updatedByProfile) {
+      lastPaletteUpdatedBy = {
+        name: updatedByProfile.full_name || `@${updatedByProfile.username || 'admin'}`,
+        username: updatedByProfile.username,
+      };
+    }
+  }
+
+  const initialPalette: SitePalette = isSitePalette(rawSettings?.site_palette)
+    ? rawSettings.site_palette
+    : 'ivory_ink';
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
@@ -186,6 +223,13 @@ export default async function AdminSettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Site Appearance Palette Card */}
+      <AdminAppearanceCard
+        currentPalette={initialPalette}
+        lastUpdatedBy={lastPaletteUpdatedBy}
+        lastUpdatedAt={rawSettings?.site_palette_updated_at}
+      />
 
       <PlatformSettingsForm initialSettings={currentSettings} />
 

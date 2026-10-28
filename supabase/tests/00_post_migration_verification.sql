@@ -196,12 +196,15 @@ DECLARE
     ];
 
     -- Explicit allow-list for anon EXECUTE (catalog/RLS helpers only)
+    -- get_public_site_settings: Deliberately executable by anon and authenticated for
+    -- root layout SSR/ISR palette resolution; returns strictly {palette} with fallback.
     v_anon_allowlist text[] := ARRAY[
         'search_public_novels',
         'get_public_novel_chapters',
         'has_novel_entitlement',
         'is_admin',
-        'get_tip_options'
+        'get_tip_options',
+        'get_public_site_settings'
     ];
 
     -- Authenticated-only workflow RPCs (must exist; must NOT be anon-executable)
@@ -215,7 +218,7 @@ DECLARE
         'open_dispute', 'resolve_dispute_for_reader_verify',
         'resolve_dispute_refund', 'resolve_dispute_for_writer',
         'close_dispute', 'request_refund', 'approve_refund_request',
-        'reject_refund_request', 'update_platform_settings',
+        'reject_refund_request', 'update_platform_settings', 'set_site_palette',
         'set_my_tip_settings', 'get_my_tip_settings', 'create_tip',
         'submit_tip_payment', 'cancel_tip', 'confirm_tip_received',
         'mark_tip_not_received', 'get_my_tips', 'get_tip_by_number', 'get_my_received_tips',
@@ -363,6 +366,20 @@ BEGIN
         INSERT INTO temp_verification_results (check_category, check_name, status, details)
         VALUES ('COLUMNS', 'platform_settings.default_unpaid_commission_limit', 'FAIL',
             'Column mismatch on platform_settings');
+    END IF;
+
+    -- platform_settings: site_palette exists
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_schema='public' AND table_name='platform_settings'
+               AND column_name='site_palette')
+    THEN
+        INSERT INTO temp_verification_results (check_category, check_name, status, details)
+        VALUES ('COLUMNS', 'platform_settings.site_palette', 'PASS',
+            'site_palette column exists');
+    ELSE
+        INSERT INTO temp_verification_results (check_category, check_name, status, details)
+        VALUES ('COLUMNS', 'platform_settings.site_palette', 'FAIL',
+            'site_palette column missing from platform_settings');
     END IF;
 
     -- =========================================================================

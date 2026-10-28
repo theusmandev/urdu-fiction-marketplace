@@ -11,7 +11,12 @@
    PALETTE A: Ivory & Ink (Default Preset)
    -------------------------------------------------------------------------- */
 :root,
+html[data-palette="ivory_ink"],
 html[data-palette="A"],
+html[data-palette="a"],
+[data-palette="ivory_ink"],
+[data-palette="A"],
+[data-palette="a"],
 html:not([data-palette]) {
   /* Canvas & Surface */
   --color-bg: #FBF8F2;
@@ -84,7 +89,12 @@ html:not([data-palette]) {
 /* --------------------------------------------------------------------------
    PALETTE B: Paper & Teal
    -------------------------------------------------------------------------- */
-html[data-palette="B"] {
+html[data-palette="paper_teal"],
+html[data-palette="B"],
+html[data-palette="b"],
+[data-palette="paper_teal"],
+[data-palette="B"],
+[data-palette="b"] {
   /* Canvas & Surface */
   --color-bg: #FAF7F0;
   --color-surface: #FFFFFF;
@@ -156,7 +166,12 @@ html[data-palette="B"] {
 /* --------------------------------------------------------------------------
    PALETTE C: Cream & Maroon
    -------------------------------------------------------------------------- */
-html[data-palette="C"] {
+html[data-palette="cream_maroon"],
+html[data-palette="C"],
+html[data-palette="c"],
+[data-palette="cream_maroon"],
+[data-palette="C"],
+[data-palette="c"] {
   /* Canvas & Surface */
   --color-bg: #FCF9F4;
   --color-surface: #FFFFFF;

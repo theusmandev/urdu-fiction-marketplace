@@ -95,6 +95,9 @@ export interface PlatformSettingsRow {
   max_tips_per_hour?: number;
   tip_daily_cap_pkr_per_reader?: number;
   tip_confirm_reminder_hours?: number;
+  site_palette?: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
+  site_palette_updated_at?: string | null;
+  site_palette_updated_by?: string | null;
   updated_at: string;
 }
 
@@ -1844,6 +1847,22 @@ export interface Database {
       delete_genre: {
         Args: { p_genre_id: string };
         Returns: { success: boolean; deleted_id: string };
+      };
+      get_public_site_settings: {
+        Args: Record<string, never>;
+        Returns: {
+          palette: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
+        };
+      };
+      set_site_palette: {
+        Args: {
+          p_palette: string;
+          p_note?: string | null;
+        };
+        Returns: {
+          palette: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
+          updated_at: string;
+        };
       };
       update_platform_settings: {
         Args: {

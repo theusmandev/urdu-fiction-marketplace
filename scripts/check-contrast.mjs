@@ -75,9 +75,9 @@ function run() {
   const css = fs.readFileSync(TOKENS_PATH, 'utf8');
 
   // Extract variables for each palette block
-  const paletteABlock = css.match(/(?::root[\s\S]*?)(?=html\[data-palette="B"\])/);
-  const paletteBBlock = css.match(/html\[data-palette="B"\]\s*\{([\s\S]*?)\}/);
-  const paletteCBlock = css.match(/html\[data-palette="C"\]\s*\{([\s\S]*?)\}/);
+  const paletteABlock = css.match(/(?::root[\s\S]*?)(?=\/\*\s*-*\s*PALETTE B:)/i);
+  const paletteBBlock = css.match(/(?:\/\*\s*-*\s*PALETTE B:[\s\S]*?)(?=\/\*\s*-*\s*PALETTE C:)/i);
+  const paletteCBlock = css.match(/(?:\/\*\s*-*\s*PALETTE C:[\s\S]*?)(?=\/\*\s*-*\s*ROLE ACCENT SCOPES)/i);
 
   const tokensA = extractTokensFromBlock(paletteABlock ? paletteABlock[0] : '', /\{([\s\S]*?)\}/);
   const tokensB = extractTokensFromBlock(paletteBBlock ? paletteBBlock[0] : '', /\{([\s\S]*?)\}/);

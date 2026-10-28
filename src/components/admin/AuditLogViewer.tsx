@@ -65,6 +65,7 @@ export function AuditLogViewer({
   };
 
   const ACTION_DISPLAY_LABELS: Record<string, string> = {
+    SET_SITE_PALETTE: 'Site palette changed',
     SET_WRITER_COMMISSION_TERMS: 'Set Writer Platform Fee Terms',
     CONFIRM_COMMISSION_SETTLEMENT: 'Confirm Platform Fee Settlement',
     REJECT_COMMISSION_REPORT: 'Reject Platform Fee Report',

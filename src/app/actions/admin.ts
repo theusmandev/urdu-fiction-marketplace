@@ -2,7 +2,8 @@
 
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { isSitePalette, ALLOWED_SITE_PALETTES, type SitePalette } from '@/lib/settings/palette';
 import {
   suspendNovelSchema,
   unsuspendNovelSchema,
@@ -454,4 +455,55 @@ export async function adminUpdateUserRoleStatusAction(formData: {
   revalidatePath('/admin');
   revalidatePath('/admin/users');
   return { success: true, data };
+}
+
+// -----------------------------------------------------------------------------
+// 6. SITE APPEARANCE & THEME PALETTE ACTIONS
+// -----------------------------------------------------------------------------
+
+export async function adminSetSitePaletteAction(
+  palette: string,
+  note?: string | null
+): Promise<ActionResult<{ palette: SitePalette; updatedAt: string }>> {
+  await requireRole('admin', '/admin');
+
+  if (!isSitePalette(palette)) {
+    return {
+      success: false,
+      error: `Invalid site palette. Allowed values: ${ALLOWED_SITE_PALETTES.join(', ')}`,
+    };
+  }
+
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc('set_site_palette', {
+    p_palette: palette,
+    p_note: note?.trim() || null,
+  });
+
+  if (error) {
+    console.error('[adminSetSitePaletteAction] RPC error:', error);
+    return { success: false, error: error.message };
+  }
+
+  const result = data as { palette: SitePalette; updated_at: string };
+
+  try {
+    revalidateTag('site-settings', 'max');
+  } catch (err) {
+    console.warn('[adminSetSitePaletteAction] revalidateTag warning:', err);
+  }
+
+  try {
+    revalidatePath('/', 'layout');
+  } catch (err) {
+    console.warn('[adminSetSitePaletteAction] revalidatePath warning:', err);
+  }
+
+  return {
+    success: true,
+    data: {
+      palette: result.palette,
+      updatedAt: result.updated_at,
+    },
+  };
 }

@@ -1234,6 +1234,128 @@ BEGIN
 END;
 $$;
 
+
+-- ------------------------------------------------------------------------------
+-- 2.6 CATEGORY 6: SITE PALETTE & PLATFORM SETTINGS ATTACK MATRIX
+-- ------------------------------------------------------------------------------
+DO $$
+DECLARE
+    v_admin_id      uuid;
+    v_writer_a      uuid;
+    v_reader_a      uuid;
+    v_test_id       integer;
+    v_res_json      jsonb;
+    v_count         integer;
+BEGIN
+    SELECT val_uuid INTO v_admin_id FROM attack_fixtures WHERE key = 'admin_id';
+    SELECT val_uuid INTO v_writer_a FROM attack_fixtures WHERE key = 'writer_a';
+    SELECT val_uuid INTO v_reader_a FROM attack_fixtures WHERE key = 'reader_a';
+
+    -- 6.1 Anon calls get_public_site_settings() and receives only {palette}
+    v_test_id := 601;
+    SET LOCAL ROLE anon;
+    PERFORM set_config('request.jwt.claims', '{"role":"anon"}', true);
+    BEGIN
+        v_res_json := public.get_public_site_settings();
+        IF v_res_json ? 'palette' AND (SELECT count(*) FROM jsonb_object_keys(v_res_json)) = 1 THEN
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site palette', 'PASS', 'SUCCESS', 'Anon received strictly palette key: ' || v_res_json::text);
+        ELSE
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site palette', 'FAIL', 'INVALID_KEYS', 'Exposed extra keys or missing palette: ' || v_res_json::text);
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site palette', 'FAIL', SQLSTATE, 'Unexpected failure: ' || SQLERRM);
+    END;
+
+    -- 6.2 Authenticated Reader calls get_public_site_settings() and receives only {palette}
+    v_test_id := 602;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_reader_a::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        v_res_json := public.get_public_site_settings();
+        IF v_res_json ? 'palette' AND (SELECT count(*) FROM jsonb_object_keys(v_res_json)) = 1 THEN
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site palette', 'PASS', 'SUCCESS', 'Authenticated reader received strictly palette: ' || v_res_json::text);
+        ELSE
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site palette', 'FAIL', 'INVALID_KEYS', 'Exposed extra keys or missing palette: ' || v_res_json::text);
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site palette', 'FAIL', SQLSTATE, 'Unexpected failure: ' || SQLERRM);
+    END;
+
+    -- 6.3 Anon direct SELECT on public.platform_settings is denied
+    v_test_id := 603;
+    SET LOCAL ROLE anon;
+    PERFORM set_config('request.jwt.claims', '{"role":"anon"}', true);
+    BEGIN
+        PERFORM default_commission_rate FROM public.platform_settings WHERE id = 1;
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Direct DML (Anon)', 'anon', 'platform_settings', 'Direct SELECT platform settings by anon', 'FAIL', 'SELECT_ALLOWED', 'VULNERABILITY: Anon read platform settings directly');
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Direct DML (Anon)', 'anon', 'platform_settings', 'Direct SELECT platform settings by anon', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
+    END;
+
+    -- 6.4 Non-admin (Writer) calling set_site_palette is rejected
+    v_test_id := 604;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_writer_a::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        v_res_json := public.set_site_palette('paper_teal', 'Writer attempt');
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Admin RPC Lockdown', 'writer_a', 'set_site_palette', 'Writer invokes set_site_palette', 'FAIL', 'EXECUTED', 'VULNERABILITY: Non-admin modified site palette');
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Admin RPC Lockdown', 'writer_a', 'set_site_palette', 'Writer invokes set_site_palette', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
+    END;
+
+    -- 6.5 Admin calling set_site_palette with invalid palette is rejected
+    v_test_id := 605;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_admin_id::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        v_res_json := public.set_site_palette('neon_pink', 'Invalid palette');
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Parameter Validation', 'admin', 'set_site_palette', 'Admin passes invalid palette', 'FAIL', 'EXECUTED', 'VULNERABILITY: Invalid palette accepted');
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Parameter Validation', 'admin', 'set_site_palette', 'Admin passes invalid palette', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
+    END;
+
+    -- 6.6 Admin calling set_site_palette with valid palette succeeds and writes audit log
+    v_test_id := 606;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_admin_id::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        v_res_json := public.set_site_palette('paper_teal', 'Admin test palette switch');
+        SELECT count(*) INTO v_count
+        FROM public.audit_logs
+        WHERE action_type = 'SET_SITE_PALETTE'
+          AND entity_type = 'platform_settings'
+          AND actor_id = v_admin_id;
+
+        IF v_count > 0 AND (v_res_json->>'palette') = 'paper_teal' THEN
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Admin Operations', 'admin', 'set_site_palette', 'Admin changes palette and writes audit log', 'PASS', 'SUCCESS', 'Palette changed to paper_teal, audit log verified');
+        ELSE
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Admin Operations', 'admin', 'set_site_palette', 'Admin changes palette and writes audit log', 'FAIL', 'AUDIT_MISSING', 'Audit log missing or response invalid: ' || v_res_json::text);
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Admin Operations', 'admin', 'set_site_palette', 'Admin changes palette and writes audit log', 'FAIL', SQLSTATE, 'Failed: ' || SQLERRM);
+    END;
+
+    -- 6.7 Direct UPDATE of platform_settings by client is denied
+    v_test_id := 607;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_writer_a::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        UPDATE public.platform_settings SET site_palette = 'cream_maroon' WHERE id = 1;
+        GET DIAGNOSTICS v_count = ROW_COUNT;
+        IF v_count > 0 THEN
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Direct DML (Writer)', 'writer_a', 'platform_settings', 'Direct UPDATE on platform_settings by writer', 'FAIL', 'ROWS=' || v_count, 'VULNERABILITY: Writer modified platform_settings directly');
+        ELSE
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Direct DML (Writer)', 'writer_a', 'platform_settings', 'Direct UPDATE on platform_settings by writer', 'PASS', 'ROWS=0', 'Blocked by RLS');
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Direct DML (Writer)', 'writer_a', 'platform_settings', 'Direct UPDATE on platform_settings by writer', 'PASS', SQLSTATE, 'Blocked: ' || SQLERRM);
+    END;
+
+    RESET ROLE;
+    PERFORM set_config('request.jwt.claims', '', true);
+END;
+$$;
+
 -- ------------------------------------------------------------------------------
 -- 3. DISPLAY RESULTS & SUMMARY (Before Rollback)
 -- ------------------------------------------------------------------------------
