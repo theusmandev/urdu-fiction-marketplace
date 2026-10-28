@@ -92,7 +92,7 @@ export default async function ContactPage() {
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm space-y-2">
           <div className="flex items-center gap-2 text-sm font-bold text-navy">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-success" />
             <span>Dispute & Verification Notice</span>
           </div>
           <p className="text-xs text-secondary leading-relaxed">

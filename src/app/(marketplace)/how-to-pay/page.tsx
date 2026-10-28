@@ -230,7 +230,7 @@ export default function HowToPayPage() {
       {/* Safety & Integrity Guidelines */}
       <section className="space-y-6 pt-4 border-t border-border">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-600">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-danger-text">
             <AlertTriangle className="w-4 h-4" />
             <span>Payment Security</span>
           </div>
@@ -246,10 +246,10 @@ export default function HowToPayPage() {
           {SAFETY_TIPS.map((tip, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-2"
+              className="p-5 rounded-2xl bg-warning/10 border border-warning-border/20 space-y-2"
             >
               <div className="flex items-center gap-2 text-navy font-bold text-xs">
-                <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-accent-strong shrink-0" />
                 <span>{tip.title}</span>
               </div>
               <p className="text-xs text-secondary leading-relaxed">
@@ -352,7 +352,7 @@ export default function HowToPayPage() {
           <h2 className="font-serif text-xl sm:text-2xl font-bold">
             Need More Information?
           </h2>
-          <UrduText size="base" className="text-slate-300">
+          <UrduText size="base" className="text-text-muted">
             مزید معلومات اور تفصیلی پالیسیاں دیکھنے کے لیے درج ذیل لنکس وزٹ کریں
           </UrduText>
         </div>

@@ -12,9 +12,9 @@ export function TabConflictBanner({ isLocked, onTakeOver }: TabConflictBannerPro
   if (!isLocked) return null;
 
   return (
-    <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 text-xs text-amber-800 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+    <div className="bg-warning/10 border-b border-warning-border/20 px-4 py-2.5 text-xs text-warning-text flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        <Lock className="w-4 h-4 text-amber-500 shrink-0" />
+        <Lock className="w-4 h-4 text-accent-strong shrink-0" />
         <span>
           <strong>This chapter is open in another tab.</strong> This tab is currently read-only to prevent editing conflicts.
         </span>
@@ -23,7 +23,7 @@ export function TabConflictBanner({ isLocked, onTakeOver }: TabConflictBannerPro
       <button
         type="button"
         onClick={onTakeOver}
-        className="px-3 py-1 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors shadow-sm flex items-center gap-1.5 shrink-0"
+        className="px-3 py-1 rounded-lg bg-warning text-white font-semibold hover:bg-warning transition-colors shadow-sm flex items-center gap-1.5 shrink-0"
       >
         <ArrowRightLeft className="w-3 h-3" />
         <span>Take over editing</span>

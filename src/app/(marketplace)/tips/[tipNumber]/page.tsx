@@ -38,7 +38,7 @@ export default async function TipDetailPage({ params }: TipDetailPageProps) {
     console.error('TipDetailPage fetch error:', tipError);
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
-        <h1 className="text-xl font-bold text-rose-700">Unable to load tip</h1>
+        <h1 className="text-xl font-bold text-danger-text">Unable to load tip</h1>
         <p className="text-sm text-secondary">{tipError.message}</p>
       </div>
     );

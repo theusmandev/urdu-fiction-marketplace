@@ -40,14 +40,14 @@ export default async function AdminInvoicesPage({
   if (queryError) {
     return (
       <div className="space-y-6 max-w-7xl mx-auto py-8">
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
-          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border space-y-3">
+          <div className="flex items-center gap-2 text-danger-text font-bold text-sm">
             <span>Database Error Loading Platform Fee Invoices</span>
           </div>
-          <p className="text-xs text-rose-800/90 leading-relaxed">
+          <p className="text-xs text-danger-text/90 leading-relaxed">
             Unable to retrieve platform fee invoice statements from the database:
           </p>
-          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-surface border border-danger-border text-xs font-mono text-danger-text">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (

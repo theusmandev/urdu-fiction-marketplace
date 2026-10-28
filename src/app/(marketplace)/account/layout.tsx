@@ -37,7 +37,7 @@ export default async function AccountLayout({
                     {profile.full_name || 'Reader'}
                   </p>
                   <p className="truncate text-xs text-secondary">@{profile.username || 'user'}</p>
-                  <span className="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                  <span className="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-warning-soft text-warning-text border border-warning-border">
                     {profile.role}
                   </span>
                 </div>
@@ -94,9 +94,9 @@ export default async function AccountLayout({
                 {profile.role === 'admin' && (
                   <Link
                     href="/admin"
-                    className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50 transition-colors"
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-danger-text hover:bg-danger-soft transition-colors"
                   >
-                    <ShieldAlert className="h-4 w-4 text-rose-600" />
+                    <ShieldAlert className="h-4 w-4 text-danger-text" />
                     <span>Admin Panel</span>
                   </Link>
                 )}
@@ -106,7 +106,7 @@ export default async function AccountLayout({
                 <form action={logoutUser}>
                   <button
                     type="submit"
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-secondary hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-secondary hover:bg-danger-soft hover:text-danger-text transition-colors cursor-pointer"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>Sign out</span>

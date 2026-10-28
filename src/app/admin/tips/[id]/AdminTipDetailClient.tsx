@@ -214,8 +214,8 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
                 {statusMeta.label}
               </span>
               {tip.review_flag && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                  <AlertTriangle className="w-3 h-3 text-amber-700" />
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-warning-soft text-warning-text border border-warning-border">
+                  <AlertTriangle className="w-3 h-3 text-warning-text" />
                   <span>Flag: {tip.review_flag}</span>
                 </span>
               )}
@@ -247,7 +247,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
               @{tip.reader.username || 'anonymous'} • ID: {tip.reader.id.slice(0, 8)}...
             </div>
             {tip.is_anonymous && (
-              <span className="inline-block px-2 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-medium">
+              <span className="inline-block px-2 py-0.5 rounded bg-warning-soft text-warning-text text-[10px] font-medium">
                 Sent anonymously to writer
               </span>
             )}
@@ -286,7 +286,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
                     onClick={() => handleCopy(tip.transaction_reference_tid!, 'tid')}
                     className="p-1 hover:text-navy"
                   >
-                    {copiedField === 'tid' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedField === 'tid' ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 )}
               </div>
@@ -338,7 +338,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
                 <button
                   type="button"
                   onClick={() => setShowRemoveDialog(true)}
-                  className="text-[11px] text-rose-700 hover:text-rose-900 font-semibold flex items-center gap-1"
+                  className="text-[11px] text-danger-text hover:text-danger-text font-semibold flex items-center gap-1"
                 >
                   <EyeOff className="w-3.5 h-3.5" />
                   <span>Remove message</span>
@@ -369,7 +369,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
             )}
             {tip.not_received_at && (
               <div>
-                <span className="block font-medium text-rose-700">Marked Not Received</span>
+                <span className="block font-medium text-danger-text">Marked Not Received</span>
                 <span>{new Date(tip.not_received_at).toLocaleString('en-PK')}</span>
               </div>
             )}
@@ -412,7 +412,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
                   onChange={() => setReviewAction('needs_action')}
                   className="text-navy"
                 />
-                <span className="font-medium text-rose-700">Needs Investigation / Note</span>
+                <span className="font-medium text-danger-text">Needs Investigation / Note</span>
               </label>
             </div>
 
@@ -421,12 +421,12 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
               onChange={(e) => setReviewNotes(e.target.value)}
               rows={2}
               placeholder="Enter audit explanation or note..."
-              className="w-full p-2.5 rounded-xl border border-border bg-ivory/50 text-xs focus:outline-none focus:ring-2 focus:ring-accent-admin/40 resize-none"
+              className="w-full p-2.5 rounded-xl border border-border bg-ivory/50 text-xs focus:outline-none focus:ring-2 focus:ring-ring-admin/40 resize-none"
               required
             />
 
             {reviewSuccess && (
-              <div className="p-2.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <div className="p-2.5 rounded-lg bg-success-soft text-success-text border border-success-border">
                 {reviewSuccess}
               </div>
             )}
@@ -450,7 +450,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-xs"
         >
           <div className="w-full max-w-md rounded-2xl bg-surface border border-border p-6 shadow-xl space-y-4">
-            <div className="flex items-center gap-2 text-rose-700 font-semibold text-sm">
+            <div className="flex items-center gap-2 text-danger-text font-semibold text-sm">
               <EyeOff className="w-4 h-4" />
               <span>Remove Offensive Message</span>
             </div>
@@ -479,7 +479,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
                 <button
                   type="submit"
                   disabled={isRemovingMessage}
-                  className="px-4 py-2 rounded-xl bg-rose-700 text-white text-xs font-semibold hover:bg-rose-800"
+                  className="px-4 py-2 rounded-xl bg-danger text-white text-xs font-semibold hover:bg-danger-hover"
                 >
                   {isRemovingMessage ? 'Removing...' : 'Confirm Remove'}
                 </button>

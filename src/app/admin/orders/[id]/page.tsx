@@ -40,15 +40,15 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Orders</span>
           </Link>
-          <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
-            <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+          <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border space-y-3">
+            <div className="flex items-center gap-2 text-danger-text font-bold text-sm">
               <ShieldAlert className="w-5 h-5 shrink-0" />
               <span>Database Error Resolving Order Number</span>
             </div>
-            <p className="text-xs text-rose-600 leading-relaxed">
+            <p className="text-xs text-danger-text leading-relaxed">
               Unable to look up order reference from the database:
             </p>
-            <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
+            <div className="p-3 rounded-xl bg-surface border border-danger-border text-xs font-mono text-danger-text">
               {ordError.message} {ordError.code ? `(Code: ${ordError.code})` : ''}
             </div>
           </div>
@@ -79,15 +79,15 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Orders</span>
         </Link>
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
-          <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border space-y-3">
+          <div className="flex items-center gap-2 text-danger-text font-bold text-sm">
             <ShieldAlert className="w-5 h-5 shrink-0" />
             <span>Database Error Loading Order</span>
           </div>
-          <p className="text-xs text-rose-600 leading-relaxed">
+          <p className="text-xs text-danger-text leading-relaxed">
             Unable to retrieve order details from the database:
           </p>
-          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-surface border border-danger-border text-xs font-mono text-danger-text">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (

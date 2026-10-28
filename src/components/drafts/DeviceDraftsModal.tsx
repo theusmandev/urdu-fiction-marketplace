@@ -124,10 +124,10 @@ export function DeviceDraftsModal({
         </div>
 
         {/* Security Notice & Remember on device opt-in */}
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3.5 space-y-2">
+        <div className="bg-warning/10 border border-warning-border/20 rounded-xl p-3.5 space-y-2">
           <div className="flex items-start gap-2.5">
-            <ShieldAlert className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-700 dark:text-amber-300">
+            <ShieldAlert className="w-4 h-4 text-accent-strong shrink-0 mt-0.5" />
+            <div className="text-xs text-warning-text">
               <p className="font-semibold">Local Storage Security</p>
               <p className="text-[11px] mt-0.5 text-secondary">
                 Unpublished manuscripts are stored unencrypted in this browser profile. Avoid retaining drafts on shared or public computers.
@@ -140,14 +140,14 @@ export function DeviceDraftsModal({
               type="checkbox"
               checked={rememberDrafts}
               onChange={(e) => handleRememberToggle(e.target.checked)}
-              className="rounded border-border text-accent focus:ring-accent"
+              className="rounded border-border text-accent focus:ring-ring"
             />
             <span>Remember drafts on this device across sessions</span>
           </label>
         </div>
 
         {actionNotice && (
-          <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 flex items-center gap-2">
+          <div className="p-2.5 rounded-lg bg-success/10 border border-success-border/20 text-xs text-success flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" />
             <span>{actionNotice}</span>
           </div>
@@ -186,11 +186,11 @@ export function DeviceDraftsModal({
                           {draft.title || 'بلا عنوان مسودہ'}
                         </UrduText>
                         {draft.dirty ? (
-                          <span className="px-1.5 py-0.2 rounded text-[10px] bg-amber-500/10 text-amber-500 font-medium">
+                          <span className="px-1.5 py-0.2 rounded text-[10px] bg-warning/10 text-accent-strong font-medium">
                             Unsynced
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-500/10 text-emerald-500 font-medium">
+                          <span className="px-1.5 py-0.2 rounded text-[10px] bg-success/10 text-success font-medium">
                             Synced
                           </span>
                         )}
@@ -214,7 +214,7 @@ export function DeviceDraftsModal({
                             onRestoreDraft(draft);
                             onClose();
                           }}
-                          className="px-2.5 py-1 rounded-lg border border-border bg-ivory text-xs font-semibold text-navy hover:bg-slate-200 transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-lg border border-border bg-ivory text-xs font-semibold text-navy hover:bg-border transition-colors flex items-center gap-1"
                         >
                           <RotateCcw className="w-3 h-3 text-accent" />
                           <span>Restore</span>
@@ -224,7 +224,7 @@ export function DeviceDraftsModal({
                       <button
                         type="button"
                         onClick={() => handleDelete(draft.client_key)}
-                        className="p-1.5 rounded-lg border border-rose-500/20 text-rose-500 hover:bg-rose-500/10 transition-colors"
+                        className="p-1.5 rounded-lg border border-danger-border/20 text-danger-text hover:bg-danger/10 transition-colors"
                         title="Delete from this device"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

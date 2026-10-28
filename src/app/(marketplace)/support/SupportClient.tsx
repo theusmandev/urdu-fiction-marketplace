@@ -67,7 +67,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
           <div>
             <div className="flex items-center gap-2">
-              <HelpCircle className="w-6 h-6 text-brand-gold" />
+              <HelpCircle className="w-6 h-6 text-accent-strong" />
               <h1 className="text-xl sm:text-2xl font-bold font-serif tracking-tight text-navy">
                 Customer Support Desk
               </h1>
@@ -83,7 +83,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
               setShowNewModal(true);
               setErrorMsg(null);
             }}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover transition-colors shadow-sm cursor-pointer shrink-0 min-h-[44px]"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-hover transition-colors shadow-sm cursor-pointer shrink-0 min-h-[44px]"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Open New Support Request</span>
@@ -93,7 +93,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
         {/* Requests List */}
         {initialRequests.length === 0 ? (
           <div className="rounded-2xl bg-surface border border-border p-12 text-center space-y-4 shadow-card">
-            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-surface-muted text-text-muted flex items-center justify-center mx-auto">
               <FileQuestion className="w-6 h-6" />
             </div>
             <div className="space-y-1">
@@ -106,7 +106,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
               <button
                 type="button"
                 onClick={() => setShowNewModal(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover transition-colors shadow-sm cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-hover transition-colors shadow-sm cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Submit Your First Request</span>
@@ -121,20 +121,20 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                 <Link
                   key={req.id}
                   href={`/support/${req.id}`}
-                  className="block rounded-2xl bg-surface hover:bg-surface-muted/50 border border-border hover:border-slate-300 p-5 transition-all group shadow-card"
+                  className="block rounded-2xl bg-surface hover:bg-surface-muted/50 border border-border hover:border-border p-5 transition-all group shadow-card"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-surface-muted text-text border border-border">
                         {req.category}
                       </span>
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           statusMeta.variant === 'warning'
-                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                            ? 'bg-warning-soft text-warning-text border border-warning-border'
                             : statusMeta.variant === 'success'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-600 border border-slate-200'
+                            ? 'bg-success-soft text-success-text border border-success-border'
+                            : 'bg-surface-muted text-text-muted border border-border'
                         }`}
                       >
                         {statusMeta.label}
@@ -143,11 +143,11 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
 
                     <div className="flex items-center gap-3 text-xs text-secondary">
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <Clock className="w-3.5 h-3.5 text-text-muted" />
                         <span>{new Date(req.created_at).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
+                        <MessageSquare className="w-3.5 h-3.5 text-text-muted" />
                         <span>{req.messages_count} replies</span>
                       </div>
                     </div>
@@ -155,7 +155,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
 
                   <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="space-y-1">
-                      <h3 className="text-sm font-semibold text-navy group-hover:text-brand-gold transition-colors">
+                      <h3 className="text-sm font-semibold text-navy group-hover:text-accent-strong transition-colors">
                         {req.subject}
                       </h3>
                       {req.order_number && (
@@ -165,7 +165,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                       )}
                     </div>
 
-                    <div className="inline-flex items-center gap-1 text-xs font-semibold text-brand-gold group-hover:translate-x-0.5 transition-transform">
+                    <div className="inline-flex items-center gap-1 text-xs font-semibold text-accent-strong group-hover:translate-x-0.5 transition-transform">
                       <span>View Ticket</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
@@ -183,7 +183,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
           <div className="max-w-lg w-full bg-surface border border-border rounded-2xl p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-bold text-navy flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-brand-gold" />
+                <HelpCircle className="w-5 h-5 text-accent-strong" />
                 <span>Open a Support Request</span>
               </h3>
               <button
@@ -196,8 +196,8 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
                 <span>{errorMsg}</span>
               </div>
             )}
@@ -205,12 +205,12 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
             <form onSubmit={handleCreateTicket} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-navy block">
-                  Category <span className="text-brand-gold">*</span>
+                  Category <span className="text-accent-strong">*</span>
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as typeof category)}
-                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold min-h-[44px]"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main focus:outline-none focus:border-border focus:ring-1 focus:ring-brand-gold min-h-[44px]"
                 >
                   <option value="order">Order or Payment Issue</option>
                   <option value="payment">General Payment Questions</option>
@@ -222,7 +222,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-navy block">
-                  Subject <span className="text-brand-gold">*</span>
+                  Subject <span className="text-accent-strong">*</span>
                 </label>
                 <input
                   type="text"
@@ -231,14 +231,14 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="Brief summary of your request (max 120 chars)"
-                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold min-h-[44px]"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-border focus:ring-1 focus:ring-brand-gold min-h-[44px]"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-navy">
-                    Description <span className="text-brand-gold">*</span>
+                    Description <span className="text-accent-strong">*</span>
                   </label>
                   <span className="text-[10px] text-secondary font-mono">
                     {body.length} / 2000 chars
@@ -251,7 +251,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   placeholder="Explain your issue in detail. Please do NOT include bank account numbers or PINs."
-                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl bg-surface border border-border text-main placeholder-secondary focus:outline-none focus:border-border focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -270,7 +270,7 @@ export function SupportClient({ initialRequests }: SupportClientProps) {
                 <button
                   type="submit"
                   disabled={isPending || !subject.trim() || !body.trim()}
-                  className="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                  className="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-hover disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
                 >
                   {isPending ? (
                     <>

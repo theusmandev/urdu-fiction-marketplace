@@ -213,15 +213,15 @@ export function NovelForm({
 
       {/* Alert Notices */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <p className="text-xs font-medium">{successMessage}</p>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
         </div>
       )}
@@ -248,7 +248,7 @@ export function NovelForm({
               helperText="Recommended: 600x900px WebP/PNG/JPG. 2:3 vertical crop. Auto-compressed."
             />
             {fieldErrors.cover_url && (
-              <p className="text-xs text-rose-600">{fieldErrors.cover_url[0]}</p>
+              <p className="text-xs text-danger-text">{fieldErrors.cover_url[0]}</p>
             )}
           </div>
 
@@ -257,7 +257,7 @@ export function NovelForm({
             {/* Urdu Title */}
             <div className="space-y-1.5" dir="rtl">
               <label className="block text-xs font-semibold text-main text-right">
-                ناول کا عنوان (اردو میں) <span className="text-rose-500">*</span>
+                ناول کا عنوان (اردو میں) <span className="text-danger-text">*</span>
               </label>
               <input
                 type="text"
@@ -265,29 +265,29 @@ export function NovelForm({
                 value={formData.title_urdu}
                 onChange={(e) => handleChange('title_urdu', e.target.value)}
                 placeholder="مثال: پیرِ کامل، جنت کے پتے، نمل"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring"
                 required
               />
               {fieldErrors.title_urdu && (
-                <p className="text-xs text-rose-600 text-right">{fieldErrors.title_urdu[0]}</p>
+                <p className="text-xs text-danger-text text-right">{fieldErrors.title_urdu[0]}</p>
               )}
             </div>
 
             {/* English Title */}
             <div className="space-y-1.5" dir="ltr">
               <label className="block text-xs font-semibold text-main">
-                English / Roman Title <span className="text-rose-500">*</span>
+                English / Roman Title <span className="text-danger-text">*</span>
               </label>
               <input
                 type="text"
                 value={formData.title_english}
                 onChange={(e) => handleChange('title_english', e.target.value)}
                 placeholder="e.g. Peer-e-Kamil, Jannat Kay Pattay, Namal"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 required
               />
               {fieldErrors.title_english && (
-                <p className="text-xs text-rose-600">{fieldErrors.title_english[0]}</p>
+                <p className="text-xs text-danger-text">{fieldErrors.title_english[0]}</p>
               )}
               <p className="text-[11px] text-secondary">
                 This title generates the novel&apos;s URL address and search indexing.
@@ -302,7 +302,7 @@ export function NovelForm({
               <select
                 value={formData.language}
                 onChange={(e) => handleChange('language', e.target.value)}
-                className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="ur">Urdu (اردو)</option>
                 <option value="en">English</option>
@@ -321,7 +321,7 @@ export function NovelForm({
         {/* Urdu Synopsis */}
         <div className="space-y-1.5" dir="rtl">
           <label className="block text-xs font-semibold text-main text-right">
-            مختصر خلاصہ (اردو) <span className="text-rose-500">*</span>
+            مختصر خلاصہ (اردو) <span className="text-danger-text">*</span>
           </label>
           <textarea
             dir="rtl"
@@ -329,11 +329,11 @@ export function NovelForm({
             value={formData.synopsis_urdu}
             onChange={(e) => handleChange('synopsis_urdu', e.target.value)}
             placeholder="کہانی کا مرکزی خیال اور سسپنس یہاں تحریر کریں۔ یہ خلاصہ ناول کے پبلک کارڈ پر قارئین کو ترغیب کے لیے پیش کیا جائے گا..."
-            className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-base leading-loose focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-base leading-loose focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
           {fieldErrors.synopsis_urdu && (
-            <p className="text-xs text-rose-600 text-right">{fieldErrors.synopsis_urdu[0]}</p>
+            <p className="text-xs text-danger-text text-right">{fieldErrors.synopsis_urdu[0]}</p>
           )}
           <p className="text-[11px] text-secondary text-right">
             کم از کم ۱۰ حروف، زیادہ سے زیادہ ۳،۰۰۰ حروف۔
@@ -351,10 +351,10 @@ export function NovelForm({
             value={formData.description_urdu || ''}
             onChange={(e) => handleChange('description_urdu', e.target.value)}
             placeholder="ناول کے پس منظر، مرکزی کرداروں یا قارئین کے لیے خصوصی پیغام کی تفصیلات..."
-            className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-base leading-loose focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-base leading-loose focus:outline-none focus:ring-2 focus:ring-ring"
           />
           {fieldErrors.description_urdu && (
-            <p className="text-xs text-rose-600 text-right">{fieldErrors.description_urdu[0]}</p>
+            <p className="text-xs text-danger-text text-right">{fieldErrors.description_urdu[0]}</p>
           )}
         </div>
       </div>
@@ -363,7 +363,7 @@ export function NovelForm({
       <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-4">
         <div>
           <h2 className="text-sm font-serif font-bold text-navy uppercase tracking-wider">
-            3. Genres & Categorization <span className="text-rose-500">*</span>
+            3. Genres & Categorization <span className="text-danger-text">*</span>
           </h2>
           <p className="text-xs text-secondary mt-0.5">
             Select one or more categories representing the themes of this novel.
@@ -371,7 +371,7 @@ export function NovelForm({
         </div>
 
         {fieldErrors.genre_ids && (
-          <p className="text-xs text-rose-600 font-medium">{fieldErrors.genre_ids[0]}</p>
+          <p className="text-xs text-danger-text font-medium">{fieldErrors.genre_ids[0]}</p>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
@@ -385,7 +385,7 @@ export function NovelForm({
                 className={`p-3 rounded-xl border text-left flex items-center justify-between gap-2 transition-all ${
                   isSelected
                     ? 'border-navy bg-navy/5 text-navy font-semibold ring-1 ring-navy'
-                    : 'border-border bg-ivory hover:border-slate-300 text-secondary'
+                    : 'border-border bg-ivory hover:border-border text-secondary'
                 }`}
               >
                 <div className="min-w-0">
@@ -399,7 +399,7 @@ export function NovelForm({
                   className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border ${
                     isSelected
                       ? 'bg-navy border-navy text-white'
-                      : 'border-slate-300 bg-white'
+                      : 'border-border bg-white'
                   }`}
                 >
                   {isSelected && <Check className="w-3 h-3" />}
@@ -425,7 +425,7 @@ export function NovelForm({
           {/* Price Input */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-main">
-              Novel Price (PKR) <span className="text-rose-500">*</span>
+              Novel Price (PKR) <span className="text-danger-text">*</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-xs font-bold text-secondary">
@@ -438,12 +438,12 @@ export function NovelForm({
                 step="1"
                 value={formData.price_pkr}
                 onChange={(e) => handleChange('price_pkr', Number(e.target.value))}
-                className="w-full pl-14 pr-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-bold text-base focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                className="w-full pl-14 pr-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-bold text-base focus:outline-none focus:ring-2 focus:ring-ring font-mono"
                 required
               />
             </div>
             {fieldErrors.price_pkr && (
-              <p className="text-xs text-rose-600">{fieldErrors.price_pkr[0]}</p>
+              <p className="text-xs text-danger-text">{fieldErrors.price_pkr[0]}</p>
             )}
             <p className="text-[11px] text-secondary">
               Minimum PKR {minPrice}. Maximum allowed novel price: PKR {maxPrice.toLocaleString()}. Whole rupees only. Readers can try your free preview chapters before buying.
@@ -468,7 +468,7 @@ export function NovelForm({
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-emerald-800 font-semibold border-t border-border pt-1.5">
+                <div className="flex items-center justify-between text-success-text font-semibold border-t border-border pt-1.5">
                   <span>Author Net Retention ({100 - platformRate}%):</span>
                   <span className="font-mono text-sm">
                     PKR {estimatedWriterNet.toLocaleString()}
@@ -483,9 +483,9 @@ export function NovelForm({
                 </div>
               </div>
             ) : (
-              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 space-y-1">
+              <div className="p-3 rounded-lg bg-warning/10 border border-warning-border/20 text-xs text-warning-text space-y-1">
                 <p className="font-semibold">Enter a valid novel price</p>
-                <p className="text-[11px] text-amber-800">
+                <p className="text-[11px] text-warning-text">
                   Price must be a whole rupee amount between PKR {minPrice} and PKR {maxPrice.toLocaleString()} to calculate author payout.
                 </p>
               </div>
@@ -511,7 +511,7 @@ export function NovelForm({
               type="checkbox"
               checked={formData.rights_declaration_accepted}
               onChange={(e) => handleChange('rights_declaration_accepted', e.target.checked)}
-              className="mt-1 w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent"
+              className="mt-1 w-4 h-4 rounded border-border text-navy focus:ring-ring"
               required
             />
             <div className="text-xs space-y-1">
@@ -524,7 +524,7 @@ export function NovelForm({
             </div>
           </label>
           {fieldErrors.rights_declaration_accepted && (
-            <p className="text-xs text-rose-600 mt-2 pl-7 font-semibold">
+            <p className="text-xs text-danger-text mt-2 pl-7 font-semibold">
               {fieldErrors.rights_declaration_accepted[0]}
             </p>
           )}

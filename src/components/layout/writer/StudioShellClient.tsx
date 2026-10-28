@@ -55,21 +55,21 @@ export function StudioShellClient({
       label: 'Verify Payments',
       icon: CreditCard,
       badge: pendingVerificationCount,
-      badgeColor: 'bg-amber-500 text-stone-950 font-bold',
+      badgeColor: 'bg-warning text-primary-contrast font-semibold',
     },
     {
       href: '/writer/tips',
       label: 'Thanks received',
       icon: Heart,
       badge: pendingTipsCount,
-      badgeColor: 'bg-amber-500 text-stone-950 font-bold',
+      badgeColor: 'bg-warning text-primary-contrast font-semibold',
     },
     {
       href: '/writer/disputes',
       label: 'Disputes',
       icon: Scale,
       badge: openDisputesCount,
-      badgeColor: 'bg-rose-500 text-white font-bold',
+      badgeColor: 'bg-danger text-white font-bold',
     },
     { href: '/writer/earnings', label: 'Earnings', icon: TrendingUp },
     { href: '/writer/commission', label: 'Platform Fee', icon: Receipt },
@@ -106,23 +106,26 @@ export function StudioShellClient({
   };
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-ivory text-main flex flex-col font-sans">
+    <div
+      data-area="studio"
+      className="h-screen w-full overflow-hidden bg-bg text-text flex flex-col font-sans"
+    >
       {/* Skip to Content Link (Accessibility) */}
       <a
         href="#writer-main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-navy focus:text-accent focus:font-semibold focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-accent"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-contrast focus:font-semibold focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-ring"
       >
         Skip to main content
       </a>
 
       {/* Top Bar (Fixed at top, zero scroll) */}
-      <header className="bg-navy text-white shrink-0 z-30 h-14 sm:h-16 border-b border-navy-light flex items-center justify-between px-4 sm:px-6 shadow-md">
+      <header className="bg-surface text-text shrink-0 z-30 h-14 sm:h-16 border-b border-border flex items-center justify-between px-4 sm:px-6 shadow-xs">
         <div className="flex items-center gap-3">
           {/* Mobile Drawer Toggle */}
           <button
             type="button"
             onClick={() => setMobileDrawerOpen((prev) => !prev)}
-            className="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-navy-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40"
+            className="lg:hidden p-2 rounded-xl text-text-muted hover:text-text hover:bg-surface-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             aria-label={mobileDrawerOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
           >
             {mobileDrawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -130,22 +133,22 @@ export function StudioShellClient({
 
           {/* Brand Logo in Top Bar */}
           <Link href="/writer" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-accent text-navy flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-role-accent text-role-accent-contrast flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
               <Feather className="w-4 h-4" />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif text-base font-bold tracking-tight text-white leading-none">
+              <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
                 Writer Studio
               </span>
-              <span className="text-[10px] text-accent font-medium mt-0.5">
+              <span className="text-[10px] text-accent-strong font-medium mt-0.5">
                 UNB Premium
               </span>
             </div>
           </Link>
 
           {/* Breadcrumb / Page Title */}
-          <div className="hidden sm:flex items-center text-xs border-l border-navy-light pl-3 ml-1">
-            <span className="font-semibold text-white">{getPageTitle()}</span>
+          <div className="hidden sm:flex items-center text-xs border-l border-border pl-3 ml-1">
+            <span className="font-semibold text-text">{getPageTitle()}</span>
           </div>
         </div>
 
@@ -156,20 +159,20 @@ export function StudioShellClient({
               href={`/writers/${profile.username}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-accent hover:bg-navy-light/60 px-2.5 py-1.5 rounded-lg border border-navy-light transition-colors"
+              className="hidden md:inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text hover:bg-surface-muted px-2.5 py-1.5 rounded-lg border border-border transition-colors"
               title="View your public author profile"
             >
-              <User className="w-3.5 h-3.5 text-accent" />
+              <User className="w-3.5 h-3.5 text-accent-strong" />
               <span>Public Profile</span>
             </Link>
           )}
 
           <Link
             href="/"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-white hover:bg-navy-light/60 px-2.5 py-1.5 rounded-lg border border-navy-light transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text hover:bg-surface-muted px-2.5 py-1.5 rounded-lg border border-border transition-colors"
             title="Return to Marketplace"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-accent" />
+            <ExternalLink className="w-3.5 h-3.5 text-accent-strong" />
             <span>Marketplace</span>
           </Link>
 
@@ -204,7 +207,7 @@ export function StudioShellClient({
             <button
               type="button"
               onClick={() => setIsCollapsed((prev) => !prev)}
-              className="p-1.5 rounded-lg text-secondary hover:text-navy hover:bg-ivory transition-colors ml-auto focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface-muted transition-colors ml-auto focus:outline-none focus:ring-2 focus:ring-ring"
               title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
@@ -229,20 +232,20 @@ export function StudioShellClient({
                   title={isCollapsed ? item.label : undefined}
                   className={`relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
                     active
-                      ? 'bg-navy text-white font-semibold shadow-sm'
-                      : 'text-secondary hover:text-navy hover:bg-ivory'
+                      ? 'bg-primary text-primary-contrast font-semibold shadow-sm'
+                      : 'text-text-muted hover:text-text hover:bg-surface-muted'
                   } ${isCollapsed ? 'justify-center px-2' : ''}`}
                 >
                   <Icon
                     className={`w-4 h-4 shrink-0 transition-colors ${
-                      active ? 'text-accent' : 'text-secondary group-hover:text-navy'
+                      active ? 'text-primary-contrast' : 'text-text-muted group-hover:text-text'
                     }`}
                   />
                   {!isCollapsed && <span className="flex-1 truncate">{item.label}</span>}
                   {!isCollapsed && typeof item.badge === 'number' && item.badge > 0 && (
                     <span
                       className={`px-1.5 py-0.5 text-[10px] rounded-full shadow-xs ${
-                        item.badgeColor || 'bg-amber-500 text-navy font-bold'
+                        item.badgeColor || 'bg-warning-soft text-warning-text border border-warning-border font-bold'
                       }`}
                     >
                       {item.badge}
@@ -251,7 +254,7 @@ export function StudioShellClient({
                   {isCollapsed && typeof item.badge === 'number' && item.badge > 0 && (
                     <span
                       className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 ring-surface ${
-                        item.href === '/writer/disputes' ? 'bg-rose-500' : 'bg-amber-500'
+                        item.href === '/writer/disputes' ? 'bg-danger' : 'bg-warning'
                       }`}
                     />
                   )}
@@ -261,19 +264,19 @@ export function StudioShellClient({
           </nav>
 
           {/* Author Pen Name Footer */}
-          <div className="p-2.5 sm:p-3 border-t border-border bg-ivory/60 text-xs shrink-0">
+          <div className="p-2.5 sm:p-3 border-t border-border bg-surface-muted/60 text-xs shrink-0">
             {!isCollapsed ? (
               <div className="px-2 py-1 space-y-0.5">
-                <span className="text-[10px] uppercase font-semibold text-secondary block">
+                <span className="text-[10px] uppercase font-semibold text-text-muted block">
                   Author Pen Name
                 </span>
-                <span className="font-semibold text-navy truncate block">
+                <span className="font-semibold text-text truncate block">
                   {writerProfile.pen_name_english}
                 </span>
               </div>
             ) : (
               <div className="flex justify-center" title={writerProfile.pen_name_english}>
-                <Feather className="w-4 h-4 text-accent" />
+                <Feather className="w-4 h-4 text-accent-strong" />
               </div>
             )}
           </div>
@@ -290,15 +293,15 @@ export function StudioShellClient({
             >
               <div className="flex items-center justify-between pb-3 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-navy text-accent flex items-center justify-center font-bold">
+                  <div className="w-7 h-7 rounded-lg bg-primary text-primary-contrast flex items-center justify-center font-bold">
                     <Feather className="w-3.5 h-3.5" />
                   </div>
-                  <span className="font-bold text-sm text-navy">Writer Studio</span>
+                  <span className="font-bold text-sm text-text">Writer Studio</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="p-1.5 rounded-lg text-secondary hover:text-navy hover:bg-ivory"
+                  className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface-muted"
                   aria-label="Close navigation"
                 >
                   <X className="w-5 h-5" />
@@ -317,14 +320,14 @@ export function StudioShellClient({
                       aria-current={active ? 'page' : undefined}
                       className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
                         active
-                          ? 'bg-navy text-white font-semibold'
-                          : 'text-secondary hover:text-navy hover:bg-ivory'
+                          ? 'bg-primary text-primary-contrast font-semibold'
+                          : 'text-text-muted hover:text-text hover:bg-surface-muted'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon
                           className={`w-4 h-4 ${
-                            active ? 'text-accent' : 'text-secondary'
+                            active ? 'text-primary-contrast' : 'text-text-muted'
                           }`}
                         />
                         <span>{item.label}</span>
@@ -332,7 +335,7 @@ export function StudioShellClient({
                       {typeof item.badge === 'number' && item.badge > 0 && (
                         <span
                           className={`px-1.5 py-0.5 text-[10px] rounded-full ${
-                            item.badgeColor || 'bg-amber-500 text-navy font-bold'
+                            item.badgeColor || 'bg-warning-soft text-warning-text border border-warning-border font-bold'
                           }`}
                         >
                           {item.badge}
@@ -348,18 +351,18 @@ export function StudioShellClient({
                   <Link
                     href={`/writers/${profile.username}`}
                     onClick={() => setMobileDrawerOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-secondary hover:text-navy hover:bg-ivory rounded-xl"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-text-muted hover:text-text hover:bg-surface-muted rounded-xl"
                   >
-                    <User className="w-4 h-4 text-accent" />
+                    <User className="w-4 h-4 text-accent-strong" />
                     <span>My Public Profile</span>
                   </Link>
                 )}
                 <Link
                   href="/"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-secondary hover:text-navy hover:bg-ivory rounded-xl"
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-text-muted hover:text-text hover:bg-surface-muted rounded-xl"
                 >
-                  <ExternalLink className="w-4 h-4 text-accent" />
+                  <ExternalLink className="w-4 h-4 text-accent-strong" />
                   <span>Marketplace Store</span>
                 </Link>
               </div>

@@ -9,79 +9,135 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // High-Trust Editorial Palette
-        primary: {
-          DEFAULT: "#17243A", // Deep Navy
-          dark: "#0F1725",
-          light: "#23344F",
-        },
-        navy: {
-          DEFAULT: "#17243A",
-          dark: "#0F1725",
-          light: "#23344F",
-        },
-        background: {
-          DEFAULT: "#FAF7F0", // Warm Ivory
-          warm: "#FAF7F0",
-          alt: "#F3EDE1",
-        },
-        ivory: {
-          DEFAULT: "#FAF7F0",
-          light: "#FCFBF7",
-          dark: "#EFE7D8",
-        },
+        // Semantic Token Mapping
+        bg: "var(--color-bg)",
         surface: {
-          DEFAULT: "#FFFFFF", // Pure White
-          elevated: "#FFFFFF",
-          muted: "#F7F5F0",
+          DEFAULT: "var(--color-surface)",
+          muted: "var(--color-surface-muted)",
+          elevated: "var(--color-surface)",
+        },
+        border: {
+          DEFAULT: "var(--color-border)",
+          subtle: "var(--color-border-subtle)",
+        },
+        text: {
+          DEFAULT: "var(--color-text)",
+          muted: "var(--color-text-muted)",
+        },
+        primary: {
+          DEFAULT: "var(--color-primary)",
+          hover: "var(--color-primary-hover)",
+          active: "var(--color-primary-active)",
+          contrast: "var(--color-primary-contrast)",
+          dark: "var(--color-primary-active)",
+          light: "var(--color-primary-hover)",
         },
         accent: {
-          DEFAULT: "#C39A55", // Muted Gold
-          light: "#D8B474",
-          dark: "#A37D3B",
+          DEFAULT: "var(--color-accent)",
+          hover: "var(--color-accent-hover)",
+          strong: "var(--color-accent-strong)",
+          soft: "var(--color-accent-soft)",
+          light: "var(--color-accent-hover)",
+          dark: "var(--color-accent-strong)",
         },
+        ring: "var(--color-ring)",
+
+        // Status Tokens
+        success: {
+          DEFAULT: "var(--color-success)",
+          hover: "var(--color-success-hover)",
+          soft: "var(--color-success-soft)",
+          text: "var(--color-success-text)",
+          border: "var(--color-success-border)",
+        },
+        warning: {
+          DEFAULT: "var(--color-warning)",
+          hover: "var(--color-warning-hover)",
+          soft: "var(--color-warning-soft)",
+          text: "var(--color-warning-text)",
+          border: "var(--color-warning-border)",
+        },
+        danger: {
+          DEFAULT: "var(--color-danger)",
+          hover: "var(--color-danger-hover)",
+          soft: "var(--color-danger-soft)",
+          text: "var(--color-danger-text)",
+          border: "var(--color-danger-border)",
+        },
+        info: {
+          DEFAULT: "var(--color-info)",
+          hover: "var(--color-info-hover)",
+          soft: "var(--color-info-soft)",
+          text: "var(--color-info-text)",
+          border: "var(--color-info-border)",
+        },
+
+        // Role & Area Accents
+        "role-accent": {
+          DEFAULT: "var(--color-role-accent)",
+          strong: "var(--color-role-accent-strong)",
+          soft: "var(--color-role-accent-soft)",
+          contrast: "var(--color-role-accent-contrast)",
+        },
+        "accent-marketplace": "var(--accent-marketplace)",
+        "accent-studio": "var(--accent-studio)",
         "accent-admin": {
-          DEFAULT: "#4338CA", // Deep Indigo
-          light: "#EEF2FF",
-          dark: "#312E81",
-          border: "#C7D2FE",
+          DEFAULT: "var(--accent-admin)",
+          hover: "var(--accent-admin-hover)",
+          soft: "var(--accent-admin-soft)",
+          strong: "var(--accent-admin-strong)",
+          contrast: "var(--accent-admin-contrast)",
+          border: "var(--accent-admin-border)",
+          light: "var(--accent-admin-soft)",
+          dark: "var(--accent-admin-strong)",
+        },
+
+        // Backward-Compatibility Aliases
+        background: {
+          DEFAULT: "var(--color-bg)",
+          warm: "var(--color-bg)",
+          alt: "var(--color-surface-muted)",
+        },
+        ivory: {
+          DEFAULT: "var(--color-bg)",
+          light: "var(--color-surface)",
+          dark: "var(--color-surface-muted)",
+        },
+        navy: {
+          DEFAULT: "var(--color-primary)",
+          dark: "var(--color-primary-active)",
+          light: "var(--color-primary-hover)",
         },
         gold: {
-          DEFAULT: "#C39A55",
-          light: "#D8B474",
-          dark: "#A37D3B",
+          DEFAULT: "var(--color-accent)",
+          light: "var(--color-accent-hover)",
+          dark: "var(--color-accent-strong)",
         },
-        main: "#202735", // Main Text
-        text: {
-          DEFAULT: "#202735",
-          muted: "#6B7280",
-        },
-        secondary: "#6B7280", // Secondary Text
-        border: "#E5E7EB", // Subtle Border
-        
-        // Semantic Verification & Moderation Status Colors
+        main: "var(--color-text)",
+        secondary: "var(--color-text-muted)",
+
         status: {
-          pending: "#D97706",
-          pendingBg: "#FEF3C7",
-          pendingBorder: "#FDE68A",
-          verified: "#059669",
-          verifiedBg: "#D1FAE5",
-          verifiedBorder: "#A7F3D0",
-          rejected: "#DC2626",
-          rejectedBg: "#FEE2E2",
-          rejectedBorder: "#FECACA",
-          success: "#059669",
-          successBg: "#D1FAE5",
-          successBorder: "#A7F3D0",
-          warning: "#D97706",
-          warningBg: "#FEF3C7",
-          warningBorder: "#FDE68A",
-          danger: "#DC2626",
-          dangerBg: "#FEE2E2",
-          dangerBorder: "#FECACA",
-          info: "#2563EB",
-          infoBg: "#DBEAFE",
-          infoBorder: "#BFDBFE",
+          pending: "var(--color-warning)",
+          pendingBg: "var(--color-warning-soft)",
+          pendingBorder: "var(--color-warning-border)",
+          verified: "var(--color-success)",
+          verifiedBg: "var(--color-success-soft)",
+          verifiedBorder: "var(--color-success-border)",
+          rejected: "var(--color-danger)",
+          rejectedBg: "var(--color-danger-soft)",
+          rejectedBorder: "var(--color-danger-border)",
+          success: "var(--color-success)",
+          successBg: "var(--color-success-soft)",
+          successBorder: "var(--color-success-border)",
+          warning: "var(--color-warning)",
+          warningBg: "var(--color-warning-soft)",
+          warningBorder: "var(--color-warning-border)",
+          danger: "var(--color-danger)",
+          dangerBg: "var(--color-danger-soft)",
+          dangerBorder: "var(--color-danger-border)",
+          info: "var(--color-info)",
+          infoBg: "var(--color-info-soft)",
+          infoBorder: "var(--color-info-border)",
         },
       },
       fontFamily: {
@@ -99,10 +155,17 @@ const config: Config = {
         "book-cover": "2 / 3",
       },
       boxShadow: {
-        book: "0 10px 25px -5px rgba(23, 36, 58, 0.15), 0 8px 10px -6px rgba(23, 36, 58, 0.1)",
-        "book-hover": "0 20px 30px -10px rgba(23, 36, 58, 0.25), 0 10px 15px -5px rgba(195, 154, 85, 0.15)",
-        card: "0 2px 10px -2px rgba(23, 36, 58, 0.05), 0 1px 3px -1px rgba(23, 36, 58, 0.05)",
-        gold: "0 4px 14px 0 rgba(195, 154, 85, 0.35)",
+        book: "var(--shadow-book)",
+        "book-hover": "var(--shadow-book-hover)",
+        card: "var(--shadow-card)",
+      },
+      borderRadius: {
+        xs: "var(--radius-xs)",
+        sm: "var(--radius-sm)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-xl)",
+        "2xl": "var(--radius-2xl)",
       },
     },
   },

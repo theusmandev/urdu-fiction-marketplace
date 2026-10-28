@@ -106,7 +106,7 @@ export function ImageUploader({
         </label>
       )}
 
-      <div className="relative group rounded-xl border-2 border-dashed border-border bg-surface-muted/60 p-4 transition-all hover:border-brand-gold/60 hover:bg-surface">
+      <div className="relative group rounded-xl border-2 border-dashed border-border bg-surface-muted/60 p-4 transition-all hover:border-border/60 hover:bg-surface">
         <input
           ref={fileInputRef}
           type="file"
@@ -134,8 +134,8 @@ export function ImageUploader({
                   }`}
                 />
               ) : (
-                <div className="flex h-24 w-48 items-center justify-center gap-2 bg-slate-100 text-slate-700 text-xs p-2 text-center">
-                  <ImageIcon className="h-4 w-4 text-brand-gold" />
+                <div className="flex h-24 w-48 items-center justify-center gap-2 bg-surface-muted text-text text-xs p-2 text-center">
+                  <ImageIcon className="h-4 w-4 text-accent-strong" />
                   <span>Private proof uploaded</span>
                 </div>
               )}
@@ -147,7 +147,7 @@ export function ImageUploader({
                     e.stopPropagation();
                     handleRemove();
                   }}
-                  className="absolute top-1 right-1 z-20 rounded-full bg-red-600/90 p-1 text-white shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-red-500 cursor-pointer"
+                  className="absolute top-1 right-1 z-20 rounded-full bg-danger/90 p-1 text-white shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-danger cursor-pointer"
                   title="Remove image"
                 >
                   <X className="h-4 w-4" />
@@ -155,8 +155,8 @@ export function ImageUploader({
               )}
             </div>
 
-            <p className="mt-2 text-xs text-emerald-700 flex items-center gap-1 font-medium">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+            <p className="mt-2 text-xs text-success-text flex items-center gap-1 font-medium">
+              <CheckCircle2 className="h-3.5 w-3.5 text-success" />
               Image compressed and ready
             </p>
           </div>
@@ -164,20 +164,20 @@ export function ImageUploader({
           <div className="flex flex-col items-center justify-center py-4 text-center">
             {isUploading ? (
               <div className="flex flex-col items-center">
-                <Loader2 className="h-8 w-8 animate-spin text-brand-gold mb-2" />
+                <Loader2 className="h-8 w-8 animate-spin text-accent-strong mb-2" />
                 <p className="text-sm font-medium text-navy">
                   Compressing & uploading ({progress}%)...
                 </p>
-                <div className="mt-2 h-1.5 w-36 overflow-hidden rounded-full bg-slate-200">
+                <div className="mt-2 h-1.5 w-36 overflow-hidden rounded-full bg-border">
                   <div
-                    className="h-full bg-brand-gold transition-all duration-300"
+                    className="h-full bg-accent transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
             ) : (
               <>
-                <div className="mb-2 rounded-full bg-slate-100 p-3 text-slate-500 group-hover:text-brand-gold group-hover:bg-amber-50 transition-colors">
+                <div className="mb-2 rounded-full bg-surface-muted p-3 text-text-muted group-hover:text-accent-strong group-hover:bg-warning-soft transition-colors">
                   <UploadCloud className="h-6 w-6" />
                 </div>
                 <p className="text-sm font-medium text-navy">
@@ -193,7 +193,7 @@ export function ImageUploader({
       </div>
 
       {error && (
-        <p className="mt-1.5 flex items-center gap-1 text-xs text-rose-600">
+        <p className="mt-1.5 flex items-center gap-1 text-xs text-danger-text">
           <AlertCircle className="h-3.5 w-3.5 shrink-0" />
           <span>{error}</span>
         </p>

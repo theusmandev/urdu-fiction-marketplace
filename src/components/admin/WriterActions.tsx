@@ -135,13 +135,13 @@ export function WriterActions({
   return (
     <div className="space-y-4">
       {error && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+        <div className="p-3.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs">
           {error}
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
+        <div className="p-3.5 rounded-xl bg-success-soft border border-success-border text-success-text text-xs">
           {successMsg}
         </div>
       )}
@@ -154,7 +154,7 @@ export function WriterActions({
               type="button"
               onClick={() => setActiveDialog('approve')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+              className="px-4 py-2 rounded-xl bg-success hover:bg-success-hover text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Approve Writer</span>
@@ -163,7 +163,7 @@ export function WriterActions({
               type="button"
               onClick={() => setActiveDialog('reject')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+              className="px-4 py-2 rounded-xl bg-danger hover:bg-danger-hover text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <XCircle className="w-4 h-4" />
               <span>Reject Application</span>
@@ -176,7 +176,7 @@ export function WriterActions({
             type="button"
             onClick={() => setActiveDialog('suspend')}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+            className="px-4 py-2 rounded-xl bg-danger hover:bg-danger-hover text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
           >
             <AlertOctagon className="w-4 h-4" />
             <span>Suspend Writer</span>
@@ -188,7 +188,7 @@ export function WriterActions({
             type="button"
             onClick={() => setActiveDialog('approve')}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+            className="px-4 py-2 rounded-xl bg-success hover:bg-success-hover text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Re-Approve Writer</span>
@@ -281,7 +281,7 @@ export function WriterActions({
                   value={rateInput}
                   onChange={(e) => setRateInput(e.target.value)}
                   placeholder="Leave blank for platform default (20%)"
-                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 />
                 <span className="text-[10px] text-muted">
                   Empty = uses platform default rate.
@@ -298,13 +298,13 @@ export function WriterActions({
                   value={limitInput}
                   onChange={(e) => setLimitInput(e.target.value)}
                   required
-                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-main block mb-1">
-                  Justification Reason <span className="text-rose-600 font-mono">*</span>
+                  Justification Reason <span className="text-danger-text font-mono">*</span>
                 </label>
                 <textarea
                   rows={2}
@@ -312,7 +312,7 @@ export function WriterActions({
                   onChange={(e) => setTermsReason(e.target.value)}
                   required
                   placeholder="Reason for rate/threshold adjustment..."
-                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-none"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin resize-none"
                 />
               </div>
             </div>

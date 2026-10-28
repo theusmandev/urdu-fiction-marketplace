@@ -130,7 +130,7 @@ export function InvoiceDetailClient({
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-ivory text-navy hover:bg-slate-100 shadow-sm transition-colors"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-ivory text-navy hover:bg-surface-muted shadow-sm transition-colors"
           >
             <Printer className="w-4 h-4 mr-1.5 text-accent" />
             Print Statement
@@ -167,7 +167,7 @@ export function InvoiceDetailClient({
             <div className="flex sm:justify-end gap-2 pt-1 print:hidden">
               <StatusBadge status={invoice.status} size="sm" />
               {invoice.is_overdue && invoice.status !== 'settled' && invoice.status !== 'void' && (
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border">
                   Overdue
                 </span>
               )}
@@ -212,7 +212,7 @@ export function InvoiceDetailClient({
             <span className="text-[10px] uppercase font-semibold text-secondary">
               Confirmed Settled
             </span>
-            <div className="text-xl font-bold font-mono text-emerald-700">
+            <div className="text-xl font-bold font-mono text-success-text">
               {formatPKR2(invoice.amount_settled_pkr)}
             </div>
           </div>
@@ -221,7 +221,7 @@ export function InvoiceDetailClient({
             <span className="text-[10px] uppercase font-semibold text-secondary">
               Remaining Amount Due
             </span>
-            <div className={`text-xl font-bold font-mono ${remainingDue > 0 ? 'text-rose-700' : 'text-emerald-700'}`}>
+            <div className={`text-xl font-bold font-mono ${remainingDue > 0 ? 'text-danger-text' : 'text-success-text'}`}>
               {formatPKR2(remainingDue)}
             </div>
           </div>
@@ -255,7 +255,7 @@ export function InvoiceDetailClient({
               </thead>
               <tbody className="divide-y divide-border">
                 {lines.map((line) => (
-                  <tr key={line.id} className="hover:bg-slate-50/50">
+                  <tr key={line.id} className="hover:bg-surface-muted">
                     <td className="py-2 px-3 font-mono text-[11px] text-secondary whitespace-nowrap">
                       {formatKarachiDateTime(line.created_at)}
                     </td>
@@ -269,7 +269,7 @@ export function InvoiceDetailClient({
                       {line.reader_display_name}
                     </td>
                     <td className="py-2 px-3 whitespace-nowrap">
-                      <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-slate-100 text-slate-700">
+                      <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-surface-muted text-text">
                         {line.entry_type}
                       </span>
                     </td>
@@ -303,16 +303,16 @@ export function InvoiceDetailClient({
         {payments.length > 0 && (
           <div className="space-y-3">
             <h3 className="font-serif font-bold text-sm text-navy flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <CheckCircle2 className="w-4 h-4 text-success" />
               Confirmed Platform Settlement Receipts ({payments.length})
             </h3>
             <div className="border border-border rounded-xl overflow-hidden divide-y divide-border">
               {payments.map((p) => (
-                <div key={p.id} className="p-3 bg-emerald-50/40 flex items-center justify-between text-xs">
+                <div key={p.id} className="p-3 bg-success-soft/40 flex items-center justify-between text-xs">
                   <div className="space-y-0.5">
-                    <div className="font-medium text-emerald-900 flex items-center gap-2">
+                    <div className="font-medium text-success-text flex items-center gap-2">
                       <span>Confirmed Deposit Receipt</span>
-                      <span className="font-mono text-[11px] text-emerald-700">
+                      <span className="font-mono text-[11px] text-success-text">
                         {formatKarachiDateTime(p.confirmed_at)}
                       </span>
                     </div>
@@ -320,7 +320,7 @@ export function InvoiceDetailClient({
                       <p className="text-[11px] text-secondary">Note: {p.notes}</p>
                     )}
                   </div>
-                  <div className="font-mono font-bold text-emerald-800 text-sm">
+                  <div className="font-mono font-bold text-success-text text-sm">
                     {formatPKR2(p.amount_pkr)}
                   </div>
                 </div>
@@ -343,13 +343,13 @@ export function InvoiceDetailClient({
                 Remit your platform fee to any of the verified platform accounts below using mobile banking or wallets.
               </p>
             </div>
-            <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            <span className="text-[11px] font-mono text-success-text bg-success-soft px-2.5 py-1 rounded-full border border-success-border">
               Verified Accounts
             </span>
           </div>
 
           {paymentInstructions.length === 0 ? (
-            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800">
+            <div className="p-4 bg-warning-soft rounded-xl border border-warning-border text-xs text-warning-text">
               No platform payment accounts are currently configured. Please contact platform administration for settlement details.
             </div>
           ) : (
@@ -372,7 +372,7 @@ export function InvoiceDetailClient({
                           {m.bank_name || m.method_type.replace('_', ' ')}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-800">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-border text-text">
                         {m.method_type.toUpperCase()}
                       </span>
                     </div>
@@ -396,7 +396,7 @@ export function InvoiceDetailClient({
                             title="Copy Account Number"
                           >
                             {copiedId === m.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              <Check className="w-3.5 h-3.5 text-success" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
@@ -432,9 +432,9 @@ export function InvoiceDetailClient({
           </div>
 
           {/* Legal / Process Alert */}
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
+          <div className="p-4 bg-warning-soft border border-warning-border rounded-xl text-xs text-warning-text space-y-1">
             <div className="font-bold flex items-center gap-1.5">
-              <AlertTriangle className="w-4 h-4 text-amber-700" />
+              <AlertTriangle className="w-4 h-4 text-warning-text" />
               <span>Independent Verification Rule</span>
             </div>
             <p>
@@ -444,15 +444,15 @@ export function InvoiceDetailClient({
           </div>
 
           {formError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center gap-2">
-              <XCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-3 bg-danger-soft border border-danger-border text-danger-text text-xs rounded-xl flex items-center gap-2">
+              <XCircle className="w-4 h-4 shrink-0 text-danger-text" />
               <span>{formError}</span>
             </div>
           )}
 
           {formSuccess && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <div className="p-3 bg-success-soft border border-success-border text-success-text text-xs rounded-xl flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
               <span>{formSuccess}</span>
             </div>
           )}
@@ -470,7 +470,7 @@ export function InvoiceDetailClient({
                   required
                   value={amountPkr}
                   onChange={(e) => setAmountPkr(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-navy font-mono focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-navy font-mono focus:outline-none focus:ring-1 focus:ring-ring"
                 />
                 <p className="text-[10px] text-secondary mt-1">
                   Remaining statement due: {formatPKR2(remainingDue)}
@@ -487,7 +487,7 @@ export function InvoiceDetailClient({
                   placeholder="e.g. 023948572910"
                   value={tid}
                   onChange={(e) => setTid(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-navy font-mono uppercase focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-navy font-mono uppercase focus:outline-none focus:ring-1 focus:ring-ring"
                 />
                 <p className="text-[10px] text-secondary mt-1">
                   Enter exactly as printed on your banking receipt (6-40 characters)
@@ -519,7 +519,7 @@ export function InvoiceDetailClient({
                 placeholder="Optional notes or details regarding your transfer..."
                 value={writerNote}
                 onChange={(e) => setWriterNote(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-white text-navy text-xs focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-white text-navy text-xs focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
 
@@ -552,7 +552,7 @@ export function InvoiceDetailClient({
             {reports.map((r) => {
               const statusBadgeKey = `report_${r.status}`;
               return (
-                <div key={r.id} className="p-4 space-y-2 text-xs hover:bg-slate-50/50">
+                <div key={r.id} className="p-4 space-y-2 text-xs hover:bg-surface-muted">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold text-navy">
@@ -580,9 +580,9 @@ export function InvoiceDetailClient({
 
                   {/* Rejection Note if Rejected */}
                   {r.status === 'rejected' && r.admin_note && (
-                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-900 rounded-lg text-xs space-y-0.5">
+                    <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-lg text-xs space-y-0.5">
                       <div className="font-bold flex items-center gap-1.5">
-                        <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                        <XCircle className="w-3.5 h-3.5 text-danger-text" />
                         <span>Rejection Reason:</span>
                       </div>
                       <p className="text-[11px]">{r.admin_note}</p>
@@ -591,8 +591,8 @@ export function InvoiceDetailClient({
 
                   {/* Confirmation note if confirmed */}
                   {r.status === 'confirmed' && (
-                    <div className="p-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-[11px] flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <div className="p-2 bg-success-soft border border-success-border text-success-text rounded-lg text-[11px] flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                       <span>Deposit verified and credited by administration.</span>
                     </div>
                   )}

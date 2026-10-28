@@ -38,7 +38,7 @@ export function DraftStatusChip({
   if (isLockedByOtherTab) {
     return (
       <div
-        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-warning/10 text-accent-strong border border-warning-border/20"
         aria-live="polite"
       >
         <Lock className="w-3.5 h-3.5 shrink-0" />
@@ -53,29 +53,29 @@ export function DraftStatusChip({
       <div
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
           status === 'syncing'
-            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+            ? 'bg-info/10 text-info-text border-info-border/30'
             : status === 'synced'
-            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            ? 'bg-success/10 text-success border-success-border/20'
             : status === 'saved_local'
-            ? 'bg-slate-500/10 text-slate-300 border-slate-500/20'
+            ? 'bg-surface-muted text-text-muted border-border'
             : status === 'offline'
-            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+            ? 'bg-warning/10 text-accent-strong border-warning-border/20'
             : status === 'conflict'
-            ? 'bg-rose-500/10 text-rose-400 border-rose-500/20 animate-pulse cursor-pointer'
+            ? 'bg-danger/10 text-danger-text border-danger-border/20 animate-pulse cursor-pointer'
             : status === 'auth_expired'
-            ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+            ? 'bg-info-soft text-info-text border-info-border/30'
             : 'bg-surface/60 text-secondary border-border'
         }`}
         aria-live="polite"
         onClick={status === 'conflict' ? onOpenConflictModal : undefined}
         role={status === 'conflict' ? 'button' : undefined}
       >
-        {status === 'syncing' && <RotateCw className="w-3.5 h-3.5 animate-spin shrink-0 text-blue-400" />}
-        {status === 'synced' && <Cloud className="w-3.5 h-3.5 shrink-0 text-emerald-400" />}
-        {status === 'saved_local' && <HardDrive className="w-3.5 h-3.5 shrink-0 text-slate-400" />}
-        {status === 'offline' && <CloudOff className="w-3.5 h-3.5 shrink-0 text-amber-400" />}
-        {status === 'conflict' && <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-400" />}
-        {status === 'auth_expired' && <Lock className="w-3.5 h-3.5 shrink-0 text-purple-400" />}
+        {status === 'syncing' && <RotateCw className="w-3.5 h-3.5 animate-spin shrink-0 text-info-text" />}
+        {status === 'synced' && <Cloud className="w-3.5 h-3.5 shrink-0 text-success" />}
+        {status === 'saved_local' && <HardDrive className="w-3.5 h-3.5 shrink-0 text-text-muted" />}
+        {status === 'offline' && <CloudOff className="w-3.5 h-3.5 shrink-0 text-accent-strong" />}
+        {status === 'conflict' && <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-danger-text" />}
+        {status === 'auth_expired' && <Lock className="w-3.5 h-3.5 shrink-0 text-info-text" />}
         {status === 'idle' && <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-secondary" />}
 
         <span className="text-[11px] sm:text-xs font-sans whitespace-nowrap">

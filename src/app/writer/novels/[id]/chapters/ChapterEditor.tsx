@@ -420,22 +420,22 @@ export function ChapterEditor({
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <p className="text-xs font-medium">{successMessage}</p>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
         </div>
       )}
 
       {helperNotice && (
-        <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 flex items-center gap-2 text-xs">
-          <Sparkles className="w-4 h-4 text-sky-600 shrink-0" />
+        <div className="p-3.5 rounded-xl bg-info-soft border border-info-border text-info-text flex items-center gap-2 text-xs">
+          <Sparkles className="w-4 h-4 text-info-text shrink-0" />
           <span>{helperNotice}</span>
         </div>
       )}
@@ -446,25 +446,25 @@ export function ChapterEditor({
           {/* Chapter Number */}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-main">
-              Chapter Number <span className="text-rose-500">*</span>
+              Chapter Number <span className="text-danger-text">*</span>
             </label>
             <input
               type="number"
               min="1"
               value={formData.chapter_number}
               onChange={(e) => handleChange('chapter_number', Number(e.target.value))}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-bold text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-bold text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />
             {fieldErrors.chapter_number && (
-              <p className="text-xs text-rose-600">{fieldErrors.chapter_number[0]}</p>
+              <p className="text-xs text-danger-text">{fieldErrors.chapter_number[0]}</p>
             )}
           </div>
 
           {/* Urdu Chapter Title */}
           <div className="sm:col-span-3 space-y-1.5" dir="rtl">
             <label className="block text-xs font-semibold text-main text-right">
-              باب کا عنوان (اردو میں) <span className="text-rose-500">*</span>
+              باب کا عنوان (اردو میں) <span className="text-danger-text">*</span>
             </label>
             <input
               type="text"
@@ -472,11 +472,11 @@ export function ChapterEditor({
               value={formData.title_urdu}
               onChange={(e) => handleChange('title_urdu', e.target.value)}
               placeholder="مثال: باب اول — اندھیری رات کا سفر"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />
             {fieldErrors.title_urdu && (
-              <p className="text-xs text-rose-600 text-right">{fieldErrors.title_urdu[0]}</p>
+              <p className="text-xs text-danger-text text-right">{fieldErrors.title_urdu[0]}</p>
             )}
           </div>
         </div>
@@ -489,7 +489,7 @@ export function ChapterEditor({
               type="checkbox"
               checked={formData.is_free_preview}
               onChange={(e) => handleChange('is_free_preview', e.target.checked)}
-              className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent"
+              className="w-4 h-4 rounded border-border text-navy focus:ring-ring"
             />
             <div className="space-y-0.5">
               <span className="font-semibold text-main block">
@@ -507,7 +507,7 @@ export function ChapterEditor({
               type="checkbox"
               checked={formData.is_published}
               onChange={(e) => handleChange('is_published', e.target.checked)}
-              className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent"
+              className="w-4 h-4 rounded border-border text-navy focus:ring-ring"
             />
             <div className="space-y-0.5">
               <span className="font-semibold text-main block">
@@ -578,21 +578,21 @@ export function ChapterEditor({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className={isOverLimit ? 'text-rose-600 font-bold' : isNearingLimit ? 'text-amber-700 font-semibold' : 'text-secondary'}>
-                <strong className={isOverLimit ? 'text-rose-600' : isNearingLimit ? 'text-amber-800' : 'text-navy'}>
+              <span className={isOverLimit ? 'text-danger-text font-bold' : isNearingLimit ? 'text-warning-text font-semibold' : 'text-secondary'}>
+                <strong className={isOverLimit ? 'text-danger-text' : isNearingLimit ? 'text-warning-text' : 'text-navy'}>
                   {charCount.toLocaleString()}
                 </strong>{' '}
                 / 120,000 chars
               </span>
 
               {/* Progress pill */}
-              <div className="w-16 h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div className="w-16 h-2 rounded-full bg-border overflow-hidden">
                 <div
                   className={`h-full transition-all duration-300 ${
                     isOverLimit
-                      ? 'bg-rose-600'
+                      ? 'bg-danger'
                       : limitPercentage >= 80
-                      ? 'bg-amber-500'
+                      ? 'bg-warning'
                       : 'bg-accent'
                   }`}
                   style={{ width: `${limitPercentage}%` }}
@@ -604,12 +604,12 @@ export function ChapterEditor({
 
         {/* Undo notification bar */}
         {undoState && (
-          <div className="mx-4 mt-3 p-2.5 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between text-xs text-slate-800 animate-in fade-in">
+          <div className="mx-4 mt-3 p-2.5 rounded-lg bg-surface-muted border border-border flex items-center justify-between text-xs text-text animate-in fade-in">
             <span>Action completed: <strong>{undoState.label}</strong></span>
             <button
               type="button"
               onClick={handleUndo}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white border border-slate-300 font-semibold text-navy hover:bg-slate-50 transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white border border-border font-semibold text-navy hover:bg-surface-muted transition-colors shadow-xs"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Undo</span>
@@ -627,8 +627,8 @@ export function ChapterEditor({
             readOnly={isLockedByOtherTab}
             onChange={(e) => handleChange('content_urdu', e.target.value)}
             placeholder="باب کا مکمل متن یہاں تحریر کریں یا 'Paste Cleaned Text' پر کلک کریں..."
-            className={`w-full p-4 rounded-xl border border-border bg-ivory text-main font-urdu text-lg leading-[2.2] focus:outline-none focus:ring-2 focus:ring-accent resize-y transition-colors min-h-[420px] ${
-              isLockedByOtherTab ? 'opacity-60 bg-slate-100 cursor-not-allowed' : ''
+            className={`w-full p-4 rounded-xl border border-border bg-ivory text-main font-urdu text-lg leading-[2.2] focus:outline-none focus:ring-2 focus:ring-ring resize-y transition-colors min-h-[420px] ${
+              isLockedByOtherTab ? 'opacity-60 bg-surface-muted cursor-not-allowed' : ''
             }`}
             required
           />
@@ -636,15 +636,15 @@ export function ChapterEditor({
 
         {fieldErrors.content_urdu && (
           <div className="px-4 pb-4">
-            <p className="text-xs text-rose-600 text-right">{fieldErrors.content_urdu[0]}</p>
+            <p className="text-xs text-danger-text text-right">{fieldErrors.content_urdu[0]}</p>
           </div>
         )}
 
         {/* Amber Banner when between 80% and 100% (96,000 - 120,000 chars) */}
         {isNearingLimit && !isOverLimit && (
-          <div className="p-4 bg-amber-50 border-t border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 bg-warning-soft border-t border-warning-border text-warning-text text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-accent-strong shrink-0" />
               <span>
                 <strong>Approaching Limit:</strong> This chapter is at {limitPercentage}% of the 120,000-character limit ({charCount.toLocaleString()} chars). You can split it into smaller chapter parts for a better reading experience.
               </span>
@@ -652,7 +652,7 @@ export function ChapterEditor({
             <button
               type="button"
               onClick={() => setIsSplitterModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warning hover:bg-primary text-white font-bold text-xs shrink-0 shadow-xs"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Split into Chapters</span>
@@ -662,9 +662,9 @@ export function ChapterEditor({
 
         {/* Red Banner when over 100% (>120,000 chars, save blocked) */}
         {isOverLimit && (
-          <div className="p-4 bg-rose-50 border-t border-rose-200 text-rose-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 bg-danger-soft border-t border-danger-border text-danger-text text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
               <span>
                 <strong>Limit Exceeded:</strong> This chapter exceeds the platform limit of 120,000 characters ({charCount.toLocaleString()} chars). Saving is blocked until the content is divided.
               </span>
@@ -672,7 +672,7 @@ export function ChapterEditor({
             <button
               type="button"
               onClick={() => setIsSplitterModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-danger hover:bg-danger-hover text-white font-bold text-xs shrink-0 shadow-xs"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Split into Chapters</span>
@@ -685,13 +685,13 @@ export function ChapterEditor({
       <div className="flex items-center justify-between bg-surface rounded-xl border border-border p-4 shadow-sm">
         <div className="text-xs text-secondary">
           {isDirty ? (
-            <span className="text-amber-700 font-medium flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="text-warning-text font-medium flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
               Unsaved changes
             </span>
           ) : (
-            <span className="text-emerald-700 font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-success-text font-medium flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-success" />
               All changes saved
             </span>
           )}
@@ -742,12 +742,12 @@ export function ChapterEditor({
             {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-5 flex-1">
               {/* Feature Highlights */}
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-1">
-                <div className="font-bold flex items-center gap-1.5 text-emerald-800">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="p-3.5 rounded-xl bg-success-soft border border-success-border text-success-text text-xs space-y-1">
+                <div className="font-bold flex items-center gap-1.5 text-success-text">
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                   Safe Cleaning Features (Always Applied):
                 </div>
-                <ul className="list-disc pl-5 space-y-0.5 text-emerald-800 text-[11px]">
+                <ul className="list-disc pl-5 space-y-0.5 text-success-text text-[11px]">
                   <li>Unicode NFC normalization and invisible bidi control character removal (preserves ZWNJ/ZWJ).</li>
                   <li>Preserves every line break (\n) and blank line. Clamps runs of 3+ blank lines to 2.</li>
                   <li>Collapses repeated horizontal whitespace (spaces & tabs) inside a line without joining lines.</li>
@@ -764,7 +764,7 @@ export function ChapterEditor({
                       type="checkbox"
                       checked={optInArabicLetters}
                       onChange={(e) => setOptInArabicLetters(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent mt-0.5"
+                      className="w-4 h-4 rounded border-border text-navy focus:ring-ring mt-0.5"
                     />
                     <div>
                       <span className="text-xs font-semibold text-main block">
@@ -777,8 +777,8 @@ export function ChapterEditor({
                   </label>
 
                   {optInArabicLetters && (
-                    <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-start gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="p-2.5 rounded-lg bg-warning-soft border border-warning-border text-warning-text text-[11px] flex items-start gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-accent-strong shrink-0 mt-0.5" />
                       <span>Warning: Quranic verses and Arabic quotations will have their orthography altered.</span>
                     </div>
                   )}
@@ -791,7 +791,7 @@ export function ChapterEditor({
                       type="checkbox"
                       checked={optInJoinLines}
                       onChange={(e) => setOptInJoinLines(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent mt-0.5"
+                      className="w-4 h-4 rounded border-border text-navy focus:ring-ring mt-0.5"
                     />
                     <div>
                       <span className="text-xs font-semibold text-main block">

@@ -251,7 +251,7 @@ export function AdminWriterCommissionDetailClient({
             }}
             className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-surface-muted text-main border border-border shadow-sm transition-colors"
           >
-            <Sliders className="w-4 h-4 mr-1.5 text-amber-600" />
+            <Sliders className="w-4 h-4 mr-1.5 text-accent-strong" />
             Record Adjustment
           </button>
           <Link
@@ -296,13 +296,13 @@ export function AdminWriterCommissionDetailClient({
           </span>
           <div className="pt-1">
             {writer.is_orders_paused_for_commission ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-danger-soft text-danger-text border border-danger-border">
+                <AlertTriangle className="w-3.5 h-3.5 text-danger-text" />
                 Reader Orders Paused
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-success-soft text-success-text border border-success-border">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                 Active & Good Standing
               </span>
             )}
@@ -351,7 +351,7 @@ export function AdminWriterCommissionDetailClient({
                     <div className="font-mono font-bold text-main">
                       {formatPKR2(inv.total_commission_owed_pkr)}
                     </div>
-                    <div className="text-[11px] font-mono text-emerald-700 font-semibold">
+                    <div className="text-[11px] font-mono text-success-text font-semibold">
                       Settled: {formatPKR2(inv.amount_settled_pkr)}
                     </div>
                   </div>
@@ -373,7 +373,7 @@ export function AdminWriterCommissionDetailClient({
       <div className="bg-surface border border-border rounded-2xl shadow-card overflow-hidden">
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-emerald-600" />
+            <DollarSign className="w-4 h-4 text-success" />
             <h2 className="font-serif font-bold text-sm text-main">
               Recent Sales Ledger Entries ({recentLedger.length})
             </h2>
@@ -409,10 +409,10 @@ export function AdminWriterCommissionDetailClient({
                     <td className="py-2.5 px-3 text-right font-mono text-main whitespace-nowrap">
                       {formatPKR2(entry.gross_amount_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-medium text-rose-700 whitespace-nowrap">
+                    <td className="py-2.5 px-3 text-right font-mono font-medium text-danger-text whitespace-nowrap">
                       {formatPKR2(entry.platform_commission_pkr)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700 whitespace-nowrap">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-success-text whitespace-nowrap">
                       {formatPKR2(entry.writer_net_pkr)}
                     </td>
                     <td className="py-2.5 px-3 text-muted max-w-xs truncate break-words" title={entry.notes || undefined}>
@@ -448,7 +448,7 @@ export function AdminWriterCommissionDetailClient({
 
             {invoiceModalSuccess ? (
               <div className="space-y-4">
-                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs">
+                <div className="p-4 bg-success-soft border border-success-border text-success-text rounded-xl text-xs">
                   {invoiceModalSuccess}
                 </div>
                 <div className="flex justify-end">
@@ -464,7 +464,7 @@ export function AdminWriterCommissionDetailClient({
             ) : (
               <div className="space-y-4 text-xs">
                 {invoiceModalError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
+                  <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl">
                     {invoiceModalError}
                   </div>
                 )}
@@ -509,7 +509,7 @@ export function AdminWriterCommissionDetailClient({
                         setPeriodStart(e.target.value ? `${e.target.value}:00+05:00` : '');
                         setPreviewData(null);
                       }}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
                     />
                   </div>
                   <div>
@@ -522,7 +522,7 @@ export function AdminWriterCommissionDetailClient({
                         setPeriodEnd(e.target.value ? `${e.target.value}:59+05:00` : '');
                         setPreviewData(null);
                       }}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
                     />
                   </div>
                 </div>
@@ -556,14 +556,14 @@ export function AdminWriterCommissionDetailClient({
                       </div>
                       <div>
                         <span className="text-[10px] text-muted uppercase font-semibold">Total Platform Fee:</span>
-                        <div className="font-mono font-bold text-rose-700">
+                        <div className="font-mono font-bold text-danger-text">
                           {formatPKR2(previewData.total_commission_pkr)}
                         </div>
                       </div>
                     </div>
 
                     {previewData.line_count === 0 && (
-                      <p className="text-amber-700 italic text-[11px] pt-1">
+                      <p className="text-warning-text italic text-[11px] pt-1">
                         No uninvoiced verified sales, refund adjustments, or manual corrections found for this period.
                       </p>
                     )}
@@ -599,7 +599,7 @@ export function AdminWriterCommissionDetailClient({
           <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-amber-600" />
+                <Sliders className="w-5 h-5 text-accent-strong" />
                 <h3 className="font-serif font-bold text-lg text-main">
                   Record Platform Fee Adjustment
                 </h3>
@@ -615,7 +615,7 @@ export function AdminWriterCommissionDetailClient({
 
             {adjustmentSuccess ? (
               <div className="space-y-4 text-xs">
-                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl">
+                <div className="p-4 bg-success-soft border border-success-border text-success-text rounded-xl">
                   {adjustmentSuccess}
                 </div>
                 <div className="flex justify-end">
@@ -631,7 +631,7 @@ export function AdminWriterCommissionDetailClient({
             ) : (
               <form onSubmit={handleRecordAdjustment} className="space-y-4 text-xs">
                 {adjustmentError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
+                  <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl">
                     {adjustmentError}
                   </div>
                 )}
@@ -651,7 +651,7 @@ export function AdminWriterCommissionDetailClient({
                     placeholder="e.g. 500 or -250"
                     value={adjustmentAmount}
                     onChange={(e) => setAdjustmentAmount(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main font-mono focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main font-mono focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
                   />
                   <p className="text-[10px] text-muted mt-1">
                     Use negative numbers to reduce author platform fee debt.
@@ -668,7 +668,7 @@ export function AdminWriterCommissionDetailClient({
                     placeholder="Explain the operational reason for this adjustment..."
                     value={adjustmentReason}
                     onChange={(e) => setAdjustmentReason(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
                   />
                 </div>
 
@@ -683,7 +683,7 @@ export function AdminWriterCommissionDetailClient({
                   <button
                     type="submit"
                     disabled={isSubmittingAdjustment}
-                    className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold transition-colors disabled:opacity-50"
+                    className="px-5 py-2 rounded-lg bg-warning hover:bg-primary text-white font-semibold transition-colors disabled:opacity-50"
                   >
                     {isSubmittingAdjustment ? 'Recording...' : 'Record Adjustment'}
                   </button>

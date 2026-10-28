@@ -167,7 +167,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                           {ticket.subject}
                         </div>
                         {ticket.order_number && (
-                          <span className="font-mono text-[10px] text-brand-gold break-all">
+                          <span className="font-mono text-[10px] text-accent-strong break-all">
                             Ref: #{ticket.order_number}
                           </span>
                         )}
@@ -191,15 +191,15 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                               meta.variant === 'warning'
-                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                ? 'bg-warning-soft text-warning-text border-warning-border'
                                 : meta.variant === 'success'
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                : 'bg-stone-100 text-stone-600 border-stone-200'
+                                ? 'bg-success-soft text-success-text border-success-border'
+                                : 'bg-surface-muted text-text-muted border-border'
                             }`}
                           >
                             {meta.label}
                           </span>
-                          <span className="text-[10px] text-brand-gold font-urdu">
+                          <span className="text-[10px] text-accent-strong font-urdu">
                             {meta.urduLabel}
                           </span>
                         </div>

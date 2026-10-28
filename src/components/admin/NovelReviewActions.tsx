@@ -157,13 +157,13 @@ export function NovelReviewActions({
   return (
     <div className="space-y-4">
       {error && (
-        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+        <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs">
           {error}
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
+        <div className="p-3 rounded-xl bg-success-soft border border-success-border text-success-text text-xs">
           {successMsg}
         </div>
       )}
@@ -182,7 +182,7 @@ export function NovelReviewActions({
               className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.rights ? (
-                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-success shrink-0" />
               ) : (
                 <Square className="w-4 h-4 text-muted shrink-0" />
               )}
@@ -195,7 +195,7 @@ export function NovelReviewActions({
               className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.content_policy ? (
-                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-success shrink-0" />
               ) : (
                 <Square className="w-4 h-4 text-muted shrink-0" />
               )}
@@ -208,7 +208,7 @@ export function NovelReviewActions({
               className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.quality ? (
-                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-success shrink-0" />
               ) : (
                 <Square className="w-4 h-4 text-muted shrink-0" />
               )}
@@ -221,7 +221,7 @@ export function NovelReviewActions({
               className="flex items-center gap-2 w-full text-left hover:text-accent-admin transition-colors py-0.5"
             >
               {checklist.price ? (
-                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckSquare className="w-4 h-4 text-success shrink-0" />
               ) : (
                 <Square className="w-4 h-4 text-muted shrink-0" />
               )}
@@ -243,7 +243,7 @@ export function NovelReviewActions({
               onClick={() => setActiveDialog('approve')}
               disabled={loading || !allChecked}
               title={!allChecked ? 'Complete all checklist items above before approving' : undefined}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+              className="px-4 py-2 rounded-xl bg-success hover:bg-success text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Approve & Publish</span>
@@ -252,7 +252,7 @@ export function NovelReviewActions({
               type="button"
               onClick={() => setActiveDialog('reject')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+              className="px-4 py-2 rounded-xl bg-danger hover:bg-danger text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <XCircle className="w-4 h-4" />
               <span>Reject Submission</span>
@@ -266,7 +266,7 @@ export function NovelReviewActions({
               type="button"
               onClick={() => setActiveDialog('suspend')}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+              className="px-4 py-2 rounded-xl bg-warning hover:bg-warning text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
             >
               <AlertOctagon className="w-4 h-4" />
               <span>Suspend Novel</span>
@@ -278,11 +278,11 @@ export function NovelReviewActions({
               disabled={loading}
               className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm ${
                 isFeatured
-                  ? 'bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100'
+                  ? 'bg-warning-soft text-warning-text border border-warning-border hover:bg-warning-soft'
                   : 'bg-surface-muted hover:bg-surface text-main border border-border'
               }`}
             >
-              <Star className={`w-4 h-4 ${isFeatured ? 'fill-amber-500 text-amber-600' : 'text-muted'}`} />
+              <Star className={`w-4 h-4 ${isFeatured ? 'fill-accent-strong/20 text-accent-strong' : 'text-muted'}`} />
               <span>{isFeatured ? 'Un-Feature Novel' : 'Feature on Marketplace'}</span>
             </button>
           </>
@@ -293,7 +293,7 @@ export function NovelReviewActions({
             type="button"
             onClick={() => setActiveDialog('unsuspend')}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-success hover:bg-success text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Unsuspend Novel</span>

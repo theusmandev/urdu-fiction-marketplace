@@ -95,15 +95,15 @@ export function WriterProfileForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <p className="text-xs font-medium">{successMessage}</p>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
         </div>
       )}
@@ -122,7 +122,7 @@ export function WriterProfileForm({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wide">
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-success-soft text-success-text uppercase tracking-wide">
               {status}
             </span>
             {username && (
@@ -162,7 +162,7 @@ export function WriterProfileForm({
           {/* Urdu Pen Name */}
           <div className="space-y-1.5" dir="rtl">
             <label className="block text-xs font-semibold text-main text-right">
-              قلمی نام (اردو میں) <span className="text-rose-500">*</span>
+              قلمی نام (اردو میں) <span className="text-danger-text">*</span>
             </label>
             <input
               type="text"
@@ -170,11 +170,11 @@ export function WriterProfileForm({
               value={formData.pen_name_urdu}
               onChange={(e) => handleChange('pen_name_urdu', e.target.value)}
               placeholder="مثال: نمرہ احمد، عمیرہ احمد"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />
             {fieldErrors.pen_name_urdu && (
-              <p className="text-xs text-rose-600 text-right">{fieldErrors.pen_name_urdu[0]}</p>
+              <p className="text-xs text-danger-text text-right">{fieldErrors.pen_name_urdu[0]}</p>
             )}
             <p className="text-[11px] text-secondary text-right">
               قارئین کو آپ کے ناولوں کے سرورق اور فہرست پر یہی نام نظر آئے گا۔
@@ -184,18 +184,18 @@ export function WriterProfileForm({
           {/* English Pen Name */}
           <div className="space-y-1.5" dir="ltr">
             <label className="block text-xs font-semibold text-main">
-              English Pen Name <span className="text-rose-500">*</span>
+              English Pen Name <span className="text-danger-text">*</span>
             </label>
             <input
               type="text"
               value={formData.pen_name_english}
               onChange={(e) => handleChange('pen_name_english', e.target.value)}
               placeholder="e.g. Nimra Ahmed, Umera Ahmed"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />
             {fieldErrors.pen_name_english && (
-              <p className="text-xs text-rose-600">{fieldErrors.pen_name_english[0]}</p>
+              <p className="text-xs text-danger-text">{fieldErrors.pen_name_english[0]}</p>
             )}
             <p className="text-[11px] text-secondary">
               Used in English search results, URLs, and platform receipts.
@@ -216,10 +216,10 @@ export function WriterProfileForm({
               value={formData.bio_urdu || ''}
               onChange={(e) => handleChange('bio_urdu', e.target.value)}
               placeholder="اپنے ادبی سفر، دلچسپیوں اور قارئین کے لیے چند جملے تحریر کریں..."
-              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-base leading-loose focus:outline-none focus:ring-2 focus:ring-accent resize-y"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main font-urdu text-base leading-loose focus:outline-none focus:ring-2 focus:ring-ring resize-y"
             />
             {fieldErrors.bio_urdu && (
-              <p className="text-xs text-rose-600 text-right">{fieldErrors.bio_urdu[0]}</p>
+              <p className="text-xs text-danger-text text-right">{fieldErrors.bio_urdu[0]}</p>
             )}
             <p className="text-[11px] text-secondary text-right">
               زیادہ سے زیادہ ۲،۰۰۰ حروف۔
@@ -236,10 +236,10 @@ export function WriterProfileForm({
               value={formData.bio_english || ''}
               onChange={(e) => handleChange('bio_english', e.target.value)}
               placeholder="Share a short summary of your literary journey and background for readers..."
-              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-y"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-y"
             />
             {fieldErrors.bio_english && (
-              <p className="text-xs text-rose-600">{fieldErrors.bio_english[0]}</p>
+              <p className="text-xs text-danger-text">{fieldErrors.bio_english[0]}</p>
             )}
             <p className="text-[11px] text-secondary">
               Maximum 2,000 characters.

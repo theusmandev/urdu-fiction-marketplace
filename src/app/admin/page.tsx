@@ -199,7 +199,7 @@ export default async function AdminDashboardPage() {
       <div className="bg-surface border border-border shadow-card rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-success-soft text-success-text border border-success-border">
               System Active
             </span>
             <span className="text-xs text-secondary font-medium">
@@ -237,11 +237,11 @@ export default async function AdminDashboardPage() {
         {/* Pending Writers */}
         <Link
           href="/admin/writers?status=pending_approval"
-          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-warning-border hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Writers</span>
-            <Feather className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+            <Feather className="w-4 h-4 text-accent-strong group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-xl font-bold text-navy font-mono">
             {pendingWritersCount ?? 0}
@@ -252,11 +252,11 @@ export default async function AdminDashboardPage() {
         {/* Novels Under Review */}
         <Link
           href="/admin/novels?status=under_review"
-          className="bg-surface border border-border shadow-card hover:border-rose-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-danger-border hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Novels</span>
-            <BookOpen className="w-4 h-4 text-rose-600 group-hover:scale-110 transition-transform" />
+            <BookOpen className="w-4 h-4 text-danger-text group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-xl font-bold text-navy font-mono">
             {underReviewNovelsCount ?? 0}
@@ -267,11 +267,11 @@ export default async function AdminDashboardPage() {
         {/* Open Disputes */}
         <Link
           href="/admin/disputes"
-          className="bg-surface border border-border shadow-card hover:border-purple-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-primary hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Disputes</span>
-            <Scale className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
+            <Scale className="w-4 h-4 text-info-text group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-xl font-bold text-navy font-mono">
             {openDisputesCount ?? 0}
@@ -282,11 +282,11 @@ export default async function AdminDashboardPage() {
         {/* Pending Refunds */}
         <Link
           href="/admin/refunds"
-          className="bg-surface border border-border shadow-card hover:border-sky-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-info hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Refunds</span>
-            <RotateCcw className="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" />
+            <RotateCcw className="w-4 h-4 text-info-text group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-xl font-bold text-navy font-mono">
             {pendingRefundsCount ?? 0}
@@ -297,11 +297,11 @@ export default async function AdminDashboardPage() {
         {/* Open Support Tickets */}
         <Link
           href="/admin/support"
-          className="bg-surface border border-border shadow-card hover:border-indigo-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-primary hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Support</span>
-            <LifeBuoy className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
+            <LifeBuoy className="w-4 h-4 text-info-text group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-xl font-bold text-navy font-mono">
             {openSupportTicketsCount ?? 0}
@@ -312,13 +312,13 @@ export default async function AdminDashboardPage() {
         {/* Delayed Verifications */}
         <Link
           href="/admin/orders?stuck=true"
-          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-warning-border hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Delayed</span>
-            <Clock className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+            <Clock className="w-4 h-4 text-accent-strong group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-xl font-bold text-amber-700 font-mono">
+          <div className="text-xl font-bold text-warning-text font-mono">
             {overdueOrdersCount ?? 0}
           </div>
           <p className="text-[10px] text-secondary">&gt; 24h unverified</p>
@@ -327,11 +327,11 @@ export default async function AdminDashboardPage() {
         {/* Tips Review Queue */}
         <Link
           href="/admin/tips?flagged=true"
-          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-warning-border hover:shadow-md rounded-2xl p-3.5 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Tips Queue</span>
-            <Sparkles className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+            <Sparkles className="w-4 h-4 text-accent-strong group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-xl font-bold text-navy font-mono">
             {flaggedTipsCount}
@@ -343,9 +343,9 @@ export default async function AdminDashboardPage() {
         <div className="bg-surface border border-border shadow-card rounded-2xl p-3.5 space-y-1">
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Near Limit</span>
-            <Flame className="w-4 h-4 text-rose-600" />
+            <Flame className="w-4 h-4 text-danger-text" />
           </div>
-          <div className="text-xl font-bold text-rose-700 font-mono">
+          <div className="text-xl font-bold text-danger-text font-mono">
             {atRiskWriters.length}
           </div>
           <p className="text-[10px] text-secondary">&gt; 80% or paused</p>
@@ -372,11 +372,11 @@ export default async function AdminDashboardPage() {
         {/* Reports Awaiting Confirmation */}
         <Link
           href="/admin/commission/reports"
-          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-warning-border hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span className="font-medium">Reports Awaiting Confirmation</span>
-            <Clock className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+            <Clock className="w-4 h-4 text-accent-strong group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-2xl font-bold text-navy font-mono">
             {pendingReportsCount ?? 0}
@@ -387,11 +387,11 @@ export default async function AdminDashboardPage() {
         {/* Overdue Invoices */}
         <Link
           href="/admin/invoices"
-          className="bg-surface border border-border shadow-card hover:border-rose-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-danger-border hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span className="font-medium">Overdue Invoices</span>
-            <AlertTriangle className="w-4 h-4 text-rose-600 group-hover:scale-110 transition-transform" />
+            <AlertTriangle className="w-4 h-4 text-danger-text group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-2xl font-bold text-navy font-mono">
             {overdueInvoicesCount ?? 0}
@@ -402,11 +402,11 @@ export default async function AdminDashboardPage() {
         {/* Writers Over 80% Limit */}
         <Link
           href="/admin/commission"
-          className="bg-surface border border-border shadow-card hover:border-purple-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-primary hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span className="font-medium">Writers Over 80% of Limit</span>
-            <Flame className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
+            <Flame className="w-4 h-4 text-info-text group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-2xl font-bold text-navy font-mono">
             {atRiskWriters.length}
@@ -417,11 +417,11 @@ export default async function AdminDashboardPage() {
         {/* Tips Review Queue */}
         <Link
           href="/admin/tips?flagged=true"
-          className="bg-surface border border-border shadow-card hover:border-amber-400 hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
+          className="bg-surface border border-border shadow-card hover:border-warning-border hover:shadow-md rounded-2xl p-4 space-y-1 transition-all block group"
         >
           <div className="flex items-center justify-between text-secondary text-xs">
             <span className="font-medium">Tips to Review</span>
-            <Sparkles className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+            <Sparkles className="w-4 h-4 text-accent-strong group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-2xl font-bold text-navy font-mono">
             {flaggedTipsCount}
@@ -454,7 +454,7 @@ export default async function AdminDashboardPage() {
 
           {!underReviewNovels || underReviewNovels.length === 0 ? (
             <div className="py-10 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600">
+              <div className="w-10 h-10 rounded-full bg-success-soft border border-success-border flex items-center justify-center mx-auto text-success">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <p className="text-xs font-semibold text-main">
@@ -519,7 +519,7 @@ export default async function AdminDashboardPage() {
 
           {!pendingWriters || pendingWriters.length === 0 ? (
             <div className="py-10 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600">
+              <div className="w-10 h-10 rounded-full bg-success-soft border border-success-border flex items-center justify-center mx-auto text-success">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <p className="text-xs font-semibold text-main">
@@ -568,14 +568,14 @@ export default async function AdminDashboardPage() {
         <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <h2 className="text-sm font-bold text-navy tracking-tight">
                 Delayed Writer Payment Verifications (&gt;24h)
               </h2>
             </div>
             <Link
               href="/admin/orders?stuck=true"
-              className="text-xs text-amber-700 hover:underline flex items-center gap-1 font-semibold"
+              className="text-xs text-warning-text hover:underline flex items-center gap-1 font-semibold"
             >
               <span>{overdueOrdersCount ?? 0} Flagged</span>
               <ChevronRight className="w-3 h-3" />
@@ -650,11 +650,11 @@ export default async function AdminDashboardPage() {
                   </div>
                   <div>
                     {writer.is_orders_paused_for_commission ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border font-semibold">
                         Orders Paused
                       </span>
                     ) : (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-warning-soft text-warning-text border border-warning-border font-semibold">
                         High Balance
                       </span>
                     )}
@@ -673,7 +673,7 @@ export default async function AdminDashboardPage() {
       <div className="bg-surface border border-border shadow-card rounded-2xl p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-border pb-3">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-emerald-600" />
+            <Activity className="w-4 h-4 text-success" />
             <h2 className="text-sm font-bold text-navy tracking-tight">
               Recent Security & Financial Audit Stream
             </h2>
@@ -699,7 +699,7 @@ export default async function AdminDashboardPage() {
                 className="p-3 rounded-xl bg-ivory/50 border border-border space-y-1 text-xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-emerald-700 font-bold font-mono text-[11px]">
+                  <span className="text-success-text font-bold font-mono text-[11px]">
                     {log.action_type}
                   </span>
                   <span className="text-[10px] text-secondary">

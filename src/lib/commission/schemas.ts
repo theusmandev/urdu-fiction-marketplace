@@ -77,43 +77,43 @@ export function getInvoiceStatusMeta(status: CommissionInvoiceStatus): {
     case 'open':
       return {
         label: 'Awaiting Payment',
-        badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+        badgeClass: 'bg-warning/15 text-warning-text border-warning-border/30',
         description: 'Invoice issued. Waiting for writer to transfer platform fee.',
       };
     case 'payment_reported':
       return {
         label: 'Claim Submitted',
-        badgeClass: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
+        badgeClass: 'bg-info-soft text-info-text border-info-border/30',
         description: 'Author has reported payment. Awaiting administrator verification.',
       };
     case 'partially_paid':
       return {
         label: 'Partially Paid',
-        badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+        badgeClass: 'bg-primary/10 text-primary border-primary/20',
         description: 'Installment payment confirmed. Remaining balance due.',
       };
     case 'settled':
       return {
         label: 'Fully Settled',
-        badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        badgeClass: 'bg-success/15 text-success border-success-border/30',
         description: 'Platform fee payment confirmed and reconciled.',
       };
     case 'void':
       return {
         label: 'Voided',
-        badgeClass: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
+        badgeClass: 'bg-surface-muted text-text-muted border-border/30',
         description: 'Invoice cancelled and lines released for re-billing.',
       };
     case 'disputed':
       return {
         label: 'Under Dispute',
-        badgeClass: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+        badgeClass: 'bg-danger/15 text-danger-text border-danger-border/30',
         description: 'Disputed billing period under review.',
       };
     default:
       return {
         label: status,
-        badgeClass: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
+        badgeClass: 'bg-surface-muted text-text-muted border-border/30',
         description: '',
       };
   }

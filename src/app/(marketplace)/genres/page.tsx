@@ -69,7 +69,7 @@ export default async function GenresIndexPage() {
               </h3>
             </div>
 
-            <div className="pt-4 border-t border-border group-hover:border-white/15 flex items-center justify-between text-xs text-secondary group-hover:text-slate-300">
+            <div className="pt-4 border-t border-border group-hover:border-white/15 flex items-center justify-between text-xs text-secondary group-hover:text-text-muted">
               <span>{genre.published_novels_count} {genre.published_novels_count === 1 ? "novel" : "novels"}</span>
               <span className="font-medium text-accent group-hover:text-accent-light">
                 Explore →

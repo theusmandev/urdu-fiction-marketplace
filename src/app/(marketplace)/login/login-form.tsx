@@ -86,22 +86,22 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
         {/* System Message Notifications */}
         {systemError && (
-          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-            <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+          <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+            <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
             <span>{systemError}</span>
           </div>
         )}
 
         {messageCode === 'password_updated' && (
-          <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 text-emerald-800 text-sm">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" />
+          <div className="rounded-xl bg-success-soft border border-success-border p-4 flex items-start gap-3 text-success-text text-sm">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-success mt-0.5" />
             <span>Your password was reset successfully. Please log in with your new password.</span>
           </div>
         )}
 
         {error && (
-          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-            <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+          <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+            <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
             <span>{error}</span>
           </div>
         )}
@@ -126,7 +126,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   disabled={isPending}
-                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                 />
               </div>
             </div>
@@ -157,7 +157,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   disabled={isPending}
-                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                  className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                 />
               </div>
             </div>
@@ -166,7 +166,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
           >
             {isPending ? (
               <>

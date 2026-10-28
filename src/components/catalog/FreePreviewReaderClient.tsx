@@ -190,7 +190,7 @@ export function FreePreviewReaderClient({
                 onClick={() => handleThemeChange("dark")}
                 aria-label="Dark mode"
                 className={`p-1.5 rounded-md text-xs transition-colors ${
-                  theme === "dark" ? "bg-slate-700 text-white shadow-sm" : "opacity-60 hover:opacity-100"
+                  theme === "dark" ? "bg-primary text-white shadow-sm" : "opacity-60 hover:opacity-100"
                 }`}
               >
                 <Moon className="w-3.5 h-3.5" />

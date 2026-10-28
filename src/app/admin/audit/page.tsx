@@ -127,7 +127,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
           <select
             name="action_type"
             defaultValue={actionType}
-            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin"
           >
             {ACTION_TYPES.map((act) => (
               <option key={act} value={act === 'ALL' ? '' : act}>
@@ -145,7 +145,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
           <select
             name="entity_type"
             defaultValue={entityType}
-            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin"
           >
             {ENTITY_TYPES.map((ent) => (
               <option key={ent} value={ent === 'ALL' ? '' : ent}>
@@ -164,7 +164,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
             type="date"
             name="from"
             defaultValue={fromDate}
-            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin"
           >
           </input>
         </div>
@@ -178,7 +178,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
             type="date"
             name="to"
             defaultValue={toDate}
-            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+            className="w-full bg-surface border border-border rounded-xl px-3 py-1.5 text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin"
           />
         </div>
 
@@ -203,15 +203,15 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
 
       {/* Audit Log Results */}
       {queryError ? (
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
-          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border space-y-3">
+          <div className="flex items-center gap-2 text-danger-text font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-danger-text" />
             <span>Database Error Loading Audit Logs</span>
           </div>
-          <p className="text-xs text-rose-900 leading-relaxed">
+          <p className="text-xs text-danger-text leading-relaxed">
             Unable to retrieve system audit records from the database:
           </p>
-          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-surface border border-danger-border text-xs font-mono text-danger-text">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (

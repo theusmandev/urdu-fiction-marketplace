@@ -60,16 +60,16 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center space-y-4 shadow-sm">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
-        <h2 className="text-xl font-bold font-serif text-emerald-950">Application Submitted!</h2>
-        <p className="text-sm text-emerald-800 leading-relaxed max-w-md mx-auto">
+      <div className="rounded-2xl border border-success-border bg-success-soft p-8 text-center space-y-4 shadow-sm">
+        <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+        <h2 className="text-xl font-bold font-serif text-success-text">Application Submitted!</h2>
+        <p className="text-sm text-success-text leading-relaxed max-w-md mx-auto">
           Your author application has been submitted for review. Once approved by our team, your author dashboard will be activated.
         </p>
         <div className="pt-2">
           <Link
             href="/account"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 rounded-xl bg-success px-5 py-2.5 text-sm font-semibold text-white hover:bg-success-hover transition-colors shadow-sm"
           >
             <span>Return to Account</span>
             <ArrowRight className="h-4 w-4" />
@@ -82,15 +82,15 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {isReapplying && (
-        <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-amber-900 text-sm">
+        <div className="rounded-xl bg-warning-soft border border-warning-border p-4 text-warning-text text-sm">
           <strong className="font-bold block mb-1">Reapplying for Author Status</strong>
           Please update your pen name or bio information below and resubmit for editorial review.
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+        <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+          <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
           <span>{error}</span>
         </div>
       )}
@@ -99,7 +99,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
         {/* Pen Name Urdu */}
         <div>
           <label htmlFor="penNameUrdu" className="block text-sm font-semibold text-secondary">
-            Urdu Pen Name (قلمی نام اردو) <span className="text-rose-500">*</span>
+            Urdu Pen Name (قلمی نام اردو) <span className="text-danger-text">*</span>
           </label>
           <input
             id="penNameUrdu"
@@ -110,17 +110,17 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setPenNameUrdu(e.target.value)}
             placeholder="مثلاً: نمرہ احمد"
             disabled={isPending}
-            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base leading-[2.2] min-h-[44px] disabled:opacity-50 transition-colors"
+            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base leading-[2.2] min-h-[44px] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.penNameUrdu && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.penNameUrdu[0]}</p>
+            <p className="mt-1 text-xs text-danger-text">{fieldErrors.penNameUrdu[0]}</p>
           )}
         </div>
 
         {/* Pen Name English */}
         <div>
           <label htmlFor="penNameEnglish" className="block text-sm font-semibold text-secondary">
-            English Pen Name (Roman/English) <span className="text-rose-500">*</span>
+            English Pen Name (Roman/English) <span className="text-danger-text">*</span>
           </label>
           <input
             id="penNameEnglish"
@@ -130,10 +130,10 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setPenNameEnglish(e.target.value)}
             placeholder="e.g. Nimra Ahmed"
             disabled={isPending}
-            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.penNameEnglish && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.penNameEnglish[0]}</p>
+            <p className="mt-1 text-xs text-danger-text">{fieldErrors.penNameEnglish[0]}</p>
           )}
         </div>
 
@@ -150,7 +150,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setBioUrdu(e.target.value)}
             placeholder="اپنے ادبی سفر اور اندازِ تحریر کے بارے میں چند جملے..."
             disabled={isPending}
-            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base leading-[2.2] disabled:opacity-50 transition-colors"
+            className="font-urdu mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base leading-[2.2] disabled:opacity-50 transition-colors"
           />
         </div>
 
@@ -166,7 +166,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             onChange={(e) => setBioEnglish(e.target.value)}
             placeholder="A brief introduction to your literary background..."
             disabled={isPending}
-            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm disabled:opacity-50 transition-colors"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm disabled:opacity-50 transition-colors"
           />
         </div>
       </div>
@@ -180,7 +180,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             checked={acceptAgreement}
             onChange={(e) => setAcceptAgreement(e.target.checked)}
             disabled={isPending}
-            className="mt-1 h-5 w-5 rounded border-border bg-white text-accent focus:ring-accent cursor-pointer shrink-0"
+            className="mt-1 h-5 w-5 rounded border-border bg-white text-accent focus:ring-ring cursor-pointer shrink-0"
           />
           <span className="text-xs text-secondary leading-normal">
             I confirm that all published Urdu stories are my original work, and I agree to the{' '}
@@ -200,7 +200,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
         <button
           type="submit"
           disabled={isPending || !acceptAgreement}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px] w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-all cursor-pointer min-h-[44px] w-full sm:w-auto"
         >
           {isPending ? (
             <>

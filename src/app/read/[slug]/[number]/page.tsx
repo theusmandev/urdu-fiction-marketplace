@@ -66,26 +66,26 @@ export default async function SecureReaderPage({ params }: ReaderPageProps) {
     if (mapped.type === 'rate_limited') {
       return (
         <div className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-stone-900 border border-amber-500/30 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
-            <div className="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+          <div className="max-w-md w-full bg-stone-900 border border-warning-border/30 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+            <div className="w-12 h-12 rounded-full bg-warning/20 text-accent-strong flex items-center justify-center mx-auto">
               <Clock className="w-6 h-6" />
             </div>
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-white">Reading Limit Reached</h2>
-              <p className="text-xs text-stone-400 leading-relaxed">
+              <p className="text-xs text-text-muted leading-relaxed">
                 {mapped.message}
               </p>
             </div>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/library"
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-stone-950 hover:bg-amber-400 transition-colors"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-warning text-stone-950 hover:bg-amber-400 transition-colors"
               >
                 Return to Library
               </Link>
               <Link
                 href={`/novels/${slug}`}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold bg-stone-800 text-stone-300 hover:bg-stone-700 transition-colors"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold bg-stone-800 text-text-muted hover:bg-stone-700 transition-colors"
               >
                 Novel Details
               </Link>
@@ -99,19 +99,19 @@ export default async function SecureReaderPage({ params }: ReaderPageProps) {
     return (
       <div className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-stone-900 border border-stone-800 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
-          <div className="w-12 h-12 rounded-full bg-stone-800 text-stone-400 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-stone-800 text-text-muted flex items-center justify-center mx-auto">
             <BookOpen className="w-6 h-6" />
           </div>
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-white">Chapter Unavailable</h2>
-            <p className="text-xs text-stone-400 leading-relaxed">
+            <p className="text-xs text-text-muted leading-relaxed">
               {mapped.message}
             </p>
           </div>
           <div className="pt-2 flex items-center justify-center gap-3">
             <Link
               href={`/novels/${slug}`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-stone-950 hover:bg-amber-400 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-warning text-stone-950 hover:bg-amber-400 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Go to Novel</span>

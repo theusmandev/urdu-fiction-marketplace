@@ -82,8 +82,8 @@ export default function AboutPage() {
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold">
-            <Heart className="w-5 h-5 text-emerald-600" />
+          <div className="w-10 h-10 rounded-xl bg-success-soft text-success border border-success-border flex items-center justify-center font-bold">
+            <Heart className="w-5 h-5 text-success" />
           </div>
           <h3 className="font-serif text-base font-bold text-navy">
             Nastaliq Elegance

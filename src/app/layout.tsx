@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Cormorant_Garamond, Gulzar, Amiri } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
+import { DevFloatingPaletteSwitcher } from "@/components/dev/DevFloatingPaletteSwitcher";
 
 // Primary Latin UI Font: Clean, high-legibility sans-serif for prices, TIDs, dashboards
 const sansFont = Plus_Jakarta_Sans({
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#17243A",
+  themeColor: "#FBF8F2",
   width: "device-width",
   initialScale: 1,
 };
@@ -77,15 +78,26 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-palette="A"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${sansFont.variable} ${serifFont.variable} ${urduFont.variable} ${arabicFont.variable}`}
     >
+      <head>
+        {process.env.NODE_ENV === "development" && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){try{var p=localStorage.getItem("unb_dev_palette");if(p==="A"||p==="B"||p==="C"){document.documentElement.setAttribute("data-palette",p);}}catch(e){}})();`,
+            }}
+          />
+        )}
+      </head>
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-background font-sans antialiased text-main flex flex-col selection:bg-accent/30 selection:text-navy"
+        className="min-h-screen bg-bg font-sans antialiased text-text flex flex-col selection:bg-accent-soft selection:text-text"
       >
         {children}
+        {process.env.NODE_ENV === "development" && <DevFloatingPaletteSwitcher />}
       </body>
     </html>
   );

@@ -81,16 +81,16 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-surface-muted text-text border border-border">
                   {request.category}
                 </span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     statusMeta.variant === 'warning'
-                      ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                      ? 'bg-warning-soft text-warning-text border border-warning-border'
                       : statusMeta.variant === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                      : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      ? 'bg-success-soft text-success-text border border-success-border'
+                      : 'bg-surface-muted text-text-muted border border-border'
                   }`}
                 >
                   {statusMeta.label}
@@ -98,7 +98,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
               </div>
               <h1 className="text-lg font-bold font-serif text-navy">{request.subject}</h1>
               {request.order_number && (
-                <span className="text-xs font-mono text-brand-gold block">
+                <span className="text-xs font-mono text-accent-strong block">
                   Related to Order #{request.order_number}
                 </span>
               )}
@@ -120,7 +120,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
 
           <div className="flex items-center gap-4 text-xs text-secondary">
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <Clock className="w-3.5 h-3.5 text-text-muted" />
               <span>Created {new Date(request.created_at).toLocaleString()}</span>
             </div>
           </div>
@@ -142,20 +142,20 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   key={msg.id}
                   className={`rounded-2xl p-4 space-y-2 border ${
                     isAdmin
-                      ? 'bg-sky-50/70 border-sky-200'
+                      ? 'bg-info-soft/70 border-info-border'
                       : 'bg-surface-muted border-border'
                   }`}
                 >
                   <div className="flex items-center justify-between border-b border-border/60 pb-2">
                     <div className="flex items-center gap-2">
                       {isAdmin ? (
-                        <Shield className="w-4 h-4 text-sky-600" />
+                        <Shield className="w-4 h-4 text-info-text" />
                       ) : (
-                        <User className="w-4 h-4 text-slate-500" />
+                        <User className="w-4 h-4 text-text-muted" />
                       )}
                       <span className="font-bold text-xs text-navy">{msg.author_name}</span>
                       {isAdmin && (
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-info-soft text-info-text">
                           Support Team
                         </span>
                       )}
@@ -177,8 +177,8 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
           {!isClosed ? (
             <form onSubmit={handleSendReply} className="pt-4 border-t border-border space-y-4">
               {errorMsg && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
                   <span>{errorMsg}</span>
                 </div>
               )}
@@ -198,7 +198,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
                   placeholder="Type your reply here..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-base sm:text-xs text-main placeholder-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-base sm:text-xs text-main placeholder-secondary focus:outline-none focus:border-border focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -206,7 +206,7 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
                 <button
                   type="submit"
                   disabled={isPending || !replyBody.trim()}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 transition-all shadow-sm cursor-pointer min-h-[44px] w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-hover disabled:opacity-50 transition-all shadow-sm cursor-pointer min-h-[44px] w-full sm:w-auto"
                 >
                   {isPending ? (
                     <>

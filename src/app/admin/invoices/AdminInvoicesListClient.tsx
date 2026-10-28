@@ -122,7 +122,7 @@ export function AdminInvoicesListClient({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && applyFilters(status, search)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-border bg-surface text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-border bg-surface text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
           />
         </div>
 
@@ -133,7 +133,7 @@ export function AdminInvoicesListClient({
               setStatus(e.target.value);
               applyFilters(e.target.value, search);
             }}
-            className="px-3 py-1.5 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+            className="px-3 py-1.5 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
           >
             <option value="">All Statuses</option>
             <option value="invoiced">Invoiced (Unpaid)</option>
@@ -198,7 +198,7 @@ export function AdminInvoicesListClient({
                       </span>
                       <StatusBadge status={inv.status} size="sm" />
                       {inv.is_overdue && inv.status !== 'settled' && inv.status !== 'void' && (
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border">
                           Overdue
                         </span>
                       )}
@@ -226,7 +226,7 @@ export function AdminInvoicesListClient({
                     </div>
 
                     {inv.reported_count > 0 && inv.status !== 'settled' && (
-                      <div className="text-[11px] text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-block font-medium">
+                      <div className="text-[11px] text-info-text bg-info-soft px-2 py-0.5 rounded border border-info-border inline-block font-medium">
                         {inv.reported_count} payment report(s) submitted • Awaiting review
                       </div>
                     )}
@@ -240,7 +240,7 @@ export function AdminInvoicesListClient({
                       <div className="text-[11px] font-mono text-muted">
                         Settled: {formatPKR2(inv.amount_settled_pkr)}
                         {remaining > 0 && (
-                          <span className="text-rose-700 font-semibold ml-1">
+                          <span className="text-danger-text font-semibold ml-1">
                             (Due: {formatPKR2(remaining)})
                           </span>
                         )}

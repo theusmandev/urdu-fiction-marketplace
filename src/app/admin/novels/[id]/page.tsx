@@ -106,15 +106,15 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Moderation Queue</span>
         </Link>
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
-          <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border space-y-3">
+          <div className="flex items-center gap-2 text-danger-text font-bold text-sm">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>Failed to Load Novel for Editorial Review</span>
           </div>
-          <p className="text-xs text-rose-600 leading-relaxed">
+          <p className="text-xs text-danger-text leading-relaxed">
             A database error occurred while retrieving this manuscript:
           </p>
-          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-surface border border-danger-border text-xs font-mono text-danger-text">
             {error.message} {error.code ? `(Code: ${error.code})` : ''}
           </div>
           {error.hint && (
@@ -166,8 +166,8 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
         <div className="flex items-center gap-2">
           <StatusBadge status={novel.status} />
           {novel.is_featured && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-              <Star className="w-3 h-3 fill-amber-500 text-amber-600" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-warning-soft text-warning-text border border-warning-border">
+              <Star className="w-3 h-3 fill-accent-strong/20 text-accent-strong" />
               <span>Featured</span>
             </span>
           )}
@@ -176,11 +176,11 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
 
       {/* Moderation Alert Banner if reason exists */}
       {novel.moderation_reason && (
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-xs text-amber-800">
-          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-2xl bg-warning-soft border border-warning-border flex items-start gap-3 text-xs text-warning-text">
+          <AlertCircle className="w-4 h-4 text-accent-strong shrink-0 mt-0.5" />
           <div className="space-y-0.5">
-            <span className="font-bold text-amber-900 block">Existing Moderation Note / Reason:</span>
-            <p className="leading-relaxed text-amber-800">{novel.moderation_reason}</p>
+            <span className="font-bold text-warning-text block">Existing Moderation Note / Reason:</span>
+            <p className="leading-relaxed text-warning-text">{novel.moderation_reason}</p>
           </div>
         </div>
       )}
@@ -214,7 +214,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                 <h1 className="text-xl sm:text-2xl font-bold text-main tracking-tight">
                   {novel.title_english}
                 </h1>
-                <UrduText as="div" size="2xl" className="text-brand-gold py-1">
+                <UrduText as="div" size="2xl" className="text-accent-strong py-1">
                   {novel.title_urdu}
                 </UrduText>
               </div>
@@ -227,13 +227,13 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                 >
                   <User className="w-3.5 h-3.5 text-accent-admin" />
                   <span className="font-semibold">{writer?.pen_name_english}</span>
-                  <UrduText as="span" size="xs" className="text-brand-gold">
+                  <UrduText as="span" size="xs" className="text-accent-strong">
                     ({writer?.pen_name_urdu})
                   </UrduText>
                 </Link>
 
                 <div className="flex items-center gap-1 font-mono text-main">
-                  <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                  <DollarSign className="w-3.5 h-3.5 text-success" />
                   <span>PKR {Number(novel.price_pkr).toLocaleString()}</span>
                 </div>
 
@@ -258,7 +258,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                       className="px-2 py-0.5 rounded-md text-[11px] bg-surface-muted text-main border border-border flex items-center gap-1"
                     >
                       <span>{g.name_english}</span>
-                      <UrduText as="span" size="xs" className="text-brand-gold font-normal">
+                      <UrduText as="span" size="xs" className="text-accent-strong font-normal">
                         ({g.name_urdu})
                       </UrduText>
                     </span>
@@ -269,13 +269,13 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
               {/* Rights Declaration Status */}
               <div className="pt-1">
                 {novel.rights_declaration_accepted ? (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-success-soft border border-success-border text-success-text text-xs font-semibold">
+                    <ShieldCheck className="w-4 h-4 text-success" />
                     <span>Intellectual Rights Declaration Confirmed by Author</span>
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
-                    <ShieldAlert className="w-4 h-4 text-rose-600" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs font-semibold">
+                    <ShieldAlert className="w-4 h-4 text-danger-text" />
                     <span>Missing Rights Declaration</span>
                   </div>
                 )}
@@ -304,7 +304,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
         <div className="bg-surface border border-border rounded-2xl p-5 shadow-card space-y-3">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <h2 className="text-sm font-bold text-main flex items-center gap-2">
-              <Eye className="w-4 h-4 text-brand-gold" />
+              <Eye className="w-4 h-4 text-accent-strong" />
               <span>خلاصہ (Synopsis Preview)</span>
             </h2>
             <span className="text-[10px] text-muted font-mono">Urdu RTL Nastaliq</span>
@@ -342,7 +342,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
           <div>
             <h2 className="text-base font-bold text-main flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-brand-gold" />
+              <BookOpen className="w-4 h-4 text-accent-strong" />
               <span>Complete Manuscript Preview ({sortedChapters.length} Chapters)</span>
             </h2>
             <p className="text-xs text-muted mt-0.5">
@@ -381,7 +381,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                         {!chapter.is_published && (
                           <>
                             <span>•</span>
-                            <span className="text-amber-700">Unpublished draft</span>
+                            <span className="text-warning-text">Unpublished draft</span>
                           </>
                         )}
                       </div>
@@ -390,7 +390,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
 
                   <div className="flex items-center gap-2">
                     {chapter.is_free_preview && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-success-soft text-success-text border border-success-border">
                         Free Sample
                       </span>
                     )}

@@ -170,7 +170,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 1,
         label: 'Awaiting Payment',
         urduLabel: 'ادائیگی کے منتظر',
-        badgeClass: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+        badgeClass: 'bg-warning/10 text-accent-strong border-warning-border/20',
         headline: 'Please transfer the payment to the author',
         explanation:
           'Transfer the exact amount to the author’s account shown below. After sending, submit your Transaction Reference (TID) and payment receipt screenshot.',
@@ -182,7 +182,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 2,
         label: 'Verification Pending',
         urduLabel: 'تصدیق زیر التوا',
-        badgeClass: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+        badgeClass: 'bg-info/10 text-info-text border-info-border/30',
         headline: 'Waiting for the author to verify receipt',
         explanation:
           'Your payment proof has been submitted. The author will check their bank/wallet account and confirm your order. Your novel access will unlock immediately upon verification.',
@@ -194,7 +194,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 3,
         label: 'Payment Verified',
         urduLabel: 'ادائیگی کی تصدیق ہو گئی',
-        badgeClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+        badgeClass: 'bg-success/10 text-success border-success-border/20',
         headline: 'Access Granted! Your novel is unlocked',
         explanation:
           'The author verified receipt of your payment. You hold a permanent purchase entitlement for this novel in your library.',
@@ -206,7 +206,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 2,
         label: 'Payment Not Verified',
         urduLabel: 'ادائیگی مسترد',
-        badgeClass: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+        badgeClass: 'bg-danger/10 text-danger-text border-danger-border/20',
         headline: 'The author could not verify your payment',
         explanation:
           'The author checked their bank statement and was unable to confirm receipt of funds for the submitted TID. Please review the reason below and resubmit with correct details or cancel.',
@@ -218,7 +218,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 2,
         label: 'Under Dispute Review',
         urduLabel: 'تنازعہ زیر جائزہ',
-        badgeClass: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+        badgeClass: 'bg-info-soft text-info-text border-info-border/30',
         headline: 'Platform administrator is reviewing this order',
         explanation:
           'A dispute has been opened for this order. Our moderation team will inspect the banking proofs and resolve access fairly.',
@@ -230,7 +230,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 0,
         label: 'Order Cancelled',
         urduLabel: 'آرڈر منسوخ',
-        badgeClass: 'bg-stone-500/10 text-stone-500 border-stone-500/20',
+        badgeClass: 'bg-surface-muted text-text-muted border-border',
         headline: 'This order was cancelled',
         explanation: 'This order was cancelled before payment verification. No funds were captured.',
         nextActor: 'none',
@@ -241,7 +241,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 3,
         label: 'Refunded / Adjusted',
         urduLabel: 'رقم واپس / ایڈجسٹ',
-        badgeClass: 'bg-stone-500/10 text-stone-500 border-stone-500/20',
+        badgeClass: 'bg-surface-muted text-text-muted border-border',
         headline: 'Order refunded or adjusted',
         explanation:
           'An administrative adjustment or refund was processed for this order, and purchase entitlement has been revoked.',
@@ -253,7 +253,7 @@ export function formatOrderStatusTimeline(status: OrderStatus): OrderStatusDetai
         stepNumber: 1,
         label: status,
         urduLabel: 'زیر کار',
-        badgeClass: 'bg-stone-500/10 text-stone-500 border-stone-500/20',
+        badgeClass: 'bg-surface-muted text-text-muted border-border',
         headline: 'Order in progress',
         explanation: 'Your order is currently being processed.',
         nextActor: 'none',

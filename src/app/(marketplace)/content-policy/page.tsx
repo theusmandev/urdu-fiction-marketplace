@@ -15,8 +15,8 @@ export default function ContentPolicyPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       {/* Legal Status Notice */}
-      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs flex items-center gap-2.5">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+      <div className="p-4 rounded-xl bg-warning/10 border border-warning-border/20 text-warning-text text-xs flex items-center gap-2.5">
+        <AlertTriangle className="w-4 h-4 text-accent-strong shrink-0" />
         <span className="font-semibold">
           Draft — Pending Formal Legal Review. This document outlines manuscript integrity and copyright policies.
         </span>
@@ -61,7 +61,7 @@ export default function ContentPolicyPage() {
             in immediate manuscript rejection, novel suspension, and potential author
             disqualification:
           </p>
-          <ul className="list-disc list-inside space-y-1 pl-2 text-rose-700 font-medium">
+          <ul className="list-disc list-inside space-y-1 pl-2 text-danger-text font-medium">
             <li>Plagiarized, pirated, or unauthorized adaptations of existing publications.</li>
             <li>Hate speech, sectarian incitement, blasphemy, or content violating Pakistani constitutional law.</li>
             <li>Sexually explicit, non-consensual, or unlawful graphic material.</li>

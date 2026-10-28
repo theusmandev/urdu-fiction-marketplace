@@ -39,6 +39,18 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
    - The word "commission" (and Urdu "کمیشن") must NEVER appear anywhere a human can read it. All user-visible labels, headings, toasts, errors, placeholders, badges, legal pages, emails, and notifications must use **"Platform fee"** (Urdu: **پلیٹ فارم فیس** with feminine grammatical agreement) or "Fees: None" on checkout order summaries.
    - Internal database objects, columns, enums, RPC function signatures, RPC return JSON keys, TypeScript identifiers, and route URLs (`/writer/commission`, `/admin/commission`) remain strictly unchanged. Refer to `docs/TERMINOLOGY.md` for the complete mapping.
    - **PRE-COMMIT / CI GATE**: Run `npm run check:terms`. This script (`scripts/check-terminology.mjs`) scans `src/` and new migrations (`0035+`) and exits non-zero if any forbidden user-facing terminology is introduced.
+7. **Semantic Design Tokens & Color Discipline (`npm run check:colors` & `npm run check:contrast`)**:
+   - **Unified Light Theme & Semantic Tokens**: All UI across Marketplace, Writer Studio, and Admin MUST use ONE shared set of semantic tokens mapped from CSS variables (`src/styles/tokens.css`, `src/app/globals.css`). Arbitrary hex colors (`bg-[#...]`) and hard-coded Tailwind palette colors (`bg-slate-*`, `text-gray-*`, `border-stone-*`, etc.) are strictly forbidden in `src/`.
+   - **Allow-list**: Hard-coded colors are permitted ONLY in `src/lib/email/*` (for email client compatibility), `src/styles/tokens.css` (token definitions), `src/app/globals.css` (Tailwind theme mapping), `src/app/dev/theme/*` (dev theme showcase & swatch display), `src/app/read/*` & `FreePreviewReaderClient.tsx` (reader preference tokens: light, sepia, dark), and book cover placeholder gradients.
+   - **Palettes**: Three selectable palettes via `data-palette` on `<html>`:
+     - Palette A ("Ivory & Ink", Default)
+     - Palette B ("Paper & Teal")
+     - Palette C ("Cream & Maroon")
+   - **Role Accents**: Applied via `data-area` attributes on shells (`data-area="marketplace"`, `data-area="studio"`, `data-area="admin"`), NOT duplicated across components.
+   - **Text Hierarchy & Contrast**: Gold (`accent`) is strictly restricted to borders, icons, fills, and large headings. Text and links MUST use `accent-strong`. Status badges use soft tints with strong text of the same hue.
+   - **PRE-COMMIT / CI GATES**:
+     - `npm run check:contrast`: Verifies that all defined pairings across all 3 palettes meet or exceed WCAG AA (4.5:1 for normal text, 3:1 for large/UI).
+     - `npm run check:colors`: Scans `src/` to ensure zero disallowed hard-coded Tailwind color classes or arbitrary hex values exist outside the allow-list.
 
 ## CORE BUSINESS & ARCHITECTURAL INVARIANTS
 1. **Payment Model**: Direct reader-to-writer payment via Pakistani rails (JazzCash, EasyPaisa, Raast, Direct Bank Transfer). No automated gateways (no Stripe, PayPal, etc.).

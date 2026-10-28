@@ -45,14 +45,14 @@ export function ReasonConfirmDialog({
   };
 
   const variantStyles = {
-    destructive: 'bg-rose-600 hover:bg-rose-700 text-white',
-    warning: 'bg-amber-600 hover:bg-amber-700 text-white',
+    destructive: 'bg-danger hover:bg-danger-hover text-white',
+    warning: 'bg-warning hover:bg-primary text-white',
     primary: 'bg-accent-admin hover:bg-accent-admin-dark text-white',
   };
 
   const iconStyles = {
-    destructive: 'bg-rose-50 border-rose-200 text-rose-600',
-    warning: 'bg-amber-50 border-amber-200 text-amber-600',
+    destructive: 'bg-danger-soft border-danger-border text-danger-text',
+    warning: 'bg-warning-soft border-warning-border text-accent-strong',
     primary: 'bg-accent-admin-light border-accent-admin-border text-accent-admin',
   };
 
@@ -73,7 +73,7 @@ export function ReasonConfirmDialog({
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-main flex items-center justify-between">
               <span>{reasonLabel}</span>
-              <span className="text-xs text-rose-600 font-semibold">* required</span>
+              <span className="text-xs text-danger-text font-semibold">* required</span>
             </label>
             <textarea
               value={reason}
@@ -84,9 +84,9 @@ export function ReasonConfirmDialog({
               placeholder={reasonPlaceholder}
               disabled={isLoading}
               rows={3}
-              className="w-full bg-surface border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin resize-none disabled:opacity-50"
+              className="w-full bg-surface border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin resize-none disabled:opacity-50"
             />
-            {error && <p className="text-[11px] text-rose-600 font-medium">{error}</p>}
+            {error && <p className="text-[11px] text-danger-text font-medium">{error}</p>}
           </div>
         )}
 

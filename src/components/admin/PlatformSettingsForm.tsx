@@ -265,15 +265,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Alert Notices */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between gap-3">
+        <div className="p-4 rounded-2xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-xs text-rose-600 hover:text-rose-800"
+            className="text-xs text-danger-text hover:text-danger-text"
           >
             ✕
           </button>
@@ -281,15 +281,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       )}
 
       {successMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center justify-between gap-3">
+        <div className="p-4 rounded-2xl bg-success-soft border border-success-border text-success-text text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
             <span>{successMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccessMsg(null)}
-            className="text-xs text-emerald-600 hover:text-emerald-800"
+            className="text-xs text-success hover:text-success-text"
           >
             ✕
           </button>
@@ -297,15 +297,15 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
       )}
 
       {/* Invariant Warning Banner */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+      <div className="bg-warning-soft border border-warning-border rounded-2xl p-4 flex items-start gap-3">
+        <ShieldAlert className="w-5 h-5 text-accent-strong shrink-0 mt-0.5" />
         <div className="space-y-1 text-xs">
-          <span className="font-bold text-amber-900 block">
+          <span className="font-bold text-warning-text block">
             Financial Scope Notice:
           </span>
-          <p className="text-amber-800 leading-relaxed">
+          <p className="text-warning-text leading-relaxed">
             Modifications to the platform fee rate or unpaid limits apply strictly to <strong className="text-main">future sales and verifications</strong>.
-            Existing orders and historical entries in the <code className="bg-amber-100/80 px-1 py-0.5 rounded text-amber-900 font-mono">sales_ledger</code> maintain their locked snapshot rates. Every change produces an audit log entry.
+            Existing orders and historical entries in the <code className="bg-warning-soft/80 px-1 py-0.5 rounded text-warning-text font-mono">sales_ledger</code> maintain their locked snapshot rates. Every change produces an audit log entry.
           </p>
         </div>
       </div>
@@ -333,7 +333,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={commissionRate}
               onChange={(e) => setCommissionRate(e.target.value)}
-              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               %
@@ -345,7 +345,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-600" />
+              <DollarSign className="w-4 h-4 text-success" />
               <span>Unpaid Platform Fee Pause Limit (PKR)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 5,000 PKR</span>
@@ -360,7 +360,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={unpaidLimit}
               onChange={(e) => setUnpaidLimit(e.target.value)}
-              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               PKR
@@ -372,7 +372,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <span>Reader Dispute Window (Days)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">1 – 365 Days</span>
@@ -388,7 +388,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={disputeDays}
               onChange={(e) => setDisputeDays(e.target.value)}
-              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               Days
@@ -400,7 +400,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-600" />
+              <DollarSign className="w-4 h-4 text-success" />
               <span>Minimum Novel Price Floor (PKR)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 50 PKR</span>
@@ -416,7 +416,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               PKR
@@ -428,7 +428,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-rose-600" />
+              <DollarSign className="w-4 h-4 text-danger-text" />
               <span>Maximum Novel Price Ceiling (PKR)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Platform Cap</span>
@@ -443,7 +443,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
               required
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+              className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
               PKR
@@ -455,7 +455,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <span>Max Reader Orders / Hour</span>
             </label>
             <span className="text-[10px] text-muted font-mono">1 - 100</span>
@@ -470,7 +470,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={maxOrdersPerHour}
             onChange={(e) => setMaxOrdersPerHour(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -493,7 +493,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={maxChapterReads}
             onChange={(e) => setMaxChapterReads(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -516,7 +516,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={chapterReadWindow}
             onChange={(e) => setChapterReadWindow(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -524,7 +524,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <span>Invoice Due Days</span>
             </label>
             <span className="text-[10px] text-muted font-mono">1 – 90 days (Default: 7)</span>
@@ -539,7 +539,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={invoiceDueDays}
             onChange={(e) => setInvoiceDueDays(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -547,7 +547,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-600" />
+              <ShieldAlert className="w-4 h-4 text-danger-text" />
               <span>Overdue Grace Days</span>
             </label>
             <span className="text-[10px] text-muted font-mono">0 – 60 days (Default: 3)</span>
@@ -562,7 +562,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={overdueGraceDays}
             onChange={(e) => setOverdueGraceDays(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -570,7 +570,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <span>Min Dispute Wait Hours</span>
             </label>
             <span className="text-[10px] text-muted font-mono">0 – 168 hrs (Default: 24)</span>
@@ -585,7 +585,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={minDisputeWaitHours}
             onChange={(e) => setMinDisputeWaitHours(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -608,7 +608,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={verificationReminderHours}
             onChange={(e) => setVerificationReminderHours(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
@@ -629,13 +629,13 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             required
             value={supportEmail}
             onChange={(e) => setSupportEmail(e.target.value)}
-            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin font-mono transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin font-mono transition-colors"
           />
         </div>
 
         {/* Tip Jar Platform Controls Heading */}
         <div className="md:col-span-2 pt-4 border-t border-border flex items-center gap-2">
-          <Heart className="w-5 h-5 text-amber-600 fill-amber-500/20" />
+          <Heart className="w-5 h-5 text-accent-strong fill-accent-strong/20" />
           <h3 className="text-sm font-bold text-navy font-serif">Tip Jar Platform Controls</h3>
         </div>
 
@@ -644,7 +644,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
           <div className="flex items-center justify-between">
             <div>
               <label className="text-xs font-bold text-main flex items-center gap-2">
-                <Heart className="w-4 h-4 text-amber-600" />
+                <Heart className="w-4 h-4 text-accent-strong" />
                 <span>Tips Enabled Globally (Kill Switch)</span>
               </label>
               <p className="text-xs text-muted leading-relaxed mt-1">
@@ -658,7 +658,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
                 onChange={(e) => setTipsEnabled(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600" />
+              <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-warning" />
             </label>
           </div>
         </div>
@@ -667,7 +667,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-amber-600" />
+              <DollarSign className="w-4 h-4 text-accent-strong" />
               <span>Platform Minimum Tip (PKR)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 20</span>
@@ -689,7 +689,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-amber-600" />
+              <DollarSign className="w-4 h-4 text-accent-strong" />
               <span>Platform Maximum Tip (PKR)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 5000</span>
@@ -712,7 +712,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <span>Max Tips Per Hour (Per Reader)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 5</span>
@@ -734,7 +734,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-amber-600" />
+              <DollarSign className="w-4 h-4 text-accent-strong" />
               <span>Daily Tip Cap (PKR Per Reader)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 10,000</span>
@@ -757,7 +757,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 md:col-span-2 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
+              <Clock className="w-4 h-4 text-accent-strong" />
               <span>Tip Confirmation Reminder Hours</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 48 hrs</span>

@@ -126,7 +126,7 @@ export function AdminCommissionOverviewClient({
           <button
             type="button"
             onClick={handleOpenOverdueModal}
-            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-xl bg-danger hover:bg-danger-hover text-white shadow-xs transition-colors cursor-pointer"
           >
             <AlertTriangle className="w-4 h-4 mr-1.5" />
             Review Overdue Writers
@@ -135,7 +135,7 @@ export function AdminCommissionOverviewClient({
             href="/admin/commission/reports"
             className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-xl bg-surface hover:bg-ivory text-main border border-border shadow-xs transition-colors"
           >
-            <Clock className="w-4 h-4 mr-1.5 text-amber-600" />
+            <Clock className="w-4 h-4 mr-1.5 text-accent-strong" />
             Reports Queue
           </Link>
           <Link
@@ -157,7 +157,7 @@ export function AdminCommissionOverviewClient({
             placeholder="Search author pen name (English / اردو)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-surface text-main text-xs placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-surface text-main text-xs placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin"
           />
         </div>
 
@@ -178,7 +178,7 @@ export function AdminCommissionOverviewClient({
             onClick={() => setFilter('at_risk')}
             className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
               filter === 'at_risk'
-                ? 'bg-amber-600 text-white'
+                ? 'bg-warning text-white'
                 : 'bg-surface text-secondary hover:text-navy hover:bg-ivory border border-border'
             }`}
           >
@@ -189,7 +189,7 @@ export function AdminCommissionOverviewClient({
             onClick={() => setFilter('paused')}
             className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
               filter === 'paused'
-                ? 'bg-rose-600 text-white'
+                ? 'bg-danger text-white'
                 : 'bg-surface text-secondary hover:text-navy hover:bg-ivory border border-border'
             }`}
           >
@@ -200,7 +200,7 @@ export function AdminCommissionOverviewClient({
             onClick={() => setFilter('overdue')}
             className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
               filter === 'overdue'
-                ? 'bg-rose-600 text-white'
+                ? 'bg-danger text-white'
                 : 'bg-surface text-secondary hover:text-navy hover:bg-ivory border border-border'
             }`}
           >
@@ -256,13 +256,13 @@ export function AdminCommissionOverviewClient({
                         {formatPKR2(w.total_accrued_pkr)}
                       </td>
 
-                      <td className="py-2.5 px-2.5 text-right font-mono text-emerald-700 font-semibold whitespace-nowrap">
+                      <td className="py-2.5 px-2.5 text-right font-mono text-success-text font-semibold whitespace-nowrap">
                         {formatPKR2(w.total_settled_pkr)}
                       </td>
 
-                      <td className="py-2.5 px-2.5 text-right font-mono text-purple-700 whitespace-nowrap">
+                      <td className="py-2.5 px-2.5 text-right font-mono text-info-text whitespace-nowrap">
                         {w.pending_reports_count > 0 ? (
-                          <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-800 border border-purple-200 text-[10px] font-semibold">
+                          <span className="px-2 py-0.5 rounded-full bg-info-soft text-info-text border border-info-border text-[10px] font-semibold">
                             {w.pending_reports_count} pending
                           </span>
                         ) : (
@@ -283,10 +283,10 @@ export function AdminCommissionOverviewClient({
                           <div
                             className={`h-full rounded-full ${
                               isPaused || w.percent_of_limit >= 100
-                                ? 'bg-rose-600'
+                                ? 'bg-danger'
                                 : isAtRisk
-                                ? 'bg-amber-600'
-                                : 'bg-emerald-600'
+                                ? 'bg-warning'
+                                : 'bg-success'
                             }`}
                             style={{ width: `${Math.min(100, w.percent_of_limit)}%` }}
                           />
@@ -295,7 +295,7 @@ export function AdminCommissionOverviewClient({
 
                       <td className="py-2.5 px-2.5 text-center whitespace-nowrap">
                         {w.overdue_invoices_count > 0 ? (
-                          <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border font-semibold">
                             {w.overdue_invoices_count} overdue
                           </span>
                         ) : (
@@ -305,12 +305,12 @@ export function AdminCommissionOverviewClient({
 
                       <td className="py-2.5 px-2.5 text-center whitespace-nowrap">
                         {isPaused ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+                          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border font-semibold">
                             <PauseCircle className="w-3 h-3" />
                             <span>Paused</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+                          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-success-soft text-success-text border border-success-border font-semibold">
                             <PlayCircle className="w-3 h-3" />
                             <span>Active</span>
                           </span>
@@ -337,11 +337,11 @@ export function AdminCommissionOverviewClient({
 
       {/* Review Overdue Writers Modal */}
       {isOverdueModalOpen && (
-        <div className="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-surface border border-border rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-rose-600" />
+                <AlertTriangle className="w-5 h-5 text-danger-text" />
                 <h3 className="font-serif font-bold text-lg text-navy">
                   Review Overdue Platform Fee Rules
                 </h3>
@@ -361,13 +361,13 @@ export function AdminCommissionOverviewClient({
                 <p className="text-xs">Inspecting overdue invoices across all authors...</p>
               </div>
             ) : overdueError ? (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs">
+              <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl text-xs">
                 {overdueError}
               </div>
             ) : (
               <div className="space-y-4 text-xs">
                 {overdueSuccess && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl">
+                  <div className="p-3 bg-success-soft border border-success-border text-success-text rounded-xl">
                     {overdueSuccess}
                   </div>
                 )}
@@ -379,7 +379,7 @@ export function AdminCommissionOverviewClient({
                 <div className="bg-ivory/50 p-4 rounded-xl border border-border space-y-2">
                   <div className="flex items-center justify-between font-semibold text-navy">
                     <span>Eligible Overdue Invoices:</span>
-                    <span className="font-mono text-rose-700 font-bold">
+                    <span className="font-mono text-danger-text font-bold">
                       {overduePreview?.overdue_invoices_count ?? 0} found
                     </span>
                   </div>
@@ -395,7 +395,7 @@ export function AdminCommissionOverviewClient({
                             <span className="font-medium text-main truncate">{item.writer_pen_name}</span>
                             <span className="text-secondary text-[11px] ml-2 font-mono break-all">Inv: {item.invoice_number}</span>
                           </div>
-                          <span className="text-[11px] font-mono text-rose-700 font-semibold whitespace-nowrap shrink-0">
+                          <span className="text-[11px] font-mono text-danger-text font-semibold whitespace-nowrap shrink-0">
                             Due: {formatPKR2(item.remaining_owed_pkr)} ({item.days_past_grace}d past grace)
                           </span>
                         </div>
@@ -421,7 +421,7 @@ export function AdminCommissionOverviewClient({
                       type="button"
                       disabled={isApplyingRules}
                       onClick={handleApplyOverdueRules}
-                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-danger hover:bg-danger-hover text-white text-xs font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
                     >
                       {isApplyingRules ? 'Pausing Orders...' : 'Confirm & Pause Overdue Writers'}
                     </button>

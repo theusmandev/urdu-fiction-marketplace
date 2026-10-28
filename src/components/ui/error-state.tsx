@@ -22,18 +22,18 @@ export function ErrorState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center p-10 text-center bg-surface rounded-2xl border border-rose-200 shadow-card",
+        "flex flex-col items-center justify-center p-10 text-center bg-surface rounded-2xl border border-danger-border shadow-card",
         className
       )}
       role="alert"
     >
-      <div className="w-14 h-14 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 mb-4">
+      <div className="w-14 h-14 rounded-full bg-danger-soft border border-danger-border flex items-center justify-center text-danger-text mb-4">
         <AlertTriangle className="w-7 h-7" />
       </div>
 
       <h3 className="font-serif text-xl font-bold text-navy mb-1">{title}</h3>
       {titleUrdu && (
-        <UrduText size="base" className="text-rose-900/80 mb-2 py-0">
+        <UrduText size="base" className="text-danger-text/80 mb-2 py-0">
           {titleUrdu}
         </UrduText>
       )}

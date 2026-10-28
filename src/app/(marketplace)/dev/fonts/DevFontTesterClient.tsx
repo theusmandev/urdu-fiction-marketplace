@@ -30,7 +30,7 @@ export function DevFontTesterClient() {
   const [activeTab, setActiveTab] = useState<'matrix' | 'specimen' | 'quran-audit'>('matrix');
 
   const themeClasses = {
-    light: 'bg-[#FAF8F5] text-stone-900 border-stone-200',
+    light: 'bg-[#FAF8F5] text-text border-border',
     dark: 'bg-[#121214] text-stone-100 border-slate-800',
     sepia: 'bg-[#F4ECD8] text-[#4A3B2C] border-[#E2D5BA]',
   }[theme];
@@ -40,12 +40,12 @@ export function DevFontTesterClient() {
       {/* Control Bar */}
       <div className="bg-surface border border-border shadow-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-border">
+        <div className="flex items-center gap-1.5 bg-surface-muted p-1 rounded-xl border border-border">
           <button
             type="button"
             onClick={() => setActiveTab('matrix')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'matrix' ? 'bg-brand-gold text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
+              activeTab === 'matrix' ? 'bg-accent text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
             }`}
           >
             Line-Height Matrix
@@ -54,7 +54,7 @@ export function DevFontTesterClient() {
             type="button"
             onClick={() => setActiveTab('specimen')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'specimen' ? 'bg-brand-gold text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
+              activeTab === 'specimen' ? 'bg-accent text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
             }`}
           >
             Comprehensive Specimen
@@ -63,7 +63,7 @@ export function DevFontTesterClient() {
             type="button"
             onClick={() => setActiveTab('quran-audit')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'quran-audit' ? 'bg-brand-gold text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
+              activeTab === 'quran-audit' ? 'bg-accent text-navy font-bold shadow-sm' : 'text-secondary hover:text-navy'
             }`}
           >
             Quranic Tashkeel Audit
@@ -77,12 +77,12 @@ export function DevFontTesterClient() {
               type="checkbox"
               checked={showBoundingBox}
               onChange={(e) => setShowBoundingBox(e.target.checked)}
-              className="rounded bg-surface border-border text-brand-gold focus:ring-0"
+              className="rounded bg-surface border-border text-accent-strong focus:ring-0"
             />
             <span>Visual Bounding Box</span>
           </label>
 
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-border text-xs">
+          <div className="flex items-center gap-1 bg-surface-muted p-1 rounded-xl border border-border text-xs">
             {(['light', 'dark', 'sepia'] as const).map((t) => (
               <button
                 key={t}
@@ -106,7 +106,7 @@ export function DevFontTesterClient() {
         <div className="space-y-6">
           {/* Size Selector */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400 font-mono">Inspect Font Size:</span>
+            <span className="text-text-muted font-mono">Inspect Font Size:</span>
             <div className="flex items-center gap-1">
               {SIZES.map((sz) => (
                 <button
@@ -115,7 +115,7 @@ export function DevFontTesterClient() {
                   onClick={() => setSelectedSize(sz)}
                   className={`px-3 py-1 rounded-lg font-mono font-semibold transition-colors cursor-pointer ${
                     selectedSize === sz
-                      ? 'bg-brand-gold text-navy font-bold shadow-sm'
+                      ? 'bg-accent text-navy font-bold shadow-sm'
                       : 'bg-surface border border-border text-secondary hover:text-navy'
                   }`}
                 >
@@ -142,12 +142,12 @@ export function DevFontTesterClient() {
                         Line Height: {lh.toFixed(1)}
                       </span>
                       {isRecommendedBody && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-success/20 text-emerald-400 border border-emerald-500/30">
                           Recommended Body
                         </span>
                       )}
                       {isRecommendedTitle && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-warning/20 text-amber-400 border border-amber-500/30">
                           Recommended Heading
                         </span>
                       )}
@@ -190,8 +190,8 @@ export function DevFontTesterClient() {
                   onClick={() => setSelectedSize(sz)}
                   className={`px-2.5 py-1 rounded font-mono font-semibold transition-colors cursor-pointer ${
                     selectedSize === sz
-                      ? 'bg-brand-gold text-navy font-bold shadow-sm'
-                      : 'bg-slate-100 border border-border text-secondary hover:text-navy'
+                      ? 'bg-accent text-navy font-bold shadow-sm'
+                      : 'bg-surface-muted border border-border text-secondary hover:text-navy'
                   }`}
                 >
                   {sz}px
@@ -208,8 +208,8 @@ export function DevFontTesterClient() {
                   onClick={() => setSelectedLineHeight(lh)}
                   className={`px-2.5 py-1 rounded font-mono font-semibold transition-colors cursor-pointer ${
                     selectedLineHeight === lh
-                      ? 'bg-brand-gold text-navy font-bold shadow-sm'
-                      : 'bg-slate-100 border border-border text-secondary hover:text-navy'
+                      ? 'bg-accent text-navy font-bold shadow-sm'
+                      : 'bg-surface-muted border border-border text-secondary hover:text-navy'
                   }`}
                 >
                   {lh.toFixed(1)}
@@ -305,11 +305,11 @@ export function DevFontTesterClient() {
       {/* ---------------------------------------------------------------------- */}
       {activeTab === 'quran-audit' && (
         <div className="space-y-6">
-          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-            <div className="font-semibold text-amber-950">Quranic &amp; Arabic Tashkeel Rendering Verification</div>
-            <p className="text-amber-800">
+          <div className="p-4 rounded-xl bg-warning-soft border border-warning-border text-xs text-warning-text space-y-1">
+            <div className="font-semibold text-warning-text">Quranic &amp; Arabic Tashkeel Rendering Verification</div>
+            <p className="text-warning-text">
               In traditional Nastaliq typography, dense Arabic diacritics (harakat / tashkeel like fatha, kasra, shaddah, sukun) can sometimes collide with diagonally stacked ligatures.
-              Below is a direct side-by-side comparison of Quranic verses rendered in <span className="font-semibold text-amber-950">Gulzar (Nastaliq)</span> versus our dedicated opt-in <span className="font-semibold text-emerald-800">&lt;ArabicText&gt; component (Amiri Naskh)</span>.
+              Below is a direct side-by-side comparison of Quranic verses rendered in <span className="font-semibold text-warning-text">Gulzar (Nastaliq)</span> versus our dedicated opt-in <span className="font-semibold text-success-text">&lt;ArabicText&gt; component (Amiri Naskh)</span>.
             </p>
           </div>
 
@@ -320,7 +320,7 @@ export function DevFontTesterClient() {
 
                 {/* Gulzar Nastaliq */}
                 <div className="space-y-1">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-warning/10 text-amber-400 border border-amber-500/20">
                     Gulzar Nastaliq (font-urdu)
                   </span>
                   <div
@@ -335,7 +335,7 @@ export function DevFontTesterClient() {
 
                 {/* Amiri Naskh */}
                 <div className="space-y-1">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-success/10 text-emerald-400 border border-emerald-500/20">
                     Amiri Naskh (&lt;ArabicText&gt;)
                   </span>
                   <div

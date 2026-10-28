@@ -250,15 +250,15 @@ export function ChapterListManager({
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <p className="text-xs font-medium">{successMessage}</p>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
         </div>
       )}
@@ -278,7 +278,7 @@ export function ChapterListManager({
           <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider block">
             Published Chapters
           </span>
-          <span className="text-2xl font-bold text-emerald-700 mt-1 block">
+          <span className="text-2xl font-bold text-success-text mt-1 block">
             {publishedCount}
           </span>
         </div>
@@ -325,9 +325,9 @@ export function ChapterListManager({
 
         {/* Unsaved New Chapter Draft Banner */}
         {unsavedNewDrafts.length > 0 && (
-          <div className="p-3 bg-amber-500/10 border-b border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="p-3 bg-warning/10 border-b border-warning-border/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+              <Sparkles className="w-4 h-4 text-accent-strong shrink-0" />
               <span className="text-navy font-medium">
                 New chapter draft in progress: <strong>{unsavedNewDrafts[0].title || 'Untitled Draft'}</strong> ({unsavedNewDrafts[0].content.length.toLocaleString()} chars saved on device)
               </span>
@@ -396,7 +396,7 @@ export function ChapterListManager({
                           type="button"
                           disabled={isFirst || isReordering}
                           onClick={() => handleMove(idx, 'up')}
-                          className="p-1 rounded hover:bg-slate-200 text-secondary hover:text-navy disabled:opacity-30 disabled:hover:bg-transparent"
+                          className="p-1 rounded hover:bg-border text-secondary hover:text-navy disabled:opacity-30 disabled:hover:bg-transparent"
                           title="Move up"
                         >
                           <ArrowUp className="w-3.5 h-3.5" />
@@ -405,7 +405,7 @@ export function ChapterListManager({
                           type="button"
                           disabled={isLast || isReordering}
                           onClick={() => handleMove(idx, 'down')}
-                          className="p-1 rounded hover:bg-slate-200 text-secondary hover:text-navy disabled:opacity-30 disabled:hover:bg-transparent"
+                          className="p-1 rounded hover:bg-border text-secondary hover:text-navy disabled:opacity-30 disabled:hover:bg-transparent"
                           title="Move down"
                         >
                           <ArrowDown className="w-3.5 h-3.5" />
@@ -423,7 +423,7 @@ export function ChapterListManager({
                           {chapter.title_urdu}
                         </UrduText>
                         {(draftChapterIds.has(chapter.id) || draftChapterNums.has(chapter.chapter_number)) && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-warning/10 text-warning-text border border-warning-border/20">
                             Draft in progress
                           </span>
                         )}
@@ -449,8 +449,8 @@ export function ChapterListManager({
                         onClick={() => handleTogglePreview(chapter)}
                         className={`px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-colors flex items-center gap-1 ${
                           chapter.is_free_preview
-                            ? 'bg-amber-50 text-amber-800 border-amber-200'
-                            : 'bg-ivory text-secondary border-border hover:bg-slate-100'
+                            ? 'bg-warning-soft text-warning-text border-warning-border'
+                            : 'bg-ivory text-secondary border-border hover:bg-surface-muted'
                         }`}
                         title="Toggle Free Preview for readers"
                       >
@@ -467,8 +467,8 @@ export function ChapterListManager({
                         onClick={() => handleTogglePublished(chapter)}
                         className={`px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-colors flex items-center gap-1 ${
                           chapter.is_published
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : 'bg-slate-100 text-slate-600 border-slate-300'
+                            ? 'bg-success-soft text-success-text border-success-border'
+                            : 'bg-surface-muted text-text-muted border-border'
                         }`}
                         title="Toggle Chapter Published state"
                       >
@@ -501,14 +501,14 @@ export function ChapterListManager({
                       <button
                         type="button"
                         onClick={() => setDeleteTargetId(chapter.id)}
-                        className="p-1.5 rounded-lg text-secondary hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors"
+                        className="p-1.5 rounded-lg text-secondary hover:text-danger-text hover:bg-danger-soft border border-transparent hover:border-danger-border transition-colors"
                         title="Delete Chapter"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     ) : (
                       <span
-                        className="p-1.5 text-slate-300 cursor-not-allowed"
+                        className="p-1.5 text-text-muted cursor-not-allowed"
                         title="Published/Submitted novel chapters cannot be hard-deleted. Use 'Unpublished' toggle instead."
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -540,7 +540,7 @@ export function ChapterListManager({
       {deleteTargetId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
             </div>
 
@@ -565,7 +565,7 @@ export function ChapterListManager({
                 type="button"
                 disabled={isDeleting}
                 onClick={handleDeleteConfirm}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger-hover disabled:opacity-50"
               >
                 {isDeleting ? (
                   <>

@@ -32,10 +32,10 @@ interface NovelCardProps {
 
 export function NovelCard({ novel }: NovelCardProps) {
   return (
-    <article className="group relative bg-surface h-full flex flex-col overflow-hidden rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-accent/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+    <article className="group relative bg-surface h-full flex flex-col overflow-hidden rounded-2xl border border-border/80 hover:border-accent/50 focus-within:ring-2 focus-within:ring-ring/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
       
       {/* Constrained 2:3 Aspect Ratio Cover Container - locked shrink-0 */}
-      <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-stone-100">
+      <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-surface-muted">
         {/* Editorial Book Spine Visual Styling */}
         <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-black/10 to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 left-2.5 w-px bg-white/20 z-10 pointer-events-none" />

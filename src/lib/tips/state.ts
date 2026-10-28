@@ -49,42 +49,42 @@ export function getTipStatusMeta(status: TipStatus): TipStatusMeta {
       return {
         label: 'Awaiting Payment',
         urduLabel: 'ادائیگی کا انتظار',
-        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40',
+        badgeClass: 'bg-warning-soft text-warning-text border-warning-border   ',
         iconName: 'Clock',
       };
     case 'payment_submitted':
       return {
         label: 'Sent — Awaiting Confirmation',
         urduLabel: 'تصدیق کا انتظار',
-        badgeClass: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/40',
+        badgeClass: 'bg-info-soft text-info-text border-info-border   ',
         iconName: 'Send',
       };
     case 'confirmed':
       return {
         label: 'Confirmed',
         urduLabel: 'قبول شدہ',
-        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/40',
+        badgeClass: 'bg-success-soft text-success-text border-success-border   ',
         iconName: 'CheckCircle2',
       };
     case 'not_received':
       return {
         label: 'Not Received',
         urduLabel: 'موصول نہیں ہوئی',
-        badgeClass: 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/40',
+        badgeClass: 'bg-danger-soft text-danger-text border-danger-border   ',
         iconName: 'AlertCircle',
       };
     case 'cancelled':
       return {
         label: 'Cancelled',
         urduLabel: 'منسوخ شدہ',
-        badgeClass: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+        badgeClass: 'bg-surface-muted text-text border-border dark:bg-primary dark:text-text-muted dark:border-border',
         iconName: 'XCircle',
       };
     case 'expired':
       return {
         label: 'Expired',
         urduLabel: 'میعاد ختم',
-        badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+        badgeClass: 'bg-surface-muted text-text-muted border-border dark:bg-primary dark:text-text-muted dark:border-border',
         iconName: 'Clock',
       };
   }

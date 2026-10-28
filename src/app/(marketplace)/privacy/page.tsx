@@ -15,8 +15,8 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       {/* Legal Status Notice */}
-      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs flex items-center gap-2.5">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+      <div className="p-4 rounded-xl bg-warning/10 border border-warning-border/20 text-warning-text text-xs flex items-center gap-2.5">
+        <AlertTriangle className="w-4 h-4 text-accent-strong shrink-0" />
         <span className="font-semibold">
           Draft — Pending Formal Legal Review. This document outlines data privacy practices on UNB Premium.
         </span>

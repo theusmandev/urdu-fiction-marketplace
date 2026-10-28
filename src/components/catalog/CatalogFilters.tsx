@@ -98,7 +98,7 @@ export function CatalogFilters({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search title in English or Urdu, synopsis, or writer pen name..."
-            className="w-full min-w-0 pl-10 pr-20 py-2.5 text-base sm:text-sm min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-accent/20 transition-all"
+            className="w-full min-w-0 pl-10 pr-20 py-2.5 text-base sm:text-sm min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-ring/20 transition-all"
           />
           <button
             type="submit"
@@ -130,7 +130,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer min-h-[44px] shrink-0"
+              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-danger-text hover:bg-danger-soft rounded-xl transition-colors cursor-pointer min-h-[44px] shrink-0"
               title="Reset all filters"
             >
               <X className="w-3.5 h-3.5" />

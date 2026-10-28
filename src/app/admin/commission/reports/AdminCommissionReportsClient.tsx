@@ -115,7 +115,7 @@ export function AdminCommissionReportsClient({
             placeholder="Search TID, invoice number, or author..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-surface text-main placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-accent-admin/40 focus:border-accent-admin"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-surface text-main placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-ring-admin/40 focus:border-accent-admin"
           />
         </div>
 
@@ -125,7 +125,7 @@ export function AdminCommissionReportsClient({
             onClick={() => setFilter('pending')}
             className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
               filter === 'pending'
-                ? 'bg-amber-600 text-white'
+                ? 'bg-warning text-white'
                 : 'bg-surface text-secondary hover:text-navy hover:bg-ivory border border-border'
             }`}
           >
@@ -136,7 +136,7 @@ export function AdminCommissionReportsClient({
             onClick={() => setFilter('confirmed')}
             className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
               filter === 'confirmed'
-                ? 'bg-emerald-600 text-white'
+                ? 'bg-success text-white'
                 : 'bg-surface text-secondary hover:text-navy hover:bg-ivory border border-border'
             }`}
           >
@@ -147,7 +147,7 @@ export function AdminCommissionReportsClient({
             onClick={() => setFilter('rejected')}
             className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
               filter === 'rejected'
-                ? 'bg-rose-600 text-white'
+                ? 'bg-danger text-white'
                 : 'bg-surface text-secondary hover:text-navy hover:bg-ivory border border-border'
             }`}
           >
@@ -171,7 +171,7 @@ export function AdminCommissionReportsClient({
       <div className="bg-surface border border-border shadow-card rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-border flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-amber-600" />
+            <Clock className="w-4 h-4 text-accent-strong" />
             <h2 className="font-serif font-bold text-navy text-sm">
               Payment Reports ({filteredReports.length})
             </h2>
@@ -199,7 +199,7 @@ export function AdminCommissionReportsClient({
                     </span>
                     <StatusBadge status={`report_${r.status}`} size="sm" />
                     {r.is_duplicate_tid && (
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-warning-soft text-warning-text border border-warning-border">
                         Duplicate TID
                       </span>
                     )}
@@ -252,7 +252,7 @@ export function AdminCommissionReportsClient({
 
       {/* Proof Viewer Modal */}
       {(viewingProofUrl || isLoadingProof || proofError) && (
-        <div className="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-surface border border-border rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="font-serif font-bold text-navy text-base">
@@ -278,7 +278,7 @@ export function AdminCommissionReportsClient({
             )}
 
             {proofError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs">
+              <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl text-xs">
                 {proofError}
               </div>
             )}

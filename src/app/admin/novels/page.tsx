@@ -105,8 +105,8 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
         </div>
 
         {pendingCount > 0 && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold shadow-sm">
-            <AlertCircle className="w-4 h-4 text-amber-600" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs font-semibold shadow-sm">
+            <AlertCircle className="w-4 h-4 text-accent-strong" />
             <span>{pendingCount} Novel{pendingCount > 1 ? 's' : ''} awaiting moderation</span>
           </div>
         )}
@@ -129,7 +129,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
               >
                 <span>{tab.label}</span>
                 {tab.value === 'under_review' && pendingCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold flex items-center justify-center">
+                  <span className="w-4 h-4 rounded-full bg-warning-soft text-warning-text text-[10px] font-bold flex items-center justify-center">
                     {pendingCount}
                   </span>
                 )}
@@ -146,22 +146,22 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={query}
             placeholder="Search title, author, email..."
-            className="w-full bg-surface border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+            className="w-full bg-surface border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
           />
         </form>
       </div>
 
       {/* Error State */}
       {queryError ? (
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
-          <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border space-y-3">
+          <div className="flex items-center gap-2 text-danger-text font-bold text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-danger-text" />
             <span>Database Error Loading Novel Catalog</span>
           </div>
-          <p className="text-xs text-rose-800/90 leading-relaxed">
+          <p className="text-xs text-danger-text/90 leading-relaxed">
             Unable to retrieve novels from the database due to a query or permissions error:
           </p>
-          <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-surface border border-danger-border text-xs font-mono text-danger-text">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (
@@ -205,19 +205,19 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                       <tr
                         key={novel.id}
                         className={`transition-colors ${
-                          isUnderReview ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-surface-muted/50'
+                          isUnderReview ? 'bg-warning-soft/40 hover:bg-warning-soft/70' : 'hover:bg-surface-muted/50'
                         }`}
                       >
                         <td className="py-2.5 px-3 sm:px-4 max-w-[220px]">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-main truncate break-words" title={novel.title_english}>{novel.title_english}</span>
                             {novel.is_featured && (
-                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-medium shrink-0">
-                                <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
+                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-warning-soft text-warning-text border border-warning-border font-medium shrink-0">
+                                <Star className="w-2.5 h-2.5 fill-accent-strong/20 text-accent-strong" /> Featured
                               </span>
                             )}
                           </div>
-                          <UrduText as="div" size="xs" className="text-brand-gold py-0 truncate">
+                          <UrduText as="div" size="xs" className="text-accent-strong py-0 truncate">
                             {novel.title_urdu}
                           </UrduText>
                         </td>
@@ -242,12 +242,12 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
 
                         <td className="py-2.5 px-3 sm:px-4 font-mono whitespace-nowrap">
                           {novel.rights_declaration_accepted ? (
-                            <span className="text-[11px] text-emerald-700 font-sans flex items-center gap-1 font-medium">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" /> Accepted
+                            <span className="text-[11px] text-success-text font-sans flex items-center gap-1 font-medium">
+                              <span className="w-1.5 h-1.5 rounded-full bg-success" /> Accepted
                             </span>
                           ) : (
-                            <span className="text-[11px] text-rose-700 font-sans flex items-center gap-1 font-medium">
-                              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" /> Missing
+                            <span className="text-[11px] text-danger-text font-sans flex items-center gap-1 font-medium">
+                              <ShieldAlert className="w-3.5 h-3.5 text-danger-text" /> Missing
                             </span>
                           )}
                         </td>
@@ -257,7 +257,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                             href={`/admin/novels/${novel.id}`}
                             className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm ${
                               isUnderReview
-                                ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                                ? 'bg-warning hover:bg-primary text-white'
                                 : 'bg-surface hover:bg-surface-muted text-main border border-border'
                             }`}
                           >
@@ -285,7 +285,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                 <div
                   key={novel.id}
                   className={`bg-surface border rounded-xl p-4 space-y-3 shadow-card ${
-                    isUnderReview ? 'border-amber-300 bg-amber-50/20' : 'border-border'
+                    isUnderReview ? 'border-warning-border bg-warning-soft/20' : 'border-border'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -293,12 +293,12 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-main text-sm">{novel.title_english}</span>
                         {novel.is_featured && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning-soft text-warning-text border border-warning-border">
                             ★ Featured
                           </span>
                         )}
                       </div>
-                      <UrduText as="div" size="xs" className="text-brand-gold py-0">
+                      <UrduText as="div" size="xs" className="text-accent-strong py-0">
                         {novel.title_urdu}
                       </UrduText>
                     </div>
@@ -310,9 +310,9 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                     <div>Price: <span className="font-mono text-main font-semibold">PKR {Number(novel.price_pkr).toLocaleString()}</span> • {novel.total_chapters} Chapters</div>
                     <div>
                       Rights: {novel.rights_declaration_accepted ? (
-                        <span className="text-emerald-700 font-semibold">Accepted</span>
+                        <span className="text-success-text font-semibold">Accepted</span>
                       ) : (
-                        <span className="text-rose-700 font-semibold">Missing</span>
+                        <span className="text-danger-text font-semibold">Missing</span>
                       )}
                     </div>
                   </div>
@@ -322,7 +322,7 @@ export default async function AdminNovelsPage({ searchParams }: PageProps) {
                       href={`/admin/novels/${novel.id}`}
                       className={`w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-colors shadow-sm ${
                         isUnderReview
-                          ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                          ? 'bg-warning hover:bg-primary text-white'
                           : 'bg-surface hover:bg-surface-muted text-main border border-border'
                       }`}
                     >

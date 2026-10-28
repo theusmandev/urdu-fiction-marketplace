@@ -5,12 +5,12 @@ import { ShieldAlert, ArrowLeft, LayoutDashboard } from 'lucide-react';
 export default function AdminNotFoundPage() {
   return (
     <div className="min-h-[55vh] flex flex-col items-center justify-center text-center px-4 py-12 space-y-5">
-      <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center shadow-xs">
+      <div className="w-14 h-14 rounded-2xl bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center shadow-xs">
         <ShieldAlert className="w-7 h-7" />
       </div>
 
       <div className="space-y-2 max-w-md">
-        <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+        <span className="text-xs font-semibold text-danger-text bg-danger-soft px-2.5 py-0.5 rounded-full border border-danger-border">
           Page Not Found
         </span>
         <h1 className="text-xl font-bold text-navy">

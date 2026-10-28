@@ -123,7 +123,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
               name="search"
               defaultValue={currentSearch}
               placeholder="Search order #, author, reader..."
-              className="bg-surface border border-border text-main text-xs pl-9 pr-3 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
+              className="bg-surface border border-border text-main text-xs pl-9 pr-3 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin"
             />
           </div>
           <button
@@ -189,7 +189,7 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                         </div>
                         <div className="text-[11px]">
                           <span className="text-muted">Author: </span>
-                          <span className="text-brand-gold font-medium truncate inline-block max-w-[120px] align-bottom" title={d.writer_pen_name || 'Author'}>
+                          <span className="text-accent-strong font-medium truncate inline-block max-w-[120px] align-bottom" title={d.writer_pen_name || 'Author'}>
                             {d.writer_pen_name || 'Author'}
                           </span>
                         </div>
@@ -219,11 +219,11 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               meta.variant === 'warning'
-                                ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                ? 'bg-warning-soft text-warning-text border border-warning-border'
                                 : meta.variant === 'success'
-                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                ? 'bg-success-soft text-success-text border border-success-border'
                                 : meta.variant === 'destructive'
-                                ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                ? 'bg-danger-soft text-danger-text border border-danger-border'
                                 : 'bg-surface-muted text-muted border border-border'
                             }`}
                           >
@@ -236,8 +236,8 @@ export default async function AdminDisputesPage({ searchParams }: AdminDisputesP
 
                         {/* Stagnant > 3 Days Warning Badge */}
                         {d.is_stuck && (
-                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
-                            <AlertTriangle className="w-3 h-3 text-rose-600 animate-pulse" />
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-danger-soft text-danger-text border border-danger-border">
+                            <AlertTriangle className="w-3 h-3 text-danger-text animate-pulse" />
                             <span>STUCK &gt; 3 DAYS</span>
                           </div>
                         )}

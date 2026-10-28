@@ -67,9 +67,9 @@ export function BuyNovelButton({
         <button
           type="button"
           disabled
-          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-slate-100 text-slate-400 font-semibold py-2 px-3 rounded-xl cursor-not-allowed text-xs border border-slate-200"
+          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-surface-muted text-text-muted font-semibold py-2 px-3 rounded-xl cursor-not-allowed text-xs border border-border"
         >
-          <Lock className="w-3.5 h-3.5 text-slate-400" />
+          <Lock className="w-3.5 h-3.5 text-text-muted" />
           <span>Unavailable</span>
         </button>
       );
@@ -79,13 +79,13 @@ export function BuyNovelButton({
         <button
           type="button"
           disabled
-          className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-400 font-semibold py-3.5 px-6 rounded-xl cursor-not-allowed text-sm border border-slate-200 min-h-[44px]"
+          className="w-full flex items-center justify-center gap-2 bg-surface-muted text-text-muted font-semibold py-3.5 px-6 rounded-xl cursor-not-allowed text-sm border border-border min-h-[44px]"
         >
-          <Lock className="w-4 h-4 text-slate-400" />
+          <Lock className="w-4 h-4 text-text-muted" />
           <span>Unavailable / دستیاب نہیں</span>
         </button>
-        <div className="flex items-start gap-1.5 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-[11px] text-rose-800">
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-1.5 p-2.5 rounded-lg bg-danger-soft border border-danger-border text-[11px] text-danger-text">
+          <AlertCircle className="w-4 h-4 text-danger-text shrink-0 mt-0.5" />
           <span>
             This novel is currently unavailable for purchase (pending pricing adjustment by author).
           </span>
@@ -103,7 +103,7 @@ export function BuyNovelButton({
           disabled
           className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-surface-muted text-secondary font-semibold py-2 px-3 rounded-xl text-xs border border-border animate-pulse"
         >
-          <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-gold" />
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-accent-strong" />
           <span>Loading...</span>
         </button>
       );
@@ -115,7 +115,7 @@ export function BuyNovelButton({
           disabled
           className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-surface-muted text-secondary font-semibold py-3.5 px-6 rounded-xl text-sm border border-border animate-pulse"
         >
-          <Loader2 className="w-4 h-4 animate-spin text-brand-gold" />
+          <Loader2 className="w-4 h-4 animate-spin text-accent-strong" />
           <span>Checking availability...</span>
         </button>
       </div>
@@ -157,7 +157,7 @@ export function BuyNovelButton({
       return (
         <Link
           href={`/read/${novelSlug}/1`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2 px-3 rounded-xl text-xs shadow-xs"
+          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-accent hover:bg-accent-hover text-navy font-bold py-2 px-3 rounded-xl text-xs shadow-xs"
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Read (Author)</span>
@@ -168,7 +168,7 @@ export function BuyNovelButton({
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/read/${novelSlug}/1`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-md cursor-pointer"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-md cursor-pointer"
         >
           <BookOpen className="w-4 h-4" />
           <span>Read Novel (Author View)</span>
@@ -190,7 +190,7 @@ export function BuyNovelButton({
       return (
         <Link
           href={`/read/${novelSlug}/1`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-3 rounded-xl shadow-xs text-xs"
+          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-success hover:bg-success text-white font-semibold py-2 px-3 rounded-xl shadow-xs text-xs"
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Read Novel</span>
@@ -201,12 +201,12 @@ export function BuyNovelButton({
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/read/${novelSlug}/1`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-success hover:bg-success text-white font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
         >
           <BookOpen className="w-4 h-4" />
           <span>Read Novel / ناول پڑھیں</span>
         </Link>
-        <p className="text-[11px] text-center text-emerald-700 font-medium">
+        <p className="text-[11px] text-center text-success-text font-medium">
           Full novel access unlocked. Access anytime in your{' '}
           <Link href="/library" className="underline font-bold">
             library
@@ -223,7 +223,7 @@ export function BuyNovelButton({
       return (
         <Link
           href={`/orders/${status.openOrderNumber}`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2 px-3 rounded-xl shadow-xs text-xs"
+          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-accent hover:bg-accent-hover text-navy font-bold py-2 px-3 rounded-xl shadow-xs text-xs"
         >
           <Clock className="w-3.5 h-3.5" />
           <span>View Order</span>
@@ -234,7 +234,7 @@ export function BuyNovelButton({
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/orders/${status.openOrderNumber}`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm cursor-pointer"
         >
           <Clock className="w-4 h-4" />
           <span>View Your Order ({status.openOrderNumber})</span>

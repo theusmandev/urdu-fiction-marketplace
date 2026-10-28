@@ -26,7 +26,7 @@ export default function WriterAgreementPage() {
               </UrduText>
             </div>
           </div>
-          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-900 font-medium">
+          <div className="mt-4 p-3 bg-warning/10 border border-warning-border/20 rounded-xl text-xs text-warning-text font-medium">
             Draft — pending legal review
           </div>
         </div>
@@ -34,7 +34,7 @@ export default function WriterAgreementPage() {
         <div className="space-y-6 text-sm text-secondary leading-relaxed">
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-navy flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 text-success" />
               1. Direct Reader-to-Writer Payout Model
             </h2>
             <p>
@@ -44,7 +44,7 @@ export default function WriterAgreementPage() {
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-navy flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 text-success" />
               2. Platform Fee & Accrual Threshold — Draft, Pending Legal Review
             </h2>
             <p>
@@ -54,7 +54,7 @@ export default function WriterAgreementPage() {
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-navy flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 text-success" />
               3. Copyright & Original Authorship
             </h2>
             <p>
@@ -64,7 +64,7 @@ export default function WriterAgreementPage() {
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-navy flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 text-success" />
               4. Verification Obligations
             </h2>
             <p>
@@ -74,7 +74,7 @@ export default function WriterAgreementPage() {
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-navy flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 text-success" />
               5. Reader Appreciation Gifts (&quot;Tips&quot;) — Draft, Pending Legal Review
             </h2>
             <p>

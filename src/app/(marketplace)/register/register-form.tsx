@@ -115,16 +115,16 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
         </div>
 
         {successMessage ? (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-4 shadow-sm">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
-            <h2 className="text-lg font-bold font-serif text-emerald-950">Verification Email Sent</h2>
-            <p className="text-sm text-emerald-800 leading-relaxed">
+          <div className="rounded-2xl border border-success-border bg-success-soft p-6 text-center space-y-4 shadow-sm">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+            <h2 className="text-lg font-bold font-serif text-success-text">Verification Email Sent</h2>
+            <p className="text-sm text-success-text leading-relaxed">
               {successMessage}
             </p>
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 rounded-xl bg-success px-4 py-2 text-sm font-semibold text-white hover:bg-success-hover transition-colors shadow-sm"
               >
                 <span>Proceed to Sign in</span>
                 <ArrowRight className="h-4 w-4" />
@@ -134,8 +134,8 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
         ) : (
           <>
             {error && (
-              <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-                <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+              <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+                <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
@@ -159,11 +159,11 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Ahmed Khan"
                     disabled={isPending}
-                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                   />
                 </div>
                 {fieldErrors.fullName && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.fullName[0]}</p>
+                  <p className="mt-1 text-xs text-danger-text">{fieldErrors.fullName[0]}</p>
                 )}
               </div>
 
@@ -179,17 +179,17 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     </span>
                   )}
                   {!usernameChecking && usernameStatus === 'available' && (
-                    <span className="text-xs text-emerald-600 flex items-center gap-1 font-semibold">
+                    <span className="text-xs text-success flex items-center gap-1 font-semibold">
                       <CheckCircle2 className="h-3 w-3" /> Available
                     </span>
                   )}
                   {!usernameChecking && usernameStatus === 'taken' && (
-                    <span className="text-xs text-rose-600 flex items-center gap-1 font-semibold">
+                    <span className="text-xs text-danger-text flex items-center gap-1 font-semibold">
                       <AlertCircle className="h-3 w-3" /> Unavailable
                     </span>
                   )}
                   {!usernameChecking && usernameStatus === 'invalid' && (
-                    <span className="text-xs text-amber-700">Lowercase letters, numbers, _</span>
+                    <span className="text-xs text-warning-text">Lowercase letters, numbers, _</span>
                   )}
                 </div>
                 <div className="relative mt-1">
@@ -209,11 +209,11 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onBlur={handleUsernameBlur}
                     placeholder="ahmed_khan"
                     disabled={isPending}
-                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                   />
                 </div>
                 {fieldErrors.username && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.username[0]}</p>
+                  <p className="mt-1 text-xs text-danger-text">{fieldErrors.username[0]}</p>
                 )}
               </div>
 
@@ -236,11 +236,11 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     disabled={isPending}
-                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                   />
                 </div>
                 {fieldErrors.email && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.email[0]}</p>
+                  <p className="mt-1 text-xs text-danger-text">{fieldErrors.email[0]}</p>
                 )}
               </div>
 
@@ -263,38 +263,38 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={isPending}
-                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                   />
                 </div>
 
                 {/* Password strength visual guidelines */}
                 <div className="mt-2 grid grid-cols-2 gap-1.5 text-[11px] text-secondary bg-surface-muted p-2.5 rounded-xl border border-border">
-                  <span className={rules.length ? 'text-emerald-700 font-semibold' : 'text-muted'}>
+                  <span className={rules.length ? 'text-success-text font-semibold' : 'text-muted'}>
                     ✓ At least 8 characters
                   </span>
-                  <span className={rules.upper ? 'text-emerald-700 font-semibold' : 'text-muted'}>
+                  <span className={rules.upper ? 'text-success-text font-semibold' : 'text-muted'}>
                     ✓ 1 uppercase letter
                   </span>
-                  <span className={rules.lower ? 'text-emerald-700 font-semibold' : 'text-muted'}>
+                  <span className={rules.lower ? 'text-success-text font-semibold' : 'text-muted'}>
                     ✓ 1 lowercase letter
                   </span>
-                  <span className={rules.number ? 'text-emerald-700 font-semibold' : 'text-muted'}>
+                  <span className={rules.number ? 'text-success-text font-semibold' : 'text-muted'}>
                     ✓ 1 number
                   </span>
-                  <span className={`col-span-2 ${rules.special ? 'text-emerald-700 font-semibold' : 'text-muted'}`}>
+                  <span className={`col-span-2 ${rules.special ? 'text-success-text font-semibold' : 'text-muted'}`}>
                     ✓ 1 special character (!@#$%^&*)
                   </span>
                 </div>
 
                 {fieldErrors.password && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.password[0]}</p>
+                  <p className="mt-1 text-xs text-danger-text">{fieldErrors.password[0]}</p>
                 )}
               </div>
 
               <button
                 type="submit"
                 disabled={isPending || usernameStatus === 'taken'}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
               >
                 {isPending ? (
                   <>

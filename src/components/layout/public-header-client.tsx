@@ -199,18 +199,18 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
       {!promoDismissed && (
         <aside
           aria-label="Platform Guarantee"
-          className="bg-navy text-white text-xs py-1.5 px-3 sm:px-6 transition-all border-b border-navy-light/40"
+          className="bg-primary text-primary-contrast text-xs py-1.5 px-3 sm:px-6 transition-all border-b border-border"
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span className="inline-flex items-center justify-center w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-accent/20 text-accent text-[9px] sm:text-[10px] shrink-0 font-bold">
+              <span className="inline-flex items-center justify-center w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-accent-soft text-accent-strong text-[9px] sm:text-[10px] shrink-0 font-bold border border-border">
                 ★
               </span>
-              <span className="font-medium text-slate-200 truncate text-[11px] sm:text-xs">
+              <span className="font-medium text-primary-contrast truncate text-[11px] sm:text-xs">
                 100% Direct-to-Writer Payments
               </span>
-              <span className="hidden sm:inline text-slate-400">|</span>
-              <span className="hidden sm:inline text-slate-300">
+              <span className="hidden sm:inline opacity-60">|</span>
+              <span className="hidden sm:inline opacity-90">
                 JazzCash, EasyPaisa & Raast Transfer
               </span>
             </div>
@@ -218,7 +218,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
             <div className="flex items-center gap-2 sm:gap-3 shrink-0 text-[11px]">
               <Link
                 href="/how-it-works"
-                className="text-accent hover:text-accent-light underline underline-offset-2 transition-colors flex items-center gap-1"
+                className="text-accent-soft hover:underline underline-offset-2 transition-colors flex items-center gap-1"
               >
                 <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden sm:inline">How Verification Works</span>
@@ -228,7 +228,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 type="button"
                 onClick={handleDismissPromo}
                 aria-label="Dismiss banner"
-                className="text-slate-400 hover:text-white p-1 rounded-sm transition-colors cursor-pointer"
+                className="opacity-75 hover:opacity-100 p-1 rounded-sm transition-opacity cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -238,26 +238,26 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
       )}
 
       {/* 2. Compact Sticky Navigation Bar */}
-      <header className="sticky top-0 z-40 w-full bg-surface/95 backdrop-blur-md border-b border-border/80 transition-all pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-40 w-full bg-surface/95 backdrop-blur-md border-b border-border transition-all pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-14 sm:h-16 md:h-20 gap-2 sm:gap-4">
             {/* Brand Identity */}
             <Link
               href="/"
-              className="flex items-center gap-2 sm:gap-3 group shrink-0 min-h-[44px] items-center"
+              className="flex items-center gap-2 sm:gap-3 group shrink-0 min-h-[44px]"
               aria-label={`${siteConfig.brandName} Home`}
             >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl bg-navy text-accent flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform border border-navy-light shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl bg-primary text-primary-contrast flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform border border-border shrink-0">
                 <BookMarked className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-accent" />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-navy leading-none">
+                <span className="font-serif text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-primary leading-none">
                   {siteConfig.brandName}
                 </span>
                 <span
                   dir="rtl"
                   lang="ur"
-                  className="font-urdu text-[10px] sm:text-xs text-accent font-medium leading-none mt-0.5"
+                  className="font-urdu text-[10px] sm:text-xs text-accent-strong font-medium leading-none mt-0.5"
                 >
                   {siteConfig.brandNameUrdu}
                 </span>
@@ -270,18 +270,18 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               className="hidden md:flex flex-1 max-w-xs lg:max-w-md mx-4"
             >
               <div className="relative w-full">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary pointer-events-none" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search Urdu novels, writers, genres..."
-                  className="w-full pl-10 pr-12 py-2 text-sm bg-ivory/60 hover:bg-ivory focus:bg-white border border-border focus:border-accent rounded-full transition-all outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-accent/20"
+                  className="w-full pl-10 pr-12 py-2 text-sm bg-surface-muted hover:bg-surface focus:bg-surface border border-border focus:border-primary rounded-full transition-all outline-none text-text placeholder:text-text-muted focus:ring-2 focus:ring-ring"
                 />
                 <button
                   type="submit"
                   aria-label="Search"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-secondary/70 hover:text-navy bg-border/40 hover:bg-border/70 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-text-muted hover:text-text bg-surface border border-border px-1.5 py-0.5 rounded cursor-pointer transition-colors"
                 >
                   ↵
                 </button>
@@ -292,7 +292,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
             <nav className="hidden lg:flex items-center gap-6">
               <Link
                 href="/novels"
-                className="text-sm font-medium text-main hover:text-navy transition-colors py-2"
+                className="text-sm font-medium text-text hover:text-primary transition-colors py-2"
               >
                 Browse Novels
               </Link>
@@ -302,20 +302,20 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <button
                   type="button"
                   onClick={() => setGenreDropdownOpen(!genreDropdownOpen)}
-                  className="flex items-center gap-1.5 text-sm font-medium text-main hover:text-navy transition-colors py-2 cursor-pointer"
+                  className="flex items-center gap-1.5 text-sm font-medium text-text hover:text-primary transition-colors py-2 cursor-pointer"
                   aria-expanded={genreDropdownOpen}
                 >
                   <span>Genres</span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-secondary transition-transform duration-200 ${
+                    className={`w-3.5 h-3.5 text-text-muted transition-transform duration-200 ${
                       genreDropdownOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
 
                 {genreDropdownOpen && (
-                  <div className="absolute top-full left-0 w-72 mt-2 bg-surface rounded-xl shadow-xl border border-border/80 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="text-[11px] font-semibold text-secondary uppercase tracking-wider px-3 py-1.5">
+                  <div className="absolute top-full left-0 w-72 mt-2 bg-surface rounded-xl shadow-xl border border-border p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="text-[11px] font-semibold text-text-muted uppercase tracking-wider px-3 py-1.5">
                       Explore by Genre / اصناف
                     </div>
                     {siteConfig.featuredGenres.map((genre) => (
@@ -323,15 +323,15 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                         key={genre.id}
                         href={`/genres/${genre.slug}`}
                         onClick={() => setGenreDropdownOpen(false)}
-                        className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-ivory transition-colors group"
+                        className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-surface-muted transition-colors group"
                       >
-                        <span className="text-xs font-medium text-main group-hover:text-navy">
+                        <span className="text-xs font-medium text-text group-hover:text-primary">
                           {genre.nameEn}
                         </span>
                         <UrduText
                           as="span"
                           size="xs"
-                          className="text-accent group-hover:text-accent-dark py-0"
+                          className="text-accent-strong py-0"
                         >
                           {genre.nameUrdu}
                         </UrduText>
@@ -345,7 +345,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               {sessionUser?.isWriter ? (
                 <Link
                   href="/writer"
-                  className="flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline transition-colors"
                 >
                   <Feather className="w-3.5 h-3.5" />
                   <span>Writer Studio</span>
@@ -353,7 +353,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               ) : (
                 <Link
                   href="/become-a-writer"
-                  className="flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline transition-colors"
                 >
                   <Feather className="w-3.5 h-3.5" />
                   <span>Sell Your Novels</span>
@@ -376,13 +376,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <>
                   <Link
                     href="/login"
-                    className="text-sm font-medium text-navy hover:text-navy-light px-3.5 py-2 rounded-lg transition-colors min-h-[44px] flex items-center"
+                    className="text-sm font-medium text-text hover:text-primary px-3.5 py-2 rounded-lg transition-colors min-h-[44px] flex items-center"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/register"
-                    className="inline-flex items-center gap-1.5 text-sm font-medium bg-navy hover:bg-navy-light text-white px-4 py-2 rounded-lg shadow-xs hover:shadow transition-all min-h-[44px]"
+                    className="btn-primary text-xs !min-h-[40px] !py-2"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-accent" />
                     <span>Join Free</span>
@@ -397,10 +397,10 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(true)}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-main hover:bg-ivory transition-colors cursor-pointer"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-text hover:bg-surface-muted transition-colors cursor-pointer"
                 aria-label="Open search"
               >
-                <Search className="w-5 h-5 text-secondary" />
+                <Search className="w-5 h-5 text-text-muted" />
               </button>
 
               {/* Mobile User Avatar or Quick Sign In */}
@@ -419,7 +419,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                       className="w-7 h-7 rounded-full object-cover border border-border"
                     />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-navy text-accent border border-navy-light flex items-center justify-center font-bold text-xs shadow-inner">
+                    <div className="w-7 h-7 rounded-full bg-primary text-primary-contrast border border-border flex items-center justify-center font-bold text-xs shadow-inner">
                       {sessionUser.name.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -427,7 +427,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               ) : (
                 <Link
                   href="/login"
-                  className="min-w-[44px] min-h-[44px] px-2 flex items-center justify-center text-xs font-semibold text-navy hover:text-accent transition-colors"
+                  className="min-w-[44px] min-h-[44px] px-2 flex items-center justify-center text-xs font-semibold text-primary hover:text-accent-strong transition-colors"
                 >
                   Sign In
                 </Link>
@@ -437,7 +437,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-main hover:bg-ivory border border-border/80 cursor-pointer"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-text hover:bg-surface-muted border border-border cursor-pointer"
                 aria-label="Open navigation menu"
                 aria-expanded={mobileMenuOpen}
               >
@@ -453,19 +453,19 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                   className="flex-1 flex items-center gap-2 min-w-0"
                 >
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary pointer-events-none" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
                     <input
                       ref={mobileSearchInputRef}
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search novels, authors, genres..."
-                      className="w-full pl-9 pr-3 py-2 text-base bg-ivory border border-border rounded-lg outline-none text-main placeholder:text-secondary/70 focus:border-accent focus:ring-1 focus:ring-accent"
+                      className="w-full pl-9 pr-3 py-2 text-base bg-surface-muted border border-border rounded-lg outline-none text-text placeholder:text-text-muted focus:border-primary focus:ring-1 focus:ring-ring"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="min-h-[44px] px-3 bg-navy text-accent text-xs font-semibold rounded-lg shrink-0 cursor-pointer flex items-center justify-center"
+                    className="btn-primary !min-h-[44px] !px-4 text-xs font-semibold"
                   >
                     Search
                   </button>
@@ -473,7 +473,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <button
                   type="button"
                   onClick={() => setMobileSearchOpen(false)}
-                  className="min-w-[44px] min-h-[44px] flex items-center justify-center text-secondary hover:text-main rounded-lg cursor-pointer shrink-0"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center text-text-muted hover:text-text rounded-lg cursor-pointer shrink-0"
                   aria-label="Close search"
                 >
                   <X className="w-5 h-5" />
@@ -494,7 +494,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
         >
           {/* Backdrop with click-to-close */}
           <div
-            className="fixed inset-0 bg-navy/60 backdrop-blur-xs transition-opacity duration-300"
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
             onClick={closeMobileMenu}
             aria-hidden="true"
           />
@@ -505,19 +505,19 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
             className="fixed inset-y-0 right-0 w-[85vw] max-w-sm bg-surface shadow-2xl flex flex-col z-50 border-l border-border pt-[env(safe-area-inset-top)] pb-[calc(0.75rem+env(safe-area-inset-bottom))] animate-in slide-in-from-right duration-200"
           >
             {/* Drawer Top Header with Brand & Close Button */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/80">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-navy text-accent flex items-center justify-center border border-navy-light">
+                <div className="w-8 h-8 rounded-lg bg-primary text-primary-contrast flex items-center justify-center border border-border">
                   <BookMarked className="w-4 h-4 text-accent" />
                 </div>
-                <span className="font-serif text-base font-bold text-navy">
+                <span className="font-serif text-base font-bold text-primary">
                   {siteConfig.brandName}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={closeMobileMenu}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-secondary hover:text-navy hover:bg-ivory cursor-pointer"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-text-muted hover:text-text hover:bg-surface-muted cursor-pointer"
                 aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
@@ -528,23 +528,23 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
               {/* Top: Signed-Out Login & Register CTAs OR Signed-In Account Card */}
               {!sessionUser ? (
-                <div className="p-3 bg-ivory/80 rounded-xl border border-border/80 space-y-2">
-                  <p className="text-xs font-semibold text-navy">Welcome to UNB Premium</p>
-                  <p className="text-[11px] text-secondary">
+                <div className="p-3 bg-surface-muted rounded-xl border border-border space-y-2">
+                  <p className="text-xs font-semibold text-text">Welcome to UNB Premium</p>
+                  <p className="text-[11px] text-text-muted">
                     Sign in to access your personal library and reader orders.
                   </p>
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <Link
                       href="/login"
                       onClick={closeMobileMenu}
-                      className="min-h-[44px] flex items-center justify-center text-center py-2 text-xs font-semibold text-navy border border-navy/25 rounded-lg hover:bg-white transition-colors"
+                      className="min-h-[44px] flex items-center justify-center text-center py-2 text-xs font-semibold text-text border border-border rounded-lg bg-surface hover:bg-surface-muted transition-colors"
                     >
                       Log In
                     </Link>
                     <Link
                       href="/register"
                       onClick={closeMobileMenu}
-                      className="min-h-[44px] flex items-center justify-center text-center py-2 text-xs font-semibold bg-navy text-white rounded-lg shadow-xs hover:bg-navy-light transition-colors"
+                      className="btn-primary !min-h-[44px] text-xs font-semibold"
                     >
                       Join Free
                     </Link>
@@ -552,7 +552,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 </div>
               ) : (
                 /* Account Card (Name, Role badge, Email) */
-                <div className="p-3 bg-ivory/80 rounded-xl border border-border/80 flex items-center gap-3">
+                <div className="p-3 bg-surface-muted rounded-xl border border-border flex items-center gap-3">
                   {sessionUser.avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -561,25 +561,25 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                       className="w-10 h-10 rounded-full object-cover border border-border shrink-0"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-navy text-accent border border-navy-light flex items-center justify-center font-bold text-sm shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary text-primary-contrast border border-border flex items-center justify-center font-bold text-sm shrink-0">
                       {sessionUser.name.charAt(0).toUpperCase()}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-navy truncate">
+                    <p className="text-sm font-bold text-text truncate">
                       {sessionUser.name}
                     </p>
-                    <p className="text-xs text-secondary truncate">
+                    <p className="text-xs text-text-muted truncate">
                       {sessionUser.email}
                     </p>
                     <div className="mt-1">
                       <span
                         className={`inline-block text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
                           sessionUser.role === "admin"
-                            ? "bg-rose-500/10 text-rose-700 border border-rose-500/20"
+                            ? "bg-accent-admin-soft text-accent-admin border border-accent-admin-border"
                             : sessionUser.isWriter
-                            ? "bg-amber-500/10 text-amber-700 border border-amber-500/20"
-                            : "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
+                            ? "bg-warning-soft text-warning-text border border-warning-border"
+                            : "bg-success-soft text-success-text border border-success-border"
                         }`}
                       >
                         {sessionUser.role === "admin"
@@ -598,48 +598,48 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               {/* Quick links for signed-in users */}
               {sessionUser && (
                 <div className="space-y-1">
-                  <div className="text-[11px] font-semibold text-secondary uppercase tracking-wider px-1 mb-1">
+                  <div className="text-[11px] font-semibold text-text-muted uppercase tracking-wider px-1 mb-1">
                     Your Library & Portals
                   </div>
 
                   <Link
                     href="/library"
                     onClick={closeMobileMenu}
-                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-main hover:text-navy hover:bg-ivory transition-colors"
+                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-text hover:text-primary hover:bg-surface-muted transition-colors"
                   >
-                    <BookOpen className="w-4 h-4 text-secondary shrink-0" />
+                    <BookOpen className="w-4 h-4 text-text-muted shrink-0" />
                     <span>My Library</span>
                   </Link>
 
                   <Link
                     href="/orders"
                     onClick={closeMobileMenu}
-                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-main hover:text-navy hover:bg-ivory transition-colors"
+                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-text hover:text-primary hover:bg-surface-muted transition-colors"
                   >
-                    <ShoppingBag className="w-4 h-4 text-secondary shrink-0" />
+                    <ShoppingBag className="w-4 h-4 text-text-muted shrink-0" />
                     <span>My Orders</span>
                   </Link>
 
                   <Link
                     href="/tips"
                     onClick={closeMobileMenu}
-                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-main hover:text-navy hover:bg-ivory transition-colors"
+                    className="min-h-[44px] flex items-center gap-2.5 px-3 rounded-xl text-sm font-medium text-text hover:text-primary hover:bg-surface-muted transition-colors"
                   >
-                    <Heart className="w-4 h-4 text-amber-600 shrink-0" />
+                    <Heart className="w-4 h-4 text-accent-strong shrink-0" />
                     <span>My Thanks</span>
                   </Link>
 
                   <Link
                     href="/notifications"
                     onClick={closeMobileMenu}
-                    className="min-h-[44px] flex items-center justify-between px-3 rounded-xl text-sm font-medium text-main hover:text-navy hover:bg-ivory transition-colors"
+                    className="min-h-[44px] flex items-center justify-between px-3 rounded-xl text-sm font-medium text-text hover:text-primary hover:bg-surface-muted transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Bell className="w-4 h-4 text-secondary shrink-0" />
+                      <Bell className="w-4 h-4 text-text-muted shrink-0" />
                       <span>Notifications</span>
                     </div>
                     {sessionUser.unreadNotificationsCount && sessionUser.unreadNotificationsCount > 0 ? (
-                      <span className="text-[10px] bg-accent text-navy font-bold px-1.5 py-0.5 rounded-full">
+                      <span className="text-[10px] bg-accent-soft text-accent-strong border border-border font-bold px-1.5 py-0.5 rounded-full">
                         {sessionUser.unreadNotificationsCount}
                       </span>
                     ) : null}
@@ -649,9 +649,9 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                     <Link
                       href="/admin"
                       onClick={closeMobileMenu}
-                      className="min-h-[44px] flex items-center gap-2.5 px-3 text-sm font-semibold text-rose-700 hover:bg-rose-50 rounded-xl transition-colors"
+                      className="min-h-[44px] flex items-center gap-2.5 px-3 text-sm font-semibold text-accent-admin hover:bg-accent-admin-soft rounded-xl transition-colors"
                     >
-                      <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                      <ShieldAlert className="w-4 h-4 text-accent-admin shrink-0" />
                       <span>Admin Panel</span>
                     </Link>
                   )}
@@ -660,9 +660,9 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                     <Link
                       href="/writer"
                       onClick={closeMobileMenu}
-                      className="min-h-[44px] flex items-center gap-2.5 px-3 text-sm font-semibold text-amber-800 hover:bg-amber-50 rounded-xl transition-colors"
+                      className="min-h-[44px] flex items-center gap-2.5 px-3 text-sm font-semibold text-accent-strong hover:bg-surface-muted rounded-xl transition-colors"
                     >
-                      <Feather className="w-4 h-4 text-amber-600 shrink-0" />
+                      <Feather className="w-4 h-4 text-accent-strong shrink-0" />
                       <span>Writer Studio</span>
                     </Link>
                   )}
@@ -671,13 +671,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                     <Link
                       href="/become-a-writer"
                       onClick={closeMobileMenu}
-                      className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-amber-700 hover:bg-amber-50 rounded-xl transition-colors"
+                      className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-text hover:bg-surface-muted rounded-xl transition-colors"
                     >
                       <div className="flex items-center gap-2.5">
-                        <Feather className="w-4 h-4 text-amber-600 shrink-0" />
+                        <Feather className="w-4 h-4 text-accent-strong shrink-0" />
                         <span>Become a writer</span>
                       </div>
-                      <span className="text-[10px] bg-amber-500/15 text-amber-800 font-semibold px-2 py-0.5 rounded">
+                      <span className="text-[10px] bg-accent-soft text-accent-strong border border-border font-semibold px-2 py-0.5 rounded">
                         Sell Novels
                       </span>
                     </Link>
@@ -686,21 +686,21 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               )}
 
               {/* Browse links */}
-              <div className="space-y-1 pt-2 border-t border-border/70">
-                <div className="text-[11px] font-semibold text-secondary uppercase tracking-wider px-1 mb-1">
+              <div className="space-y-1 pt-2 border-t border-border">
+                <div className="text-[11px] font-semibold text-text-muted uppercase tracking-wider px-1 mb-1">
                   Explore Marketplace
                 </div>
 
                 <Link
                   href="/novels"
                   onClick={closeMobileMenu}
-                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
+                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-text hover:text-primary hover:bg-surface-muted rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <BookMarked className="w-4 h-4 text-secondary shrink-0" />
+                    <BookMarked className="w-4 h-4 text-text-muted shrink-0" />
                     <span>Browse Novels</span>
                   </div>
-                  <UrduText as="span" size="xs" className="text-secondary py-0">
+                  <UrduText as="span" size="xs" className="text-text-muted py-0">
                     ناولز تلاش کریں
                   </UrduText>
                 </Link>
@@ -708,13 +708,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <Link
                   href="/genres"
                   onClick={closeMobileMenu}
-                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
+                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-text hover:text-primary hover:bg-surface-muted rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Grid className="w-4 h-4 text-secondary shrink-0" />
+                    <Grid className="w-4 h-4 text-text-muted shrink-0" />
                     <span>Genres</span>
                   </div>
-                  <UrduText as="span" size="xs" className="text-secondary py-0">
+                  <UrduText as="span" size="xs" className="text-text-muted py-0">
                     اصنافِ ادب
                   </UrduText>
                 </Link>
@@ -722,13 +722,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <Link
                   href="/writers"
                   onClick={closeMobileMenu}
-                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
+                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-text hover:text-primary hover:bg-surface-muted rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Users className="w-4 h-4 text-secondary shrink-0" />
+                    <Users className="w-4 h-4 text-text-muted shrink-0" />
                     <span>Featured Authors</span>
                   </div>
-                  <UrduText as="span" size="xs" className="text-secondary py-0">
+                  <UrduText as="span" size="xs" className="text-text-muted py-0">
                     نمایاں مصنّفین
                   </UrduText>
                 </Link>
@@ -736,13 +736,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <Link
                   href="/how-it-works"
                   onClick={closeMobileMenu}
-                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
+                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-text hover:text-primary hover:bg-surface-muted rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <ShieldCheck className="w-4 h-4 text-secondary shrink-0" />
+                    <ShieldCheck className="w-4 h-4 text-text-muted shrink-0" />
                     <span>How Direct Payment Works</span>
                   </div>
-                  <UrduText as="span" size="xs" className="text-secondary py-0">
+                  <UrduText as="span" size="xs" className="text-text-muted py-0">
                     براہ راست ادائیگی
                   </UrduText>
                 </Link>
@@ -750,13 +750,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
                 <Link
                   href="/faq"
                   onClick={closeMobileMenu}
-                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors"
+                  className="min-h-[44px] flex items-center justify-between px-3 text-sm font-medium text-text hover:text-primary hover:bg-surface-muted rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <HelpCircle className="w-4 h-4 text-secondary shrink-0" />
+                    <HelpCircle className="w-4 h-4 text-text-muted shrink-0" />
                     <span>FAQ & Support</span>
                   </div>
-                  <UrduText as="span" size="xs" className="text-secondary py-0">
+                  <UrduText as="span" size="xs" className="text-text-muted py-0">
                     سوالات و جوابات
                   </UrduText>
                 </Link>

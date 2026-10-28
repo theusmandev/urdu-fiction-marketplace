@@ -111,7 +111,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                     href={`/read/${novelSlug}/${ch.chapter_number}`}
                     className={`group/row p-3.5 sm:p-4 flex items-center justify-between gap-3 min-h-[44px] transition-colors ${
                       rowType.isCurrent
-                        ? 'bg-brand-gold/10 hover:bg-brand-gold/15'
+                        ? 'bg-accent/10 hover:bg-accent/15'
                         : 'hover:bg-ivory/50'
                     }`}
                   >
@@ -119,7 +119,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                       <span
                         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-serif text-xs font-semibold shrink-0 ${
                           rowType.isCurrent
-                            ? 'bg-brand-gold text-navy shadow-xs font-bold'
+                            ? 'bg-accent text-navy shadow-xs font-bold'
                             : 'bg-ivory text-secondary border border-border/80'
                         }`}
                       >
@@ -144,13 +144,13 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
 
                     <div className="shrink-0 flex items-center gap-2">
                       {rowType.isCurrent ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-brand-gold text-navy px-2.5 py-1 rounded-lg shadow-xs">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-accent text-navy px-2.5 py-1 rounded-lg shadow-xs">
                           <Bookmark className="w-3 h-3 fill-navy" />
                           <span>Continue</span>
                         </span>
                       ) : rowType.isRead ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-medium">
-                          <Check className="w-3 h-3 text-emerald-600" />
+                        <span className="inline-flex items-center gap-1 text-[10px] text-success-text bg-success-soft border border-success-border px-2 py-0.5 rounded-md font-medium">
+                          <Check className="w-3 h-3 text-success" />
                           <span className="hidden sm:inline">Read</span>
                         </span>
                       ) : (
@@ -196,9 +196,9 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                     <div className="shrink-0 flex items-center gap-2">
                       <Link
                         href={`/novels/${novelSlug}/read/${ch.chapter_number}`}
-                        className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors min-h-[36px]"
+                        className="inline-flex items-center gap-1.5 bg-success-soft hover:bg-success-soft text-success-text border border-success-border px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors min-h-[36px]"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                        <Sparkles className="w-3.5 h-3.5 text-success" />
                         <span className="hidden sm:inline">Read Free Preview</span>
                         <span className="sm:hidden">Preview</span>
                       </Link>
@@ -217,10 +217,10 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                   aria-expanded={selectedLockedChapter?.chapter_number === ch.chapter_number}
                   aria-disabled="true"
                   aria-label={`Chapter ${ch.chapter_number}: ${ch.title_urdu}. Paid chapter, click for unlock details.`}
-                  className="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 min-h-[44px] bg-slate-50/50 hover:bg-slate-100/70 transition-colors cursor-pointer group/locked"
+                  className="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 min-h-[44px] bg-surface-muted hover:bg-surface-muted/70 transition-colors cursor-pointer group/locked"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center font-serif text-xs font-semibold shrink-0 border border-slate-200">
+                    <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-surface-muted text-text-muted flex items-center justify-center font-serif text-xs font-semibold shrink-0 border border-border">
                       {ch.chapter_number}
                     </span>
 
@@ -229,20 +229,20 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                         <UrduText
                           as="span"
                           size="sm"
-                          className="text-slate-700 group-hover/locked:text-navy transition-colors leading-[2.2] py-0 line-clamp-2 font-normal"
+                          className="text-text group-hover/locked:text-navy transition-colors leading-[2.2] py-0 line-clamp-2 font-normal"
                         >
                           {ch.title_urdu}
                         </UrduText>
                       </div>
-                      <span className="text-[10px] sm:text-[11px] text-slate-500">
+                      <span className="text-[10px] sm:text-[11px] text-text-muted">
                         {ch.word_count} words
                       </span>
                     </div>
                   </div>
 
                   <div className="shrink-0 flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-xs text-secondary bg-slate-100 group-hover/locked:bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200 transition-colors">
-                      <Lock className="w-3.5 h-3.5 text-slate-500" />
+                    <span className="inline-flex items-center gap-1.5 text-xs text-secondary bg-surface-muted group-hover/locked:bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-border transition-colors">
+                      <Lock className="w-3.5 h-3.5 text-text-muted" />
                       <span className="hidden sm:inline">Paid Chapter</span>
                       <span className="sm:hidden">Paid</span>
                     </span>
@@ -277,7 +277,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-brand-gold/20 text-brand-gold flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-lg bg-accent/20 text-accent-strong flex items-center justify-center font-bold text-xs">
                   {selectedLockedChapter.chapter_number}
                 </div>
                 <h3
@@ -299,8 +299,8 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
 
             {/* Modal Body */}
             <div className="space-y-3 text-center py-2">
-              <div className="w-12 h-12 rounded-2xl bg-brand-gold/15 text-navy mx-auto flex items-center justify-center border border-brand-gold/30">
-                <Lock className="w-6 h-6 text-brand-gold" />
+              <div className="w-12 h-12 rounded-2xl bg-accent/15 text-navy mx-auto flex items-center justify-center border border-border">
+                <Lock className="w-6 h-6 text-accent-strong" />
               </div>
 
               <div className="space-y-1">
@@ -322,21 +322,21 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
               {/* State-Adaptive Actions */}
               {state === 'pending_verification' ? (
                 <div className="pt-2 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 text-left">
-                    <Clock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs flex items-center gap-2 text-left">
+                    <Clock className="w-4 h-4 text-warning-text shrink-0" />
                     <span>Your payment is awaiting author verification.</span>
                   </div>
                   <Link
                     href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-xs"
+                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-xs"
                   >
                     <span>View your order</span>
                   </Link>
                 </div>
               ) : state === 'rejected' || state === 'disputed' ? (
                 <div className="pt-2 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-center gap-2 text-left">
-                    <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2 text-left">
+                    <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
                     <span>
                       {state === 'rejected'
                         ? 'Payment proof was rejected.'
@@ -345,7 +345,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                   </div>
                   <Link
                     href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-xs"
+                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-xs"
                   >
                     <span>View your order</span>
                   </Link>

@@ -343,8 +343,8 @@ export function WriterTipsClient({
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
       {/* Policy Reminder Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-main leading-relaxed space-y-1">
-        <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-semibold text-sm">
+      <div className="p-4 sm:p-5 rounded-2xl bg-warning/10 border border-warning-border/30 text-xs text-main leading-relaxed space-y-1">
+        <div className="flex items-center gap-2 text-warning-text font-semibold text-sm">
           <ShieldCheck className="w-4 h-4 shrink-0" />
           <span>{WRITER_STUDIO_COPY.reminderBannerTitle}</span>
         </div>
@@ -377,14 +377,14 @@ export function WriterTipsClient({
               onClick={() => setActiveTab('queue')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all min-h-[40px] ${
                 activeTab === 'queue'
-                  ? 'bg-amber-600 text-white shadow-xs'
+                  ? 'bg-warning text-white shadow-xs'
                   : 'text-secondary hover:text-main'
               }`}
             >
               <ListFilter className="w-3.5 h-3.5" />
               <span>Queue</span>
               {pendingCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-amber-900 text-white text-[10px] font-bold">
+                <span className="px-1.5 py-0.2 rounded-full bg-warning-soft text-white text-[10px] font-bold">
                   {pendingCount}
                 </span>
               )}
@@ -395,7 +395,7 @@ export function WriterTipsClient({
               onClick={() => setActiveTab('settings')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all min-h-[40px] ${
                 activeTab === 'settings'
-                  ? 'bg-amber-600 text-white shadow-xs'
+                  ? 'bg-warning text-white shadow-xs'
                   : 'text-secondary hover:text-main'
               }`}
             >
@@ -408,7 +408,7 @@ export function WriterTipsClient({
               onClick={() => setActiveTab('summary')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all min-h-[40px] ${
                 activeTab === 'summary'
-                  ? 'bg-amber-600 text-white shadow-xs'
+                  ? 'bg-warning text-white shadow-xs'
                   : 'text-secondary hover:text-main'
               }`}
             >
@@ -431,7 +431,7 @@ export function WriterTipsClient({
               onClick={() => setQueueFilter('payment_submitted')}
               className={`px-3 py-1.5 rounded-xl border transition-all ${
                 queueFilter === 'payment_submitted'
-                  ? 'border-amber-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 font-semibold'
+                  ? 'border-warning-border bg-warning-soft/60  text-warning-text  font-semibold'
                   : 'border-border/60 bg-surface text-secondary hover:text-main'
               }`}
             >
@@ -442,7 +442,7 @@ export function WriterTipsClient({
               onClick={() => setQueueFilter('confirmed')}
               className={`px-3 py-1.5 rounded-xl border transition-all ${
                 queueFilter === 'confirmed'
-                  ? 'border-amber-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 font-semibold'
+                  ? 'border-warning-border bg-warning-soft/60  text-warning-text  font-semibold'
                   : 'border-border/60 bg-surface text-secondary hover:text-main'
               }`}
             >
@@ -453,7 +453,7 @@ export function WriterTipsClient({
               onClick={() => setQueueFilter('not_received')}
               className={`px-3 py-1.5 rounded-xl border transition-all ${
                 queueFilter === 'not_received'
-                  ? 'border-amber-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 font-semibold'
+                  ? 'border-warning-border bg-warning-soft/60  text-warning-text  font-semibold'
                   : 'border-border/60 bg-surface text-secondary hover:text-main'
               }`}
             >
@@ -464,7 +464,7 @@ export function WriterTipsClient({
               onClick={() => setQueueFilter('all')}
               className={`px-3 py-1.5 rounded-xl border transition-all ${
                 queueFilter === 'all'
-                  ? 'border-amber-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 font-semibold'
+                  ? 'border-warning-border bg-warning-soft/60  text-warning-text  font-semibold'
                   : 'border-border/60 bg-surface text-secondary hover:text-main'
               }`}
             >
@@ -475,7 +475,7 @@ export function WriterTipsClient({
           {/* List */}
           {filteredTips.length === 0 ? (
             <div className="p-10 rounded-2xl bg-surface border border-border/80 text-center space-y-2">
-              <Heart className="w-8 h-8 text-amber-500/30 mx-auto" />
+              <Heart className="w-8 h-8 text-accent-strong/30 mx-auto" />
               <p className="text-sm font-semibold text-main">No tips in this queue</p>
               <p className="text-xs text-secondary">
                 {queueFilter === 'payment_submitted'
@@ -492,7 +492,7 @@ export function WriterTipsClient({
                 return (
                   <div
                     key={tip.id}
-                    className="p-5 sm:p-6 rounded-2xl bg-surface border border-border/80 hover:border-amber-300/80 transition-all shadow-xs space-y-4"
+                    className="p-5 sm:p-6 rounded-2xl bg-surface border border-border/80 hover:border-warning-border/80 transition-all shadow-xs space-y-4"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="space-y-1">
@@ -506,8 +506,8 @@ export function WriterTipsClient({
                             {statusMeta.label}
                           </span>
                           {tip.is_duplicate_tid_flagged && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                              <AlertTriangle className="w-3 h-3 text-rose-600" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border">
+                              <AlertTriangle className="w-3 h-3 text-danger-text" />
                               <span>Duplicate TID</span>
                             </span>
                           )}
@@ -542,7 +542,7 @@ export function WriterTipsClient({
                                 title="Copy TID"
                               >
                                 {copiedTid === tip.id ? (
-                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <Check className="w-3 h-3 text-success" />
                                 ) : (
                                   <Copy className="w-3 h-3" />
                                 )}
@@ -564,7 +564,7 @@ export function WriterTipsClient({
                               type="button"
                               onClick={() => handleViewProof(tip.id, tip.screenshot_path!)}
                               disabled={proofLoadingId === tip.id}
-                              className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 hover:underline font-medium"
+                              className="inline-flex items-center gap-1 text-warning-text dark:text-accent-strong hover:underline font-medium"
                             >
                               <ExternalLink className="w-3 h-3" />
                               <span>{proofLoadingId === tip.id ? 'Loading...' : 'View Receipt'}</span>
@@ -574,7 +574,7 @@ export function WriterTipsClient({
                       </div>
 
                       <div className="sm:text-right">
-                        <div className="text-lg sm:text-xl font-bold text-amber-900 dark:text-amber-200">
+                        <div className="text-lg sm:text-xl font-bold text-warning-text">
                           PKR {Number(tip.amount_pkr).toLocaleString()}
                         </div>
                         <div className="text-[11px] text-secondary">
@@ -613,8 +613,8 @@ export function WriterTipsClient({
 
                     {/* Author Reply (if already confirmed) */}
                     {tip.status === 'confirmed' && tip.writer_reply && (
-                      <div className="p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 text-xs">
-                        <span className="font-semibold text-amber-800 dark:text-amber-300">
+                      <div className="p-3 rounded-xl bg-warning-soft/50 border border-warning-border/50 text-xs">
+                        <span className="font-semibold text-warning-text">
                           Your sent reply:
                         </span>
                         <UrduText as="p" size="sm" className="text-main mt-0.5 py-0 leading-relaxed">
@@ -629,7 +629,7 @@ export function WriterTipsClient({
                         <button
                           type="button"
                           onClick={() => handleOpenConfirm(tip)}
-                          className="px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 text-white font-medium text-xs transition-colors flex items-center gap-1.5 min-h-[40px] shadow-xs cursor-pointer"
+                          className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-hover dark:bg-warning text-white font-medium text-xs transition-colors flex items-center gap-1.5 min-h-[40px] shadow-xs cursor-pointer"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>I received it</span>
@@ -638,7 +638,7 @@ export function WriterTipsClient({
                         <button
                           type="button"
                           onClick={() => handleOpenReject(tip)}
-                          className="px-4 py-2 rounded-xl border border-border hover:bg-surface-elevated text-secondary hover:text-rose-600 font-medium text-xs transition-colors flex items-center gap-1.5 min-h-[40px] cursor-pointer"
+                          className="px-4 py-2 rounded-xl border border-border hover:bg-surface-elevated text-secondary hover:text-danger-text font-medium text-xs transition-colors flex items-center gap-1.5 min-h-[40px] cursor-pointer"
                         >
                           <XCircle className="w-4 h-4" />
                           <span>Not received</span>
@@ -672,8 +672,8 @@ export function WriterTipsClient({
                       <span
                         className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
                           enabled
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                            : 'bg-stone-200 text-stone-700 dark:bg-stone-800 dark:text-stone-300 border-stone-300 dark:border-stone-700'
+                            ? 'bg-success-soft text-success-text   border-success-border '
+                            : 'bg-border text-text  dark:text-text-muted border-border '
                         }`}
                       >
                         {enabled ? 'ON • فعال' : 'OFF • غیر فعال'}
@@ -688,8 +688,8 @@ export function WriterTipsClient({
                     role="switch"
                     aria-checked={enabled}
                     onClick={() => setEnabled(!enabled)}
-                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-amber-500/40 ${
-                      enabled ? 'bg-amber-600' : 'bg-slate-300 dark:bg-slate-700'
+                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-ring/40 ${
+                      enabled ? 'bg-warning' : 'bg-border'
                     }`}
                   >
                     <span className="sr-only">Accept reader appreciation tips</span>
@@ -740,7 +740,7 @@ export function WriterTipsClient({
                             type="checkbox"
                             checked={isUsed}
                             onChange={() => handleToggleAccountForTips(method.id, isUsed)}
-                            className="w-4 h-4 rounded border-border text-amber-600 focus:ring-amber-500/30"
+                            className="w-4 h-4 rounded border-border text-accent-strong focus:ring-ring/30"
                           />
                         </label>
                       );
@@ -762,7 +762,7 @@ export function WriterTipsClient({
                   {presetAmounts.map((preset, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 text-xs font-semibold"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-warning-border bg-warning-soft text-xs font-semibold"
                     >
                       <span>PKR</span>
                       <input
@@ -782,7 +782,7 @@ export function WriterTipsClient({
                           onClick={() => {
                             setPresetAmounts(presetAmounts.filter((_, i) => i !== idx));
                           }}
-                          className="text-secondary hover:text-rose-600 ml-1 font-bold"
+                          className="text-secondary hover:text-danger-text ml-1 font-bold"
                           title="Remove preset"
                         >
                           ×
@@ -795,7 +795,7 @@ export function WriterTipsClient({
                     <button
                       type="button"
                       onClick={() => setPresetAmounts([...presetAmounts, 1000])}
-                      className="px-3 py-1.5 rounded-xl border border-dashed border-border hover:border-amber-500 text-xs text-secondary hover:text-main font-medium"
+                      className="px-3 py-1.5 rounded-xl border border-dashed border-border hover:border-warning-border text-xs text-secondary hover:text-main font-medium"
                     >
                       + Add preset
                     </button>
@@ -857,7 +857,7 @@ export function WriterTipsClient({
                   value={thankYouMessage}
                   onChange={(e) => setThankYouMessage(e.target.value.slice(0, 500))}
                   rows={3}
-                  className="w-full p-3 rounded-xl border border-border bg-surface text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 resize-none font-urdu leading-[2.2] text-start"
+                  className="w-full p-3 rounded-xl border border-border bg-surface text-sm focus:outline-hidden focus:ring-2 focus:ring-ring/30 resize-none font-urdu leading-[2.2] text-start"
                   placeholder="شکریہ! آپ کی پزیرائی کا بہت شکریہ۔"
                 />
               </div>
@@ -867,8 +867,8 @@ export function WriterTipsClient({
                 <div
                   className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
                     settingsFeedback.type === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                      : 'bg-rose-50 text-rose-800 border border-rose-200'
+                      ? 'bg-success-soft text-success-text border border-success-border'
+                      : 'bg-danger-soft text-danger-text border border-danger-border'
                   }`}
                 >
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -880,7 +880,7 @@ export function WriterTipsClient({
               <button
                 type="submit"
                 disabled={isSavingSettings}
-                className="w-full py-3 px-6 rounded-xl bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-sm disabled:opacity-50 cursor-pointer"
+                className="w-full py-3 px-6 rounded-xl bg-primary hover:bg-primary-hover dark:bg-warning text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 {isSavingSettings ? (
                   <>
@@ -905,7 +905,7 @@ export function WriterTipsClient({
                 <button
                   type="button"
                   onClick={() => setShowReaderStepsModal(true)}
-                  className="text-xs font-medium text-amber-800 dark:text-amber-300 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-medium text-warning-text hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
                   <span>See reader&apos;s steps</span>
                   <span aria-hidden="true">&rarr;</span>
@@ -916,20 +916,20 @@ export function WriterTipsClient({
               <div
                 role="img"
                 aria-label="Non-interactive visual preview of reader appreciation card"
-                className={`relative rounded-2xl border border-amber-200/80 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-5 shadow-xs text-main space-y-4 pointer-events-none select-none overflow-hidden transition-opacity duration-200 ${
+                className={`relative rounded-2xl border border-warning-border bg-surface p-5 shadow-xs text-main space-y-4 pointer-events-none select-none overflow-hidden transition-opacity duration-200 ${
                   enabled ? 'opacity-100' : 'opacity-40 grayscale-25'
                 }`}
               >
                 {/* Preview Ribbon */}
                 <div className="absolute top-3 right-3">
-                  <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-amber-200/80 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 px-2 py-0.5 rounded-full border border-amber-300/80 dark:border-amber-700">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest bg-warning-soft/80 text-warning-text px-2 py-0.5 rounded-full border border-warning-border/80">
                     PREVIEW • پیش منظر
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0">
-                    <Heart className="w-4 h-4 fill-amber-600/30" />
+                  <div className="w-8 h-8 rounded-xl bg-warning-soft text-warning-text flex items-center justify-center shrink-0">
+                    <Heart className="w-4 h-4 fill-accent-strong/30" />
                   </div>
                   <div className="pr-16">
                     <h3 className="font-semibold text-sm">Say thanks to {writerPenName}</h3>
@@ -954,22 +954,22 @@ export function WriterTipsClient({
                   })}
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-amber-100/50 dark:bg-amber-950/20 text-[11px] text-secondary">
+                <div className="p-2.5 rounded-lg bg-warning-soft/50 text-[11px] text-secondary">
                   Optional. The whole amount goes directly to the author; UNB Premium takes no share.
                 </div>
 
-                <div className="w-full py-2.5 rounded-xl bg-amber-700 text-white font-medium text-xs text-center cursor-default pointer-events-none shadow-none">
+                <div className="w-full py-2.5 rounded-xl bg-primary text-white font-medium text-xs text-center cursor-default pointer-events-none shadow-none">
                   Continue • آگے بڑھیں
                 </div>
               </div>
 
               {/* Dimmed Notice when tips are off */}
               {!enabled && (
-                <div className="p-3 rounded-xl bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-center space-y-0.5">
-                  <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+                <div className="p-3 rounded-xl bg-surface-muted border border-border text-center space-y-0.5">
+                  <p className="text-xs font-semibold text-text dark:text-text-muted">
                     Tips are off — readers do not see this card
                   </p>
-                  <UrduText as="p" size="xs" className="text-stone-500 dark:text-stone-400 py-0">
+                  <UrduText as="p" size="xs" className="text-text-muted dark:text-text-muted py-0">
                     ٹپس غیر فعال ہیں — قارئین کو یہ کارڈ نظر نہیں آئے گا
                   </UrduText>
                 </div>
@@ -987,7 +987,7 @@ export function WriterTipsClient({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-6 rounded-2xl bg-surface border border-border/80 shadow-xs space-y-1">
               <span className="text-xs text-secondary font-medium">Total Received (Gifts)</span>
-              <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-200">
+              <div className="text-2xl sm:text-3xl font-bold text-warning-text">
                 PKR {Number(summary.confirmed_total_pkr || 0).toLocaleString()}
               </div>
               <p className="text-[11px] text-secondary">0% platform fee deducted</p>
@@ -1012,7 +1012,7 @@ export function WriterTipsClient({
 
           <div className="p-5 rounded-2xl bg-surface-elevated border border-border/60 text-xs text-secondary space-y-2">
             <div className="flex items-center gap-2 font-semibold text-main">
-              <Sparkles className="w-4 h-4 text-amber-600" />
+              <Sparkles className="w-4 h-4 text-accent-strong" />
               <span>Strictly Private to Author</span>
             </div>
             <p className="leading-relaxed">
@@ -1033,7 +1033,7 @@ export function WriterTipsClient({
         >
           <div className="w-full max-w-md rounded-2xl bg-surface border border-border p-6 shadow-xl space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+              <div className="p-2 rounded-xl bg-success-soft text-success-text">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
@@ -1075,7 +1075,7 @@ export function WriterTipsClient({
                 <button
                   type="submit"
                   disabled={isConfirming}
-                  className="px-5 py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-semibold flex items-center gap-2"
                 >
                   {isConfirming ? 'Confirming...' : 'Yes, I Received It'}
                 </button>
@@ -1096,7 +1096,7 @@ export function WriterTipsClient({
         >
           <div className="w-full max-w-md rounded-2xl bg-surface border border-border p-6 shadow-xl space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
+              <div className="p-2 rounded-xl bg-danger-soft text-danger-text">
                 <XCircle className="w-5 h-5" />
               </div>
               <div>
@@ -1132,7 +1132,7 @@ export function WriterTipsClient({
                 <button
                   type="submit"
                   disabled={isRejecting}
-                  className="px-5 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl bg-danger hover:bg-danger-hover text-white text-xs font-semibold flex items-center gap-2"
                 >
                   {isRejecting ? 'Submitting...' : 'Mark Not Received'}
                 </button>
@@ -1176,7 +1176,7 @@ export function WriterTipsClient({
               {/* Step 1 */}
               <div className="p-4 rounded-2xl bg-surface-elevated border border-border/60 space-y-2">
                 <div className="flex items-center gap-2 font-semibold text-main">
-                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
+                  <span className="w-5 h-5 rounded-full bg-warning/20 text-warning-text flex items-center justify-center text-xs">
                     1
                   </span>
                   <span>Step 1: Reader Selects Amount &amp; Message</span>
@@ -1189,7 +1189,7 @@ export function WriterTipsClient({
               {/* Step 2 */}
               <div className="p-4 rounded-2xl bg-surface-elevated border border-border/60 space-y-2">
                 <div className="flex items-center gap-2 font-semibold text-main">
-                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
+                  <span className="w-5 h-5 rounded-full bg-warning/20 text-warning-text flex items-center justify-center text-xs">
                     2
                   </span>
                   <span>Step 2: Direct Transfer &amp; TID Submission</span>
@@ -1202,7 +1202,7 @@ export function WriterTipsClient({
               {/* Step 3 */}
               <div className="p-4 rounded-2xl bg-surface-elevated border border-border/60 space-y-2">
                 <div className="flex items-center gap-2 font-semibold text-main">
-                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
+                  <span className="w-5 h-5 rounded-full bg-warning/20 text-warning-text flex items-center justify-center text-xs">
                     3
                   </span>
                   <span>Step 3: You Confirm Receipt &amp; Reply</span>

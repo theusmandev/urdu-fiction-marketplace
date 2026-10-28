@@ -108,19 +108,19 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
           </div>
 
           {/* Payment Model Explanation Banner */}
-          <div className="rounded-2xl bg-amber-50/80 border border-amber-200 p-4 sm:p-5 space-y-2">
+          <div className="rounded-2xl bg-warning-soft/80 border border-warning-border p-4 sm:p-5 space-y-2">
             <div className="flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-amber-950">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-warning-text">
                   Direct Reader-to-Writer Payment
                 </h2>
-                <p className="text-xs text-amber-900 leading-relaxed">
+                <p className="text-xs text-warning-text leading-relaxed">
                   You pay the writer directly. Access unlocks after the writer verifies your payment.
                   The platform never receives your money.
                 </p>
                 <div className="pt-1">
-                  <UrduText as="p" size="xs" className="text-amber-950 font-medium leading-[2.2]">
+                  <UrduText as="p" size="xs" className="text-warning-text font-medium leading-[2.2]">
                     آپ رقم براہِ راست مصنف کے اکاؤنٹ میں بھیجتے ہیں۔ مصنف کی تصدیق کے بعد ناول تک رسائی حاصل ہو گی۔
                   </UrduText>
                 </div>
@@ -130,8 +130,8 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
 
           {/* Error Alert */}
           {error && (
-            <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-xs text-rose-800">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-xs text-danger-text">
+              <AlertCircle className="w-4 h-4 text-danger-text shrink-0 mt-0.5" />
               <span className="leading-relaxed">{error}</span>
             </div>
           )}
@@ -151,8 +151,8 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                       key={method.id}
                       className={`block p-4 rounded-xl border transition-all cursor-pointer shadow-sm ${
                         isSelected
-                          ? 'bg-amber-50/80 border-accent shadow-sm ring-1 ring-accent/30'
-                          : 'bg-surface border-border hover:border-slate-300'
+                          ? 'bg-warning-soft/80 border-accent shadow-sm ring-1 ring-ring/30'
+                          : 'bg-surface border-border hover:border-border'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -162,7 +162,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                           value={method.id}
                           checked={isSelected}
                           onChange={() => setSelectedMethodId(method.id)}
-                          className="mt-1 h-4 w-4 text-accent border-border focus:ring-accent"
+                          className="mt-1 h-4 w-4 text-accent border-border focus:ring-ring"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
@@ -203,7 +203,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                   type="checkbox"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded text-accent border-border focus:ring-accent"
+                  className="mt-1 h-4 w-4 rounded text-accent border-border focus:ring-ring"
                 />
                 <span className="text-xs text-secondary leading-relaxed">
                   I understand that I am transferring funds directly to the author’s personal account. I have read and agree to the{' '}
@@ -224,7 +224,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
               <button
                 type="submit"
                 disabled={isPending || !selectedMethodId || !termsAccepted}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-sm text-navy bg-accent hover:bg-accent-dark active:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px]"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-sm text-navy bg-accent hover:bg-accent-dark active:bg-warning disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px]"
               >
                 {isPending ? (
                   <>
@@ -257,7 +257,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                   formSubmitBtn?.click();
                 }}
                 disabled={isPending || !selectedMethodId || !termsAccepted}
-                className="flex-1 max-w-[210px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
+                className="flex-1 max-w-[210px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-warning disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
               >
                 {isPending ? (
                   <>
@@ -324,7 +324,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
               </div>
               <div className="flex justify-between text-secondary">
                 <span>Fees</span>
-                <span className="text-emerald-700 font-semibold font-mono">None (PKR 0)</span>
+                <span className="text-success-text font-semibold font-mono">None (PKR 0)</span>
               </div>
               <div className="flex justify-between text-sm font-bold text-navy pt-2 border-t border-border">
                 <span>Total Amount Due</span>

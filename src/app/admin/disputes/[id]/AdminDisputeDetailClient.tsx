@@ -144,11 +144,11 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                 statusMeta.variant === 'warning'
-                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                  ? 'bg-warning-soft text-warning-text border border-warning-border'
                   : statusMeta.variant === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  ? 'bg-success-soft text-success-text border border-success-border'
                   : statusMeta.variant === 'destructive'
-                  ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                  ? 'bg-danger-soft text-danger-text border border-danger-border'
                   : 'bg-surface-muted text-muted border border-border'
               }`}
             >
@@ -161,8 +161,8 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
         {/* Action button summary */}
         {!isResolved && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-amber-800 font-medium flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg shadow-sm">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <span className="text-xs text-warning-text font-medium flex items-center gap-1.5 bg-warning-soft border border-warning-border px-3 py-1.5 rounded-lg shadow-sm">
+              <AlertTriangle className="w-4 h-4 text-accent-strong" />
               <span>Awaiting Administrative Ruling</span>
             </span>
           </div>
@@ -170,8 +170,8 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
       </div>
 
       {outcomeSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5 shadow-sm">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text text-xs flex items-center gap-2.5 shadow-sm">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
           <span>{outcomeSuccess}</span>
         </div>
       )}
@@ -364,13 +364,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     setSelectedOutcome('verify_reader');
                     setOutcomeError(null);
                   }}
-                  className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
+                  className="p-4 rounded-xl border border-success-border bg-success-soft/50 hover:bg-success-soft text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <div className="flex items-center gap-2 text-success-text font-bold text-xs">
+                    <ShieldCheck className="w-4 h-4 text-success" />
                     <span>A. Verify for Reader</span>
                   </div>
-                  <p className="text-[11px] text-emerald-700 leading-relaxed">
+                  <p className="text-[11px] text-success-text leading-relaxed">
                     Deposit verified real. Grants novel access, logs sales ledger sale, and accrues author commission.
                   </p>
                 </button>
@@ -382,13 +382,13 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     setSelectedOutcome('refund_adjustment');
                     setOutcomeError(null);
                   }}
-                  className="p-4 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
+                  className="p-4 rounded-xl border border-info-border bg-info-soft/50 hover:bg-info-soft text-left transition-all group cursor-pointer space-y-1.5 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 text-sky-800 font-bold text-xs">
-                    <RotateCcw className="w-4 h-4 text-sky-600" />
+                  <div className="flex items-center gap-2 text-info-text font-bold text-xs">
+                    <RotateCcw className="w-4 h-4 text-info-text" />
                     <span>B. Refund Adjustment</span>
                   </div>
-                  <p className="text-[11px] text-sky-700 leading-relaxed">
+                  <p className="text-[11px] text-info-text leading-relaxed">
                     Author returned funds off-platform. Logs negative sales ledger adjustment and revokes access.
                   </p>
                 </button>
@@ -459,9 +459,9 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                       key={msg.id}
                       className={`p-4 rounded-xl text-xs space-y-2 border ${
                         isAdmin
-                          ? 'bg-indigo-50/70 border-indigo-200 text-indigo-950'
+                          ? 'bg-info-soft/70 border-info-border text-text'
                           : isWriter
-                          ? 'bg-amber-50/60 border-amber-200 text-amber-950'
+                          ? 'bg-warning-soft/60 border-warning-border text-warning-text'
                           : 'bg-surface-muted border-border text-main'
                       }`}
                     >
@@ -472,7 +472,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                               isAdmin
                                 ? 'text-accent-admin'
                                 : isWriter
-                                ? 'text-amber-900'
+                                ? 'text-warning-text'
                                 : 'text-main'
                             }`}
                           >
@@ -483,7 +483,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                               isAdmin
                                 ? 'bg-accent-admin/10 text-accent-admin border border-accent-admin/20'
                                 : isWriter
-                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                ? 'bg-warning-soft text-warning-text border border-warning-border'
                                 : 'bg-surface text-muted border border-border'
                             }`}
                           >
@@ -523,8 +523,8 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                 </span>
 
                 {replyError && (
-                  <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <div className="p-3 rounded-lg bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
                     <span>{replyError}</span>
                   </div>
                 )}
@@ -535,7 +535,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                     value={replyBody}
                     onChange={(e) => setReplyBody(e.target.value)}
                     placeholder="Enter official inquiry or administrative instruction to reader or author..."
-                    className="w-full bg-surface border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin resize-y"
+                    className="w-full bg-surface border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin resize-y"
                   />
                   <div className="flex justify-end">
                     <button
@@ -589,10 +589,10 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
             <div
               className={`p-3.5 rounded-xl text-xs space-y-1.5 border ${
                 selectedOutcome === 'verify_reader'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  ? 'bg-success-soft border-success-border text-success-text'
                   : selectedOutcome === 'refund_adjustment'
-                  ? 'bg-sky-50 border-sky-200 text-sky-800'
-                  : 'bg-amber-50 border-amber-200 text-amber-800'
+                  ? 'bg-info-soft border-info-border text-info-text'
+                  : 'bg-warning-soft border-warning-border text-warning-text'
               }`}
             >
               <div className="font-bold flex items-center gap-1.5">
@@ -612,22 +612,22 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
             </div>
 
             {outcomeError && (
-              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="p-3 rounded-lg bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
                 <span>{outcomeError}</span>
               </div>
             )}
 
             <div className="space-y-2">
               <label className="block text-xs font-bold text-main">
-                Administrative Justification Note <span className="text-rose-600">*</span>
+                Administrative Justification Note <span className="text-danger-text">*</span>
               </label>
               <textarea
                 rows={3}
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="State the verifiable reason, bank confirmation reference, or policy justification..."
-                className="w-full bg-surface border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin resize-y"
+                className="w-full bg-surface border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-ring-admin focus:border-accent-admin resize-y"
               />
             </div>
 
@@ -646,12 +646,12 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                 disabled={isPending || !adminNote.trim()}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 ${
                   selectedOutcome === 'verify_reader'
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    ? 'bg-success hover:bg-success-hover text-white'
                     : selectedOutcome === 'refund_adjustment'
-                    ? 'bg-sky-600 hover:bg-sky-700 text-white'
+                    ? 'bg-info hover:bg-info/90 text-white'
                     : selectedOutcome === 'resolve_writer'
-                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                    : 'bg-rose-600 hover:bg-rose-700 text-white'
+                    ? 'bg-warning hover:bg-primary text-white'
+                    : 'bg-danger hover:bg-danger-hover text-white'
                 } disabled:opacity-50 shadow-sm`}
               >
                 {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

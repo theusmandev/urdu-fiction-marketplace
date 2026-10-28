@@ -97,7 +97,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
     { label: string; bg: string; text: string; icon: React.ComponentType<{ className?: string }> }
   > = {
     admin: { label: 'Admin', bg: 'bg-accent-admin/10 border-accent-admin/30', text: 'text-accent-admin', icon: Shield },
-    writer: { label: 'Writer', bg: 'bg-amber-50 border-amber-200', text: 'text-amber-800', icon: Feather },
+    writer: { label: 'Writer', bg: 'bg-warning-soft border-warning-border', text: 'text-warning-text', icon: Feather },
     reader: { label: 'Reader', bg: 'bg-surface-muted border-border', text: 'text-muted', icon: BookOpen },
   };
 
@@ -105,15 +105,15 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
     <div className="space-y-4">
       {/* Alert Notices */}
       {error && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-xs text-rose-600 hover:text-rose-800"
+            className="text-xs text-danger-text hover:text-danger-text"
           >
             ✕
           </button>
@@ -121,15 +121,15 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
       )}
 
       {successMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-success-soft border border-success-border text-success-text text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
             <span>{successMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccessMsg(null)}
-            className="text-xs text-emerald-600 hover:text-emerald-800"
+            className="text-xs text-success hover:text-success-text"
           >
             ✕
           </button>
@@ -192,8 +192,8 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
                           user.is_active
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                            ? 'bg-success-soft text-success-text border border-success-border'
+                            : 'bg-danger-soft text-danger-text border border-danger-border'
                         }`}
                       >
                         <Power className="w-2.5 h-2.5" />
@@ -263,7 +263,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
               <div className="flex items-center justify-between text-xs text-muted border-t border-border pt-2 font-mono">
                 <div>
                   Status:{' '}
-                  <span className={user.is_active ? 'text-emerald-700' : 'text-rose-700'}>
+                  <span className={user.is_active ? 'text-success-text' : 'text-danger-text'}>
                     {user.is_active ? 'Active' : 'Deactivated'}
                   </span>
                 </div>
@@ -307,8 +307,8 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
 
             {/* Self protection alert */}
             {isSelf && (
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-accent-strong shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold block">Self-Lockout Protection:</span>
                   You cannot demote or deactivate your own account. This safeguard prevents accidental administrator lockout.
@@ -326,14 +326,14 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value as UserRole)}
                   disabled={isSelf || loading}
-                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin disabled:opacity-50"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin disabled:opacity-50"
                 >
                   <option value="reader">Reader (Standard consumer)</option>
                   <option value="writer">Writer (Author publishing access)</option>
                   <option value="admin">Admin (Full platform governance)</option>
                 </select>
                 {selectedUser.role === 'writer' && targetRole === 'reader' && (
-                  <p className="text-[10px] text-amber-700 mt-1">
+                  <p className="text-[10px] text-warning-text mt-1">
                     Note: If this writer has published novels, demoting to reader will be blocked until their published novels are suspended.
                   </p>
                 )}
@@ -347,7 +347,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                   checked={targetIsActive}
                   onChange={(e) => setTargetIsActive(e.target.checked)}
                   disabled={isSelf || loading}
-                  className="w-4 h-4 rounded bg-surface-muted border-border text-accent-admin focus:ring-accent-admin/20 disabled:opacity-50"
+                  className="w-4 h-4 rounded bg-surface-muted border-border text-accent-admin focus:ring-ring-admin/20 disabled:opacity-50"
                 />
                 <label
                   htmlFor="user-active-checkbox"
@@ -360,7 +360,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
               {/* Mandatory Reason */}
               <div>
                 <label className="text-xs font-semibold text-main block mb-1">
-                  Justification Reason <span className="text-rose-600 font-mono">*</span>
+                  Justification Reason <span className="text-danger-text font-mono">*</span>
                 </label>
                 <textarea
                   rows={2}
@@ -368,7 +368,7 @@ export function UserManagementTable({ users, currentAdminId }: UserManagementTab
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Mandatory reason for audit log..."
-                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-none"
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin resize-none"
                 />
               </div>
             </div>

@@ -109,7 +109,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
               setActionError(null);
               setShowForceVerifyModal(true);
             }}
-            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-danger hover:bg-danger text-white font-bold text-xs flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
           >
             <ShieldAlert className="w-4 h-4" />
             <span>Force Verify Order</span>
@@ -129,7 +129,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                 Status: {order.status.replace('_', ' ')}
               </span>
               {order.is_stuck && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-warning-soft text-warning-text border border-warning-border">
                   Stuck &gt; 24h
                 </span>
               )}
@@ -143,7 +143,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
             <span className="text-[10px] text-muted uppercase tracking-wider block font-mono">
               Total Order Amount
             </span>
-            <span className="text-2xl font-bold text-emerald-700 font-mono">
+            <span className="text-2xl font-bold text-success-text font-mono">
               {formatPKR(order.amount_pkr)}
             </span>
           </div>
@@ -169,13 +169,13 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
           {/* Writer */}
           <div className="bg-surface-muted p-4 rounded-xl border border-border space-y-2">
             <div className="flex items-center gap-2 text-muted font-semibold text-[11px] uppercase tracking-wider">
-              <BookOpen className="w-3.5 h-3.5 text-brand-gold" />
+              <BookOpen className="w-3.5 h-3.5 text-accent-strong" />
               <span>Author Details</span>
             </div>
             <p className="text-sm font-bold text-main">{writer.pen_name}</p>
             <Link
               href={`/admin/writers/${writer.id}`}
-              className="text-xs text-brand-gold hover:underline inline-flex items-center gap-1"
+              className="text-xs text-accent-strong hover:underline inline-flex items-center gap-1"
             >
               <span>Inspect Author Profile</span>
               <ExternalLink className="w-3 h-3" />
@@ -217,8 +217,8 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
               >
                 {/* Duplicate Warning */}
                 {sub.is_duplicate_tid && (
-                  <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <div className="p-3 rounded-lg bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-danger-text" />
                     <span>
                       <strong>Duplicate TID Warning:</strong> This transaction reference has been used on another order. Inspect deposit slip closely.
                     </span>
@@ -239,14 +239,14 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                         <Copy className="w-3 h-3" />
                       </button>
                       {copiedText === sub.transaction_reference_tid && (
-                        <span className="text-[10px] text-emerald-700 font-sans font-normal">Copied!</span>
+                        <span className="text-[10px] text-success-text font-sans font-normal">Copied!</span>
                       )}
                     </div>
                   </div>
 
                   <div>
                     <span className="text-muted block text-[11px]">Amount Claimed</span>
-                    <span className="font-mono font-bold text-emerald-700">
+                    <span className="font-mono font-bold text-success-text">
                       {formatPKR(sub.paid_amount_claimed_pkr)}
                     </span>
                   </div>
@@ -277,7 +277,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                     {loadingProof === sub.screenshot_path ? (
                       <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
-                      <Eye className="w-3 h-3 text-brand-gold" />
+                      <Eye className="w-3 h-3 text-accent-strong" />
                     )}
                     <span>Inspect Payment Receipt Screenshot</span>
                   </button>
@@ -291,23 +291,23 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
       {/* Disputes Section */}
       {disputes.length > 0 && (
         <div className="bg-surface border border-border rounded-2xl p-6 space-y-3 shadow-card">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-purple-700 flex items-center gap-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-info-text flex items-center gap-2">
             <AlertTriangle className="w-4 h-4" />
             <span>Associated Disputes ({disputes.length})</span>
           </h3>
 
           <div className="space-y-3">
             {disputes.map((d) => (
-              <div key={d.id} className="p-4 rounded-xl bg-purple-50/50 border border-purple-200 text-xs space-y-2">
+              <div key={d.id} className="p-4 rounded-xl bg-info-soft/50 border border-info-border text-xs space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-purple-900 capitalize">Status: {d.status}</span>
+                  <span className="font-bold text-info-text capitalize">Status: {d.status}</span>
                   <span className="text-muted font-mono text-[10px]">
                     Opened {new Date(d.created_at).toLocaleDateString()}
                   </span>
                 </div>
                 <p className="text-main"><strong>Reason:</strong> {d.reason}</p>
                 {d.resolution_note && (
-                  <p className="text-emerald-700"><strong>Resolution Note:</strong> {d.resolution_note}</p>
+                  <p className="text-success-text"><strong>Resolution Note:</strong> {d.resolution_note}</p>
                 )}
               </div>
             ))}
@@ -318,7 +318,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
       {/* Financial Ledger Entries */}
       <div className="bg-surface border border-border rounded-2xl p-6 space-y-3 shadow-card">
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
-          <Receipt className="w-4 h-4 text-emerald-600" />
+          <Receipt className="w-4 h-4 text-success" />
           <span>Financial Sales Ledger Entries ({ledger.length})</span>
         </h3>
 
@@ -337,7 +337,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                 </div>
                 <div>
                   <span className="text-muted text-[10px] block">Gross Amount</span>
-                  <span className="text-emerald-700">{formatPKR(row.gross_amount_pkr)}</span>
+                  <span className="text-success-text">{formatPKR(row.gross_amount_pkr)}</span>
                 </div>
                 <div>
                   <span className="text-muted text-[10px] block">Platform Fee</span>
@@ -356,18 +356,18 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
       {/* Purchase Entitlement State */}
       <div className="bg-surface border border-border rounded-2xl p-6 space-y-2 text-xs shadow-card">
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <CheckCircle2 className="w-4 h-4 text-success" />
           <span>Reader Purchase Entitlement</span>
         </h3>
 
         {entitlement ? (
-          <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 space-y-1">
-            <p className="text-emerald-800 font-semibold">Active Entitlement Granted</p>
-            <p className="text-emerald-700 text-[11px] font-mono">
+          <div className="p-3 bg-success-soft rounded-xl border border-success-border space-y-1">
+            <p className="text-success-text font-semibold">Active Entitlement Granted</p>
+            <p className="text-success-text text-[11px] font-mono">
               Granted At: {new Date(entitlement.granted_at).toLocaleString()}
             </p>
             {entitlement.is_revoked && (
-              <p className="text-rose-700 text-[11px]">
+              <p className="text-danger-text text-[11px]">
                 Revoked: {entitlement.revoked_reason}
               </p>
             )}
@@ -383,7 +383,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
           <div className="max-w-lg w-full bg-surface border border-border rounded-2xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-bold text-main flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-rose-600" />
+                <ShieldAlert className="w-4 h-4 text-danger-text" />
                 <span>Confirm Admin Force-Verification</span>
               </h3>
               <button
@@ -396,7 +396,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
             </div>
 
             <div className="space-y-3 text-xs text-main">
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 space-y-1">
+              <div className="p-3.5 rounded-xl bg-warning-soft border border-warning-border text-warning-text space-y-1">
                 <p className="font-bold">Financial & Access Impact Warning:</p>
                 <p className="text-[11px] leading-relaxed">
                   Force-verifying order <strong>{order.order_number}</strong> immediately grants the reader full access to the novel and creates a <strong>sale_verified</strong> financial ledger entry, establishing a platform fee debt for author <strong>{writer.pen_name}</strong>.
@@ -404,7 +404,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
               </div>
 
               {actionError && (
-                <div className="p-3 rounded-lg bg-rose-50 text-rose-700 text-xs border border-rose-200">
+                <div className="p-3 rounded-lg bg-danger-soft text-danger-text text-xs border border-danger-border">
                   {actionError}
                 </div>
               )}
@@ -412,7 +412,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
               <form onSubmit={handleForceVerifySubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="font-semibold text-main block">
-                    Administrative Reason / Note <span className="text-rose-600">*</span>
+                    Administrative Reason / Note <span className="text-danger-text">*</span>
                   </label>
                   <textarea
                     required
@@ -420,7 +420,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                     value={adminNote}
                     onChange={(e) => setAdminNote(e.target.value)}
                     placeholder="e.g. Verified bank deposit slip reference directly with bank records."
-                    className="w-full bg-surface-muted border border-border rounded-xl p-3 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                    className="w-full bg-surface-muted border border-border rounded-xl p-3 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-danger/20 focus:border-danger-border"
                   />
                   <p className="text-[10px] text-muted">
                     This note will be logged in the dispute resolution, payment submission, and audit log.
@@ -438,7 +438,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="px-5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
+                    className="px-5 py-2 rounded-xl text-xs font-bold bg-danger hover:bg-danger text-white flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
                   >
                     {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     <span>Confirm Force Verification</span>

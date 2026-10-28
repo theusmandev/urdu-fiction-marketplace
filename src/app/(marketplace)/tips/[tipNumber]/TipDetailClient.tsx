@@ -214,7 +214,7 @@ export function TipDetailClient({
       </nav>
 
       {/* Main Status & Header Card */}
-      <div className="rounded-3xl border border-amber-200/70 dark:border-amber-900/40 bg-surface p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="rounded-3xl border border-warning-border/70 bg-surface p-6 sm:p-8 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/60 pb-6">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
@@ -247,7 +247,7 @@ export function TipDetailClient({
           </div>
 
           <div className="sm:text-right">
-            <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-200">
+            <div className="text-2xl sm:text-3xl font-bold text-warning-text">
               PKR {Number(tip.amount_pkr).toLocaleString()}
             </div>
             <div className="text-[11px] text-secondary">
@@ -283,12 +283,12 @@ export function TipDetailClient({
                 <h2 className="text-sm font-semibold text-main">
                   Step 2: Pay to author&apos;s account
                 </h2>
-                <span className="text-xs text-amber-700 dark:text-amber-400 capitalize font-medium">
+                <span className="text-xs text-warning-text dark:text-accent-strong capitalize font-medium">
                   {snapshot.method_type.replace('_', ' ')}
                 </span>
               </div>
 
-              <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 space-y-3.5">
+              <div className="p-4 sm:p-5 rounded-2xl bg-warning-soft/50 border border-warning-border/60 space-y-3.5">
                 {/* Bank / Provider Name */}
                 {snapshot.bank_name && (
                   <div className="flex items-center justify-between text-xs">
@@ -309,7 +309,7 @@ export function TipDetailClient({
                       title="Copy account title"
                     >
                       {copyField === 'title' ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <Check className="w-3.5 h-3.5 text-success" />
                       ) : (
                         <Copy className="w-3.5 h-3.5" />
                       )}
@@ -329,7 +329,7 @@ export function TipDetailClient({
                       title="Copy account number"
                     >
                       {copyField === 'iban' ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <Check className="w-3.5 h-3.5 text-success" />
                       ) : (
                         <Copy className="w-3.5 h-3.5" />
                       )}
@@ -338,9 +338,9 @@ export function TipDetailClient({
                 </div>
 
                 {/* Exact Amount */}
-                <div className="flex items-center justify-between text-xs border-t border-amber-200/40 dark:border-amber-900/40 pt-3">
+                <div className="flex items-center justify-between text-xs border-t border-warning-border/40 pt-3">
                   <span className="text-secondary font-medium">Exact Amount:</span>
-                  <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-200 text-sm">
+                  <div className="flex items-center gap-1.5 font-bold text-warning-text text-sm">
                     <span>PKR {Number(tip.amount_pkr).toLocaleString()}</span>
                     <button
                       type="button"
@@ -349,7 +349,7 @@ export function TipDetailClient({
                       title="Copy amount"
                     >
                       {copyField === 'amount' ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <Check className="w-3.5 h-3.5 text-success" />
                       ) : (
                         <Copy className="w-3.5 h-3.5" />
                       )}
@@ -359,15 +359,15 @@ export function TipDetailClient({
 
                 {/* Custom writer note if any */}
                 {snapshot.instructions_note && (
-                  <p className="text-[11px] text-secondary italic border-t border-amber-200/40 dark:border-amber-900/40 pt-2">
+                  <p className="text-[11px] text-secondary italic border-t border-warning-border/40 pt-2">
                     Note from author: {snapshot.instructions_note}
                   </p>
                 )}
               </div>
 
               {/* Warning to pay only the exact amount and account */}
-              <div className="p-3 rounded-xl bg-amber-100/50 dark:bg-amber-900/20 text-xs text-amber-950 dark:text-amber-200 flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-xl bg-warning-soft/50 text-xs text-warning-text flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-warning-text dark:text-accent-strong shrink-0 mt-0.5" />
                 <p>
                   Please send the <strong>exact amount</strong> to the account details above via your mobile banking app or wallet. The entire amount goes directly to the author.
                 </p>
@@ -390,7 +390,7 @@ export function TipDetailClient({
                   value={tid}
                   onChange={(e) => setTid(e.target.value.toUpperCase())}
                   placeholder="e.g. 123456789012"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border/80 bg-surface text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-amber-500/30"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border/80 bg-surface text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-ring/30"
                   required
                 />
                 <p className="text-[11px] text-secondary mt-1">
@@ -409,7 +409,7 @@ export function TipDetailClient({
                   onChange={(e) => setSenderName(e.target.value)}
                   placeholder="e.g. Muhammad Usman"
                   maxLength={100}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border/80 bg-surface text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border/80 bg-surface text-sm focus:outline-hidden focus:ring-2 focus:ring-ring/30"
                 />
                 <p className="text-[11px] text-secondary mt-1">
                   Helps the author match the deposit in their bank statement.
@@ -434,7 +434,7 @@ export function TipDetailClient({
 
               {/* Form Error */}
               {formError && (
-                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-300 flex items-start gap-2">
+                <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-xs text-danger-text flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{formError}</span>
                 </div>
@@ -445,7 +445,7 @@ export function TipDetailClient({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto flex-1 py-3 px-6 rounded-xl bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-sm disabled:opacity-50 cursor-pointer"
+                  className="w-full sm:w-auto flex-1 py-3 px-6 rounded-xl bg-primary hover:bg-primary-hover dark:bg-warning text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-sm disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
@@ -477,16 +477,16 @@ export function TipDetailClient({
         {/* CASE 2: PAYMENT SUBMITTED (Calm Waiting Screen)                    */}
         {/* ------------------------------------------------------------------ */}
         {tip.status === 'payment_submitted' && (
-          <div className="p-6 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 space-y-4">
+          <div className="p-6 rounded-2xl bg-info-soft/60 border border-info-border/60 space-y-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 shrink-0">
+              <div className="p-2 rounded-xl bg-info-soft text-info-text shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-blue-950 dark:text-blue-200">
+                <h2 className="text-sm font-semibold text-info-text">
                   Sent — Waiting for author to confirm
                 </h2>
-                <UrduText as="p" size="xs" className="text-blue-900/80 dark:text-blue-300/80 py-0">
+                <UrduText as="p" size="xs" className="text-info-text/80 py-0">
                   شکریہ بھیج دیا گیا — مصنف کی تصدیق کا انتظار ہے
                 </UrduText>
                 <p className="text-xs text-secondary leading-relaxed pt-1">
@@ -496,7 +496,7 @@ export function TipDetailClient({
             </div>
 
             {/* TID Review info */}
-            <div className="pt-2 border-t border-blue-200/40 dark:border-blue-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="pt-2 border-t border-info-border/40 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="space-y-0.5">
                 <span className="text-secondary">Submitted TID:</span>
                 <div className="font-mono font-bold text-main">
@@ -509,7 +509,7 @@ export function TipDetailClient({
                   type="button"
                   onClick={handleViewProof}
                   disabled={proofLoading}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-300 dark:border-blue-800 bg-surface text-blue-800 dark:text-blue-300 hover:bg-blue-50 text-xs font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-info-border bg-surface text-info-text hover:bg-info-soft text-xs font-medium transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>{proofLoading ? 'Loading...' : 'View Receipt'}</span>
@@ -519,11 +519,11 @@ export function TipDetailClient({
 
             {/* Support link if waiting > 72h */}
             {isWaitingOver72Hours && (
-              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between gap-3">
+              <div className="p-3 rounded-xl bg-warning-soft border border-warning-border text-xs text-warning-text flex items-center justify-between gap-3">
                 <span>Waiting longer than 72 hours for confirmation?</span>
                 <Link
                   href={`/support?subject=${encodeURIComponent(`Tip ${tip.tip_number} confirmation enquiry`)}`}
-                  className="px-3 py-1.5 rounded-lg bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors shrink-0 text-xs"
+                  className="px-3 py-1.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-hover transition-colors shrink-0 text-xs"
                 >
                   Contact Support
                 </Link>
@@ -536,9 +536,9 @@ export function TipDetailClient({
         {/* CASE 3: CONFIRMED (Author Thank You Card)                         */}
         {/* ------------------------------------------------------------------ */}
         {tip.status === 'confirmed' && (
-          <div className="p-6 sm:p-7 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/40 space-y-4">
+          <div className="p-6 sm:p-7 rounded-2xl bg-warning-soft/70 border border-warning-border/70 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 shrink-0">
+              <div className="p-2 rounded-xl bg-success-soft text-success-text shrink-0">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
@@ -559,8 +559,8 @@ export function TipDetailClient({
             </div>
 
             {/* Warm Thank You Message Box */}
-            <div className="p-4 sm:p-5 rounded-xl bg-surface border border-amber-200/60 dark:border-amber-900/40 space-y-2 shadow-2xs">
-              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-semibold text-xs">
+            <div className="p-4 sm:p-5 rounded-xl bg-surface border border-warning-border/60 space-y-2 shadow-2xs">
+              <div className="flex items-center gap-2 text-warning-text font-semibold text-xs">
                 <Sparkles className="w-4 h-4" />
                 <span>Message from {tip.writer_pen_name}:</span>
               </div>
@@ -575,16 +575,16 @@ export function TipDetailClient({
         {/* CASE 4: NOT RECEIVED                                              */}
         {/* ------------------------------------------------------------------ */}
         {tip.status === 'not_received' && (
-          <div className="p-6 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40 space-y-3">
+          <div className="p-6 rounded-2xl bg-danger-soft/60 border border-danger-border/60 space-y-3">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300 shrink-0">
+              <div className="p-2 rounded-xl bg-danger-soft text-danger-text shrink-0">
                 <XCircle className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-rose-950 dark:text-rose-200">
+                <h2 className="text-sm font-semibold text-danger-text">
                   Author could not locate this payment
                 </h2>
-                <UrduText as="p" size="xs" className="text-rose-900/80 dark:text-rose-300/80 py-0">
+                <UrduText as="p" size="xs" className="text-danger-text/80 py-0">
                   مصنف کو یہ ادائیگی موصول نہیں ہوئی
                 </UrduText>
                 <p className="text-xs text-secondary leading-relaxed pt-1">
@@ -619,13 +619,13 @@ export function TipDetailClient({
         )}
 
         {/* Honest Disclosure Reminder */}
-        <div className="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/40 dark:border-amber-900/30 flex items-start gap-2.5 text-xs">
-          <Sparkles className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-warning-soft/50 border border-warning-border/40 flex items-start gap-2.5 text-xs">
+          <Sparkles className="w-4 h-4 text-warning-text dark:text-accent-strong shrink-0 mt-0.5" />
           <div className="space-y-0.5">
-            <p className="text-amber-950 dark:text-amber-200 font-medium">
+            <p className="text-warning-text font-medium">
               {HOW_TIPS_WORK.honestLine}
             </p>
-            <UrduText as="p" size="xs" className="text-[11px] text-amber-900/80 dark:text-amber-300/80 py-0">
+            <UrduText as="p" size="xs" className="text-[11px] text-warning-text/80 py-0">
               {HOW_TIPS_WORK.honestLineUrdu}
             </UrduText>
           </div>

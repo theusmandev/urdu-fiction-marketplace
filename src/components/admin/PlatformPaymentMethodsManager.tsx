@@ -234,9 +234,9 @@ export function PlatformPaymentMethodsManager({
                     {isBank ? (
                       <Building className="w-4 h-4 text-accent-admin" />
                     ) : isRaast ? (
-                      <Zap className="w-4 h-4 text-brand-gold" />
+                      <Zap className="w-4 h-4 text-accent-strong" />
                     ) : (
-                      <Smartphone className="w-4 h-4 text-emerald-600" />
+                      <Smartphone className="w-4 h-4 text-success" />
                     )}
                     <span className="font-semibold text-main text-xs uppercase">
                       {m.bank_name || (isRaast ? 'RAAST P2M' : m.method_type.replace('_', ' '))}
@@ -245,7 +245,7 @@ export function PlatformPaymentMethodsManager({
 
                   <div className="flex items-center gap-2">
                     {m.is_active ? (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-success-soft text-success-text border border-success-border">
                         Active
                       </span>
                     ) : (
@@ -266,7 +266,7 @@ export function PlatformPaymentMethodsManager({
                       <button
                         type="button"
                         onClick={() => handleDeactivate(m.id)}
-                        className="p-1 text-muted hover:text-rose-600 transition-colors cursor-pointer"
+                        className="p-1 text-muted hover:text-danger-text transition-colors cursor-pointer"
                         title="Deactivate Account"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -324,7 +324,7 @@ export function PlatformPaymentMethodsManager({
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               {formError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl">
+                <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl">
                   {formError}
                 </div>
               )}
@@ -341,7 +341,7 @@ export function PlatformPaymentMethodsManager({
                       e.target.value as 'jazzcash' | 'easypaisa' | 'raast' | 'bank_transfer'
                     )
                   }
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 >
                   <option value="bank_transfer">Direct Bank Transfer (IBAN)</option>
                   <option value="jazzcash">JazzCash Mobile Wallet</option>
@@ -362,7 +362,7 @@ export function PlatformPaymentMethodsManager({
                     placeholder="e.g. Meezan Bank, HBL, Bank Alfalah"
                     value={bankName}
                     onChange={(e) => setBankName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                   />
                 </div>
               )}
@@ -378,7 +378,7 @@ export function PlatformPaymentMethodsManager({
                   placeholder="e.g. Urdu Novels Bazaar PVT LTD"
                   value={accountTitle}
                   onChange={(e) => setAccountTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 />
               </div>
 
@@ -403,7 +403,7 @@ export function PlatformPaymentMethodsManager({
                   }
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main font-mono focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main font-mono focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 />
               </div>
 
@@ -417,7 +417,7 @@ export function PlatformPaymentMethodsManager({
                   placeholder="e.g. Mention your Pen Name or Invoice Number in the transfer description..."
                   value={instructionsNote}
                   onChange={(e) => setInstructionsNote(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface-muted text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 />
               </div>
 

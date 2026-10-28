@@ -1,0 +1,294 @@
+/* ==========================================================================
+   UNB PREMIUM SEMANTIC DESIGN TOKENS
+   One shared set of semantic design tokens with a warm light aesthetic.
+   Supports three palette presets selectable via data-palette on <html>:
+     - A: Ivory & Ink (Default)
+     - B: Paper & Teal
+     - C: Cream & Maroon
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   PALETTE A: Ivory & Ink (Default Preset)
+   -------------------------------------------------------------------------- */
+:root,
+html[data-palette="A"],
+html:not([data-palette]) {
+  /* Canvas & Surface */
+  --color-bg: #FBF8F2;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F3EEE3;
+  --color-border: #E8E1D3;
+  --color-border-subtle: #F2ECE1;
+
+  /* Typography */
+  --color-text: #1F2430;
+  --color-text-muted: #5F6673;
+
+  /* Brand Primary (Editorial Navy) */
+  --color-primary: #1B2A41;
+  --color-primary-hover: #263C5D;
+  --color-primary-active: #131E2F;
+  --color-primary-contrast: #FFFFFF;
+
+  /* Brand Accent (Gold) */
+  --color-accent: #B98A3E;
+  --color-accent-hover: #C99A4E;
+  --color-accent-strong: #8A6A2B; /* Darker gold for text & links (WCAG AA 4.5:1+) */
+  --color-accent-soft: #FBF4E8;
+  --color-ring: #B98A3E;
+
+  /* Status Colors: Solid, Soft-Tint Background, Strong Text */
+  --color-success: #2F7D5B;
+  --color-success-hover: #26684B;
+  --color-success-soft: #EBF5EF;
+  --color-success-text: #1E5E42;
+  --color-success-border: #C8E5D5;
+
+  --color-warning: #B7791F;
+  --color-warning-hover: #9E6718;
+  --color-warning-soft: #FEF8EC;
+  --color-warning-text: #8C530A;
+  --color-warning-border: #F7E3BE;
+
+  --color-danger: #B4432F;
+  --color-danger-hover: #9B3826;
+  --color-danger-soft: #FCEEED;
+  --color-danger-text: #8F2B1A;
+  --color-danger-border: #F8CEC9;
+
+  --color-info: #2F6690;
+  --color-info-hover: #265578;
+  --color-info-soft: #EBF3F8;
+  --color-info-text: #1E4E72;
+  --color-info-border: #C6DEEE;
+
+  /* Shell Role Accents */
+  --accent-marketplace: #B98A3E;
+  --accent-marketplace-strong: #8A6A2B;
+  --accent-marketplace-soft: #FBF4E8;
+  --accent-marketplace-contrast: #FFFFFF;
+
+  --accent-studio: #2F7D5B;
+  --accent-studio-strong: #1E5E42;
+  --accent-studio-soft: #EBF5EF;
+  --accent-studio-contrast: #FFFFFF;
+
+  --accent-admin: #4338CA; /* Deep Indigo for Admin */
+  --accent-admin-hover: #3730A3;
+  --accent-admin-soft: #EEF2FF;
+  --accent-admin-strong: #312E81;
+  --accent-admin-contrast: #FFFFFF;
+  --accent-admin-border: #C7D2FE;
+}
+
+/* --------------------------------------------------------------------------
+   PALETTE B: Paper & Teal
+   -------------------------------------------------------------------------- */
+html[data-palette="B"] {
+  /* Canvas & Surface */
+  --color-bg: #FAF7F0;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F1ECDF;
+  --color-border: #E6DFD0;
+  --color-border-subtle: #EFE9DC;
+
+  /* Typography */
+  --color-text: #22262B;
+  --color-text-muted: #5B6470;
+
+  /* Brand Primary (Deep Teal) */
+  --color-primary: #0F5E5A;
+  --color-primary-hover: #157974;
+  --color-primary-active: #0A4340;
+  --color-primary-contrast: #FFFFFF;
+
+  /* Brand Accent (Warm Amber Gold) */
+  --color-accent: #D39A2A;
+  --color-accent-hover: #E3AA3A;
+  --color-accent-strong: #8E6410; /* WCAG AA 4.5:1+ */
+  --color-accent-soft: #FBF4E4;
+  --color-ring: #0F5E5A;
+
+  /* Status Colors */
+  --color-success: #2F7D5B;
+  --color-success-hover: #26684B;
+  --color-success-soft: #EBF5EF;
+  --color-success-text: #1E5E42;
+  --color-success-border: #C8E5D5;
+
+  --color-warning: #B7791F;
+  --color-warning-hover: #9E6718;
+  --color-warning-soft: #FEF8EC;
+  --color-warning-text: #8C530A;
+  --color-warning-border: #F7E3BE;
+
+  --color-danger: #B4432F;
+  --color-danger-hover: #9B3826;
+  --color-danger-soft: #FCEEED;
+  --color-danger-text: #8F2B1A;
+  --color-danger-border: #F8CEC9;
+
+  --color-info: #2F6690;
+  --color-info-hover: #265578;
+  --color-info-soft: #EBF3F8;
+  --color-info-text: #1E4E72;
+  --color-info-border: #C6DEEE;
+
+  /* Shell Role Accents */
+  --accent-marketplace: #D39A2A;
+  --accent-marketplace-strong: #8E6410;
+  --accent-marketplace-soft: #FBF4E4;
+  --accent-marketplace-contrast: #FFFFFF;
+
+  --accent-studio: #0F5E5A;
+  --accent-studio-strong: #0A4340;
+  --accent-studio-soft: #E8F4F3;
+  --accent-studio-contrast: #FFFFFF;
+
+  --accent-admin: #4338CA;
+  --accent-admin-hover: #3730A3;
+  --accent-admin-soft: #EEF2FF;
+  --accent-admin-strong: #312E81;
+  --accent-admin-contrast: #FFFFFF;
+  --accent-admin-border: #C7D2FE;
+}
+
+/* --------------------------------------------------------------------------
+   PALETTE C: Cream & Maroon
+   -------------------------------------------------------------------------- */
+html[data-palette="C"] {
+  /* Canvas & Surface */
+  --color-bg: #FCF9F4;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F5EEE6;
+  --color-border: #EADFD2;
+  --color-border-subtle: #F2E8DC;
+
+  /* Typography */
+  --color-text: #2A2420;
+  --color-text-muted: #6B6058;
+
+  /* Brand Primary (Rich Burgundy / Maroon) */
+  --color-primary: #7A2E3A;
+  --color-primary-hover: #943A48;
+  --color-primary-active: #5E212B;
+  --color-primary-contrast: #FFFFFF;
+
+  /* Brand Accent (Gold) */
+  --color-accent: #B98A3E;
+  --color-accent-hover: #C99A4E;
+  --color-accent-strong: #8A6A2B; /* WCAG AA 4.5:1+ */
+  --color-accent-soft: #FBF4E8;
+  --color-ring: #7A2E3A;
+
+  /* Status Colors */
+  --color-success: #3C7A55;
+  --color-success-hover: #306545;
+  --color-success-soft: #EDF5F0;
+  --color-success-text: #26593B;
+  --color-success-border: #CBE2D4;
+
+  --color-warning: #B7791F;
+  --color-warning-hover: #9E6718;
+  --color-warning-soft: #FEF8EC;
+  --color-warning-text: #8C530A;
+  --color-warning-border: #F7E3BE;
+
+  --color-danger: #A63A3A;
+  --color-danger-hover: #8C2E2E;
+  --color-danger-soft: #FBEDED;
+  --color-danger-text: #802424;
+  --color-danger-border: #F5CCCC;
+
+  --color-info: #4A6A8A;
+  --color-info-hover: #3C5773;
+  --color-info-soft: #EEF3F8;
+  --color-info-text: #2B4E6F;
+  --color-info-border: #CCDCEB;
+
+  /* Shell Role Accents (Admin uses deep maroon accent in C) */
+  --accent-marketplace: #B98A3E;
+  --accent-marketplace-strong: #8A6A2B;
+  --accent-marketplace-soft: #FBF4E8;
+  --accent-marketplace-contrast: #FFFFFF;
+
+  --accent-studio: #7A2E3A;
+  --accent-studio-strong: #5E212B;
+  --accent-studio-soft: #F9ECEE;
+  --accent-studio-contrast: #FFFFFF;
+
+  --accent-admin: #7A2E3A;
+  --accent-admin-hover: #5E212B;
+  --accent-admin-soft: #F9ECEE;
+  --accent-admin-strong: #5E212B;
+  --accent-admin-contrast: #FFFFFF;
+  --accent-admin-border: #E8BFC5;
+}
+
+/* --------------------------------------------------------------------------
+   ROLE ACCENT SCOPES (Applied via data-area on the 3 shells)
+   -------------------------------------------------------------------------- */
+[data-area="marketplace"] {
+  --color-role-accent: var(--accent-marketplace);
+  --color-role-accent-strong: var(--accent-marketplace-strong);
+  --color-role-accent-soft: var(--accent-marketplace-soft);
+  --color-role-accent-contrast: var(--accent-marketplace-contrast);
+}
+
+[data-area="studio"] {
+  --color-role-accent: var(--accent-studio);
+  --color-role-accent-strong: var(--accent-studio-strong);
+  --color-role-accent-soft: var(--accent-studio-soft);
+  --color-role-accent-contrast: var(--accent-studio-contrast);
+}
+
+[data-area="admin"] {
+  --color-role-accent: var(--accent-admin);
+  --color-role-accent-strong: var(--accent-admin-strong);
+  --color-role-accent-soft: var(--accent-admin-soft);
+  --color-role-accent-contrast: var(--accent-admin-contrast);
+}
+
+/* --------------------------------------------------------------------------
+   READER TOKENS (Light, Sepia, Dark reader preferences)
+   -------------------------------------------------------------------------- */
+:root {
+  --reader-light-bg: #FBF8F2;
+  --reader-light-surface: #FFFFFF;
+  --reader-light-text: #2A2520;
+  --reader-light-text-muted: #6B6058;
+  --reader-light-border: #E8E1D3;
+
+  --reader-sepia-bg: #F4ECD8;
+  --reader-sepia-surface: #FAF4E6;
+  --reader-sepia-text: #3B3226;
+  --reader-sepia-text-muted: #72624D;
+  --reader-sepia-border: #E2D5BA;
+
+  --reader-dark-bg: #141416;
+  --reader-dark-surface: #1E1E22;
+  --reader-dark-text: #E5E5E5;
+  --reader-dark-text-muted: #9E9EA8;
+  --reader-dark-border: #2A2A30;
+}
+
+/* --------------------------------------------------------------------------
+   ELEVATION, RADII & SHADOWS
+   -------------------------------------------------------------------------- */
+:root {
+  --shadow-sm: 0 1px 2px 0 rgba(31, 36, 48, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(31, 36, 48, 0.07), 0 2px 4px -2px rgba(31, 36, 48, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(31, 36, 48, 0.08), 0 4px 6px -4px rgba(31, 36, 48, 0.04);
+  --shadow-card: 0 2px 8px -2px rgba(31, 36, 48, 0.05), 0 1px 3px -1px rgba(31, 36, 48, 0.04);
+  --shadow-book: 0 10px 25px -5px rgba(27, 42, 65, 0.12), 0 8px 10px -6px rgba(27, 42, 65, 0.08);
+  --shadow-book-hover: 0 20px 30px -10px rgba(27, 42, 65, 0.18), 0 10px 15px -5px rgba(185, 138, 62, 0.15);
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+

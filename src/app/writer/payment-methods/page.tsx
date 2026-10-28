@@ -27,11 +27,11 @@ export default async function WriterPaymentMethodsPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {methodsError && (
-        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+        <div className="p-4 rounded-xl border border-danger-border bg-danger-soft text-danger-text flex items-start gap-3">
           <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load payment methods</h3>
-            <p className="text-xs text-red-400/80 mt-1">{methodsError.message}</p>
+            <p className="text-xs text-danger-text/80 mt-1">{methodsError.message}</p>
           </div>
         </div>
       )}

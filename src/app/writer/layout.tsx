@@ -27,12 +27,12 @@ export default async function WriterLayout({
       <div className="min-h-screen bg-ivory py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
         <div className="max-w-xl w-full">
           <div className="bg-surface rounded-2xl border border-border shadow-md p-8 text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+            <div className="w-16 h-16 rounded-full bg-warning-soft border border-warning-border text-accent-strong flex items-center justify-center mx-auto shadow-inner">
               <Clock className="w-8 h-8" />
             </div>
 
             <div className="space-y-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning-soft text-warning-text">
                 Application Under Editorial Review
               </span>
               <h1 className="text-2xl font-serif font-bold text-navy">
@@ -54,7 +54,7 @@ export default async function WriterLayout({
               </p>
             </div>
 
-            <div className="text-xs text-secondary bg-slate-50 p-4 rounded-xl text-left space-y-1 border border-border/60">
+            <div className="text-xs text-secondary bg-surface-muted p-4 rounded-xl text-left space-y-1 border border-border/60">
               <div><strong>Application Submitted:</strong> {new Date(writerProfile.created_at).toLocaleDateString()}</div>
               <div><strong>Account Email:</strong> {profile.email}</div>
               <div><strong>Terms Accepted:</strong> UNB Author & Payment Agreement v1.0</div>

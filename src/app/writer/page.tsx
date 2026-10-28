@@ -114,11 +114,11 @@ export default async function WriterDashboardPage() {
   return (
     <div className="space-y-8">
       {queryError && (
-        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+        <div className="p-4 rounded-xl border border-danger-border bg-danger-soft text-danger-text flex items-start gap-3">
           <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load dashboard data</h3>
-            <p className="text-xs text-red-400/80 mt-1">{queryError.message}</p>
+            <p className="text-xs text-danger-text/80 mt-1">{queryError.message}</p>
           </div>
         </div>
       )}
@@ -126,7 +126,7 @@ export default async function WriterDashboardPage() {
       <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-success-soft text-success-text">
               Approved author
             </span>
             <span className="text-xs text-secondary">
@@ -161,8 +161,8 @@ export default async function WriterDashboardPage() {
 
       {/* Platform Fee Status Alert if threshold reached */}
       {writerProfile.is_orders_paused_for_commission && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 shrink-0 text-rose-600 mt-0.5" />
+        <div className="p-4 bg-danger-soft border border-danger-border rounded-xl text-danger-text flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 shrink-0 text-danger-text mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-semibold text-sm">
               Reader Orders Temporarily Paused (Platform Fee Limit Exceeded)
@@ -180,7 +180,7 @@ export default async function WriterDashboardPage() {
         {/* Authored Novels */}
         <Link
           href="/writer/novels"
-          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-border transition-colors block"
         >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Authored Novels</span>
@@ -195,11 +195,11 @@ export default async function WriterDashboardPage() {
         {/* Verification Queue */}
         <Link
           href="/writer/orders"
-          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-border transition-colors block"
         >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Awaiting Verification</span>
-            <Clock className="w-4 h-4 text-amber-600" />
+            <Clock className="w-4 h-4 text-accent-strong" />
           </div>
           <div className="text-2xl font-bold text-navy">{pendingOrdersTotal}</div>
           <p className="text-[11px] text-secondary">
@@ -210,11 +210,11 @@ export default async function WriterDashboardPage() {
         {/* Payment Methods */}
         <Link
           href="/writer/payment-methods"
-          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-border transition-colors block"
         >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Active Payouts</span>
-            <CreditCard className="w-4 h-4 text-emerald-600" />
+            <CreditCard className="w-4 h-4 text-success" />
           </div>
           <div className="text-2xl font-bold text-navy">{activePayoutsTotal}</div>
           <p className="text-[11px] text-secondary">
@@ -225,7 +225,7 @@ export default async function WriterDashboardPage() {
         {/* Outstanding Platform Fee Balance */}
         <Link
           href="/writer/commission"
-          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
+          className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-border transition-colors block"
         >
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Platform Fee Due</span>
@@ -296,7 +296,7 @@ export default async function WriterDashboardPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <div className="w-full h-full flex items-center justify-center text-text-muted">
                           <BookOpen className="w-4 h-4" />
                         </div>
                       )}
@@ -353,7 +353,7 @@ export default async function WriterDashboardPage() {
 
           {pendingOrdersTotal === 0 ? (
             <div className="py-10 text-center space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-ivory border border-border flex items-center justify-center mx-auto text-emerald-600">
+              <div className="w-12 h-12 rounded-xl bg-ivory border border-border flex items-center justify-center mx-auto text-success">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div className="space-y-1">

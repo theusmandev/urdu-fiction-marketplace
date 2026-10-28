@@ -19,7 +19,7 @@ export default function GlobalErrorPage({
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center space-y-6">
-      <div className="w-16 h-16 rounded-3xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shadow-sm">
+      <div className="w-16 h-16 rounded-3xl bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center shadow-sm">
         <AlertCircle className="w-8 h-8" />
       </div>
 

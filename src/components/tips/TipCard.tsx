@@ -141,15 +141,15 @@ export function TipCard({
   if (loading) {
     return (
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/40 dark:border-amber-900/30 bg-amber-50/20 dark:bg-amber-950/10 p-6 animate-pulse min-h-[160px] ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-warning-border/40  bg-warning-soft/20  p-6 animate-pulse min-h-[160px] ${className}`}
         aria-hidden="true"
       >
-        <div className="h-5 bg-amber-200/40 dark:bg-amber-800/20 rounded w-1/3 mb-4" />
-        <div className="h-4 bg-amber-200/30 dark:bg-amber-800/10 rounded w-2/3 mb-6" />
+        <div className="h-5 bg-warning-soft/40 rounded w-1/3 mb-4" />
+        <div className="h-4 bg-warning-soft/30 rounded w-2/3 mb-6" />
         <div className="flex gap-2">
-          <div className="h-10 bg-amber-200/40 dark:bg-amber-800/20 rounded-xl w-24" />
-          <div className="h-10 bg-amber-200/40 dark:bg-amber-800/20 rounded-xl w-24" />
-          <div className="h-10 bg-amber-200/40 dark:bg-amber-800/20 rounded-xl w-24" />
+          <div className="h-10 bg-warning-soft/40 rounded-xl w-24" />
+          <div className="h-10 bg-warning-soft/40 rounded-xl w-24" />
+          <div className="h-10 bg-warning-soft/40 rounded-xl w-24" />
         </div>
       </div>
     );
@@ -159,11 +159,11 @@ export function TipCard({
   if (cardState.status === 'author_own_profile') {
     return (
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-300/60 dark:border-amber-800/60 bg-amber-50/50 dark:bg-amber-950/20 p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-warning-border/60  bg-warning-soft/50  p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
       >
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-semibold text-sm">
-            <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <div className="flex items-center gap-2 text-warning-text font-semibold text-sm">
+            <Sparkles className="w-4 h-4 text-accent-strong dark:text-accent-strong shrink-0" />
             <span>Author View • مصنف کا منظر</span>
           </div>
           {onClose && (
@@ -184,7 +184,7 @@ export function TipCard({
         <div className="pt-1">
           <Link
             href={cardState.settingsHref}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors min-h-[44px]"
           >
             <span>Open Tip Settings</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -219,7 +219,7 @@ export function TipCard({
   if (cardState.status === 'sign_in_required') {
     return (
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-6 shadow-xs text-main space-y-4 text-center ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-warning-border/70 bg-surface p-6 shadow-xs text-main space-y-4 text-center ${className}`}
       >
         {onClose && (
           <div className="flex justify-end">
@@ -233,8 +233,8 @@ export function TipCard({
             </button>
           </div>
         )}
-        <div className="w-12 h-12 rounded-2xl bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 flex items-center justify-center mx-auto shadow-xs">
-          <Heart className="w-6 h-6 fill-amber-600/30" />
+        <div className="w-12 h-12 rounded-2xl bg-warning-soft/80 text-warning-text flex items-center justify-center mx-auto shadow-xs">
+          <Heart className="w-6 h-6 fill-accent-strong/30" />
         </div>
         <div className="space-y-1">
           <h3 className="font-semibold text-base text-main">{TIP_CARD_COPY.title}</h3>
@@ -245,7 +245,7 @@ export function TipCard({
         </div>
         <Link
           href={cardState.loginUrl}
-          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold transition-colors min-h-[44px] shadow-xs"
+          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors min-h-[44px] shadow-xs"
         >
           <span>Sign In to Say Thanks</span>
           <span className="font-urdu text-sm py-0">لاگ ان کریں</span>
@@ -265,11 +265,11 @@ export function TipCard({
   ) {
     return (
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-warning-border/70 bg-surface p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
       >
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-semibold text-sm">
-            <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <div className="flex items-center gap-2 text-warning-text font-semibold text-sm">
+            <Info className="w-4 h-4 text-accent-strong dark:text-accent-strong shrink-0" />
             <span>Notice • اطلاع</span>
           </div>
           {onClose && (
@@ -295,11 +295,11 @@ export function TipCard({
   if (cardState.status === 'error') {
     return (
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-danger-border  bg-danger-soft/40  p-5 sm:p-6 shadow-xs text-main space-y-3 ${className}`}
       >
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 text-rose-900 dark:text-rose-200 font-semibold text-sm">
-            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+          <div className="flex items-center gap-2 text-danger-text font-semibold text-sm">
+            <AlertCircle className="w-4 h-4 text-danger-text dark:text-danger-text shrink-0" />
             <span>Unable to Load • خرابی</span>
           </div>
           {onClose && (
@@ -313,15 +313,15 @@ export function TipCard({
             </button>
           )}
         </div>
-        <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">{cardState.message}</p>
-        <UrduText as="p" size="xs" className="text-rose-800/80 dark:text-rose-300/80 py-0">
+        <p className="text-xs text-danger-text leading-relaxed">{cardState.message}</p>
+        <UrduText as="p" size="xs" className="text-danger-text/80 py-0">
           {cardState.messageUrdu}
         </UrduText>
         <div className="pt-2">
           <button
             type="button"
             onClick={handleRetry}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface border border-rose-300 hover:bg-rose-50 text-rose-900 dark:text-rose-200 text-xs font-semibold transition-colors min-h-[44px] cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface border border-danger-border hover:bg-danger-soft text-danger-text text-xs font-semibold transition-colors min-h-[44px] cursor-pointer"
           >
             <RotateCw className="w-3.5 h-3.5" />
             <span>Try Again • دوبارہ کوشش کریں</span>
@@ -452,14 +452,14 @@ export function TipCard({
   return (
     <>
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-[#fdfbf7] dark:bg-[#1a1714] ${paddingClasses} shadow-xs text-main transition-all ${className}`}
+        className={`w-full max-w-xl mx-auto rounded-2xl border border-warning-border/70 bg-surface ${paddingClasses} shadow-xs text-main transition-all ${className}`}
         id="tip-card"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs">
-              <Heart className="w-5 h-5 fill-amber-600/30 dark:fill-amber-400/30" />
+            <div className="w-10 h-10 rounded-xl bg-warning-soft/80 text-warning-text flex items-center justify-center shrink-0 shadow-xs">
+              <Heart className="w-5 h-5 fill-accent-strong/30" />
             </div>
             <div>
               <div className="flex items-baseline gap-2">
@@ -480,7 +480,7 @@ export function TipCard({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-1 text-xs text-secondary hover:text-main transition-colors py-1 px-2 rounded-lg hover:bg-amber-100/40 dark:hover:bg-amber-900/20 min-h-[44px]"
+              className="flex items-center gap-1 text-xs text-secondary hover:text-main transition-colors py-1 px-2 rounded-lg hover:bg-warning-soft/40 min-h-[44px]"
               title={HOW_TIPS_WORK.title}
             >
               <HelpCircle className="w-3.5 h-3.5" />
@@ -518,8 +518,8 @@ export function TipCard({
                     onClick={() => handleSelectPreset(preset)}
                     className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-xl border text-center transition-all min-h-[54px] ${
                       isSelected
-                        ? 'border-amber-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 font-semibold shadow-xs'
-                        : 'border-border/60 bg-surface/70 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 text-main'
+                        ? 'border-warning-border bg-warning-soft/60  text-warning-text  font-semibold shadow-xs'
+                        : 'border-border/60 bg-surface/70 hover:bg-warning-soft/50  text-main'
                     }`}
                   >
                     <span className="text-xs font-medium">{meta?.name || 'Tip'}</span>
@@ -539,8 +539,8 @@ export function TipCard({
                 onClick={handleSelectCustom}
                 className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-xl border text-center transition-all min-h-[54px] ${
                   isCustom
-                    ? 'border-amber-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 font-semibold shadow-xs'
-                    : 'border-border/60 bg-surface/70 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 text-main'
+                    ? 'border-warning-border bg-warning-soft/60  text-warning-text  font-semibold shadow-xs'
+                    : 'border-border/60 bg-surface/70 hover:bg-warning-soft/50  text-main'
                 }`}
               >
                 <span className="text-xs font-medium">{TIP_CARD_COPY.customLabel}</span>
@@ -553,7 +553,7 @@ export function TipCard({
 
             {/* Custom Amount Input Field */}
             {isCustom && (
-              <div className="mt-3 p-3 rounded-xl bg-surface/80 border border-amber-300/80 dark:border-amber-800/80 space-y-2 animate-in fade-in duration-150">
+              <div className="mt-3 p-3 rounded-xl bg-surface/80 border border-warning-border/80 space-y-2 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between text-xs text-secondary">
                   <span>Enter amount</span>
                   <span>
@@ -571,7 +571,7 @@ export function TipCard({
                     value={customInput}
                     onChange={handleCustomChange}
                     placeholder={`e.g. ${presets[0] || 100}`}
-                    className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-border bg-surface text-main font-semibold text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30"
+                    className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-border bg-surface text-main font-semibold text-sm focus:outline-hidden focus:ring-2 focus:ring-ring/30"
                     autoFocus
                   />
                 </div>
@@ -592,8 +592,8 @@ export function TipCard({
                     key={pm.id}
                     className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer select-none transition-all ${
                       isSelected
-                        ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 text-main'
-                        : 'border-border/60 bg-surface/70 hover:bg-amber-50/30 text-secondary'
+                        ? 'border-warning-border bg-warning-soft/60  text-main'
+                        : 'border-border/60 bg-surface/70 hover:bg-warning-soft/30 text-secondary'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -603,7 +603,7 @@ export function TipCard({
                         value={pm.id}
                         checked={isSelected}
                         onChange={() => setSelectedMethodId(pm.id)}
-                        className="text-amber-600 focus:ring-amber-500/30"
+                        className="text-accent-strong focus:ring-ring/30"
                       />
                       <div>
                         <span className="text-xs font-semibold capitalize text-main">
@@ -641,7 +641,7 @@ export function TipCard({
               onChange={(e) => setReaderMessage(e.target.value.slice(0, 300))}
               placeholder="Add a warm word of appreciation... / مصنف کے لیے حوصلہ افزا پیغام لکھیں"
               rows={2}
-              className="w-full p-3 rounded-xl border border-border/60 bg-surface/70 text-sm font-urdu leading-[2.2] text-start focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 resize-none"
+              className="w-full p-3 rounded-xl border border-border/60 bg-surface/70 text-sm font-urdu leading-[2.2] text-start focus:outline-hidden focus:ring-2 focus:ring-ring/30 resize-none"
             />
           </div>
 
@@ -651,7 +651,7 @@ export function TipCard({
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-amber-600 focus:ring-amber-500/30"
+              className="w-4 h-4 rounded border-border text-accent-strong focus:ring-ring/30"
             />
             <span className="text-xs text-secondary">
               {TIP_CARD_COPY.anonymousOption}
@@ -660,20 +660,20 @@ export function TipCard({
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 flex items-start gap-2.5 text-xs text-rose-800 dark:text-rose-300">
+            <div className="p-3 rounded-xl bg-danger-soft border border-danger-border flex items-start gap-2.5 text-xs text-danger-text">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* Honest Disclosure Line */}
-          <div className="p-3 rounded-xl bg-amber-100/40 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/20 flex items-start gap-2.5">
-            <Sparkles className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+          <div className="p-3 rounded-xl bg-warning-soft/40 border border-warning-border/50 flex items-start gap-2.5">
+            <Sparkles className="w-4 h-4 text-warning-text dark:text-accent-strong shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <p className="text-xs text-amber-950 dark:text-amber-200 font-medium">
+              <p className="text-xs text-warning-text font-medium">
                 {TIP_CARD_COPY.honestLine}
               </p>
-              <UrduText as="p" size="xs" className="text-[11px] text-amber-900/80 dark:text-amber-300/80 py-0">
+              <UrduText as="p" size="xs" className="text-[11px] text-warning-text/80 py-0">
                 {TIP_CARD_COPY.honestLineUrdu}
               </UrduText>
             </div>
@@ -683,7 +683,7 @@ export function TipCard({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-6 rounded-xl bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-500 text-white font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-sm disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 px-6 rounded-xl bg-primary hover:bg-primary-hover dark:bg-warning dark:hover:bg-warning text-white font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-sm disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? (
               <>

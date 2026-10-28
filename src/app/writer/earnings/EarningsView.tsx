@@ -116,7 +116,7 @@ export function EarningsView({
       <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-success-soft text-success-text">
               Financial Ledger
             </span>
             <span className="text-xs text-secondary font-mono">
@@ -152,8 +152,8 @@ export function EarningsView({
 
       {/* Paused Alert Banner */}
       {isPaused && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 shrink-0 text-rose-600 mt-0.5" />
+        <div className="p-4 bg-danger-soft border border-danger-border rounded-xl text-danger-text flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 shrink-0 text-danger-text mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-semibold text-sm">
               New Reader Orders Paused (Platform Fee Threshold Exceeded)
@@ -173,7 +173,7 @@ export function EarningsView({
         <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Verified Sales</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
+            <TrendingUp className="w-4 h-4 text-success" />
           </div>
           <div className="text-2xl font-bold text-navy">
             {summary?.sales_count ?? 0}
@@ -189,7 +189,7 @@ export function EarningsView({
             <span className="text-xs font-semibold uppercase tracking-wider">Writer Net Earnings</span>
             <Receipt className="w-4 h-4 text-accent" />
           </div>
-          <div className="text-2xl font-bold text-emerald-700">
+          <div className="text-2xl font-bold text-success-text">
             {formatPKR2(summary?.total_net_pkr ?? 0)}
           </div>
           <p className="text-[11px] text-secondary">
@@ -215,9 +215,9 @@ export function EarningsView({
         <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-secondary">
             <span className="text-xs font-semibold uppercase tracking-wider">Outstanding Balance</span>
-            <AlertTriangle className={`w-4 h-4 ${isPaused ? 'text-rose-600' : 'text-amber-600'}`} />
+            <AlertTriangle className={`w-4 h-4 ${isPaused ? 'text-danger-text' : 'text-accent-strong'}`} />
           </div>
-          <div className={`text-2xl font-bold ${isPaused ? 'text-rose-600' : 'text-navy'}`}>
+          <div className={`text-2xl font-bold ${isPaused ? 'text-danger-text' : 'text-navy'}`}>
             {formatPKR2(summary?.unpaid_commission_balance_pkr ?? 0)}
           </div>
           <p className="text-[11px] text-secondary">
@@ -239,21 +239,21 @@ export function EarningsView({
             <button
               type="button"
               onClick={() => handlePreset('this_month')}
-              className="px-2.5 py-1 text-[11px] font-medium rounded-lg border border-border bg-ivory text-secondary hover:text-navy hover:bg-slate-100 transition-colors"
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg border border-border bg-ivory text-secondary hover:text-navy hover:bg-surface-muted transition-colors"
             >
               This Month
             </button>
             <button
               type="button"
               onClick={() => handlePreset('last_month')}
-              className="px-2.5 py-1 text-[11px] font-medium rounded-lg border border-border bg-ivory text-secondary hover:text-navy hover:bg-slate-100 transition-colors"
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg border border-border bg-ivory text-secondary hover:text-navy hover:bg-surface-muted transition-colors"
             >
               Last Month
             </button>
             <button
               type="button"
               onClick={() => handlePreset('all_time')}
-              className="px-2.5 py-1 text-[11px] font-medium rounded-lg border border-border bg-ivory text-secondary hover:text-navy hover:bg-slate-100 transition-colors"
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg border border-border bg-ivory text-secondary hover:text-navy hover:bg-surface-muted transition-colors"
             >
               All Time
             </button>
@@ -272,7 +272,7 @@ export function EarningsView({
                 const val = e.target.value ? `${e.target.value}T00:00:00+05:00` : '';
                 setFrom(val);
               }}
-              className="w-full px-3 py-1.5 rounded-lg border border-border bg-white text-navy focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full px-3 py-1.5 rounded-lg border border-border bg-white text-navy focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
 
@@ -287,7 +287,7 @@ export function EarningsView({
                 const val = e.target.value ? `${e.target.value}T23:59:59+05:00` : '';
                 setTo(val);
               }}
-              className="w-full px-3 py-1.5 rounded-lg border border-border bg-white text-navy focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full px-3 py-1.5 rounded-lg border border-border bg-white text-navy focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
 
@@ -298,7 +298,7 @@ export function EarningsView({
             <select
               value={entryType}
               onChange={(e) => setEntryType(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-border bg-white text-navy focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full px-3 py-1.5 rounded-lg border border-border bg-white text-navy focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="">All Transactions</option>
               <option value="sale_verified">Sale Verified</option>
@@ -320,7 +320,7 @@ export function EarningsView({
                 type="button"
                 onClick={handleReset}
                 title="Reset filters"
-                className="p-2 border border-border rounded-lg text-secondary hover:text-navy hover:bg-slate-100 transition-colors"
+                className="p-2 border border-border rounded-lg text-secondary hover:text-navy hover:bg-surface-muted transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -346,7 +346,7 @@ export function EarningsView({
         {ledgerEntries.length === 0 ? (
           <div className="py-12 text-center space-y-3">
             <div className="w-12 h-12 rounded-xl bg-ivory border border-border flex items-center justify-center mx-auto text-secondary">
-              <Receipt className="w-6 h-6 text-slate-400" />
+              <Receipt className="w-6 h-6 text-text-muted" />
             </div>
             <div className="space-y-1">
               <p className="text-xs font-semibold text-main">No transactions found</p>
@@ -376,7 +376,7 @@ export function EarningsView({
                 </thead>
                 <tbody className="divide-y divide-border">
                   {ledgerEntries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={entry.id} className="hover:bg-surface-muted transition-colors">
                       <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-secondary">
                         {formatKarachiDateTime(entry.created_at)}
                       </td>
@@ -398,15 +398,15 @@ export function EarningsView({
                       <td className="py-3 px-4 text-right font-mono text-secondary">
                         {entry.commission_rate.toFixed(1)}%
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-medium text-rose-700">
+                      <td className="py-3 px-4 text-right font-mono font-medium text-danger-text">
                         {formatPKR2(entry.platform_commission_pkr)}
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-bold text-emerald-700">
+                      <td className="py-3 px-4 text-right font-mono font-bold text-success-text">
                         {formatPKR2(entry.writer_net_pkr)}
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         {entry.invoice_number ? (
-                          <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                          <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-info-soft text-info-text border border-info-border">
                             {entry.invoice_number}
                           </span>
                         ) : (
@@ -450,13 +450,13 @@ export function EarningsView({
                     </div>
                     <div>
                       <div className="text-[10px] text-secondary uppercase">Platform Fee</div>
-                      <div className="font-mono font-semibold text-rose-700">
+                      <div className="font-mono font-semibold text-danger-text">
                         {formatPKR2(entry.platform_commission_pkr)}
                       </div>
                     </div>
                     <div>
                       <div className="text-[10px] text-secondary uppercase">Writer Net</div>
-                      <div className="font-mono font-bold text-emerald-700">
+                      <div className="font-mono font-bold text-success-text">
                         {formatPKR2(entry.writer_net_pkr)}
                       </div>
                     </div>
@@ -465,7 +465,7 @@ export function EarningsView({
                   {entry.invoice_number && (
                     <div className="text-[11px] text-secondary flex items-center justify-between">
                       <span>Billed in Invoice:</span>
-                      <span className="font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="font-mono px-2 py-0.5 rounded bg-info-soft text-info-text border border-info-border">
                         {entry.invoice_number}
                       </span>
                     </div>

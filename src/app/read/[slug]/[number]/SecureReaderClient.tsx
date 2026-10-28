@@ -178,13 +178,13 @@ export function SecureReaderClient({
 
   // Theme style classes
   const themeContainerClasses = {
-    light: 'bg-[#FAF8F5] text-stone-900 border-stone-200 selection:bg-amber-200/50',
-    dark: 'bg-[#121214] text-stone-100 border-stone-800 selection:bg-amber-500/30',
+    light: 'bg-[#FAF8F5] text-text border-border selection:bg-warning-soft/50',
+    dark: 'bg-[#121214] text-stone-100 border-stone-800 selection:bg-warning/30',
     sepia: 'bg-[#F4ECD8] text-[#4A3B2C] border-[#E2D5BA] selection:bg-[#E0CEAA]',
   }[theme];
 
   const headerBgClasses = {
-    light: 'bg-[#FAF8F5]/90 border-stone-200/80 backdrop-blur-md text-stone-900',
+    light: 'bg-[#FAF8F5]/90 border-border/80 backdrop-blur-md text-text',
     dark: 'bg-[#121214]/90 border-stone-800/80 backdrop-blur-md text-stone-100',
     sepia: 'bg-[#F4ECD8]/90 border-[#E2D5BA]/80 backdrop-blur-md text-[#4A3B2C]',
   }[theme];
@@ -263,7 +263,7 @@ export function SecureReaderClient({
                       ? 'bg-stone-900 border-stone-800 text-stone-100'
                       : theme === 'sepia'
                       ? 'bg-[#EFE4CB] border-[#D9CAAA] text-[#4A3B2C]'
-                      : 'bg-white border-stone-200 text-stone-900'
+                      : 'bg-white border-border text-text'
                   }`}
                 >
                   <div className="flex items-center justify-between border-b pb-2 mb-3 border-current/10">
@@ -288,11 +288,11 @@ export function SecureReaderClient({
                           onClick={() => updatePreference('theme', t)}
                           className={`py-1.5 rounded-lg border text-center capitalize transition-all ${
                             theme === t
-                              ? 'border-amber-500 font-bold ring-2 ring-amber-500/20'
+                              ? 'border-warning-border font-bold ring-2 ring-ring/20'
                               : 'border-current/15 opacity-70 hover:opacity-100'
                           } ${
                             t === 'light'
-                              ? 'bg-[#FAF8F5] text-stone-900'
+                              ? 'bg-[#FAF8F5] text-text'
                               : t === 'sepia'
                               ? 'bg-[#F4ECD8] text-[#4A3B2C]'
                               : 'bg-[#121214] text-stone-100'
@@ -315,7 +315,7 @@ export function SecureReaderClient({
                           onClick={() => updatePreference('fontSize', s)}
                           className={`py-1 rounded-lg border text-center transition-all ${
                             fontSize === s
-                              ? 'border-amber-500 font-bold bg-amber-500/10'
+                              ? 'border-warning-border font-bold bg-warning/10'
                               : 'border-current/15 opacity-70 hover:opacity-100'
                           }`}
                         >
@@ -336,7 +336,7 @@ export function SecureReaderClient({
                           onClick={() => updatePreference('lineHeight', lh)}
                           className={`py-1.5 rounded-lg border text-center capitalize transition-all ${
                             lineHeight === lh
-                              ? 'border-amber-500 font-bold bg-amber-500/10'
+                              ? 'border-warning-border font-bold bg-warning/10'
                               : 'border-current/15 opacity-70 hover:opacity-100'
                           }`}
                         >
@@ -357,7 +357,7 @@ export function SecureReaderClient({
                           onClick={() => updatePreference('paragraphSpacing', ps)}
                           className={`py-1.5 rounded-lg border text-center capitalize transition-all ${
                             paragraphSpacing === ps
-                              ? 'border-amber-500 font-bold bg-amber-500/10'
+                              ? 'border-warning-border font-bold bg-warning/10'
                               : 'border-current/15 opacity-70 hover:opacity-100'
                           }`}
                         >
@@ -440,7 +440,7 @@ export function SecureReaderClient({
               <button
                 type="button"
                 onClick={() => navigateToChapter(chapter.previous_chapter_number)}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-current/20 hover:border-amber-500 font-semibold text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-current/20 hover:border-warning-border font-semibold text-xs transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>پچھلا باب ({chapter.previous_chapter_number})</span>
@@ -453,7 +453,7 @@ export function SecureReaderClient({
               <button
                 type="button"
                 onClick={() => navigateToChapter(chapter.next_chapter_number)}
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-colors shadow-md shadow-amber-500/10 cursor-pointer ml-auto"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-warning hover:bg-amber-400 text-stone-950 font-bold text-xs transition-colors shadow-md shadow-amber-500/10 cursor-pointer ml-auto"
               >
                 <span>اگلا باب ({chapter.next_chapter_number})</span>
                 <ChevronRight className="w-4 h-4" />
@@ -466,12 +466,12 @@ export function SecureReaderClient({
           {/* End of Novel State (Decoupled & Centered Completion Card) */}
           {!chapter.next_chapter_number && (
             <div className="w-full max-w-2xl mx-auto mt-10">
-              <div className="w-full p-6 sm:p-8 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-3">
-                <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto">
+              <div className="w-full p-6 sm:p-8 rounded-2xl bg-warning/10 border border-warning-border/30 text-center space-y-3">
+                <div className="w-10 h-10 rounded-full bg-warning/20 text-accent-strong flex items-center justify-center mx-auto">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
-                  <UrduText size="xl" className="text-amber-500">
+                  <UrduText size="xl" className="text-accent-strong">
                     پڑھنے کا شکریہ!
                   </UrduText>
                   <p className="text-xs opacity-80 max-w-sm mx-auto">
@@ -487,7 +487,7 @@ export function SecureReaderClient({
                   </Link>
                   <Link
                     href="/library"
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-stone-950 hover:bg-amber-400 transition-colors"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-warning text-stone-950 hover:bg-amber-400 transition-colors"
                   >
                     My Library
                   </Link>
@@ -509,14 +509,14 @@ export function SecureReaderClient({
                 ? 'bg-stone-900 border-l border-stone-800 text-stone-100'
                 : theme === 'sepia'
                 ? 'bg-[#EFE4CB] border-l border-[#D9CAAA] text-[#4A3B2C]'
-                : 'bg-white border-l border-stone-200 text-stone-900'
+                : 'bg-white border-l border-border text-text'
             }`}
           >
             {/* Drawer Header */}
             <div className="flex items-center justify-between border-b pb-3 border-current/10">
               <div>
                 <h3 className="text-sm font-bold flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-amber-500" />
+                  <BookOpen className="w-4 h-4 text-accent-strong" />
                   <span>فہرست ابواب / Table of Contents</span>
                 </h3>
                 <p className="text-[11px] opacity-60 mt-0.5">
@@ -546,7 +546,7 @@ export function SecureReaderClient({
                       className="p-3 rounded-xl opacity-40 flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <Lock className="w-3.5 h-3.5 text-accent-strong shrink-0" />
                         <span className="font-mono text-[11px] font-bold">
                           Ch {item.chapter_number}:
                         </span>
@@ -554,7 +554,7 @@ export function SecureReaderClient({
                           {item.title_urdu}
                         </UrduText>
                       </div>
-                      <span className="text-[10px] text-amber-500 font-semibold shrink-0">
+                      <span className="text-[10px] text-accent-strong font-semibold shrink-0">
                         Paid
                       </span>
                     </div>
@@ -571,7 +571,7 @@ export function SecureReaderClient({
                     }}
                     className={`w-full text-left p-3 rounded-xl transition-colors flex items-center justify-between text-xs cursor-pointer ${
                       isCurrent
-                        ? 'bg-amber-500/15 border border-amber-500/30 font-bold'
+                        ? 'bg-warning/15 border border-warning-border/30 font-bold'
                         : 'hover:bg-black/5 dark:hover:bg-white/5'
                     }`}
                   >
@@ -585,7 +585,7 @@ export function SecureReaderClient({
                     </div>
 
                     {isCurrent && (
-                      <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-accent-strong uppercase tracking-wider shrink-0 flex items-center gap-1">
                         <Check className="w-3 h-3" />
                         <span>Reading</span>
                       </span>

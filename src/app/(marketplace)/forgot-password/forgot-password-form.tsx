@@ -51,10 +51,10 @@ export function ForgotPasswordForm() {
         </div>
 
         {submitted ? (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-4 shadow-sm">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
-            <h2 className="text-lg font-bold font-serif text-emerald-950">Check Your Inbox</h2>
-            <p className="text-sm text-emerald-800 leading-relaxed">
+          <div className="rounded-2xl border border-success-border bg-success-soft p-6 text-center space-y-4 shadow-sm">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+            <h2 className="text-lg font-bold font-serif text-success-text">Check Your Inbox</h2>
+            <p className="text-sm text-success-text leading-relaxed">
               {message}
             </p>
             <div className="pt-2">
@@ -70,8 +70,8 @@ export function ForgotPasswordForm() {
         ) : (
           <>
             {error && (
-              <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-                <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+              <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+                <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
@@ -95,7 +95,7 @@ export function ForgotPasswordForm() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     disabled={isPending}
-                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                    className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
                   />
                 </div>
               </div>
@@ -103,7 +103,7 @@ export function ForgotPasswordForm() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
               >
                 {isPending ? (
                   <>

@@ -97,7 +97,7 @@ export function DraftRestoreModal({
 
           {showComparison && (
             <div
-              className="max-h-48 overflow-y-auto rounded-xl border border-border bg-slate-950 p-3 font-mono text-xs space-y-1 select-text"
+              className="max-h-48 overflow-y-auto rounded-xl border border-border bg-surface-muted p-3 font-mono text-xs space-y-1 select-text"
               dir="rtl"
             >
               {diff.slice(0, 40).map((line: DiffLine, idx: number) => (
@@ -105,17 +105,17 @@ export function DraftRestoreModal({
                   key={idx}
                   className={`py-0.5 px-2 rounded leading-relaxed text-right font-urdu text-sm ${
                     line.type === 'added'
-                      ? 'bg-emerald-950/60 text-emerald-300'
+                      ? 'bg-success-soft text-success-text'
                       : line.type === 'removed'
-                      ? 'bg-rose-950/60 text-rose-300 line-through opacity-80'
-                      : 'text-slate-300'
+                      ? 'bg-danger-soft text-danger-text line-through opacity-80'
+                      : 'text-text-muted'
                   }`}
                 >
                   <UrduText as="span">{line.text || ' '}</UrduText>
                 </div>
               ))}
               {diff.length > 40 && (
-                <div className="text-center text-[10px] text-slate-500 pt-1 font-sans" dir="ltr">
+                <div className="text-center text-[10px] text-text-muted pt-1 font-sans" dir="ltr">
                   ... and {diff.length - 40} more lines
                 </div>
               )}
@@ -128,7 +128,7 @@ export function DraftRestoreModal({
           <button
             type="button"
             onClick={onDiscard}
-            className="px-4 py-2 rounded-xl border border-rose-500/30 text-xs font-semibold text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center justify-center gap-1.5"
+            className="px-4 py-2 rounded-xl border border-danger-border/30 text-xs font-semibold text-danger-text hover:bg-danger/10 transition-colors flex items-center justify-center gap-1.5"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Discard Local Draft</span>

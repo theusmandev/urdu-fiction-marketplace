@@ -69,68 +69,42 @@ export function AccountMenu({
 
   const initials = (user.name || user.email || 'U').charAt(0).toUpperCase();
 
-  // Role badge label & color
+  // Role badge label & color using semantic tokens
   const getRoleBadge = () => {
     if (user.role === 'admin') {
       return {
         label: 'Platform Admin',
-        classes: 'bg-accent-admin-light text-accent-admin-dark border-accent-admin-border font-bold',
+        classes: 'bg-accent-admin-soft text-accent-admin border-accent-admin-border font-bold',
       };
     }
     if (user.writerStatus === 'pending_approval') {
       return {
         label: 'Author (Pending)',
-        classes: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        classes: 'bg-warning-soft text-warning-text border-warning-border font-semibold',
       };
     }
     if (user.isWriter || user.role === 'writer') {
       return {
         label: 'Approved author',
-        classes: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        classes: 'bg-accent-soft text-accent-strong border-border font-semibold',
       };
     }
     return {
       label: 'Reader',
-      classes: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      classes: 'bg-success-soft text-success-text border-success-border font-semibold',
     };
   };
 
   const roleMeta = getRoleBadge();
 
-  // Variant-specific trigger button styling
-  let triggerButtonStyles = '';
-  let dropdownPanelStyles = '';
-  let headerBoxStyles = '';
-  let linkItemStyles = '';
-
-  if (variant === 'admin') {
-    triggerButtonStyles =
-      'flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl border border-navy-light/80 bg-navy/80 hover:bg-navy-light/60 transition-all text-left focus:outline-none focus:ring-2 focus:ring-accent-admin/40 cursor-pointer';
-    dropdownPanelStyles =
-      'absolute right-0 top-full mt-2 w-64 bg-surface rounded-2xl shadow-xl border border-border p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-main';
-    headerBoxStyles =
-      'px-3 py-2.5 bg-ivory/70 rounded-xl mb-1.5 border border-border/60';
-    linkItemStyles =
-      'flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors';
-  } else if (variant === 'writer') {
-    triggerButtonStyles =
-      'flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl border border-navy-light/80 bg-navy/80 hover:bg-navy-light/60 transition-all text-left focus:outline-none focus:ring-2 focus:ring-accent/40 cursor-pointer';
-    dropdownPanelStyles =
-      'absolute right-0 top-full mt-2 w-64 bg-navy rounded-2xl shadow-2xl border border-navy-light p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-white';
-    headerBoxStyles =
-      'px-3 py-2.5 bg-navy-light/50 rounded-xl mb-1.5 border border-navy-light';
-    linkItemStyles =
-      'flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-200 hover:text-white hover:bg-navy-light rounded-xl transition-colors';
-  } else {
-    triggerButtonStyles =
-      'flex items-center gap-2.5 py-1.5 px-3 rounded-full border border-border/90 hover:border-accent/50 bg-surface hover:bg-ivory/60 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer';
-    dropdownPanelStyles =
-      'absolute right-0 top-full mt-2 w-64 bg-surface rounded-2xl shadow-xl border border-border/80 p-2 z-50 animate-in fade-in zoom-in-95 duration-150';
-    headerBoxStyles =
-      'px-3 py-2.5 bg-ivory/70 rounded-xl mb-1.5 border border-border/60';
-    linkItemStyles =
-      'flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-main hover:text-navy hover:bg-ivory rounded-xl transition-colors';
-  }
+  const triggerButtonStyles =
+    'flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl border border-border bg-surface hover:bg-surface-muted transition-all text-left focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer';
+  const dropdownPanelStyles =
+    'absolute right-0 top-full mt-2 w-64 bg-surface rounded-2xl shadow-xl border border-border p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-text';
+  const headerBoxStyles =
+    'px-3 py-2.5 bg-surface-muted rounded-xl mb-1.5 border border-border';
+  const linkItemStyles =
+    'flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-muted hover:text-text hover:bg-surface-muted rounded-xl transition-colors';
 
   return (
     <div className={`relative ${className || ''}`} ref={menuRef}>
@@ -147,16 +121,16 @@ export function AccountMenu({
           <img
             src={user.avatarUrl}
             alt={user.name}
-            className="w-7 h-7 rounded-full object-cover border border-slate-700 shrink-0"
+            className="w-7 h-7 rounded-full object-cover border border-border shrink-0"
           />
         ) : (
           <div
             className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-inner ${
               variant === 'admin'
-                ? 'bg-accent-admin-light text-accent-admin border border-accent-admin-border'
+                ? 'bg-accent-admin-soft text-accent-admin border border-accent-admin-border'
                 : variant === 'writer'
-                ? 'bg-accent/20 text-accent border border-accent/30'
-                : 'bg-navy text-accent border border-navy-light'
+                ? 'bg-accent-soft text-accent-strong border border-border'
+                : 'bg-primary text-primary-contrast border border-border'
             }`}
           >
             {initials}
@@ -164,24 +138,10 @@ export function AccountMenu({
         )}
 
         <div className="hidden sm:flex flex-col text-left max-w-[120px]">
-          <span
-            className={`text-xs font-semibold truncate leading-tight ${
-              variant === 'admin' || variant === 'writer'
-                ? 'text-white'
-                : 'text-main'
-            }`}
-          >
+          <span className="text-xs font-semibold truncate leading-tight text-text">
             {user.name}
           </span>
-          <span
-            className={`text-[10px] capitalize leading-tight ${
-              variant === 'admin'
-                ? 'text-slate-400 font-medium'
-                : variant === 'writer'
-                ? 'text-slate-400'
-                : 'text-secondary'
-            }`}
-          >
+          <span className="text-[10px] capitalize leading-tight text-text-muted">
             {user.role === 'admin'
               ? 'Admin'
               : user.isWriter
@@ -191,11 +151,9 @@ export function AccountMenu({
         </div>
 
         <ChevronDown
-          className={`w-3.5 h-3.5 transition-transform duration-200 ${
-            variant === 'admin' || variant === 'writer'
-              ? 'text-slate-400'
-              : 'text-secondary'
-          } ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3.5 h-3.5 text-text-muted transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
         />
       </button>
 
@@ -215,31 +173,25 @@ export function AccountMenu({
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
                     variant === 'admin'
-                      ? 'bg-accent-admin-light text-accent-admin'
+                      ? 'bg-accent-admin-soft text-accent-admin border border-accent-admin-border'
                       : variant === 'writer'
-                      ? 'bg-accent/20 text-accent'
-                      : 'bg-navy text-accent'
+                      ? 'bg-accent-soft text-accent-strong border border-border'
+                      : 'bg-primary text-primary-contrast'
                   }`}
                 >
                   {initials}
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <p
-                  className={`text-xs font-bold truncate ${
-                    variant === 'writer'
-                      ? 'text-white'
-                      : 'text-navy'
-                  }`}
-                >
+                <p className="text-xs font-bold truncate text-text">
                   {user.name}
                 </p>
-                <p className={`text-[11px] truncate ${variant === 'writer' ? 'text-slate-300' : 'text-secondary'}`}>
+                <p className="text-[11px] truncate text-text-muted">
                   {user.email}
                 </p>
                 <div className="mt-1">
                   <span
-                    className={`inline-block text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full border ${roleMeta.classes}`}
+                    className={`inline-block text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${roleMeta.classes}`}
                   >
                     {roleMeta.label}
                   </span>
@@ -249,7 +201,7 @@ export function AccountMenu({
           </div>
 
           {/* Contextual Links */}
-          <div className="space-y-0.5 border-b border-border/60 pb-1 mb-1">
+          <div className="space-y-0.5 border-b border-border pb-1 mb-1">
             {variant === 'admin' ? (
               <>
                 <Link
@@ -265,7 +217,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Settings className="w-4 h-4 text-secondary shrink-0" />
+                  <Settings className="w-4 h-4 text-text-muted shrink-0" />
                   <span>Platform Settings</span>
                 </Link>
                 <Link
@@ -273,7 +225,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Activity className="w-4 h-4 text-secondary shrink-0" />
+                  <Activity className="w-4 h-4 text-text-muted shrink-0" />
                   <span>Audit Trail</span>
                 </Link>
                 <Link
@@ -281,7 +233,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <ExternalLink className="w-4 h-4 text-accent shrink-0" />
+                  <ExternalLink className="w-4 h-4 text-accent-strong shrink-0" />
                   <span>View Public Marketplace</span>
                 </Link>
               </>
@@ -292,7 +244,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Feather className="w-4 h-4 text-amber-400 shrink-0" />
+                  <Feather className="w-4 h-4 text-accent-strong shrink-0" />
                   <span>Writer Studio</span>
                 </Link>
                 {user.username && (
@@ -301,7 +253,7 @@ export function AccountMenu({
                     onClick={() => setIsOpen(false)}
                     className={linkItemStyles}
                   >
-                    <UserIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                    <UserIcon className="w-4 h-4 text-text-muted shrink-0" />
                     <span>My Public Profile</span>
                   </Link>
                 )}
@@ -310,7 +262,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <BookOpen className="w-4 h-4 text-slate-400 shrink-0" />
+                  <BookOpen className="w-4 h-4 text-text-muted shrink-0" />
                   <span>My Library</span>
                 </Link>
                 <Link
@@ -318,7 +270,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <ShoppingBag className="w-4 h-4 text-slate-400 shrink-0" />
+                  <ShoppingBag className="w-4 h-4 text-text-muted shrink-0" />
                   <span>My Orders</span>
                 </Link>
                 <Link
@@ -326,7 +278,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Heart className="w-4 h-4 text-amber-400 shrink-0" />
+                  <Heart className="w-4 h-4 text-accent-strong shrink-0" />
                   <span>Thanks received</span>
                 </Link>
                 <Link
@@ -334,7 +286,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Settings className="w-4 h-4 text-slate-400 shrink-0" />
+                  <Settings className="w-4 h-4 text-text-muted shrink-0" />
                   <span>Account Settings</span>
                 </Link>
                 <Link
@@ -342,7 +294,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <ExternalLink className="w-4 h-4 text-accent shrink-0" />
+                  <ExternalLink className="w-4 h-4 text-accent-strong shrink-0" />
                   <span>View Marketplace</span>
                 </Link>
               </>
@@ -352,9 +304,9 @@ export function AccountMenu({
                   <Link
                     href="/admin"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 rounded-xl transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-accent-admin hover:bg-accent-admin-soft rounded-xl transition-colors"
                   >
-                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                    <ShieldAlert className="w-4 h-4 text-accent-admin shrink-0" />
                     <span>Admin Panel</span>
                   </Link>
                 )}
@@ -362,9 +314,9 @@ export function AccountMenu({
                   <Link
                     href="/writer"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-50 rounded-xl transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-accent-strong hover:bg-surface-muted rounded-xl transition-colors"
                   >
-                    <Feather className="w-4 h-4 text-amber-600 shrink-0" />
+                    <Feather className="w-4 h-4 text-accent-strong shrink-0" />
                     <span>Writer Studio</span>
                   </Link>
                 )}
@@ -373,7 +325,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <BookOpen className="w-4 h-4 text-secondary shrink-0" />
+                  <BookOpen className="w-4 h-4 text-text-muted shrink-0" />
                   <span>My Library</span>
                 </Link>
                 <Link
@@ -381,7 +333,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <ShoppingBag className="w-4 h-4 text-secondary shrink-0" />
+                  <ShoppingBag className="w-4 h-4 text-text-muted shrink-0" />
                   <span>My Orders</span>
                 </Link>
                 <Link
@@ -389,7 +341,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <Heart className="w-4 h-4 text-amber-600 shrink-0" />
+                  <Heart className="w-4 h-4 text-accent-strong shrink-0" />
                   <span>My Thanks</span>
                 </Link>
                 <Link
@@ -397,7 +349,7 @@ export function AccountMenu({
                   onClick={() => setIsOpen(false)}
                   className={linkItemStyles}
                 >
-                  <UserIcon className="w-4 h-4 text-secondary shrink-0" />
+                  <UserIcon className="w-4 h-4 text-text-muted shrink-0" />
                   <span>Account Settings</span>
                 </Link>
               </>
@@ -408,13 +360,7 @@ export function AccountMenu({
           <div className="pt-1">
             <LogoutButton
               onLoggedOut={() => setIsOpen(false)}
-              variant={
-                variant === 'admin'
-                  ? 'admin'
-                  : variant === 'writer'
-                  ? 'writer'
-                  : 'dropdown'
-              }
+              variant="dropdown"
             />
           </div>
         </div>

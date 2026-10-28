@@ -67,8 +67,8 @@ export default function ResetPasswordPage() {
         </div>
 
         {error && (
-          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-            <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+          <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+            <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
             <span>{error}</span>
           </div>
         )}
@@ -92,11 +92,11 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
               />
             </div>
             {fieldErrors.password && (
-              <p className="mt-1 text-xs text-rose-600">{fieldErrors.password[0]}</p>
+              <p className="mt-1 text-xs text-danger-text">{fieldErrors.password[0]}</p>
             )}
           </div>
 
@@ -118,40 +118,40 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+                className="block w-full rounded-xl border border-border bg-surface-muted py-2.5 pl-10 pr-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
               />
             </div>
             {fieldErrors.confirmPassword && (
-              <p className="mt-1 text-xs text-rose-600">{fieldErrors.confirmPassword[0]}</p>
+              <p className="mt-1 text-xs text-danger-text">{fieldErrors.confirmPassword[0]}</p>
             )}
           </div>
 
           {/* Strength validation checklist */}
           <div className="grid grid-cols-2 gap-1.5 text-[11px] text-secondary bg-surface-muted p-3 rounded-xl border border-border">
-            <span className={rules.length ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
-              {rules.length ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 8+ characters
+            <span className={rules.length ? 'text-success-text font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.length ? <CheckCircle2 className="h-3 w-3 text-success" /> : '•'} 8+ characters
             </span>
-            <span className={rules.upper ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
-              {rules.upper ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 uppercase
+            <span className={rules.upper ? 'text-success-text font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.upper ? <CheckCircle2 className="h-3 w-3 text-success" /> : '•'} 1 uppercase
             </span>
-            <span className={rules.lower ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
-              {rules.lower ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 lowercase
+            <span className={rules.lower ? 'text-success-text font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.lower ? <CheckCircle2 className="h-3 w-3 text-success" /> : '•'} 1 lowercase
             </span>
-            <span className={rules.number ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
-              {rules.number ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 number
+            <span className={rules.number ? 'text-success-text font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.number ? <CheckCircle2 className="h-3 w-3 text-success" /> : '•'} 1 number
             </span>
-            <span className={rules.special ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
-              {rules.special ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} 1 special char
+            <span className={rules.special ? 'text-success-text font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.special ? <CheckCircle2 className="h-3 w-3 text-success" /> : '•'} 1 special char
             </span>
-            <span className={rules.match ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'text-muted'}>
-              {rules.match ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : '•'} Passwords match
+            <span className={rules.match ? 'text-success-text font-semibold flex items-center gap-1' : 'text-muted'}>
+              {rules.match ? <CheckCircle2 className="h-3 w-3 text-success" /> : '•'} Passwords match
             </span>
           </div>
 
           <button
             type="submit"
             disabled={isPending || !rules.match}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
           >
             {isPending ? (
               <>

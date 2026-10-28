@@ -42,7 +42,7 @@ export default async function WritersDirectoryPage() {
               اپنے اردو ناولز اور افسانے براہ راست قارئین تک پہنچائیں
             </UrduText>
 
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+            <p className="text-text-muted text-sm md:text-base leading-relaxed">
               Publish independently on Pakistan&apos;s dedicated digital literature
               platform. Keep up to 80% of novel sales, receive direct payments into
               your JazzCash, EasyPaisa, or Bank Account, and retain full copyright
@@ -98,8 +98,8 @@ export default async function WritersDirectoryPage() {
           </div>
 
           <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold">
-              <UserCheck className="w-5 h-5 text-emerald-600" />
+            <div className="w-10 h-10 rounded-xl bg-success-soft text-success border border-success-border flex items-center justify-center font-bold">
+              <UserCheck className="w-5 h-5 text-success" />
             </div>
             <h3 className="font-serif text-lg font-bold text-navy">
               Urdu-First Studio
@@ -158,7 +158,7 @@ export default async function WritersDirectoryPage() {
                     >
                       {writer.pen_name_urdu}
                     </UrduText>
-                    <p className="font-serif text-xs text-secondary group-hover:text-slate-300 font-medium truncate">
+                    <p className="font-serif text-xs text-secondary group-hover:text-text-muted font-medium truncate">
                       {writer.pen_name_english}
                     </p>
                   </div>
@@ -168,13 +168,13 @@ export default async function WritersDirectoryPage() {
                   <p
                     dir="rtl"
                     lang="ur"
-                    className="font-urdu text-xs text-secondary/90 group-hover:text-slate-300 line-clamp-2 leading-[2] text-right"
+                    className="font-urdu text-xs text-secondary/90 group-hover:text-text-muted line-clamp-2 leading-[2] text-right"
                   >
                     {writer.bio_urdu}
                   </p>
                 )}
 
-                <div className="pt-3 border-t border-border group-hover:border-white/15 flex items-center justify-between text-xs text-secondary group-hover:text-slate-300">
+                <div className="pt-3 border-t border-border group-hover:border-white/15 flex items-center justify-between text-xs text-secondary group-hover:text-text-muted">
                   <div className="flex items-center gap-1.5">
                     <BookOpen className="w-3.5 h-3.5 text-accent" />
                     <span>

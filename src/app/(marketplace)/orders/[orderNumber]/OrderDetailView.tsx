@@ -102,16 +102,16 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
       onClick={handleCopy}
       title={`Copy ${label || text}`}
       aria-label={`Copy ${label || text}`}
-      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300/70 px-3 py-2 rounded-xl transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
+      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-warning-text bg-warning-soft hover:bg-warning-soft border border-warning-border/70 px-3 py-2 rounded-xl transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
     >
       {copied ? (
         <>
-          <Check className="w-4 h-4 text-emerald-600" />
-          <span className="text-emerald-700 font-bold">Copied!</span>
+          <Check className="w-4 h-4 text-success" />
+          <span className="text-success-text font-bold">Copied!</span>
         </>
       ) : (
         <>
-          <Copy className="w-4 h-4 text-amber-800" />
+          <Copy className="w-4 h-4 text-warning-text" />
           <span>{label || 'Copy'}</span>
         </>
       )}
@@ -190,7 +190,7 @@ function SignedScreenshotPreview({ path }: { path: string }) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="max-h-[75vh] overflow-auto rounded-xl flex items-center justify-center bg-slate-100 p-2 border border-border">
+            <div className="max-h-[75vh] overflow-auto rounded-xl flex items-center justify-center bg-surface-muted p-2 border border-border">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt="Full Payment Receipt" className="max-h-[70vh] w-auto object-contain rounded-lg" />
             </div>
@@ -402,8 +402,8 @@ export function OrderDetailView({
 
         {/* Inline General Errors */}
         {formError && (
-          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-xs text-rose-800">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-xs text-danger-text">
+            <AlertCircle className="w-4 h-4 text-danger-text shrink-0 mt-0.5" />
             <span>{formError}</span>
           </div>
         )}
@@ -415,17 +415,17 @@ export function OrderDetailView({
           <div className="space-y-6 pt-2">
             {/* Rejection Notice if rejected */}
             {order.status === 'rejected' && order.rejectedReason && (
-              <div className="rounded-2xl bg-rose-50 border border-rose-200 p-4 sm:p-5 space-y-2">
+              <div className="rounded-2xl bg-danger-soft border border-danger-border p-4 sm:p-5 space-y-2">
                 <div className="flex items-start gap-3">
-                  <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                  <XCircle className="w-5 h-5 text-danger-text shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-rose-800">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-danger-text">
                       Author Rejection Reason
                     </h3>
-                    <p className="text-xs text-rose-950 leading-relaxed font-mono bg-white p-2.5 rounded-lg border border-rose-200">
+                    <p className="text-xs text-danger-text leading-relaxed font-mono bg-white p-2.5 rounded-lg border border-danger-border">
                       &quot;{order.rejectedReason}&quot;
                     </p>
-                    <p className="text-[11px] text-rose-700">
+                    <p className="text-[11px] text-danger-text">
                       Please verify your deposit against the instructions below and resubmit your payment
                       proof, or cancel this order.
                     </p>
@@ -473,7 +473,7 @@ export function OrderDetailView({
                     Writer&apos;s Payment Instructions
                   </h3>
                 </div>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-warning-soft text-warning-text border border-warning-border">
                   {order.paymentMethod}
                 </span>
               </div>
@@ -501,22 +501,22 @@ export function OrderDetailView({
               </div>
 
               {/* Exact Amount & Reference Warning */}
-              <div className="rounded-xl bg-amber-50/80 border border-amber-200 p-3.5 space-y-2 text-xs">
+              <div className="rounded-xl bg-warning-soft/80 border border-warning-border p-3.5 space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-amber-950 font-medium">
+                  <span className="text-warning-text font-medium">
                     Payment Reference / Note:{' '}
-                    <span className="font-mono font-bold text-amber-900">{order.orderNumber}</span>
+                    <span className="font-mono font-bold text-warning-text">{order.orderNumber}</span>
                   </span>
                   <CopyButton text={order.orderNumber} label="Copy Ref" />
                 </div>
-                <p className="text-[11px] text-amber-900 leading-relaxed">
-                  <strong className="text-amber-950 font-bold">Important:</strong> Transfer exactly{' '}
-                  <strong className="text-amber-950 font-bold">{formatPKR(order.amountPkr)}</strong> to the author&apos;s
-                  account. Include <strong className="text-amber-950 font-bold">{order.orderNumber}</strong> in your
+                <p className="text-[11px] text-warning-text leading-relaxed">
+                  <strong className="text-warning-text font-bold">Important:</strong> Transfer exactly{' '}
+                  <strong className="text-warning-text font-bold">{formatPKR(order.amountPkr)}</strong> to the author&apos;s
+                  account. Include <strong className="text-warning-text font-bold">{order.orderNumber}</strong> in your
                   bank transfer note for faster verification.
                 </p>
                 {instructionsNote && (
-                  <p className="text-[11px] text-amber-900/80 italic pt-1 border-t border-amber-200/60">
+                  <p className="text-[11px] text-warning-text/80 italic pt-1 border-t border-warning-border/60">
                     Author note: &quot;{instructionsNote}&quot;
                   </p>
                 )}
@@ -538,7 +538,7 @@ export function OrderDetailView({
                 {/* TID */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-secondary block">
-                    Transaction Reference (TID) <span className="text-rose-500">*</span>
+                    Transaction Reference (TID) <span className="text-danger-text">*</span>
                   </label>
                   <input
                     type="text"
@@ -556,7 +556,7 @@ export function OrderDetailView({
                 {/* Amount Paid Claimed */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-secondary block">
-                    Amount Paid (PKR) <span className="text-rose-500">*</span>
+                    Amount Paid (PKR) <span className="text-danger-text">*</span>
                   </label>
                   <input
                     type="number"
@@ -568,7 +568,7 @@ export function OrderDetailView({
                     className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-border text-base sm:text-xs text-navy focus:outline-none focus:border-accent focus:bg-white transition-colors font-mono min-h-[44px]"
                   />
                   {claimedAmount !== order.amountPkr && (
-                    <p className="text-[10px] text-amber-700 font-medium">
+                    <p className="text-[10px] text-warning-text font-medium">
                       Amount differs from invoice total ({formatPKR(order.amountPkr)}).
                     </p>
                   )}
@@ -611,7 +611,7 @@ export function OrderDetailView({
               {/* Screenshot Proof Uploader */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-secondary block">
-                  Payment Screenshot Proof <span className="text-rose-500">*</span>
+                  Payment Screenshot Proof <span className="text-danger-text">*</span>
                 </label>
                 <ImageUploader
                   bucket="payment-proofs"
@@ -630,7 +630,7 @@ export function OrderDetailView({
                   type="button"
                   onClick={() => setShowCancelModal(true)}
                   disabled={isPending}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-secondary hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[44px] flex items-center justify-center cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-secondary hover:text-danger-text hover:bg-danger-soft transition-colors min-h-[44px] flex items-center justify-center cursor-pointer"
                 >
                   Cancel Order
                 </button>
@@ -638,7 +638,7 @@ export function OrderDetailView({
                 <button
                   type="submit"
                   disabled={isPending || !tid.trim() || !screenshotPath}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-warning disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px]"
                 >
                   {isPending ? (
                     <>
@@ -673,7 +673,7 @@ export function OrderDetailView({
                     }
                   }}
                   disabled={isPending || !tid.trim() || !screenshotPath}
-                  className="flex-1 max-w-[210px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
+                  className="flex-1 max-w-[210px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-warning disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
                 >
                   {isPending ? (
                     <>
@@ -701,7 +701,7 @@ export function OrderDetailView({
             <div className="rounded-2xl bg-surface border border-border p-5 space-y-4 shadow-sm">
               <div className="flex items-center justify-between border-b border-border pb-3">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-blue-600" />
+                  <Clock className="w-4 h-4 text-info-text" />
                   <h3 className="text-xs font-bold uppercase tracking-wider text-navy">
                     Submitted Payment Details
                   </h3>
@@ -746,13 +746,13 @@ export function OrderDetailView({
             </div>
 
             {/* Waiting info & Dispute action after 24h */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-info-soft border border-info-border text-xs text-info-text">
               <div className="space-y-1">
-                <p className="font-semibold text-blue-900">The author has been notified</p>
-                <p className="text-[11px] text-blue-800">
+                <p className="font-semibold text-info-text">The author has been notified</p>
+                <p className="text-[11px] text-info-text">
                   Verification usually occurs within a few hours. If the author does not respond within {minDisputeWaitHours} hours, you can raise an administrative dispute.
                   {!waitStatus.canDispute && (
-                    <span className="block text-amber-800 mt-1 font-medium">
+                    <span className="block text-warning-text mt-1 font-medium">
                       Cooldown active: Dispute option available in {waitStatus.remainingHours}h {waitStatus.remainingMinutes}m.
                     </span>
                   )}
@@ -763,7 +763,7 @@ export function OrderDetailView({
                 <button
                   type="button"
                   onClick={() => setShowDisputeModal(true)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-rose-700 hover:text-rose-800 bg-rose-100 hover:bg-rose-200 border border-rose-300 transition-colors shrink-0"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-danger-text hover:text-danger-text bg-danger-soft hover:bg-danger-soft border border-danger-border transition-colors shrink-0"
                 >
                   Raise a Dispute
                 </button>
@@ -786,13 +786,13 @@ export function OrderDetailView({
         {/* ========================================================================= */}
         {order.status === 'verified' && (
           <div className="space-y-6 pt-2">
-            <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-6 text-center space-y-4 shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+            <div className="rounded-2xl bg-success-soft border border-success-border p-6 text-center space-y-4 shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-success-soft text-success-text flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-bold font-serif text-emerald-950">Your Access is Active!</h3>
-                <p className="text-xs text-emerald-800 max-w-md mx-auto">
+                <h3 className="text-lg font-bold font-serif text-success-text">Your Access is Active!</h3>
+                <p className="text-xs text-success-text max-w-md mx-auto">
                   The author has verified your payment deposit. You can now read all locked and future chapters
                   for this novel in your library.
                 </p>
@@ -820,7 +820,7 @@ export function OrderDetailView({
                 <button
                   type="button"
                   onClick={() => setShowDisputeModal(true)}
-                  className="text-[11px] font-semibold text-secondary hover:text-rose-600 transition-colors flex items-center gap-1"
+                  className="text-[11px] font-semibold text-secondary hover:text-danger-text transition-colors flex items-center gap-1"
                 >
                   <ShieldAlert className="w-3.5 h-3.5" />
                   <span>Report a Problem / Raise Dispute</span>
@@ -834,23 +834,23 @@ export function OrderDetailView({
         {/* CASE 4: DISPUTED / CANCELLED / REFUNDED EXPLANATIONS                     */}
         {/* ========================================================================= */}
         {order.status === 'disputed' && (
-          <div className="rounded-2xl bg-purple-50 border border-purple-200 p-5 space-y-3 text-xs text-purple-950 shadow-sm">
-            <div className="flex items-center gap-2 text-purple-900 font-bold uppercase tracking-wider">
+          <div className="rounded-2xl bg-info-soft border border-info-border p-5 space-y-3 text-xs text-info-text shadow-sm">
+            <div className="flex items-center gap-2 text-info-text font-bold uppercase tracking-wider">
               <ShieldAlert className="w-4 h-4" />
               <span>Dispute In Review</span>
             </div>
-            <p className="text-purple-800">
+            <p className="text-info-text">
               This order is actively being reviewed by platform administrators. Both parties’ submission
               records and banking statements are being evaluated.
             </p>
             {disputes.length > 0 && (
-              <div className="bg-white p-3 rounded-xl border border-purple-200 text-[11px] space-y-2">
-                <span className="text-purple-900 block font-semibold">Dispute Details</span>
+              <div className="bg-white p-3 rounded-xl border border-info-border text-[11px] space-y-2">
+                <span className="text-info-text block font-semibold">Dispute Details</span>
                 <p className="text-navy font-mono">&quot;{disputes[0].reason}&quot;</p>
                 <div className="pt-1">
                   <Link
                     href={`/disputes/${disputes[0].id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-900 bg-purple-100 hover:bg-purple-200 border border-purple-300 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-info-text bg-info-soft hover:bg-info-soft border border-info-border transition-colors"
                   >
                     <span>Open Dispute Thread & Evidence / گفتگو دیکھیں</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -969,7 +969,7 @@ export function OrderDetailView({
                 type="button"
                 onClick={handleCancelOrder}
                 disabled={isPending}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 disabled:opacity-50 transition-colors shadow-sm"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-danger hover:bg-danger disabled:opacity-50 transition-colors shadow-sm"
               >
                 {isPending ? 'Cancelling...' : 'Confirm Cancellation'}
               </button>
@@ -986,7 +986,7 @@ export function OrderDetailView({
           <div className="max-w-md w-full bg-surface border border-border rounded-2xl p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-bold font-serif text-navy flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-purple-600" />
+                <ShieldAlert className="w-4 h-4 text-info-text" />
                 <span>Open Administrative Dispute</span>
               </h3>
               <button
@@ -1005,7 +1005,7 @@ export function OrderDetailView({
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-secondary block">
-                Dispute Reason <span className="text-rose-500">*</span>
+                Dispute Reason <span className="text-danger-text">*</span>
               </label>
               <textarea
                 rows={4}
@@ -1031,7 +1031,7 @@ export function OrderDetailView({
                 type="button"
                 onClick={handleOpenDispute}
                 disabled={isPending || disputeReason.trim().length < 10}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 disabled:opacity-50 transition-colors shadow-sm"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover disabled:opacity-50 transition-colors shadow-sm"
               >
                 {isPending ? 'Submitting...' : 'Submit Dispute'}
               </button>

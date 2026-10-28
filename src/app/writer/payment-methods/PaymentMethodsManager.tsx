@@ -184,22 +184,22 @@ export function PaymentMethodsManager({
     <div className="space-y-6">
       {/* Alert Notices */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <p className="text-xs font-medium">{successMessage}</p>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
         </div>
       )}
 
       {/* Educational Banner regarding Pakistani Direct Rails */}
-      <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-amber-900 flex items-start gap-4 shadow-sm">
-        <div className="p-2.5 rounded-xl bg-amber-100/80 text-amber-800 shrink-0 mt-0.5">
+      <div className="p-5 rounded-2xl bg-warning-soft/70 border border-warning-border text-warning-text flex items-start gap-4 shadow-sm">
+        <div className="p-2.5 rounded-xl bg-warning-soft/80 text-warning-text shrink-0 mt-0.5">
           <Info className="w-5 h-5" />
         </div>
         <div className="text-xs space-y-1.5 leading-relaxed">
@@ -286,7 +286,7 @@ export function PaymentMethodsManager({
                             ? `Bank Transfer (${method.bank_name || 'IBAN'})`
                             : method.method_type.toUpperCase()}
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-100 text-emerald-800">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-success-soft text-success-text">
                           Active
                         </span>
                       </div>
@@ -300,17 +300,17 @@ export function PaymentMethodsManager({
                         <button
                           type="button"
                           onClick={() => handleCopy(method.id, method.account_number_or_iban)}
-                          className="p-1 rounded hover:bg-slate-200 text-secondary hover:text-navy transition-colors"
+                          className="p-1 rounded hover:bg-border text-secondary hover:text-navy transition-colors"
                           title="Copy full account number"
                         >
                           {isCopied ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <Check className="w-3.5 h-3.5 text-success" />
                           ) : (
                             <Copy className="w-3.5 h-3.5" />
                           )}
                         </button>
                         {isCopied && (
-                          <span className="text-[10px] text-emerald-600 font-sans font-medium">
+                          <span className="text-[10px] text-success font-sans font-medium">
                             Copied!
                           </span>
                         )}
@@ -338,7 +338,7 @@ export function PaymentMethodsManager({
                     <button
                       type="button"
                       onClick={() => setConfirmDeactivateId(method.id)}
-                      className="p-2 rounded-lg text-secondary hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors text-xs font-medium flex items-center gap-1"
+                      className="p-2 rounded-lg text-secondary hover:text-danger-text hover:bg-danger-soft border border-transparent hover:border-danger-border transition-colors text-xs font-medium flex items-center gap-1"
                       title="Deactivate method"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -405,7 +405,7 @@ export function PaymentMethodsManager({
               {/* Method Type Select */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-main">
-                  Payment Method Type <span className="text-rose-500">*</span>
+                  Payment Method Type <span className="text-danger-text">*</span>
                 </label>
                 <select
                   value={formData.method_type}
@@ -415,7 +415,7 @@ export function PaymentMethodsManager({
                       method_type: e.target.value as PaymentMethodType,
                     }))
                   }
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="jazzcash">JazzCash Mobile Wallet</option>
                   <option value="easypaisa">EasyPaisa Mobile Wallet</option>
@@ -427,7 +427,7 @@ export function PaymentMethodsManager({
               {/* Account Title */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-main">
-                  Account Title (Full Name as shown on Bank/Wallet) <span className="text-rose-500">*</span>
+                  Account Title (Full Name as shown on Bank/Wallet) <span className="text-danger-text">*</span>
                 </label>
                 <input
                   type="text"
@@ -436,11 +436,11 @@ export function PaymentMethodsManager({
                     setFormData((prev) => ({ ...prev, account_title: e.target.value }))
                   }
                   placeholder="e.g. Muhammad Usman Tariq"
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                   required
                 />
                 {fieldErrors.account_title && (
-                  <p className="text-xs text-rose-600">{fieldErrors.account_title[0]}</p>
+                  <p className="text-xs text-danger-text">{fieldErrors.account_title[0]}</p>
                 )}
               </div>
 
@@ -448,7 +448,7 @@ export function PaymentMethodsManager({
               {formData.method_type === 'bank_iban' && (
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold text-main">
-                    Bank Name <span className="text-rose-500">*</span>
+                    Bank Name <span className="text-danger-text">*</span>
                   </label>
                   <input
                     type="text"
@@ -457,11 +457,11 @@ export function PaymentMethodsManager({
                       setFormData((prev) => ({ ...prev, bank_name: e.target.value }))
                     }
                     placeholder="e.g. Meezan Bank, HBL, Bank Alfalah"
-                    className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                     required
                   />
                   {fieldErrors.bank_name && (
-                    <p className="text-xs text-rose-600">{fieldErrors.bank_name[0]}</p>
+                    <p className="text-xs text-danger-text">{fieldErrors.bank_name[0]}</p>
                   )}
                 </div>
               )}
@@ -473,7 +473,7 @@ export function PaymentMethodsManager({
                     ? '24-Character Pakistani IBAN'
                     : formData.method_type === 'raast'
                     ? 'Raast ID (Mobile Number or PK IBAN)'
-                    : '11-Digit Mobile Number (03XXXXXXXXX)'} <span className="text-rose-500">*</span>
+                    : '11-Digit Mobile Number (03XXXXXXXXX)'} <span className="text-danger-text">*</span>
                 </label>
                 <input
                   type="text"
@@ -486,11 +486,11 @@ export function PaymentMethodsManager({
                       ? 'PK36SCBL0000001123456701'
                       : '03001234567'
                   }
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs font-mono focus:outline-none focus:ring-2 focus:ring-accent uppercase"
+                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs font-mono focus:outline-none focus:ring-2 focus:ring-ring uppercase"
                   required
                 />
                 {fieldErrors.account_number_or_iban && (
-                  <p className="text-xs text-rose-600">
+                  <p className="text-xs text-danger-text">
                     {fieldErrors.account_number_or_iban[0]}
                   </p>
                 )}
@@ -513,7 +513,7 @@ export function PaymentMethodsManager({
                     setFormData((prev) => ({ ...prev, instructions_note: e.target.value }))
                   }
                   placeholder="e.g. Please send screenshot with TID via WhatsApp"
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-ivory text-main text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -549,7 +549,7 @@ export function PaymentMethodsManager({
       {confirmDeactivateId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
               <ShieldAlert className="w-6 h-6" />
             </div>
 
@@ -574,7 +574,7 @@ export function PaymentMethodsManager({
                 type="button"
                 disabled={deactivatingId === confirmDeactivateId}
                 onClick={() => handleDeactivate(confirmDeactivateId)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger-hover disabled:opacity-50"
               >
                 {deactivatingId === confirmDeactivateId ? (
                   <>

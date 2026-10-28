@@ -122,7 +122,7 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
               <h1 className="font-serif text-3xl md:text-4xl font-bold text-white">
                 {genre.name_english}
               </h1>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-text-muted">
                 {totalCount} {totalCount === 1 ? "published novel" : "published novels"} in this collection
               </p>
             </div>

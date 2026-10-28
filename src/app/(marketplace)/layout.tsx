@@ -9,10 +9,13 @@ export default function MarketplaceLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-clip flex flex-col bg-background text-main">
+    <div
+      data-area="marketplace"
+      className="min-h-screen w-full max-w-full overflow-x-clip flex flex-col bg-bg text-text"
+    >
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-navy text-accent px-4 py-2 rounded-lg shadow-lg font-semibold border border-accent/40"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-primary text-primary-contrast px-4 py-2 rounded-lg shadow-lg font-semibold border border-border"
       >
         Skip to main content
       </a>

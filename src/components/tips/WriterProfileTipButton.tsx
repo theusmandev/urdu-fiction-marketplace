@@ -108,13 +108,13 @@ export function WriterProfileTipButton({
     return (
       <div
         data-testid="owner-tip-note"
-        className={`inline-flex flex-wrap items-center gap-2 px-3.5 py-2 rounded-xl border border-amber-300/60 dark:border-amber-800/60 bg-amber-50/50 dark:bg-amber-950/20 text-xs text-amber-900 dark:text-amber-200 ${className}`}
+        className={`inline-flex flex-wrap items-center gap-2 px-3.5 py-2 rounded-xl border border-warning-border/60  bg-warning-soft/50  text-xs text-warning-text  ${className}`}
       >
-        <Heart className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+        <Heart className="w-3.5 h-3.5 text-accent-strong dark:text-accent-strong shrink-0" />
         <span>Readers see a &ldquo;Say thanks&rdquo; button here.</span>
         <Link
           href="/writer/tips"
-          className="font-medium underline hover:text-amber-700 dark:hover:text-amber-300 inline-flex items-center gap-1"
+          className="font-medium underline hover:text-warning-text inline-flex items-center gap-1"
         >
           <span>Manage tip settings</span>
           <span aria-hidden="true">&rarr;</span>
@@ -137,15 +137,15 @@ export function WriterProfileTipButton({
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className="inline-flex items-baseline gap-2 px-4 py-2 rounded-xl border border-amber-300/80 dark:border-amber-800/80 bg-amber-50/60 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 font-medium hover:bg-amber-100/60 dark:hover:bg-amber-900/30 transition-all min-h-[44px] shadow-xs active:scale-[0.99] touch-manipulation cursor-pointer"
+        className="inline-flex items-baseline gap-2 px-4 py-2 rounded-xl border border-warning-border/80 bg-warning-soft/60 text-warning-text font-medium hover:bg-warning-soft/60 transition-all min-h-[44px] shadow-xs active:scale-[0.99] touch-manipulation cursor-pointer"
       >
-        <Heart className="w-4 h-4 fill-amber-500/20 text-amber-700 dark:text-amber-400 self-center shrink-0" />
+        <Heart className="w-4 h-4 fill-accent-strong/20 text-warning-text dark:text-accent-strong self-center shrink-0" />
         <span className="text-sm font-medium">{TIP_CARD_COPY.title}</span>
-        <span className="text-amber-400/60 dark:text-amber-600/60 font-light text-xs self-center">/</span>
+        <span className="text-accent-strong/60 dark:text-accent-strong/60 font-light text-xs self-center">/</span>
         <span
           dir="rtl"
           lang="ur"
-          className="font-urdu text-[1.1rem] leading-none text-amber-900 dark:text-amber-200"
+          className="font-urdu text-[1.1rem] leading-none text-warning-text"
         >
           {TIP_CARD_COPY.titleUrdu}
         </span>

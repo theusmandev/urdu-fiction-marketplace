@@ -137,14 +137,14 @@ export function AdminRefundsClient({
         <div
           className={`p-4 rounded-xl text-xs flex items-center gap-2.5 ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-              : 'bg-rose-50 border border-rose-200 text-rose-700'
+              ? 'bg-success-soft border border-success-border text-success-text'
+              : 'bg-danger-soft border border-danger-border text-danger-text'
           }`}
         >
           {feedback.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
           )}
           <span>{feedback.message}</span>
         </div>
@@ -207,7 +207,7 @@ export function AdminRefundsClient({
                         <Link
                           href={`/admin/orders?search=${encodeURIComponent(req.order_number)}`}
                           target="_blank"
-                          className="font-mono font-bold text-brand-gold text-xs hover:underline inline-flex items-center gap-1 whitespace-nowrap"
+                          className="font-mono font-bold text-accent-strong text-xs hover:underline inline-flex items-center gap-1 whitespace-nowrap"
                         >
                           <span>#{req.order_number}</span>
                           <ExternalLink className="w-3 h-3 text-muted" />
@@ -225,7 +225,7 @@ export function AdminRefundsClient({
                       <td className="py-2.5 px-3 sm:px-4 space-y-1 max-w-[180px]">
                         <div className="text-[11px]">
                           <span className="text-muted">Author: </span>
-                          <span className="text-brand-gold font-medium truncate inline-block max-w-[120px] align-bottom" title={req.writer_pen_name}>
+                          <span className="text-accent-strong font-medium truncate inline-block max-w-[120px] align-bottom" title={req.writer_pen_name}>
                             {req.writer_pen_name}
                           </span>
                         </div>
@@ -273,10 +273,10 @@ export function AdminRefundsClient({
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                             meta.variant === 'warning'
-                              ? 'bg-amber-50 text-amber-800 border-amber-200'
+                              ? 'bg-warning-soft text-warning-text border-warning-border'
                               : meta.variant === 'success'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-rose-50 text-rose-700 border-rose-200'
+                              ? 'bg-success-soft text-success-text border-success-border'
+                              : 'bg-danger-soft text-danger-text border-danger-border'
                           }`}
                         >
                           {meta.label}
@@ -301,7 +301,7 @@ export function AdminRefundsClient({
                                 setAdminNote('');
                                 setFeedback(null);
                               }}
-                              className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors shadow-sm"
+                              className="px-2.5 py-1.5 bg-success-soft hover:bg-success-soft text-success-text border border-success-border rounded-lg text-xs font-semibold transition-colors shadow-sm"
                             >
                               Approve
                             </button>
@@ -313,7 +313,7 @@ export function AdminRefundsClient({
                                 setAdminNote('');
                                 setFeedback(null);
                               }}
-                              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition-colors shadow-sm"
+                              className="px-2.5 py-1.5 bg-danger-soft hover:bg-danger-soft text-danger-text border border-danger-border rounded-lg text-xs font-semibold transition-colors shadow-sm"
                             >
                               Decline
                             </button>
@@ -389,8 +389,8 @@ export function AdminRefundsClient({
             <div
               className={`p-3.5 rounded-xl text-xs space-y-1.5 border ${
                 actionType === 'approve'
-                  ? 'bg-amber-50 border-amber-200 text-amber-800'
-                  : 'bg-rose-50 border-rose-200 text-rose-700'
+                  ? 'bg-warning-soft border-warning-border text-warning-text'
+                  : 'bg-danger-soft border-danger-border text-danger-text'
               }`}
             >
               <div className="font-bold flex items-center gap-1.5">
@@ -406,14 +406,14 @@ export function AdminRefundsClient({
 
             <div className="space-y-2">
               <label className="block text-xs font-bold text-main">
-                Administrative Reason / Review Note <span className="text-rose-600">*</span>
+                Administrative Reason / Review Note <span className="text-danger-text">*</span>
               </label>
               <textarea
                 rows={3}
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="State the justification, bank reference, or reason for this ruling..."
-                className="w-full bg-surface-muted border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-y placeholder-muted"
+                className="w-full bg-surface-muted border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin resize-y placeholder-muted"
               />
             </div>
 
@@ -435,8 +435,8 @@ export function AdminRefundsClient({
                 disabled={isPending || !adminNote.trim()}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm ${
                   actionType === 'approve'
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                    : 'bg-rose-600 hover:bg-rose-500 text-white'
+                    ? 'bg-success hover:bg-success text-white'
+                    : 'bg-danger hover:bg-danger text-white'
                 } disabled:opacity-50`}
               >
                 {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

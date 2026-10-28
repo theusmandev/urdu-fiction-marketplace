@@ -63,8 +63,8 @@ export default async function MyTipsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/80 pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300">
-              <Heart className="w-5 h-5 fill-amber-600/30" />
+            <div className="p-2 rounded-xl bg-warning-soft/80 text-warning-text">
+              <Heart className="w-5 h-5 fill-accent-strong/30" />
             </div>
             <h1 className="text-2xl font-bold font-serif text-main">My Thanks</h1>
             <UrduText as="span" size="sm" className="text-secondary py-0">
@@ -87,7 +87,7 @@ export default async function MyTipsPage() {
 
       {/* Error state if RPC failed */}
       {tipsError && (
-        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 flex items-start gap-3 text-sm text-rose-800 dark:text-rose-300">
+        <div className="p-4 rounded-2xl bg-danger-soft border border-danger-border flex items-start gap-3 text-sm text-danger-text">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold">Unable to load tips</p>
@@ -122,14 +122,14 @@ export default async function MyTipsPage() {
             return (
               <div
                 key={tip.id}
-                className="p-5 sm:p-6 rounded-2xl bg-surface border border-border/80 hover:border-amber-300/80 transition-all shadow-xs space-y-4"
+                className="p-5 sm:p-6 rounded-2xl bg-surface border border-border/80 hover:border-warning-border/80 transition-all shadow-xs space-y-4"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2.5">
                       <Link
                         href={`/tips/${tip.tip_number}`}
-                        className="font-mono text-xs font-bold text-main hover:text-amber-700 dark:hover:text-amber-400 transition-colors"
+                        className="font-mono text-xs font-bold text-main hover:text-warning-text dark:hover:text-accent-strong transition-colors"
                       >
                         {tip.tip_number}
                       </Link>
@@ -178,8 +178,8 @@ export default async function MyTipsPage() {
 
                 {/* Author's Thank You Reply if confirmed */}
                 {tip.status === 'confirmed' && tip.writer_reply && (
-                  <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-xs text-main space-y-1">
-                    <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-medium">
+                  <div className="p-3.5 rounded-xl bg-warning-soft/70 border border-warning-border/60 text-xs text-main space-y-1">
+                    <div className="flex items-center gap-1.5 text-warning-text font-medium">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Author&apos;s thank-you message</span>
                     </div>

@@ -57,13 +57,13 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
   const totalPages = Math.ceil(response.total_count / limit) || 1;
 
   const statusBadges: Record<string, { label: string; bg: string; text: string }> = {
-    pending_payment: { label: 'Pending Payment', bg: 'bg-stone-100 text-stone-700 border-stone-200', text: 'text-stone-700' },
-    payment_submitted: { label: 'Payment Submitted', bg: 'bg-amber-50 text-amber-800 border-amber-200', text: 'text-amber-800' },
-    verified: { label: 'Verified', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', text: 'text-emerald-700' },
-    rejected: { label: 'Rejected', bg: 'bg-rose-50 text-rose-700 border-rose-200', text: 'text-rose-700' },
-    disputed: { label: 'Disputed', bg: 'bg-purple-50 text-purple-700 border-purple-200', text: 'text-purple-700' },
-    cancelled: { label: 'Cancelled', bg: 'bg-stone-100 text-stone-600 border-stone-200', text: 'text-stone-600' },
-    refunded_adjusted: { label: 'Refunded / Adjusted', bg: 'bg-blue-50 text-blue-700 border-blue-200', text: 'text-blue-700' },
+    pending_payment: { label: 'Pending Payment', bg: 'bg-surface-muted text-text border-border', text: 'text-text' },
+    payment_submitted: { label: 'Payment Submitted', bg: 'bg-warning-soft text-warning-text border-warning-border', text: 'text-warning-text' },
+    verified: { label: 'Verified', bg: 'bg-success-soft text-success-text border-success-border', text: 'text-success-text' },
+    rejected: { label: 'Rejected', bg: 'bg-danger-soft text-danger-text border-danger-border', text: 'text-danger-text' },
+    disputed: { label: 'Disputed', bg: 'bg-info-soft text-info-text border-info-border', text: 'text-info-text' },
+    cancelled: { label: 'Cancelled', bg: 'bg-surface-muted text-text-muted border-border', text: 'text-text-muted' },
+    refunded_adjusted: { label: 'Refunded / Adjusted', bg: 'bg-info-soft text-info-text border-info-border', text: 'text-info-text' },
   };
 
   return (
@@ -93,11 +93,11 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
             href="/admin/orders?stuck=true"
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border ${
               onlyStuck
-                ? 'bg-amber-50 text-amber-800 border-amber-300'
+                ? 'bg-warning-soft text-warning-text border-warning-border'
                 : 'bg-surface-muted hover:bg-surface text-main border-border'
             }`}
           >
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
+            <Clock className="w-3.5 h-3.5 text-accent-strong" />
             <span>Stuck &gt; 24h</span>
           </Link>
           <Link
@@ -158,14 +158,14 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
             name="search"
             defaultValue={currentSearch}
             placeholder="Search order #, novel, reader..."
-            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-4 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-4 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin transition-colors"
           />
         </form>
       </div>
 
       {/* Orders List */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs">
           Failed to load orders: {error.message}
         </div>
       )}
@@ -234,7 +234,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                       <td className="px-3 py-2.5 text-main max-w-[140px] truncate break-words" title={order.writer_pen_name}>
                         {order.writer_pen_name}
                       </td>
-                      <td className="px-3 py-2.5 font-mono font-semibold text-emerald-700 whitespace-nowrap">
+                      <td className="px-3 py-2.5 font-mono font-semibold text-success-text whitespace-nowrap">
                         {formatPKR(order.amount_pkr)}
                       </td>
                       <td className="px-3 py-2.5 whitespace-nowrap">
@@ -245,13 +245,13 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                             {badge.label}
                           </span>
                           {order.is_stuck && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-warning-soft text-warning-text border border-warning-border flex items-center gap-1">
                               <Clock className="w-2.5 h-2.5" />
                               <span>Stuck</span>
                             </span>
                           )}
                           {order.has_duplicate_submission && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-danger-soft text-danger-text border border-danger-border">
                               Duplicate TID
                             </span>
                           )}
@@ -307,7 +307,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                     </p>
                     <div className="flex items-center justify-between text-muted text-[11px]">
                       <span>Reader: {order.reader_display_name}</span>
-                      <span className="font-mono text-emerald-700 font-bold">
+                      <span className="font-mono text-success-text font-bold">
                         {formatPKR(order.amount_pkr)}
                       </span>
                     </div>
@@ -319,12 +319,12 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                   {(order.is_stuck || order.has_duplicate_submission) && (
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {order.is_stuck && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-warning-soft text-warning-text border border-warning-border">
                           Stuck &gt; 24h
                         </span>
                       )}
                       {order.has_duplicate_submission && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-danger-soft text-danger-text border border-danger-border">
                           Duplicate TID Warning
                         </span>
                       )}

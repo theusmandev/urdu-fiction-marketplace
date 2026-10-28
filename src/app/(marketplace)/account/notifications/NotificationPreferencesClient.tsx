@@ -55,14 +55,14 @@ export function NotificationPreferencesClient({
         <div
           className={`p-3.5 rounded-xl text-xs flex items-center gap-2.5 ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+              ? 'bg-success-soft border border-success-border text-success-text'
+              : 'bg-danger-soft border border-danger-border text-danger-text'
           }`}
         >
           {feedback.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
           )}
           <span>{feedback.message}</span>
         </div>
@@ -86,7 +86,7 @@ export function NotificationPreferencesClient({
               onChange={(e) => handleToggle(e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent" />
+            <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent" />
           </label>
         </div>
 
@@ -101,7 +101,7 @@ export function NotificationPreferencesClient({
       {/* Critical System Notice Policy */}
       <div className="rounded-2xl bg-surface-muted border border-border p-6 space-y-4">
         <div className="flex items-center gap-2 text-xs font-bold text-navy uppercase tracking-wider">
-          <Lock className="w-4 h-4 text-purple-600" />
+          <Lock className="w-4 h-4 text-info-text" />
           <span>Critical Transaction &amp; Security Notices (Always Sent)</span>
         </div>
         <p className="text-xs text-secondary leading-relaxed">
@@ -112,19 +112,19 @@ export function NotificationPreferencesClient({
 
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-navy">
           <li className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-border shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-success shrink-0" />
             <span>Payment Verified / Rejected Notices</span>
           </li>
           <li className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-border shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-accent-strong shrink-0" />
             <span>Dispute Opened &amp; Resolution Decisions</span>
           </li>
           <li className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-border shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-rose-600 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-danger-text shrink-0" />
             <span>Platform Fee Invoice &amp; Overdue Warnings</span>
           </li>
           <li className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-border shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-info-text shrink-0" />
             <span>Author &amp; Novel Editorial Approvals</span>
           </li>
         </ul>

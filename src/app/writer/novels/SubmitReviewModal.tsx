@@ -151,8 +151,8 @@ export function SubmitReviewModal({
         </div>
 
         {errorMessage && (
-          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2 text-xs">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <div className="p-3.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-2 text-xs">
+            <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
@@ -170,15 +170,15 @@ export function SubmitReviewModal({
               >
                   <div className="flex items-center gap-2.5">
                     {item.passed ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                     ) : (
-                      <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                      <XCircle className="w-4 h-4 text-danger-text shrink-0" />
                     )}
                     <span
                       className={
                         item.passed
                           ? 'text-main font-medium'
-                          : 'text-rose-700 font-semibold'
+                          : 'text-danger-text font-semibold'
                       }
                     >
                       {item.label}

@@ -87,15 +87,15 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
                 statusMeta.variant === 'warning'
-                  ? 'bg-amber-50 text-amber-800 border-amber-200'
+                  ? 'bg-warning-soft text-warning-text border-warning-border'
                   : statusMeta.variant === 'success'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-stone-100 text-stone-600 border-stone-200'
+                  ? 'bg-success-soft text-success-text border-success-border'
+                  : 'bg-surface-muted text-text-muted border-border'
               }`}
             >
               {statusMeta.label}
             </span>
-            <span className="text-xs text-brand-gold font-urdu">{statusMeta.urduLabel}</span>
+            <span className="text-xs text-accent-strong font-urdu">{statusMeta.urduLabel}</span>
           </div>
         </div>
 
@@ -118,14 +118,14 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
         <div
           className={`p-4 rounded-xl text-xs flex items-center gap-2.5 ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-              : 'bg-rose-50 border border-rose-200 text-rose-700'
+              ? 'bg-success-soft border border-success-border text-success-text'
+              : 'bg-danger-soft border border-danger-border text-danger-text'
           }`}
         >
           {feedback.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
           )}
           <span>{feedback.message}</span>
         </div>
@@ -149,7 +149,7 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
             <Link
               href={`/admin/orders?search=${encodeURIComponent(request.order_number)}`}
               target="_blank"
-              className="font-mono font-bold text-brand-gold hover:underline inline-flex items-center gap-1"
+              className="font-mono font-bold text-accent-strong hover:underline inline-flex items-center gap-1"
             >
               <span>#{request.order_number}</span>
               <ExternalLink className="w-3 h-3 text-muted" />
@@ -227,7 +227,7 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
                 value={replyBody}
                 onChange={(e) => setReplyBody(e.target.value)}
                 placeholder="Type your response to the user..."
-                className="w-full bg-surface-muted border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin resize-y placeholder-muted transition-colors"
+                className="w-full bg-surface-muted border border-border text-main text-xs p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin resize-y placeholder-muted transition-colors"
               />
               <div className="flex justify-end">
                 <button

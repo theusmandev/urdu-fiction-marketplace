@@ -11,7 +11,9 @@
     "check:sql": "node scripts/check-sql-syntax-constructs.mjs",
     "check:frontend": "node scripts/check-frontend-queries.mjs",
     "check:links": "node scripts/check-internal-links.mjs",
-    "check:terms": "node scripts/check-terminology.mjs"
+    "check:terms": "node scripts/check-terminology.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:colors": "node scripts/check-colors.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

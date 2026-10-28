@@ -84,12 +84,12 @@ function CopyTidButton({ tid }: { tid: string }) {
       type="button"
       onClick={handleCopy}
       title="Copy TID"
-      className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 transition-colors cursor-pointer"
+      className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-strong hover:text-warning-text bg-warning-soft hover:bg-warning-soft px-2 py-0.5 rounded border border-warning-border transition-colors cursor-pointer"
     >
       {copied ? (
         <>
-          <Check className="w-3 h-3 text-emerald-600" />
-          <span className="text-emerald-700">Copied</span>
+          <Check className="w-3 h-3 text-success" />
+          <span className="text-success-text">Copied</span>
         </>
       ) : (
         <>
@@ -128,7 +128,7 @@ function WriterScreenshotThumbnail({ path }: { path: string }) {
   if (loading) {
     return (
       <div className="w-20 h-20 rounded-xl bg-ivory border border-border flex items-center justify-center text-secondary">
-        <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
+        <Loader2 className="w-4 h-4 animate-spin text-accent-strong" />
       </div>
     );
   }
@@ -305,27 +305,27 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning-soft text-warning-text">
             {awaitingOrders.length} Awaiting Verification
           </span>
         </div>
       </div>
 
       {/* Writer Obligation & Legal Compliance Notice */}
-      <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 sm:p-5 space-y-2">
+      <div className="rounded-2xl bg-warning/10 border border-warning-border/20 p-4 sm:p-5 space-y-2">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-accent-strong shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-amber-800">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-warning-text">
               Writer Verification Agreement & Platform Fee Policy
             </h2>
-            <p className="text-xs text-stone-700 leading-relaxed">
+            <p className="text-xs text-text leading-relaxed">
               Verifying an order immediately creates the reader’s permanent access to your novel and records a platform
               fee obligation on your writer balance. False verification or hiding completed sales violates the writer agreement
               and can result in store suspension.
             </p>
             <div className="pt-0.5">
-              <UrduText as="p" size="xs" className="text-amber-900 leading-[2.2]">
+              <UrduText as="p" size="xs" className="text-warning-text leading-[2.2]">
                 تصدیق کرنے سے قاری کو فوری رسائی مل جائے گی اور پلیٹ فارم فیس ریکارڈ ہو گی۔ غلط تصدیق یا خفیہ فروخت معاہدے کی خلاف ورزی ہے۔
               </UrduText>
             </div>
@@ -345,7 +345,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           }`}
         >
           <span>Awaiting Verification</span>
-          <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-semibold">
+          <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-warning-soft text-warning-text font-semibold">
             {awaitingOrders.length}
           </span>
         </button>
@@ -360,7 +360,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           }`}
         >
           <span>Verified Orders</span>
-          <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-semibold">
+          <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-success-soft text-success-text font-semibold">
             {verifiedOrders.length}
           </span>
         </button>
@@ -375,7 +375,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           }`}
         >
           <span>Rejected</span>
-          <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-800 font-semibold">
+          <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-danger-soft text-danger-text font-semibold">
             {rejectedOrders.length}
           </span>
         </button>
@@ -436,12 +436,12 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                     <span
                       className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                         order.status === 'verified'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-success-soft text-success-text'
                           : order.status === 'payment_submitted'
-                          ? 'bg-amber-100 text-amber-800'
+                          ? 'bg-warning-soft text-warning-text'
                           : order.status === 'rejected'
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-stone-100 text-stone-700'
+                          ? 'bg-danger-soft text-danger-text'
+                          : 'bg-surface-muted text-text'
                       }`}
                     >
                       {order.status.replace('_', ' ')}
@@ -485,9 +485,9 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                       <div className="space-y-3">
                         {/* Duplicate TID Warning Banner */}
                         {activeSubmission.isDuplicateTidFlagged && (
-                          <div className="p-3 rounded-xl bg-rose-50 border border-rose-300 text-xs text-rose-800 space-y-1">
-                            <div className="flex items-center gap-1.5 font-bold text-rose-900">
-                              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                          <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-xs text-danger-text space-y-1">
+                            <div className="flex items-center gap-1.5 font-bold text-danger-text">
+                              <AlertTriangle className="w-4 h-4 text-danger-text shrink-0" />
                               <span>DUPLICATE TID WARNING</span>
                             </div>
                             <p className="text-[11px] leading-relaxed">
@@ -513,13 +513,13 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                               <span className="text-secondary">Reader claims paid: </span>
                               <span
                                 className={`font-bold ${
-                                  hasMismatch ? 'text-rose-600 bg-rose-50 px-1 rounded' : 'text-navy'
+                                  hasMismatch ? 'text-danger-text bg-danger-soft px-1 rounded' : 'text-navy'
                                 }`}
                               >
                                 {formatPKR(activeSubmission.claimedAmount)}
                               </span>
                               {hasMismatch && (
-                                <span className="ml-1 text-[10px] text-rose-600 font-semibold block">
+                                <span className="ml-1 text-[10px] text-danger-text font-semibold block">
                                   ⚠ Amount mismatch with invoice ({formatPKR(order.amountPkr)})!
                                 </span>
                               )}
@@ -563,7 +563,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                             setVerifyTarget({ order, submission: activeSubmission });
                             setVerifyError(null);
                           }}
-                          className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                          className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-success hover:bg-success active:bg-success-hover transition-colors shadow-sm cursor-pointer"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Verify Payment</span>
@@ -576,7 +576,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                             setRejectReason('');
                             setRejectError(null);
                           }}
-                          className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-xs text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors cursor-pointer"
+                          className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-xs text-danger-text bg-danger-soft hover:bg-danger-soft border border-danger-border transition-colors cursor-pointer"
                         >
                           <XCircle className="w-4 h-4" />
                           <span>Reject Proof</span>
@@ -586,8 +586,8 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
 
                     {order.status === 'verified' && (
                       <div className="space-y-2">
-                        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-1">
-                          <div className="flex items-center gap-1 font-bold text-emerald-900">
+                        <div className="p-3 rounded-xl bg-success-soft border border-success-border text-xs text-success-text space-y-1">
+                          <div className="flex items-center gap-1 font-bold text-success-text">
                             <Check className="w-4 h-4" />
                             <span>Verified & Access Active</span>
                           </div>
@@ -597,9 +597,9 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                         </div>
 
                         {order.hasPendingRefund ? (
-                          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 space-y-1">
+                          <div className="p-2.5 rounded-xl bg-warning-soft border border-warning-border text-[11px] text-warning-text space-y-1">
                             <span className="font-bold block">Refund Request Under Review</span>
-                            <p className="text-[10px] text-amber-800">
+                            <p className="text-[10px] text-warning-text">
                               Administrators are verifying your off-platform refund.
                             </p>
                           </div>
@@ -622,19 +622,19 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                     )}
 
                     {order.status === 'refunded_adjusted' && (
-                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 space-y-1">
+                      <div className="p-3 rounded-xl bg-info-soft border border-info-border text-xs text-info-text space-y-1">
                         <span className="font-bold block">Refund Adjusted</span>
-                        <p className="text-[11px] text-purple-700">
+                        <p className="text-[11px] text-info-text">
                           Sale reversed: Negative platform fee line recorded in ledger & access revoked.
                         </p>
                       </div>
                     )}
 
                     {order.status === 'rejected' && (
-                      <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1">
+                      <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-xs text-danger-text space-y-1">
                         <span className="font-bold block">Rejected</span>
                         {order.rejectedReason && (
-                          <p className="text-[11px] italic text-rose-900">
+                          <p className="text-[11px] italic text-danger-text">
                             &quot;{order.rejectedReason}&quot;
                           </p>
                         )}
@@ -656,7 +656,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           <div className="max-w-lg w-full bg-surface border border-border rounded-2xl p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-serif font-bold text-navy flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                <ShieldCheck className="w-5 h-5 text-success" />
                 <span>Confirm Payment Receipt</span>
               </h3>
               <button
@@ -669,11 +669,11 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
             </div>
 
             {/* Mandatory confirmation text explanation */}
-            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2 text-xs text-emerald-900">
+            <div className="p-4 rounded-xl bg-success-soft border border-success-border space-y-2 text-xs text-success-text">
               <p className="font-bold">
                 &quot;I confirm that PKR {verifyTarget.order.amountPkr} has been received in my account for order {verifyTarget.order.orderNumber}&quot;
               </p>
-              <p className="text-[11px] text-emerald-800 leading-relaxed">
+              <p className="text-[11px] text-success-text leading-relaxed">
                 By confirming, you certify that you have checked your personal bank/wallet statement and
                 positively confirmed this deposit. The reader will be granted novel access immediately.
               </p>
@@ -695,7 +695,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
             </div>
 
             {verifyError && (
-              <p className="text-xs text-rose-600 font-semibold">{verifyError}</p>
+              <p className="text-xs text-danger-text font-semibold">{verifyError}</p>
             )}
 
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
@@ -710,7 +710,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                 type="button"
                 onClick={handleConfirmVerification}
                 disabled={isPending}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-success hover:bg-success disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
               >
                 {isPending ? 'Verifying...' : 'Confirm Receipt & Unlock Novel'}
               </button>
@@ -727,7 +727,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           <div className="max-w-md w-full bg-surface border border-border rounded-2xl p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-serif font-bold text-navy flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-rose-600" />
+                <XCircle className="w-5 h-5 text-danger-text" />
                 <span>Reject Payment Proof</span>
               </h3>
               <button
@@ -746,7 +746,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-navy block">
-                Rejection Reason <span className="text-rose-600">*</span>
+                Rejection Reason <span className="text-danger-text">*</span>
               </label>
               <textarea
                 rows={3}
@@ -755,13 +755,13 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="e.g. TID not found in bank statement, or amount received is less than due."
-                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-rose-400"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-danger-border"
               />
               <p className="text-[10px] text-secondary">Minimum 5 characters.</p>
             </div>
 
             {rejectError && (
-              <p className="text-xs text-rose-600 font-semibold">{rejectError}</p>
+              <p className="text-xs text-danger-text font-semibold">{rejectError}</p>
             )}
 
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
@@ -776,7 +776,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                 type="button"
                 onClick={handleConfirmRejection}
                 disabled={isPending || rejectReason.trim().length < 5}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-rose-600 hover:bg-rose-500 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-danger hover:bg-danger disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
               >
                 {isPending ? 'Rejecting...' : 'Reject Payment Proof'}
               </button>
@@ -793,7 +793,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           <div className="max-w-lg w-full bg-surface border border-border rounded-2xl p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-serif font-bold text-navy flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-amber-600" />
+                <Receipt className="w-5 h-5 text-accent-strong" />
                 <span>Record Off-Platform Refund (Order #{refundTarget.orderNumber})</span>
               </h3>
               <button
@@ -805,13 +805,13 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
               </button>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1.5 leading-relaxed">
+            <div className="p-3.5 rounded-xl bg-warning-soft border border-warning-border text-xs text-warning-text space-y-1.5 leading-relaxed">
               <span className="font-bold block">Important Notice:</span>
               <p>
                 You are declaring that you have returned PKR {refundTarget.amountPkr} directly to the reader
                 outside the platform (e.g. via JazzCash, EasyPaisa, or Raast).
               </p>
-              <p className="text-[11px] text-amber-800">
+              <p className="text-[11px] text-warning-text">
                 After an administrator reviews and approves this request, a negative adjustment row will be
                 appended to your sales ledger (reducing your platform fee balance) and the reader&apos;s library
                 access will be revoked.
@@ -820,7 +820,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-navy block">
-                Reason for Refund <span className="text-rose-600">*</span>
+                Reason for Refund <span className="text-danger-text">*</span>
               </label>
               <textarea
                 rows={2}
@@ -829,7 +829,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                 value={refundReason}
                 onChange={(e) => setRefundReason(e.target.value)}
                 placeholder="e.g. Reader requested cancellation; transferred back full amount."
-                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-warning-border"
               />
             </div>
 
@@ -843,7 +843,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                 value={refundEvidenceNote}
                 onChange={(e) => setRefundEvidenceNote(e.target.value)}
                 placeholder="e.g. Transferred via EasyPaisa TID: 11223344"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-ivory border border-border focus:outline-none focus:border-warning-border"
               />
             </div>
 
@@ -863,7 +863,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
             </div>
 
             {refundError && (
-              <p className="text-xs text-rose-600 font-semibold">{refundError}</p>
+              <p className="text-xs text-danger-text font-semibold">{refundError}</p>
             )}
 
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
@@ -898,7 +898,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                   });
                 }}
                 disabled={isPending || !refundReason.trim()}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-amber-600 hover:bg-amber-500 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-warning hover:bg-warning disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
               >
                 {isPending ? 'Submitting...' : 'Submit Refund Request'}
               </button>

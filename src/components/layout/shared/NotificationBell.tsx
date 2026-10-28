@@ -17,28 +17,20 @@ export function NotificationBell({
   variant = 'marketplace',
   className,
 }: NotificationBellProps) {
-  let defaultStyles = '';
-  let badgeStyles = '';
+  const defaultStyles =
+    'relative p-2 rounded-xl text-text-muted hover:text-text hover:bg-surface-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer';
 
+  let badgeStyles = '';
   switch (variant) {
     case 'admin':
-      defaultStyles =
-        'relative p-2 rounded-lg text-slate-300 hover:text-white hover:bg-navy-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent-admin/40';
       badgeStyles =
-        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-accent-admin text-[10px] font-bold text-white shadow-sm';
+        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-accent-admin text-[10px] font-bold text-white shadow-xs';
       break;
     case 'writer':
-      defaultStyles =
-        'relative p-2 rounded-lg text-slate-300 hover:text-white hover:bg-navy-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40';
-      badgeStyles =
-        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-navy shadow-sm';
-      break;
     case 'marketplace':
     default:
-      defaultStyles =
-        'relative p-2 rounded-full text-secondary hover:text-navy hover:bg-ivory transition-colors focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer';
       badgeStyles =
-        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-stone-950 shadow-sm';
+        'absolute top-1 right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-accent-soft text-accent-strong border border-border text-[10px] font-bold shadow-xs';
       break;
   }
 

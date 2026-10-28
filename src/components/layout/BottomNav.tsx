@@ -124,31 +124,31 @@ export function BottomNav() {
               aria-current={isActive ? "page" : undefined}
               className={`relative flex-1 flex flex-col items-center justify-center min-h-[44px] py-1 transition-colors select-none ${
                 isActive
-                  ? "text-navy font-semibold"
-                  : "text-secondary hover:text-navy"
+                  ? "text-primary font-semibold"
+                  : "text-text-muted hover:text-primary"
               }`}
             >
               <div className="relative">
                 <Icon
                   className={`w-5 h-5 transition-transform ${
-                    isActive ? "scale-110 text-accent" : "text-secondary"
+                    isActive ? "scale-110 text-accent-strong" : "text-text-muted"
                   }`}
                 />
                 {tab.badge !== undefined && (
-                  <span className="absolute -top-1 -right-2 min-w-4 h-4 px-1 rounded-full bg-accent text-navy text-[10px] font-bold flex items-center justify-center border border-surface shadow-xs">
+                  <span className="absolute -top-1 -right-2 min-w-4 h-4 px-1 rounded-full bg-accent-soft text-accent-strong text-[10px] font-bold flex items-center justify-center border border-border shadow-xs">
                     {tab.badge > 99 ? "99+" : tab.badge}
                   </span>
                 )}
               </div>
               <span
                 className={`text-[10px] tracking-tight mt-0.5 leading-none ${
-                  isActive ? "text-navy font-bold" : "text-secondary"
+                  isActive ? "text-primary font-bold" : "text-text-muted"
                 }`}
               >
                 {tab.label}
               </span>
               {isActive && (
-                <span className="absolute bottom-0 w-8 h-0.5 bg-accent rounded-full" />
+                <span className="absolute bottom-0 w-8 h-0.5 bg-accent-strong rounded-full" />
               )}
             </Link>
           );

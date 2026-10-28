@@ -45,10 +45,10 @@ export default async function WriterDisputesPage() {
         </div>
 
         {/* Guidance Notice */}
-        <div className="rounded-2xl bg-amber-50/80 border border-amber-200 p-4 sm:p-5 flex items-start gap-3.5">
+        <div className="rounded-2xl bg-warning-soft/80 border border-warning-border p-4 sm:p-5 flex items-start gap-3.5">
           <AlertCircle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-          <div className="space-y-1 text-xs text-amber-900 leading-relaxed">
-            <span className="font-bold text-amber-950 block">Author Resolution Protocol</span>
+          <div className="space-y-1 text-xs text-warning-text leading-relaxed">
+            <span className="font-bold text-warning-text block">Author Resolution Protocol</span>
             <p>
               When a dispute is raised, please check your bank account or digital wallet app (JazzCash,
               EasyPaisa, Raast) against the reader&apos;s submitted Transaction ID. You can post comments, clarify
@@ -78,7 +78,7 @@ export default async function WriterDisputesPage() {
                 <Link
                   key={dispute.dispute_id}
                   href={`/writer/disputes/${dispute.dispute_id}`}
-                  className="block rounded-2xl bg-surface hover:bg-surface-muted border border-border hover:border-slate-300 p-5 transition-all shadow-card group"
+                  className="block rounded-2xl bg-surface hover:bg-surface-muted border border-border hover:border-border p-5 transition-all shadow-card group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <div className="flex items-center gap-3">
@@ -88,12 +88,12 @@ export default async function WriterDisputesPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           statusMeta.variant === 'warning'
-                            ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                            ? 'bg-warning-soft text-warning-text border border-warning-border'
                             : statusMeta.variant === 'success'
-                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                            ? 'bg-success-soft text-success-text border border-success-border'
                             : statusMeta.variant === 'destructive'
-                            ? 'bg-rose-100 text-rose-900 border border-rose-200'
-                            : 'bg-slate-100 text-slate-800 border border-slate-200'
+                            ? 'bg-danger-soft text-danger-text border border-danger-border'
+                            : 'bg-surface-muted text-text border border-border'
                         }`}
                       >
                         {statusMeta.label}

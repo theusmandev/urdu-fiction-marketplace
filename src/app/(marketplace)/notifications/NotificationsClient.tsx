@@ -64,32 +64,32 @@ function resolveNotificationLink(item: NotificationItem): string | null {
 function getNotificationIcon(type: string) {
   switch (type) {
     case 'order_payment_submitted':
-      return <CreditCard className="w-4 h-4 text-amber-400" />;
+      return <CreditCard className="w-4 h-4 text-accent-strong" />;
     case 'order_verified':
-      return <ShoppingBag className="w-4 h-4 text-emerald-400" />;
+      return <ShoppingBag className="w-4 h-4 text-success" />;
     case 'order_rejected':
-      return <AlertCircle className="w-4 h-4 text-rose-400" />;
+      return <AlertCircle className="w-4 h-4 text-danger-text" />;
     case 'dispute_opened':
     case 'dispute_resolved':
     case 'stagnant_dispute_alert':
-      return <Scale className="w-4 h-4 text-amber-400" />;
+      return <Scale className="w-4 h-4 text-accent-strong" />;
     case 'dispute_message':
-      return <MessageSquare className="w-4 h-4 text-sky-400" />;
+      return <MessageSquare className="w-4 h-4 text-info-text" />;
     case 'refund_requested':
     case 'refund_approved':
     case 'refund_rejected':
-      return <RotateCcw className="w-4 h-4 text-sky-400" />;
+      return <RotateCcw className="w-4 h-4 text-info-text" />;
     case 'invoice_due_reminder':
     case 'invoice_overdue':
-      return <Receipt className="w-4 h-4 text-rose-400" />;
+      return <Receipt className="w-4 h-4 text-danger-text" />;
     case 'support_reply':
     case 'support_ticket_closed':
-      return <LifeBuoy className="w-4 h-4 text-purple-400" />;
+      return <LifeBuoy className="w-4 h-4 text-info-text" />;
     case 'writer_application_approved':
     case 'novel_approved':
-      return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
+      return <CheckCircle2 className="w-4 h-4 text-success" />;
     default:
-      return <Bell className="w-4 h-4 text-amber-500" />;
+      return <Bell className="w-4 h-4 text-accent-strong" />;
   }
 }
 
@@ -179,7 +179,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
               className={`rounded-2xl border p-4 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-3 shadow-card ${
                 item.is_read
                   ? 'bg-surface border-border opacity-90'
-                  : 'bg-amber-50/40 border-amber-200 border-l-4 border-l-accent'
+                  : 'bg-warning-soft/40 border-warning-border border-l-4 border-l-accent'
               }`}
             >
               <div className="flex items-start gap-3 min-w-0 flex-1">

@@ -60,7 +60,7 @@ export default function FaqPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Draft Legal Notice */}
-      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs text-center font-medium">
+      <div className="p-3 rounded-xl bg-warning/10 border border-warning-border/20 text-warning-text text-xs text-center font-medium">
         Draft — pending legal review
       </div>
 

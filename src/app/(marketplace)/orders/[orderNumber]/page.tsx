@@ -121,11 +121,11 @@ export default async function OrderPage({ params }: OrderPageProps) {
   if (orderError) {
     return (
       <div className="min-h-screen bg-ivory text-main py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
+        <div className="max-w-4xl mx-auto p-4 rounded-xl border border-danger-border bg-danger-soft text-danger-text flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-danger-text" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load order</h3>
-            <p className="text-xs text-rose-700/80 mt-1">{orderError.message}</p>
+            <p className="text-xs text-danger-text/80 mt-1">{orderError.message}</p>
           </div>
         </div>
       </div>

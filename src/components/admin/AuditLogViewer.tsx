@@ -84,15 +84,15 @@ export function AuditLogViewer({
   const getActionBadgeColor = (action: string) => {
     const act = action.toUpperCase();
     if (act.includes('DELETE') || act.includes('REJECT') || act.includes('SUSPEND')) {
-      return 'bg-rose-50 text-rose-800 border-rose-200';
+      return 'bg-danger-soft text-danger-text border-danger-border';
     }
     if (act.includes('APPROVE') || act.includes('UNSUSPEND') || act.includes('CREATE')) {
-      return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+      return 'bg-success-soft text-success-text border-success-border';
     }
     if (act.includes('UPDATE') || act.includes('SET')) {
       return 'bg-accent-admin-light text-accent-admin border-accent-admin-border';
     }
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+    return 'bg-surface-muted text-text border-border';
   };
 
   return (
@@ -337,7 +337,7 @@ export function AuditLogViewer({
                   </div>
                   <div className="bg-ivory/40 border border-border rounded-xl p-4 overflow-x-auto max-h-56">
                     {selectedEntry.previous_state ? (
-                      <pre className="text-xs font-mono text-rose-800 whitespace-pre leading-relaxed">
+                      <pre className="text-xs font-mono text-danger-text whitespace-pre leading-relaxed">
                         {JSON.stringify(selectedEntry.previous_state, null, 2)}
                       </pre>
                     ) : (
@@ -361,7 +361,7 @@ export function AuditLogViewer({
                   </div>
                   <div className="bg-ivory/40 border border-border rounded-xl p-4 overflow-x-auto max-h-64">
                     {selectedEntry.new_state ? (
-                      <pre className="text-xs font-mono text-emerald-800 whitespace-pre leading-relaxed">
+                      <pre className="text-xs font-mono text-success-text whitespace-pre leading-relaxed">
                         {JSON.stringify(selectedEntry.new_state, null, 2)}
                       </pre>
                     ) : (

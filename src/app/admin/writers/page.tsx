@@ -119,22 +119,22 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={query}
             placeholder="Search pen name, email..."
-            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin"
+            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
           />
         </form>
       </div>
 
       {/* Results List */}
       {queryError ? (
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 space-y-3">
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border text-danger-text space-y-3">
           <div className="flex items-center gap-2 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
+            <ShieldAlert className="w-5 h-5 shrink-0 text-danger-text" />
             <span>Database Error Loading Writers Catalog</span>
           </div>
-          <p className="text-xs text-rose-700 leading-relaxed">
+          <p className="text-xs text-danger-text leading-relaxed">
             Unable to retrieve author records from the database:
           </p>
-          <div className="p-3 rounded-xl bg-white border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-white border border-danger-border text-xs font-mono text-danger-text">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
           </div>
           {queryError.hint && (
@@ -176,7 +176,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                           <div className="font-semibold text-main truncate break-words" title={writer.pen_name_english}>
                             {writer.pen_name_english}
                           </div>
-                          <UrduText as="div" size="xs" className="text-brand-gold py-0 font-normal truncate">
+                          <UrduText as="div" size="xs" className="text-accent-strong py-0 font-normal truncate">
                             {writer.pen_name_urdu}
                           </UrduText>
                         </td>
@@ -237,7 +237,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                       <div className="font-semibold text-main text-sm">
                         {writer.pen_name_english}
                       </div>
-                      <UrduText as="div" size="xs" className="text-brand-gold py-0">
+                      <UrduText as="div" size="xs" className="text-accent-strong py-0">
                         {writer.pen_name_urdu}
                       </UrduText>
                     </div>

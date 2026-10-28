@@ -26,21 +26,21 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
   const percentage = limit > 0 ? Math.min(100, Math.round((outstanding / limit) * 100)) : 0;
   const isPaused = summary?.is_orders_paused ?? false;
 
-  let meterColor = 'bg-emerald-500';
-  let meterTextColor = 'text-emerald-700';
+  let meterColor = 'bg-success';
+  let meterTextColor = 'text-success-text';
   let meterBadge = 'Good Standing';
-  let meterBadgeClass = 'bg-emerald-100 text-emerald-800';
+  let meterBadgeClass = 'bg-success-soft text-success-text';
 
   if (percentage >= 100 || isPaused) {
-    meterColor = 'bg-rose-500';
-    meterTextColor = 'text-rose-700';
+    meterColor = 'bg-danger';
+    meterTextColor = 'text-danger-text';
     meterBadge = 'Orders Paused (100% Exceeded)';
-    meterBadgeClass = 'bg-rose-100 text-rose-800';
+    meterBadgeClass = 'bg-danger-soft text-danger-text';
   } else if (percentage >= 80) {
-    meterColor = 'bg-amber-500';
-    meterTextColor = 'text-amber-700';
+    meterColor = 'bg-warning';
+    meterTextColor = 'text-warning-text';
     meterBadge = 'Threshold Warning (≥ 80%)';
-    meterBadgeClass = 'bg-amber-100 text-amber-800';
+    meterBadgeClass = 'bg-warning-soft text-warning-text';
   }
 
   const filteredInvoices = invoices.filter((inv) => {
@@ -115,7 +115,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
 
         {/* Progress Bar */}
         <div className="space-y-1.5">
-          <div className="w-full bg-slate-100 rounded-full h-3.5 p-0.5 overflow-hidden border border-border">
+          <div className="w-full bg-surface-muted rounded-full h-3.5 p-0.5 overflow-hidden border border-border">
             <div
               className={`h-full rounded-full transition-all duration-500 ${meterColor}`}
               style={{ width: `${Math.min(100, percentage)}%` }}
@@ -123,8 +123,8 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
           </div>
           <div className="flex items-center justify-between text-[11px] text-secondary font-mono">
             <span>0% (PKR 0.00)</span>
-            <span className="text-amber-600 font-semibold">80% Alert (PKR {(limit * 0.8).toLocaleString()})</span>
-            <span className="text-rose-600 font-semibold">100% Pause (PKR {limit.toLocaleString()})</span>
+            <span className="text-accent-strong font-semibold">80% Alert (PKR {(limit * 0.8).toLocaleString()})</span>
+            <span className="text-danger-text font-semibold">100% Pause (PKR {limit.toLocaleString()})</span>
           </div>
         </div>
 
@@ -213,7 +213,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
               onClick={() => setFilter('overdue')}
               className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
                 filter === 'overdue'
-                  ? 'bg-rose-700 text-white'
+                  ? 'bg-danger text-white'
                   : 'bg-ivory text-secondary hover:text-navy border border-border'
               }`}
             >
@@ -225,7 +225,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
         {filteredInvoices.length === 0 ? (
           <div className="py-12 text-center space-y-3">
             <div className="w-12 h-12 rounded-xl bg-ivory border border-border flex items-center justify-center mx-auto text-secondary">
-              <Receipt className="w-6 h-6 text-slate-400" />
+              <Receipt className="w-6 h-6 text-text-muted" />
             </div>
             <div className="space-y-1">
               <p className="text-xs font-semibold text-main">No invoices in this view</p>
@@ -243,7 +243,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
               return (
                 <div
                   key={inv.id}
-                  className="p-5 hover:bg-slate-50/50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="p-5 hover:bg-surface-muted transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
@@ -252,7 +252,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
                       </span>
                       <StatusBadge status={inv.status} size="sm" />
                       {inv.is_overdue && inv.status !== 'settled' && inv.status !== 'void' && (
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border">
                           Overdue
                         </span>
                       )}
@@ -266,14 +266,14 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
                       </span>
                       {inv.due_date && (
                         <span className="flex items-center gap-1 font-medium text-navy">
-                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                          <Clock className="w-3.5 h-3.5 text-accent-strong" />
                           Due: {formatKarachiDateTime(inv.due_date, false)}
                         </span>
                       )}
                     </div>
 
                     {(inv.reported_count ?? 0) > 0 && inv.status !== 'settled' && (
-                      <div className="text-[11px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 inline-block">
+                      <div className="text-[11px] text-info-text bg-info-soft px-2 py-0.5 rounded border border-info-border inline-block">
                         {inv.reported_count} payment report(s) submitted • Awaiting admin verification
                       </div>
                     )}
@@ -287,7 +287,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
                       <div className="text-[11px] text-secondary font-mono">
                         Settled: {formatPKR2(inv.amount_settled_pkr)}
                         {remainingPkr > 0 && (
-                          <span className="text-rose-700 font-semibold block sm:inline sm:ml-1">
+                          <span className="text-danger-text font-semibold block sm:inline sm:ml-1">
                             (Due: {formatPKR2(remainingPkr)})
                           </span>
                         )}

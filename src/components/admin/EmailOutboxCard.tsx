@@ -57,8 +57,8 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
               <span
                 className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
                   hasFailures
-                    ? 'bg-rose-50 text-rose-800 border-rose-200'
-                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    ? 'bg-danger-soft text-danger-text border-danger-border'
+                    : 'bg-success-soft text-success-text border-success-border'
                 }`}
               >
                 {hasFailures ? 'Attention Needed' : 'Healthy Outbox'}
@@ -89,14 +89,14 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
         <div
           className={`p-3.5 rounded-xl text-xs flex items-center gap-2.5 ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+              ? 'bg-success-soft border border-success-border text-success-text'
+              : 'bg-danger-soft border border-danger-border text-danger-text'
           }`}
         >
           {feedback.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
           )}
           <span>{feedback.message}</span>
         </div>
@@ -108,9 +108,9 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
         <div className="bg-ivory/60 p-3.5 rounded-xl border border-border space-y-1">
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Pending</span>
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
+            <Clock className="w-3.5 h-3.5 text-accent-strong" />
           </div>
-          <div className="text-xl font-bold font-mono text-amber-700">
+          <div className="text-xl font-bold font-mono text-warning-text">
             {stats.pending_count ?? 0}
           </div>
           <span className="text-[10px] text-secondary">In dispatch queue</span>
@@ -120,9 +120,9 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
         <div className="bg-ivory/60 p-3.5 rounded-xl border border-border space-y-1">
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Dispatched</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-success" />
           </div>
-          <div className="text-xl font-bold font-mono text-emerald-700">
+          <div className="text-xl font-bold font-mono text-success-text">
             {stats.sent_count ?? 0}
           </div>
           <span className="text-[10px] text-secondary">Successfully sent</span>
@@ -132,9 +132,9 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
         <div className="bg-ivory/60 p-3.5 rounded-xl border border-border space-y-1">
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Failed</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+            <AlertTriangle className="w-3.5 h-3.5 text-danger-text" />
           </div>
-          <div className="text-xl font-bold font-mono text-rose-700">
+          <div className="text-xl font-bold font-mono text-danger-text">
             {stats.failed_count ?? 0}
           </div>
           <span className="text-[10px] text-secondary">Awaiting retry</span>
@@ -144,9 +144,9 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
         <div className="bg-ivory/60 p-3.5 rounded-xl border border-border space-y-1">
           <div className="flex items-center justify-between text-secondary text-xs">
             <span>Skipped</span>
-            <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-info-text" />
           </div>
-          <div className="text-xl font-bold font-mono text-sky-700">
+          <div className="text-xl font-bold font-mono text-info-text">
             {stats.skipped_count ?? 0}
           </div>
           <span className="text-[10px] text-secondary">User opted out</span>

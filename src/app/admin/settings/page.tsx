@@ -178,11 +178,11 @@ export default async function AdminSettingsPage() {
       </div>
 
       {pageError && (
-        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
+        <div className="p-4 rounded-xl border border-danger-border bg-danger-soft text-danger-text flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-danger-text" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load platform settings data</h3>
-            <p className="text-xs text-rose-600/90 mt-1">{pageError.message}</p>
+            <p className="text-xs text-danger-text/90 mt-1">{pageError.message}</p>
           </div>
         </div>
       )}

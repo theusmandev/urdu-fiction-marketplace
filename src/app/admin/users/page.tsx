@@ -58,11 +58,11 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       {usersError && (
-        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
+        <div className="p-4 rounded-xl border border-danger-border bg-danger-soft text-danger-text flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-danger-text" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load users</h3>
-            <p className="text-xs text-rose-600/90 mt-1">{usersError.message}</p>
+            <p className="text-xs text-danger-text/90 mt-1">{usersError.message}</p>
           </div>
         </div>
       )}
@@ -110,7 +110,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={query}
             placeholder="Search email, username..."
-            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-admin/20 focus:border-accent-admin transition-colors"
+            className="w-full bg-surface-muted border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin transition-colors"
           />
         </form>
       </div>

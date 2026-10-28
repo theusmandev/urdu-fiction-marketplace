@@ -80,18 +80,18 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-sm font-bold text-brand-gold">
+                <span className="font-mono text-sm font-bold text-accent-strong">
                   Order #{order.order_number}
                 </span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     statusMeta.variant === 'warning'
-                      ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                      ? 'bg-warning-soft text-warning-text border border-warning-border'
                       : statusMeta.variant === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      ? 'bg-success-soft text-success-text border border-success-border'
                       : statusMeta.variant === 'destructive'
-                      ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                      : 'bg-slate-100 text-slate-700 border border-slate-200'
+                      ? 'bg-danger-soft text-danger-text border border-danger-border'
+                      : 'bg-surface-muted text-text border border-border'
                   }`}
                 >
                   {statusMeta.label}
@@ -141,9 +141,9 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
           </div>
 
           {/* Dispute Reason Snapshot */}
-          <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-xs space-y-1">
-            <span className="text-amber-950 font-bold block">Dispute Statement:</span>
-            <p className="text-amber-900 leading-relaxed">&quot;{dispute.reason}&quot;</p>
+          <div className="bg-warning-soft border border-warning-border p-3.5 rounded-xl text-xs space-y-1">
+            <span className="text-warning-text font-bold block">Dispute Statement:</span>
+            <p className="text-warning-text leading-relaxed">&quot;{dispute.reason}&quot;</p>
           </div>
 
           {/* Status Resolution Banner */}
@@ -151,17 +151,17 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
             <div
               className={`p-4 rounded-xl text-xs space-y-1.5 border ${
                 dispute.status === 'resolved_for_reader'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                  ? 'bg-success-soft border-success-border text-success-text'
                   : dispute.status === 'resolved_for_writer'
-                  ? 'bg-sky-50 border-sky-200 text-sky-900'
+                  ? 'bg-info-soft border-info-border text-info-text'
                   : 'bg-surface-muted border-border text-main'
               }`}
             >
               <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-[11px]">
                 {dispute.status === 'resolved_for_reader' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                 ) : (
-                  <ShieldAlert className="w-4 h-4 text-sky-600" />
+                  <ShieldAlert className="w-4 h-4 text-info-text" />
                 )}
                 <span>Administrative Resolution Outcome</span>
               </div>
@@ -196,14 +196,14 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                   <div className="space-y-1">
                     <div className="flex justify-between">
                       <span className="text-secondary">Claimed TID:</span>
-                      <span className="font-mono font-bold text-brand-gold">
+                      <span className="font-mono font-bold text-accent-strong">
                         {sub.transaction_reference_tid}
                       </span>
                     </div>
                     {sub.sender_account_name && (
                       <div className="flex justify-between">
                         <span className="text-secondary">Sender Name:</span>
-                        <span className="text-slate-800">{sub.sender_account_name}</span>
+                        <span className="text-text">{sub.sender_account_name}</span>
                       </div>
                     )}
                     {sub.reader_note && (
@@ -220,7 +220,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                         onClick={() => setSelectedProofUrl(sub.screenshot_url)}
                         className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-navy bg-surface hover:bg-surface-muted border border-border shadow-sm transition-colors cursor-pointer min-h-[44px]"
                       >
-                        <Eye className="w-3.5 h-3.5 text-brand-gold" />
+                        <Eye className="w-3.5 h-3.5 text-accent-strong" />
                         <span>Inspect Receipt Screenshot</span>
                       </button>
                     </div>
@@ -235,7 +235,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
         <div className="rounded-2xl bg-surface border border-border p-6 space-y-6 shadow-card">
           <div className="flex items-center justify-between border-b border-border pb-4">
             <h2 className="text-sm font-bold tracking-tight text-navy flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-brand-gold" />
+              <ShieldAlert className="w-4 h-4 text-accent-strong" />
               <span>Discussion &amp; Investigation Thread ({messages.length})</span>
             </h2>
             <span className="text-[11px] text-secondary">
@@ -258,27 +258,27 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                     key={msg.id}
                     className={`rounded-2xl p-4 space-y-2 border ${
                       isAdmin
-                        ? 'bg-purple-50/70 border-purple-200'
+                        ? 'bg-info-soft/70 border-info-border'
                         : isWriter
-                        ? 'bg-amber-50/70 border-amber-200'
+                        ? 'bg-warning-soft/70 border-warning-border'
                         : 'bg-surface-muted border-border'
                     }`}
                   >
                     <div className="flex items-center justify-between border-b border-border/60 pb-2">
                       <div className="flex items-center gap-2">
                         {isAdmin ? (
-                          <Shield className="w-4 h-4 text-purple-600" />
+                          <Shield className="w-4 h-4 text-info-text" />
                         ) : (
-                          <User className="w-4 h-4 text-slate-500" />
+                          <User className="w-4 h-4 text-text-muted" />
                         )}
                         <span className="font-bold text-xs text-navy">{msg.author_name}</span>
                         <span
                           className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                             isAdmin
-                              ? 'bg-purple-100 text-purple-800'
+                              ? 'bg-info-soft text-info-text'
                               : isWriter
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-slate-200 text-slate-700'
+                              ? 'bg-warning-soft text-warning-text'
+                              : 'bg-border text-text'
                           }`}
                         >
                           {msg.author_role}
@@ -296,7 +296,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                     {msg.attachment_path && (
                       <div className="pt-2">
                         <span className="inline-flex items-center gap-1.5 text-xs text-navy bg-surface px-3 py-1.5 rounded-lg border border-border shadow-sm">
-                          <Paperclip className="w-3.5 h-3.5 text-brand-gold" />
+                          <Paperclip className="w-3.5 h-3.5 text-accent-strong" />
                           <span>Attachment: {msg.attachment_path.split('/').pop()}</span>
                         </span>
                       </div>
@@ -311,8 +311,8 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
           {!isClosed ? (
             <form onSubmit={handleSendMessage} className="pt-4 border-t border-border space-y-4">
               {errorMsg && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <div className="p-3 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
                   <span>{errorMsg}</span>
                 </div>
               )}
@@ -332,7 +332,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                   value={messageBody}
                   onChange={(e) => setMessageBody(e.target.value)}
                   placeholder="Provide clarification, bank transaction remarks, or additional verification details..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-base sm:text-xs text-main placeholder:text-secondary focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold leading-relaxed"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-base sm:text-xs text-main placeholder:text-secondary focus:outline-none focus:border-border focus:ring-1 focus:ring-brand-gold leading-relaxed"
                 />
               </div>
 
@@ -343,7 +343,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                   onClick={() => setShowUploader(!showUploader)}
                   className="text-xs text-secondary hover:text-navy transition-colors flex items-center gap-1.5 cursor-pointer py-1.5 min-h-[44px]"
                 >
-                  <Paperclip className="w-3.5 h-3.5 text-brand-gold" />
+                  <Paperclip className="w-3.5 h-3.5 text-accent-strong" />
                   <span>
                     {showUploader ? 'Hide Attachment Uploader' : 'Attach Additional Evidence / Proof'}
                   </span>
@@ -368,7 +368,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                 <button
                   type="submit"
                   disabled={isPending || !messageBody.trim()}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-brand-gold hover:bg-brand-gold-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px] w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer min-h-[44px] w-full sm:w-auto"
                 >
                   {isPending ? (
                     <>
@@ -408,7 +408,7 @@ export function DisputeDetailClient({ payload }: DisputeDetailClientProps) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-auto flex items-center justify-center bg-slate-100 rounded-xl p-2">
+            <div className="max-h-[70vh] overflow-auto flex items-center justify-center bg-surface-muted rounded-xl p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={selectedProofUrl}

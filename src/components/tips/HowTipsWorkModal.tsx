@@ -39,9 +39,9 @@ export function HowTipsWorkModal({ isOpen, onClose }: HowTipsWorkModalProps) {
       {/* Modal Content */}
       <div className="relative w-full max-w-lg bg-surface border border-gold-200/60 dark:border-gold-900/40 rounded-2xl shadow-xl overflow-hidden z-10">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-border/40 flex items-center justify-between bg-amber-50/40 dark:bg-amber-950/20">
+        <div className="px-6 py-5 border-b border-border/40 flex items-center justify-between bg-warning-soft/40">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-100/80 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+            <div className="p-2 rounded-xl bg-warning-soft/80 text-warning-text">
               <Heart className="w-5 h-5" />
             </div>
             <div>
@@ -66,14 +66,14 @@ export function HowTipsWorkModal({ isOpen, onClose }: HowTipsWorkModalProps) {
         {/* Body */}
         <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-sm">
           {/* Honest Disclosure Box */}
-          <div className="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/30">
+          <div className="p-4 rounded-xl bg-warning-soft/70 border border-warning-border/60">
             <div className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+              <Sparkles className="w-5 h-5 text-warning-text dark:text-accent-strong shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <p className="font-medium text-amber-950 dark:text-amber-200">
+                <p className="font-medium text-warning-text">
                   {HOW_TIPS_WORK.honestLine}
                 </p>
-                <UrduText as="p" size="xs" className="text-amber-900/80 dark:text-amber-300/80 py-0">
+                <UrduText as="p" size="xs" className="text-warning-text/80 py-0">
                   {HOW_TIPS_WORK.honestLineUrdu}
                 </UrduText>
               </div>
@@ -82,7 +82,7 @@ export function HowTipsWorkModal({ isOpen, onClose }: HowTipsWorkModalProps) {
 
           {/* Principle 1: 100% to author */}
           <div className="flex items-start gap-3 pt-2">
-            <div className="p-1.5 rounded-lg bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5">
+            <div className="p-1.5 rounded-lg bg-success-soft/80 text-success-text dark:text-success shrink-0 mt-0.5">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
@@ -95,7 +95,7 @@ export function HowTipsWorkModal({ isOpen, onClose }: HowTipsWorkModalProps) {
 
           {/* Principle 2: Voluntary gift, unlocks nothing */}
           <div className="flex items-start gap-3">
-            <div className="p-1.5 rounded-lg bg-blue-100/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 shrink-0 mt-0.5">
+            <div className="p-1.5 rounded-lg bg-info-soft/80 text-info-text dark:text-info-text shrink-0 mt-0.5">
               <Heart className="w-4 h-4" />
             </div>
             <div>
@@ -108,7 +108,7 @@ export function HowTipsWorkModal({ isOpen, onClose }: HowTipsWorkModalProps) {
 
           {/* Principle 3: Author confirms directly */}
           <div className="flex items-start gap-3">
-            <div className="p-1.5 rounded-lg bg-purple-100/80 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 shrink-0 mt-0.5">
+            <div className="p-1.5 rounded-lg bg-info-soft/80 text-info-text dark:text-info-text shrink-0 mt-0.5">
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <div>

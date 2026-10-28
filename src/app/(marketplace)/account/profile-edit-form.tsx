@@ -52,15 +52,15 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
       {successMessage && (
-        <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 text-emerald-800 text-sm">
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" />
+        <div className="rounded-xl bg-success-soft border border-success-border p-4 flex items-start gap-3 text-success-text text-sm">
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-success mt-0.5" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-rose-800 text-sm">
-          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
+        <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+          <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
           <span>{error}</span>
         </div>
       )}
@@ -92,10 +92,10 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             disabled={isPending}
-            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.fullName && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.fullName[0]}</p>
+            <p className="mt-1 text-xs text-danger-text">{fieldErrors.fullName[0]}</p>
           )}
         </div>
 
@@ -111,10 +111,10 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
             value={username}
             onChange={(e) => setUsername(e.target.value.toLowerCase())}
             disabled={isPending}
-            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-navy placeholder:text-muted focus:border-accent focus:bg-white focus:outline-none focus:ring-1 focus:ring-ring text-base sm:text-sm min-h-[44px] disabled:opacity-50 transition-colors"
           />
           {fieldErrors.username && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.username[0]}</p>
+            <p className="mt-1 text-xs text-danger-text">{fieldErrors.username[0]}</p>
           )}
         </div>
 
@@ -129,7 +129,7 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
             readOnly
             disabled
             value={profile.email}
-            className="mt-1 block w-full rounded-xl border border-border bg-slate-100 py-2.5 px-3 text-secondary text-base sm:text-sm min-h-[44px] cursor-not-allowed"
+            className="mt-1 block w-full rounded-xl border border-border bg-surface-muted py-2.5 px-3 text-secondary text-base sm:text-sm min-h-[44px] cursor-not-allowed"
           />
           <p className="mt-1 text-[11px] text-secondary">
             Primary email address cannot be changed directly.
@@ -141,7 +141,7 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
           <label className="block text-sm font-semibold text-secondary">
             Account Status & Role
           </label>
-          <div className="mt-1 flex items-center gap-2 min-h-[44px] px-3 rounded-xl border border-border bg-slate-100 text-main text-sm">
+          <div className="mt-1 flex items-center gap-2 min-h-[44px] px-3 rounded-xl border border-border bg-surface-muted text-main text-sm">
             <span className="uppercase font-bold text-xs tracking-wider text-accent">
               {profile.role}
             </span>
@@ -157,7 +157,7 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 transition-colors cursor-pointer min-h-[44px] w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-navy shadow-sm hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-colors cursor-pointer min-h-[44px] w-full sm:w-auto"
         >
           {isPending ? (
             <>

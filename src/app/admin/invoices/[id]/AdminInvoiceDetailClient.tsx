@@ -249,7 +249,7 @@ export function AdminInvoiceDetailClient({
             </h1>
             <StatusBadge status={invoice.status} size="sm" />
             {isOverdue && (
-              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-danger-soft text-danger-text border border-danger-border">
                 Overdue
               </span>
             )}
@@ -297,7 +297,7 @@ export function AdminInvoiceDetailClient({
                 setConfirmError(null);
                 setIsConfirmModalOpen(true);
               }}
-              className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors"
+              className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-success hover:bg-success-hover text-white shadow-sm transition-colors"
             >
               <CheckCircle2 className="w-4 h-4 mr-1.5" />
               Confirm Bank Settlement
@@ -312,7 +312,7 @@ export function AdminInvoiceDetailClient({
                 setVoidError(null);
                 setIsVoidModalOpen(true);
               }}
-              className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-rose-50 text-rose-700 border border-border shadow-sm transition-colors"
+              className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-danger-soft text-danger-text border border-border shadow-sm transition-colors"
             >
               <Ban className="w-4 h-4 mr-1.5" />
               Void Invoice
@@ -323,9 +323,9 @@ export function AdminInvoiceDetailClient({
 
       {/* Void Notice if Voided */}
       {invoice.status === 'void' && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs space-y-1">
+        <div className="p-4 bg-danger-soft border border-danger-border rounded-xl text-danger-text text-xs space-y-1">
           <div className="font-bold flex items-center gap-1.5 text-sm">
-            <Ban className="w-4 h-4 text-rose-600" />
+            <Ban className="w-4 h-4 text-danger-text" />
             <span>Invoice Voided</span>
           </div>
           <p>
@@ -352,7 +352,7 @@ export function AdminInvoiceDetailClient({
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
             Confirmed Settled
           </span>
-          <div className="text-2xl font-bold font-mono text-emerald-700">
+          <div className="text-2xl font-bold font-mono text-success-text">
             {formatPKR2(invoice.amount_settled_pkr)}
           </div>
         </div>
@@ -361,7 +361,7 @@ export function AdminInvoiceDetailClient({
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
             Remaining Unsettled
           </span>
-          <div className={`text-2xl font-bold font-mono ${remainingDue > 0 ? 'text-rose-700' : 'text-emerald-700'}`}>
+          <div className={`text-2xl font-bold font-mono ${remainingDue > 0 ? 'text-danger-text' : 'text-success-text'}`}>
             {formatPKR2(remainingDue)}
           </div>
         </div>
@@ -371,7 +371,7 @@ export function AdminInvoiceDetailClient({
       <div className="bg-surface border border-border rounded-2xl shadow-card overflow-hidden print:hidden">
         <div className="p-4 border-b border-border flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-amber-600" />
+            <Clock className="w-4 h-4 text-accent-strong" />
             <h2 className="font-serif font-bold text-main text-sm">
               Author Payment Claims ({reports.length})
             </h2>
@@ -398,7 +398,7 @@ export function AdminInvoiceDetailClient({
                       </span>
                       <StatusBadge status={`report_${r.status}`} size="sm" />
                       {r.is_duplicate_tid && (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-warning-soft text-warning-text border border-warning-border">
                           Duplicate TID
                         </span>
                       )}
@@ -425,7 +425,7 @@ export function AdminInvoiceDetailClient({
                               setConfirmError(null);
                               setIsConfirmModalOpen(true);
                             }}
-                            className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold shadow-sm transition-colors"
+                            className="inline-flex items-center px-2.5 py-1 rounded-lg bg-success hover:bg-success-hover text-white text-[11px] font-semibold shadow-sm transition-colors"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
                             Confirm Deposit
@@ -438,7 +438,7 @@ export function AdminInvoiceDetailClient({
                               setRejectError(null);
                               setIsRejectModalOpen(true);
                             }}
-                            className="inline-flex items-center px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-semibold shadow-sm transition-colors"
+                            className="inline-flex items-center px-2.5 py-1 rounded-lg bg-danger hover:bg-danger-hover text-white text-[11px] font-semibold shadow-sm transition-colors"
                           >
                             <XCircle className="w-3.5 h-3.5 mr-1" />
                             Reject Claim
@@ -463,7 +463,7 @@ export function AdminInvoiceDetailClient({
                   )}
 
                   {r.status === 'rejected' && r.admin_note && (
-                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl space-y-0.5">
+                    <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl space-y-0.5">
                       <span className="font-bold">Rejection Note:</span>
                       <p>{r.admin_note}</p>
                     </div>
@@ -480,7 +480,7 @@ export function AdminInvoiceDetailClient({
         <div className="bg-surface border border-border rounded-2xl shadow-card overflow-hidden">
           <div className="p-4 border-b border-border text-xs">
             <h2 className="font-serif font-bold text-main text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <CheckCircle2 className="w-4 h-4 text-success" />
               Confirmed Bank Settlements ({payments.length})
             </h2>
           </div>
@@ -488,7 +488,7 @@ export function AdminInvoiceDetailClient({
             {payments.map((p) => (
               <div key={p.id} className="p-4 flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-mono text-emerald-700 font-bold">
+                  <div className="font-mono text-success-text font-bold">
                     {formatPKR2(p.amount_pkr)}
                   </div>
                   <div className="text-muted text-[11px]">
@@ -496,7 +496,7 @@ export function AdminInvoiceDetailClient({
                     {p.notes && ` • Note: ${p.notes}`}
                   </div>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-success-soft text-success-text border border-success-border font-semibold">
                   DEPOSIT CONFIRMED
                 </span>
               </div>
@@ -572,7 +572,7 @@ export function AdminInvoiceDetailClient({
           <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <CheckCircle2 className="w-5 h-5 text-success" />
                 <h3 className="font-serif font-bold text-lg text-main">
                   Confirm Bank Deposit Settlement
                 </h3>
@@ -588,7 +588,7 @@ export function AdminInvoiceDetailClient({
 
             <form onSubmit={handleConfirmSubmit} className="space-y-4 text-xs">
               {confirmError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
+                <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl">
                   {confirmError}
                 </div>
               )}
@@ -609,7 +609,7 @@ export function AdminInvoiceDetailClient({
                   required
                   value={confirmAmount}
                   onChange={(e) => setConfirmAmount(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main font-mono focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <p className="text-[10px] text-muted mt-1">
                   Remaining statement due: {formatPKR2(remainingDue)}
@@ -625,7 +625,7 @@ export function AdminInvoiceDetailClient({
                   placeholder="e.g. Bank statement ref #94827"
                   value={confirmAdminNote}
                   onChange={(e) => setConfirmAdminNote(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -640,7 +640,7 @@ export function AdminInvoiceDetailClient({
                 <button
                   type="submit"
                   disabled={isSubmittingConfirm}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 transition-colors shadow-sm"
+                  className="px-5 py-2 rounded-lg bg-success hover:bg-success-hover text-white font-semibold disabled:opacity-50 transition-colors shadow-sm"
                 >
                   {isSubmittingConfirm ? 'Confirming...' : 'Confirm Deposit'}
                 </button>
@@ -656,7 +656,7 @@ export function AdminInvoiceDetailClient({
           <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-rose-600" />
+                <XCircle className="w-5 h-5 text-danger-text" />
                 <h3 className="font-serif font-bold text-lg text-main">
                   Reject Payment Claim
                 </h3>
@@ -672,7 +672,7 @@ export function AdminInvoiceDetailClient({
 
             <form onSubmit={handleRejectSubmit} className="space-y-4 text-xs">
               {rejectError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
+                <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl">
                   {rejectError}
                 </div>
               )}
@@ -691,7 +691,7 @@ export function AdminInvoiceDetailClient({
                   placeholder="e.g. Deposit TID does not match bank record or screenshot illegible..."
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-danger"
                 />
               </div>
 
@@ -706,7 +706,7 @@ export function AdminInvoiceDetailClient({
                 <button
                   type="submit"
                   disabled={isSubmittingReject}
-                  className="px-5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold disabled:opacity-50 transition-colors shadow-sm"
+                  className="px-5 py-2 rounded-lg bg-danger hover:bg-danger-hover text-white font-semibold disabled:opacity-50 transition-colors shadow-sm"
                 >
                   {isSubmittingReject ? 'Rejecting...' : 'Reject Claim'}
                 </button>
@@ -722,7 +722,7 @@ export function AdminInvoiceDetailClient({
           <div className="bg-surface border border-border rounded-2xl max-w-md w-full p-6 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
-                <Ban className="w-5 h-5 text-rose-600" />
+                <Ban className="w-5 h-5 text-danger-text" />
                 <h3 className="font-serif font-bold text-lg text-main">
                   Void Commission Invoice
                 </h3>
@@ -738,7 +738,7 @@ export function AdminInvoiceDetailClient({
 
             <form onSubmit={handleVoidSubmit} className="space-y-4 text-xs">
               {voidError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl">
+                <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl">
                   {voidError}
                 </div>
               )}
@@ -757,7 +757,7 @@ export function AdminInvoiceDetailClient({
                   placeholder="e.g. Incorrect date range selected by billing administrator..."
                   value={voidReason}
                   onChange={(e) => setVoidReason(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main focus:outline-none focus:ring-2 focus:ring-danger"
                 />
               </div>
 
@@ -772,7 +772,7 @@ export function AdminInvoiceDetailClient({
                 <button
                   type="submit"
                   disabled={isSubmittingVoid}
-                  className="px-5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold disabled:opacity-50 transition-colors shadow-sm"
+                  className="px-5 py-2 rounded-lg bg-danger hover:bg-danger-hover text-white font-semibold disabled:opacity-50 transition-colors shadow-sm"
                 >
                   {isSubmittingVoid ? 'Voiding...' : 'Confirm Void'}
                 </button>
@@ -810,7 +810,7 @@ export function AdminInvoiceDetailClient({
             )}
 
             {proofError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs">
+              <div className="p-3 bg-danger-soft border border-danger-border text-danger-text rounded-xl text-xs">
                 {proofError}
               </div>
             )}

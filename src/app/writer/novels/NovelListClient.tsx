@@ -111,15 +111,15 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
     <div className="space-y-6">
       {/* Alert Notices */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <p className="text-xs font-medium">{successMessage}</p>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
         </div>
       )}
@@ -169,7 +169,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
               <span>{tab.label}</span>
               <span
                 className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-secondary'
+                  isActive ? 'bg-white/20 text-white' : 'bg-border text-secondary'
                 }`}
               >
                 {tab.count}
@@ -215,7 +215,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
             return (
               <div
                 key={novel.id}
-                className="bg-surface rounded-2xl border border-border overflow-hidden shadow-sm flex flex-col justify-between hover:border-slate-300 transition-all"
+                className="bg-surface rounded-2xl border border-border overflow-hidden shadow-sm flex flex-col justify-between hover:border-border transition-all"
               >
                 <div>
                   {/* Top Bar: Status + Actions */}
@@ -223,7 +223,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                     <StatusBadge status={novel.status} size="sm" showUrduLabel />
 
                     <div className="flex items-center gap-1.5 text-xs text-secondary font-mono">
-                      <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                      <DollarSign className="w-3.5 h-3.5 text-success" />
                       <span>{novel.price_pkr === 0 ? 'Free' : `PKR ${novel.price_pkr.toLocaleString()}`}</span>
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 p-2 text-center text-[10px]">
+                        <div className="w-full h-full flex flex-col items-center justify-center text-text-muted p-2 text-center text-[10px]">
                           <BookOpen className="w-5 h-5 mb-1" />
                           <span>No Cover</span>
                         </div>
@@ -289,9 +289,9 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
 
                   {/* Editorial Rejection Notice if rejected */}
                   {novel.status === 'rejected' && novel.moderation_reason && (
-                    <div className="mx-5 mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-1">
-                      <div className="flex items-center gap-1.5 font-bold text-rose-800">
-                        <AlertTriangle className="w-4 h-4 text-rose-600" />
+                    <div className="mx-5 mb-4 p-3 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs space-y-1">
+                      <div className="flex items-center gap-1.5 font-bold text-danger-text">
+                        <AlertTriangle className="w-4 h-4 text-danger-text" />
                         <span>Editorial Revision Requested:</span>
                       </div>
                       <p className="leading-relaxed pl-5">
@@ -339,7 +339,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                       <button
                         type="button"
                         onClick={() => setWithdrawNovelId(novel.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-surface text-amber-800 hover:bg-amber-50 text-[11px] font-semibold"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-surface text-warning-text hover:bg-warning-soft text-[11px] font-semibold"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Withdraw</span>
@@ -352,7 +352,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                         <button
                           type="button"
                           onClick={() => setUnpublishNovelId(novel.id)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-surface text-secondary hover:text-rose-600 hover:bg-rose-50 text-[11px] font-semibold"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-surface text-secondary hover:text-danger-text hover:bg-danger-soft text-[11px] font-semibold"
                         >
                           <EyeOff className="w-3.5 h-3.5" />
                           <span>Unpublish</span>
@@ -393,7 +393,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
       {withdrawNovelId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-warning-soft border border-warning-border text-accent-strong flex items-center justify-center mx-auto">
               <RotateCcw className="w-6 h-6" />
             </div>
 
@@ -438,7 +438,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
       {unpublishNovelId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
               <EyeOff className="w-6 h-6" />
             </div>
 
@@ -464,7 +464,7 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                 type="button"
                 disabled={isUnpublishing}
                 onClick={() => handleUnpublish(unpublishNovelId)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger-hover disabled:opacity-50"
               >
                 {isUnpublishing ? (
                   <>

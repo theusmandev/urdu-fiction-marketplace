@@ -42,7 +42,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     return (
       <div className="min-h-screen bg-ivory text-main py-16 px-4 sm:px-6">
         <div className="max-w-xl mx-auto text-center space-y-4 bg-surface border border-border p-8 rounded-2xl shadow-card">
-          <h1 className="text-xl font-bold font-serif text-rose-700">Checkout Error</h1>
+          <h1 className="text-xl font-bold font-serif text-danger-text">Checkout Error</h1>
           <p className="text-sm text-secondary">{novelError.message}</p>
         </div>
       </div>
@@ -82,12 +82,12 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     return (
       <div className="min-h-screen bg-ivory text-main py-16 px-4 sm:px-6">
         <div className="max-w-xl mx-auto text-center space-y-4 bg-surface border border-border p-8 rounded-2xl shadow-card">
-          <h1 className="text-xl font-bold font-serif text-rose-700">Checkout Unavailable</h1>
+          <h1 className="text-xl font-bold font-serif text-danger-text">Checkout Unavailable</h1>
           <p className="text-sm text-secondary">{checkoutError.message}</p>
           <div className="pt-4">
             <a
               href={`/novels/${slug}`}
-              className="inline-flex items-center px-4 py-2 rounded-xl bg-surface-muted hover:bg-slate-100 border border-border text-sm font-semibold text-navy transition-colors shadow-sm"
+              className="inline-flex items-center px-4 py-2 rounded-xl bg-surface-muted hover:bg-surface-muted border border-border text-sm font-semibold text-navy transition-colors shadow-sm"
             >
               Return to Novel Details
             </a>

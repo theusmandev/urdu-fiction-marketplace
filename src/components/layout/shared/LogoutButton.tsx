@@ -32,25 +32,19 @@ export function LogoutButton({
 
   switch (variant) {
     case 'admin':
-      defaultStyles =
-        'flex items-center gap-2.5 w-full px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
-      break;
     case 'writer':
-      defaultStyles =
-        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-200 bg-navy-light/60 hover:bg-rose-950/40 hover:text-rose-300 border border-navy-light hover:border-rose-900/50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
-      break;
     case 'dropdown':
       defaultStyles =
-        'flex items-center gap-2.5 w-full px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+        'flex items-center gap-2.5 w-full px-3 py-2 text-xs font-medium text-danger-text hover:bg-danger-soft border border-transparent hover:border-danger-border rounded-xl transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
       break;
     case 'icon':
       defaultStyles =
-        'p-2 rounded-lg text-secondary hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+        'p-2 rounded-lg text-text-muted hover:text-danger-text hover:bg-danger-soft transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
       break;
     case 'marketplace':
     default:
       defaultStyles =
-        'flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+        'flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-danger-text bg-danger-soft hover:bg-danger-soft/80 border border-danger-border transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
       break;
   }
 

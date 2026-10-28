@@ -40,8 +40,8 @@ export default async function NewTipPage({ searchParams }: NewTipPageProps) {
       </nav>
 
       <div className="text-center space-y-2 pb-2">
-        <div className="inline-flex p-3 rounded-2xl bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 mx-auto">
-          <Heart className="w-6 h-6 fill-amber-600/30" />
+        <div className="inline-flex p-3 rounded-2xl bg-warning-soft/80 text-warning-text mx-auto">
+          <Heart className="w-6 h-6 fill-accent-strong/30" />
         </div>
         <h1 className="text-2xl font-bold font-serif text-main">
           {TIP_CARD_COPY.title}

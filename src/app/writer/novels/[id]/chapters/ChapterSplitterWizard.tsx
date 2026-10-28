@@ -516,15 +516,15 @@ export function ChapterSplitterWizard({
         {/* Modal Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 bg-ivory/20">
           {successMessage && (
-            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <div className="p-4 rounded-xl bg-success-soft border border-success-border text-success-text flex items-center gap-3">
+              <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
               <p className="text-xs font-semibold">{successMessage}</p>
             </div>
           )}
 
           {errorMessage && (
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-danger-text shrink-0 mt-0.5" />
               <p className="text-xs">{errorMessage}</p>
             </div>
           )}
@@ -573,7 +573,7 @@ export function ChapterSplitterWizard({
                     type="checkbox"
                     checked={normalizeArabic}
                     onChange={(e) => setNormalizeArabic(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-navy focus:ring-accent mt-0.5"
+                    className="w-4 h-4 rounded border-border text-navy focus:ring-ring mt-0.5"
                   />
                   <div>
                     <span className="text-xs font-semibold text-main block">
@@ -629,7 +629,7 @@ export function ChapterSplitterWizard({
                   }`}
                 >
                   <div className="flex items-center gap-2 font-bold text-xs text-navy">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-success" />
                     <span>Split by Headings</span>
                   </div>
                   <p className="text-xs text-secondary mt-2 leading-relaxed">
@@ -647,7 +647,7 @@ export function ChapterSplitterWizard({
                   }`}
                 >
                   <div className="flex items-center gap-2 font-bold text-xs text-navy">
-                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-600" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary" />
                     <span>Split Manually</span>
                   </div>
                   <p className="text-xs text-secondary mt-2 leading-relaxed">
@@ -692,14 +692,14 @@ export function ChapterSplitterWizard({
                 </div>
 
                 {activePatternDesc && (
-                  <span className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-success-soft text-success-text border border-success-border">
                     Pattern: {activePatternDesc}
                   </span>
                 )}
               </div>
 
               {/* Lines Viewer */}
-              <div className="max-h-96 overflow-y-auto rounded-xl border border-border bg-white divide-y divide-slate-100 font-urdu text-sm leading-[2.2]">
+              <div className="max-h-96 overflow-y-auto rounded-xl border border-border bg-white divide-y divide-border/40 font-urdu text-sm leading-[2.2]">
                 {analysis.allLines.map((line, idx) => {
                   const lineNum = idx + 1;
                   const isFrontMatter = Boolean(
@@ -722,15 +722,15 @@ export function ChapterSplitterWizard({
                       onClick={() => toggleManualSplitLine(lineNum)}
                       className={`p-2 sm:px-3 flex items-start gap-3 cursor-pointer transition-colors group ${
                         isMarked
-                          ? 'bg-amber-100/70 border-l-4 border-l-accent'
+                          ? 'bg-warning-soft/70 border-l-4 border-l-accent'
                           : isFrontMatter
-                          ? 'bg-indigo-50/50'
+                          ? 'bg-info-soft/50'
                           : isEndNote
-                          ? 'bg-rose-50/50'
+                          ? 'bg-danger-soft/50'
                           : 'hover:bg-ivory'
                       }`}
                     >
-                      <span className="font-mono text-[10px] text-slate-400 select-none w-8 shrink-0 text-right pt-1">
+                      <span className="font-mono text-[10px] text-text-muted select-none w-8 shrink-0 text-right pt-1">
                         {lineNum}
                       </span>
 
@@ -741,17 +741,17 @@ export function ChapterSplitterWizard({
                       {/* Tag badges */}
                       <div className="shrink-0 flex items-center gap-1.5 pt-0.5">
                         {isFrontMatter && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 font-mono">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-info-soft text-info-text font-mono">
                             Header
                           </span>
                         )}
                         {isEndNote && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-mono">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-danger-soft text-danger-text font-mono">
                             Footer
                           </span>
                         )}
                         {isSceneBreak && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-mono">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-warning-soft text-warning-text font-mono">
                             Break
                           </span>
                         )}
@@ -762,7 +762,7 @@ export function ChapterSplitterWizard({
                               e.stopPropagation();
                               handleLineClickForPattern(line);
                             }}
-                            className="text-[9px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold"
+                            className="text-[9px] px-2 py-0.5 rounded bg-success-soft text-success-text hover:bg-success-soft font-semibold"
                             title="Split before all lines like this one"
                           >
                             Use as Heading Pattern
@@ -796,8 +796,8 @@ export function ChapterSplitterWizard({
               {analysis.frontMatter && (
                 <div className="p-4 rounded-xl border border-border bg-white space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-info-text" />
                       Front-Matter Attribution Detected ({analysis.frontMatter.lines.length} lines)
                     </span>
                     <label className="flex items-center gap-2 cursor-pointer text-xs">
@@ -805,7 +805,7 @@ export function ChapterSplitterWizard({
                         type="checkbox"
                         checked={removeFrontMatter}
                         onChange={(e) => setRemoveFrontMatter(e.target.checked)}
-                        className="w-4 h-4 rounded text-navy focus:ring-accent"
+                        className="w-4 h-4 rounded text-navy focus:ring-ring"
                       />
                       <span className="font-semibold text-main">Remove from Chapter 1</span>
                     </label>
@@ -820,8 +820,8 @@ export function ChapterSplitterWizard({
               {analysis.endNote && (
                 <div className="p-4 rounded-xl border border-border bg-white space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+                    <span className="text-xs font-bold text-danger-text flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-danger-text" />
                       End-of-Episode Announcement Detected ({analysis.endNote.lines.length} lines)
                     </span>
                     <label className="flex items-center gap-2 cursor-pointer text-xs">
@@ -829,7 +829,7 @@ export function ChapterSplitterWizard({
                         type="checkbox"
                         checked={removeEndNote}
                         onChange={(e) => setRemoveEndNote(e.target.checked)}
-                        className="w-4 h-4 rounded text-navy focus:ring-accent"
+                        className="w-4 h-4 rounded text-navy focus:ring-ring"
                       />
                       <span className="font-semibold text-main">Remove from Final Chapter</span>
                     </label>
@@ -902,7 +902,7 @@ export function ChapterSplitterWizard({
                       type="checkbox"
                       checked={prioritizeSceneBreaks}
                       onChange={(e) => setPrioritizeSceneBreaks(e.target.checked)}
-                      className="w-4 h-4 rounded text-navy focus:ring-accent"
+                      className="w-4 h-4 rounded text-navy focus:ring-ring"
                     />
                     <span className="font-semibold text-main">
                       Prioritize scene-break dividers (***, ---, ❖) nearest the target
@@ -912,7 +912,7 @@ export function ChapterSplitterWizard({
               </div>
 
               {/* Result Preview Box */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+              <div className="p-4 rounded-xl bg-surface-muted border border-border flex items-center justify-between text-xs">
                 <div>
                   <span className="text-secondary block">Estimated Result:</span>
                   <strong className="text-sm text-navy">
@@ -921,7 +921,7 @@ export function ChapterSplitterWizard({
                 </div>
                 <div className="text-right">
                   <span className="text-secondary block">Average Size:</span>
-                  <span className="font-mono text-sm text-slate-700">
+                  <span className="font-mono text-sm text-text">
                     ~{Math.round(analysis.totalWords / (computedRawParts.length || 1)).toLocaleString()} words / part
                   </span>
                 </div>
@@ -988,13 +988,13 @@ export function ChapterSplitterWizard({
                 {/* Preservation Check Badge */}
                 <div className="flex items-center gap-1.5">
                   {buildResult.textPreserved ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success-soft text-success-text border border-success-border text-xs font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                       <span>Text Preserved: 100% Lossless Match</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warning-soft text-warning-text border border-warning-border text-xs font-bold">
+                      <AlertTriangle className="w-3.5 h-3.5 text-accent-strong" />
                       <span>Whitespace difference detected</span>
                     </span>
                   )}
@@ -1003,9 +1003,9 @@ export function ChapterSplitterWizard({
 
               {/* Warnings List */}
               {buildResult.warnings.length > 0 && (
-                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1">
+                <div className="p-3.5 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs space-y-1">
                   <strong className="flex items-center gap-1.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <AlertTriangle className="w-4 h-4 text-accent-strong" />
                     Review Warnings:
                   </strong>
                   <ul className="list-disc pl-5 space-y-0.5 text-[11px]">
@@ -1031,7 +1031,7 @@ export function ChapterSplitterWizard({
                           dir="rtl"
                           value={part.title}
                           onChange={(e) => handleTitleChange(idx, e.target.value)}
-                          className="px-2.5 py-1 rounded border border-border bg-ivory font-urdu text-sm focus:outline-none focus:ring-1 focus:ring-accent flex-1 max-w-md"
+                          className="px-2.5 py-1 rounded border border-border bg-ivory font-urdu text-sm focus:outline-none focus:ring-1 focus:ring-ring flex-1 max-w-md"
                         />
                       </div>
 
@@ -1042,7 +1042,7 @@ export function ChapterSplitterWizard({
                         <span
                           className={`font-mono text-[11px] ${
                             part.charCount > HARD_MAX_CHAPTER_CHARACTERS
-                              ? 'text-rose-600 font-bold'
+                              ? 'text-danger-text font-bold'
                               : 'text-secondary'
                           }`}
                         >
@@ -1056,7 +1056,7 @@ export function ChapterSplitterWizard({
                               type="checkbox"
                               checked={firstPartFree}
                               onChange={(e) => setFirstPartFree(e.target.checked)}
-                              className="w-3.5 h-3.5 rounded text-navy focus:ring-accent"
+                              className="w-3.5 h-3.5 rounded text-navy focus:ring-ring"
                             />
                             <span className="text-[11px] text-secondary font-medium">Free Preview</span>
                           </label>
@@ -1104,9 +1104,9 @@ export function ChapterSplitterWizard({
               </div>
 
               {mode === 'split-existing' ? (
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2 text-xs">
+                <div className="p-4 rounded-xl bg-warning-soft border border-warning-border text-warning-text space-y-2 text-xs">
                   <div className="font-bold flex items-center gap-2">
-                    <Info className="w-4 h-4 text-amber-600" />
+                    <Info className="w-4 h-4 text-accent-strong" />
                     <span>Existing Chapter Replacement Confirmation</span>
                   </div>
                   <p className="leading-relaxed text-[11px]">
@@ -1134,7 +1134,7 @@ export function ChapterSplitterWizard({
                 </div>
               )}
 
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+              <div className="p-4 rounded-xl bg-surface-muted border border-border space-y-2 text-xs">
                 <div className="font-bold text-navy">Database Safeguards:</div>
                 <ul className="list-disc pl-5 space-y-1 text-secondary text-[11px]">
                   <li>All chapters will be saved atomically as <strong>DRAFT</strong> (unpublished).</li>

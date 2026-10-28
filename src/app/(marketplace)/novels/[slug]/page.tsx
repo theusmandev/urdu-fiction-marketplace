@@ -343,7 +343,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                     <FileText className="w-3.5 h-3.5 text-accent" />
                     <span>Free Preview</span>
                   </div>
-                  <p className="font-bold text-emerald-600 mt-1 text-sm">
+                  <p className="font-bold text-success mt-1 text-sm">
                     {freeChapters.length} {freeChapters.length === 1 ? "Chapter" : "Chapters"}
                   </p>
                 </div>

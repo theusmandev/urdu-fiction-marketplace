@@ -101,11 +101,11 @@ interface WriterOrderDbRow {
   if (ordersError) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 flex items-start gap-3">
+        <div className="p-4 rounded-xl border border-danger-border bg-danger-soft text-danger-text flex items-start gap-3">
           <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
           <div>
             <h3 className="font-semibold text-sm">Failed to load orders</h3>
-            <p className="text-xs text-red-400/80 mt-1">{ordersError.message}</p>
+            <p className="text-xs text-danger-text/80 mt-1">{ordersError.message}</p>
           </div>
         </div>
       </div>

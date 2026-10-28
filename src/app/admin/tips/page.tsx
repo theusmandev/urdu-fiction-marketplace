@@ -82,8 +82,8 @@ export default async function AdminTipsPage({ searchParams }: AdminTipsPageProps
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-100 text-amber-800">
-              <Heart className="w-5 h-5 fill-amber-600/30" />
+            <div className="p-2 rounded-xl bg-warning-soft text-warning-text">
+              <Heart className="w-5 h-5 fill-accent-strong/30" />
             </div>
             <div>
               <h1 className="text-xl font-bold font-serif text-navy">
@@ -101,11 +101,11 @@ export default async function AdminTipsPage({ searchParams }: AdminTipsPageProps
           href={`/admin/tips?flagged=${isFlaggedOnly ? 'false' : 'true'}`}
           className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
             isFlaggedOnly
-              ? 'bg-amber-100 text-amber-900 border-amber-300 shadow-xs'
+              ? 'bg-warning-soft text-warning-text border-warning-border shadow-xs'
               : 'bg-surface text-secondary border-border hover:bg-surface-elevated'
           }`}
         >
-          <AlertTriangle className="w-4 h-4 text-amber-600" />
+          <AlertTriangle className="w-4 h-4 text-accent-strong" />
           <span>{isFlaggedOnly ? 'Showing Tips to Review' : 'Filter Tips to Review'}</span>
         </Link>
       </div>
@@ -121,7 +121,7 @@ export default async function AdminTipsPage({ searchParams }: AdminTipsPageProps
               name="search"
               defaultValue={currentSearch}
               placeholder="Search by tip number, TID, or writer..."
-              className="w-full pl-9 pr-4 py-2 bg-ivory/50 border border-border rounded-xl text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40"
+              className="w-full pl-9 pr-4 py-2 bg-ivory/50 border border-border rounded-xl text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/40"
             />
           </div>
 
@@ -130,7 +130,7 @@ export default async function AdminTipsPage({ searchParams }: AdminTipsPageProps
             <select
               name="status"
               defaultValue={currentStatus}
-              className="w-full px-3 py-2 bg-ivory/50 border border-border rounded-xl text-xs text-main focus:outline-none focus:ring-2 focus:ring-accent-admin/40 cursor-pointer"
+              className="w-full px-3 py-2 bg-ivory/50 border border-border rounded-xl text-xs text-main focus:outline-none focus:ring-2 focus:ring-ring-admin/40 cursor-pointer"
             >
               <option value="">All Statuses</option>
               <option value="pending_payment">Pending Payment</option>
@@ -225,8 +225,8 @@ export default async function AdminTipsPage({ searchParams }: AdminTipsPageProps
                       </td>
                       <td className="py-3.5 px-4">
                         {isFlagged ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                            <AlertTriangle className="w-3 h-3 text-amber-700" />
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-warning-soft text-warning-text border border-warning-border">
+                            <AlertTriangle className="w-3 h-3 text-warning-text" />
                             <span>{tip.review_flag || 'Duplicate TID'}</span>
                           </span>
                         ) : (

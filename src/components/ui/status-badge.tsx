@@ -50,31 +50,31 @@ const statusMap: Record<string, StatusMeta> = {
   pending_verification: {
     labelEn: "Pending Verification",
     labelUrdu: "تصدیق کی منتظر",
-    classes: "bg-amber-50 text-amber-800 border-amber-200/80 hover:bg-amber-100/60",
+    classes: "bg-warning-soft text-warning-text border-warning-border",
     icon: Clock,
   },
   verified: {
     labelEn: "Payment Verified",
     labelUrdu: "تصدیق شدہ",
-    classes: "bg-emerald-50 text-emerald-800 border-emerald-200/80 hover:bg-emerald-100/60",
+    classes: "bg-success-soft text-success-text border-success-border",
     icon: CheckCircle2,
   },
   rejected: {
     labelEn: "Verification Rejected",
     labelUrdu: "مسترد شدہ",
-    classes: "bg-rose-50 text-rose-800 border-rose-200/80 hover:bg-rose-100/60",
+    classes: "bg-danger-soft text-danger-text border-danger-border",
     icon: XCircle,
   },
   disputed: {
     labelEn: "In Dispute",
     labelUrdu: "زیرِ تنازعہ",
-    classes: "bg-purple-50 text-purple-800 border-purple-200/80 hover:bg-purple-100/60",
+    classes: "bg-danger-soft text-danger-text border-danger-border",
     icon: AlertCircle,
   },
   processing: {
     labelEn: "Processing",
     labelUrdu: "زیرِ عمل",
-    classes: "bg-blue-50 text-blue-800 border-blue-200/80",
+    classes: "bg-info-soft text-info-text border-info-border",
     icon: Clock,
   },
 
@@ -82,75 +82,75 @@ const statusMap: Record<string, StatusMeta> = {
   draft: {
     labelEn: "Draft",
     labelUrdu: "مسودہ",
-    classes: "bg-stone-100 text-stone-700 border-stone-200",
+    classes: "bg-surface-muted text-text-muted border-border",
     icon: FileText,
   },
   under_review: {
     labelEn: "Under Review",
     labelUrdu: "زیرِ جائزہ",
-    classes: "bg-sky-50 text-sky-800 border-sky-200",
+    classes: "bg-info-soft text-info-text border-info-border",
     icon: Clock,
   },
   published: {
     labelEn: "Published",
     labelUrdu: "شائع شدہ",
-    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    classes: "bg-success-soft text-success-text border-success-border",
     icon: ShieldCheck,
   },
   suspended: {
     labelEn: "Suspended",
     labelUrdu: "معطل",
-    classes: "bg-rose-50 text-rose-800 border-rose-200",
+    classes: "bg-danger-soft text-danger-text border-danger-border",
     icon: PauseCircle,
   },
 
-  // Commission Ledger & Invoices
+  // Platform Fee Ledger & Invoices
   commission_unpaid: {
     labelEn: "Platform Fee Accruing",
     labelUrdu: "پلیٹ فارم فیس واجب الادا",
-    classes: "bg-amber-50 text-amber-800 border-amber-200",
+    classes: "bg-warning-soft text-warning-text border-warning-border",
     icon: Clock,
   },
   commission_cleared: {
     labelEn: "Remitted & Cleared",
     labelUrdu: "پلیٹ فارم فیس ادا شدہ",
-    classes: "bg-teal-50 text-teal-800 border-teal-200",
+    classes: "bg-success-soft text-success-text border-success-border",
     icon: CheckCircle2,
   },
   commission_overdue: {
     labelEn: "Threshold Exceeded",
     labelUrdu: "حد سے متجاوز",
-    classes: "bg-rose-100 text-rose-900 border-rose-300 font-semibold",
+    classes: "bg-danger-soft text-danger-text border-danger-border font-semibold",
     icon: AlertCircle,
   },
   invoiced: {
     labelEn: "Invoiced",
     labelUrdu: "انوائس جاری شدہ",
-    classes: "bg-blue-50 text-blue-800 border-blue-200",
+    classes: "bg-info-soft text-info-text border-info-border",
     icon: FileText,
   },
   payment_reported: {
     labelEn: "Payment Reported",
     labelUrdu: "ادائیگی ارسال کردہ",
-    classes: "bg-purple-50 text-purple-800 border-purple-200",
+    classes: "bg-warning-soft text-warning-text border-warning-border",
     icon: Clock,
   },
   partially_paid: {
     labelEn: "Partially Paid",
     labelUrdu: "جزوی ادا شدہ",
-    classes: "bg-amber-50 text-amber-800 border-amber-200",
+    classes: "bg-warning-soft text-warning-text border-warning-border",
     icon: AlertCircle,
   },
   settled: {
     labelEn: "Settled",
     labelUrdu: "مکمل ادا شدہ",
-    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    classes: "bg-success-soft text-success-text border-success-border",
     icon: CheckCircle2,
   },
   void: {
     labelEn: "Voided",
     labelUrdu: "منسوخ شدہ",
-    classes: "bg-slate-100 text-slate-600 border-slate-300 line-through",
+    classes: "bg-surface-muted text-text-muted border-border line-through",
     icon: XCircle,
   },
 
@@ -158,19 +158,19 @@ const statusMap: Record<string, StatusMeta> = {
   report_pending: {
     labelEn: "Pending Review",
     labelUrdu: "زیرِ جائزہ",
-    classes: "bg-amber-50 text-amber-800 border-amber-200",
+    classes: "bg-warning-soft text-warning-text border-warning-border",
     icon: Clock,
   },
   report_confirmed: {
     labelEn: "Confirmed",
     labelUrdu: "تصدیق شدہ",
-    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    classes: "bg-success-soft text-success-text border-success-border",
     icon: CheckCircle2,
   },
   report_rejected: {
     labelEn: "Rejected",
     labelUrdu: "مسترد",
-    classes: "bg-rose-50 text-rose-800 border-rose-200",
+    classes: "bg-danger-soft text-danger-text border-danger-border",
     icon: XCircle,
   },
 
@@ -178,19 +178,19 @@ const statusMap: Record<string, StatusMeta> = {
   sale_verified: {
     labelEn: "Sale Verified",
     labelUrdu: "فروخت تصدیق شدہ",
-    classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    classes: "bg-success-soft text-success-text border-success-border",
     icon: CheckCircle2,
   },
   refund_adjustment: {
     labelEn: "Refund Adjustment",
     labelUrdu: "رقم واپسی ایڈجسٹمنٹ",
-    classes: "bg-rose-50 text-rose-800 border-rose-200",
+    classes: "bg-danger-soft text-danger-text border-danger-border",
     icon: AlertCircle,
   },
   manual_correction: {
     labelEn: "Manual Correction",
     labelUrdu: "دستی درستگی",
-    classes: "bg-indigo-50 text-indigo-800 border-indigo-200",
+    classes: "bg-info-soft text-info-text border-info-border",
     icon: FileText,
   },
 };
@@ -198,7 +198,7 @@ const statusMap: Record<string, StatusMeta> = {
 const defaultStatusMeta: StatusMeta = {
   labelEn: "Unknown",
   labelUrdu: "نامعلوم",
-  classes: "bg-gray-100 text-gray-700 border-gray-200",
+  classes: "bg-surface-muted text-text-muted border-border",
   icon: HelpCircle,
 };
 

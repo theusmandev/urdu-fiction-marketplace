@@ -78,15 +78,15 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Authors Directory</span>
         </Link>
-        <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 space-y-3">
+        <div className="p-6 rounded-2xl bg-danger-soft border border-danger-border text-danger-text space-y-3">
           <div className="flex items-center gap-2 font-bold text-sm">
-            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
+            <ShieldAlert className="w-5 h-5 shrink-0 text-danger-text" />
             <span>Database Error Loading Author Profile</span>
           </div>
-          <p className="text-xs text-rose-700 leading-relaxed">
+          <p className="text-xs text-danger-text leading-relaxed">
             A database error occurred while retrieving this writer profile:
           </p>
-          <div className="p-3 rounded-xl bg-white border border-rose-200 text-xs font-mono text-rose-800">
+          <div className="p-3 rounded-xl bg-white border border-danger-border text-xs font-mono text-danger-text">
             {writerError.message} {writerError.code ? `(Code: ${writerError.code})` : ''}
           </div>
           {writerError.hint && (
@@ -149,7 +149,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
         <div className="flex items-center gap-2">
           <StatusBadge status={writer.status} />
           {writer.is_orders_paused_for_commission && (
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-danger-soft text-danger-text border border-danger-border">
               Orders Paused (Limit Exceeded)
             </span>
           )}
@@ -168,7 +168,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                 <h1 className="text-xl md:text-2xl font-bold text-main tracking-tight">
                   {writer.pen_name_english}
                 </h1>
-                <UrduText as="div" size="lg" className="text-brand-gold font-medium py-0">
+                <UrduText as="div" size="lg" className="text-accent-strong font-medium py-0">
                   {writer.pen_name_urdu}
                 </UrduText>
               </div>
@@ -231,7 +231,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
 
               <div className="flex justify-between items-center py-1.5 border-b border-border">
                 <span className="text-muted font-sans">Current Unpaid Balance:</span>
-                <span className="font-bold text-emerald-600 font-mono">
+                <span className="font-bold text-success font-mono">
                   PKR {Number(writer.current_unpaid_commission).toLocaleString()}
                 </span>
               </div>
@@ -247,11 +247,11 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                 <span className="text-muted font-sans">Order Acceptance:</span>
                 <span>
                   {writer.is_orders_paused_for_commission ? (
-                    <span className="text-rose-600 flex items-center gap-1 font-sans font-semibold">
+                    <span className="text-danger-text flex items-center gap-1 font-sans font-semibold">
                       <AlertTriangle className="w-3.5 h-3.5" /> Paused (Over Limit)
                     </span>
                   ) : (
-                    <span className="text-emerald-600 font-sans font-semibold">Active & Accepting</span>
+                    <span className="text-success font-sans font-semibold">Active & Accepting</span>
                   )}
                 </span>
               </div>
@@ -271,7 +271,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
             <div className="text-xs text-main space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-muted">Status:</span>
-                <span className={writer.agreement_accepted_at ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
+                <span className={writer.agreement_accepted_at ? 'text-success font-semibold' : 'text-accent-strong font-semibold'}>
                   {writer.agreement_accepted_at ? 'Accepted' : 'Pending Acceptance'}
                 </span>
               </div>
@@ -316,7 +316,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
           <div className="bg-surface border border-border rounded-2xl p-5 space-y-4 shadow-card">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-main flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-emerald-600" />
+                <CreditCard className="w-4 h-4 text-success" />
                 <span>Registered Payment Methods ({paymentMethods?.length || 0})</span>
               </h2>
               <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
@@ -342,7 +342,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                           pm.is_active
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            ? 'bg-success-soft text-success-text border border-success-border'
                             : 'bg-surface text-muted border border-border'
                         }`}
                       >
@@ -379,7 +379,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
           <div className="bg-surface border border-border rounded-2xl p-5 space-y-4 shadow-card">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-main flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-brand-gold" />
+                <BookOpen className="w-4 h-4 text-accent-strong" />
                 <span>Novels Portfolio ({novels?.length || 0})</span>
               </h2>
             </div>
@@ -402,12 +402,12 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                         </span>
                         <StatusBadge status={novel.status} />
                         {novel.is_featured && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning-soft text-warning-text border border-warning-border">
                             Featured
                           </span>
                         )}
                       </div>
-                      <UrduText as="div" size="sm" className="text-brand-gold py-0">
+                      <UrduText as="div" size="sm" className="text-accent-strong py-0">
                         {novel.title_urdu}
                       </UrduText>
                       <div className="text-[11px] text-muted flex items-center gap-3 font-mono">

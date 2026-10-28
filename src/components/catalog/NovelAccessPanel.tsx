@@ -45,7 +45,7 @@ export function NovelAccessPanel({
     if (compact) {
       return (
         <div className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-surface-muted text-secondary rounded-xl border border-border animate-pulse px-3 py-2 text-xs">
-          <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-gold" />
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-accent-strong" />
           <span>Loading access...</span>
         </div>
       );
@@ -54,11 +54,11 @@ export function NovelAccessPanel({
     return (
       <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4 animate-pulse">
         <div className="flex justify-between items-center">
-          <div className="h-4 bg-slate-200 rounded w-16" />
-          <div className="h-6 bg-slate-200 rounded w-24" />
+          <div className="h-4 bg-border rounded w-16" />
+          <div className="h-6 bg-border rounded w-24" />
         </div>
-        <div className="h-11 bg-slate-200 rounded-xl w-full" />
-        <div className="h-9 bg-slate-100 rounded-xl w-full" />
+        <div className="h-11 bg-border rounded-xl w-full" />
+        <div className="h-9 bg-surface-muted rounded-xl w-full" />
       </div>
     );
   }
@@ -70,9 +70,9 @@ export function NovelAccessPanel({
         <button
           type="button"
           disabled
-          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-slate-100 text-slate-400 font-semibold py-2 px-3 rounded-xl cursor-not-allowed text-xs border border-slate-200"
+          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-surface-muted text-text-muted font-semibold py-2 px-3 rounded-xl cursor-not-allowed text-xs border border-border"
         >
-          <Lock className="w-3.5 h-3.5 text-slate-400" />
+          <Lock className="w-3.5 h-3.5 text-text-muted" />
           <span>Unavailable</span>
         </button>
       );
@@ -82,7 +82,7 @@ export function NovelAccessPanel({
       return (
         <div className="flex items-center justify-between gap-3 w-full">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1 text-emerald-700 text-xs font-semibold">
+            <div className="flex items-center gap-1 text-success-text text-xs font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">You own this novel</span>
             </div>
@@ -90,7 +90,7 @@ export function NovelAccessPanel({
           </div>
           <Link
             href={`/read/${novelSlug}/${continueInfo.chapterNumber}`}
-            className="shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl shadow-xs text-xs"
+            className="shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 bg-success hover:bg-success text-white font-bold py-2 px-4 rounded-xl shadow-xs text-xs"
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>{continueInfo.isContinue ? `Continue (Ch ${continueInfo.chapterNumber})` : 'Start Reading'}</span>
@@ -111,7 +111,7 @@ export function NovelAccessPanel({
           </Link>
           <Link
             href={`/read/${novelSlug}/${lastReadChapterNumber ?? 1}`}
-            className="flex-1 min-h-[44px] flex items-center justify-center gap-1 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2 px-2.5 rounded-xl text-xs"
+            className="flex-1 min-h-[44px] flex items-center justify-center gap-1 bg-accent hover:bg-accent-hover text-navy font-bold py-2 px-2.5 rounded-xl text-xs"
           >
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span>Read as Author</span>
@@ -132,7 +132,7 @@ export function NovelAccessPanel({
           </Link>
           <Link
             href={`/read/${novelSlug}/${lastReadChapterNumber ?? 1}`}
-            className="flex-1 min-h-[44px] flex items-center justify-center gap-1 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2 px-2.5 rounded-xl text-xs"
+            className="flex-1 min-h-[44px] flex items-center justify-center gap-1 bg-accent hover:bg-accent-hover text-navy font-bold py-2 px-2.5 rounded-xl text-xs"
           >
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span>Read</span>
@@ -145,7 +145,7 @@ export function NovelAccessPanel({
       return (
         <div className="flex items-center justify-between gap-3 w-full">
           <div className="min-w-0 flex-1">
-            <div className="text-xs font-semibold text-brand-gold truncate">
+            <div className="text-xs font-semibold text-accent-strong truncate">
               {state === 'pending_verification'
                 ? 'Payment Pending'
                 : state === 'rejected'
@@ -158,7 +158,7 @@ export function NovelAccessPanel({
           </div>
           <Link
             href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-            className="shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2 px-4 rounded-xl text-xs"
+            className="shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 bg-accent hover:bg-accent-hover text-navy font-bold py-2 px-4 rounded-xl text-xs"
           >
             <Clock className="w-3.5 h-3.5" />
             <span>View Order</span>
@@ -200,16 +200,16 @@ export function NovelAccessPanel({
       <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4">
         <div className="flex items-baseline justify-between">
           <span className="text-xs text-secondary">Price / قیمت:</span>
-          <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+          <span className="text-xs font-semibold text-danger-text bg-danger-soft px-2.5 py-0.5 rounded-full border border-danger-border">
             Unavailable
           </span>
         </div>
         <button
           type="button"
           disabled
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-slate-100 text-slate-400 font-semibold py-3 px-4 rounded-xl cursor-not-allowed text-sm border border-slate-200"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-surface-muted text-text-muted font-semibold py-3 px-4 rounded-xl cursor-not-allowed text-sm border border-border"
         >
-          <Lock className="w-4 h-4 text-slate-400" />
+          <Lock className="w-4 h-4 text-text-muted" />
           <span>Unavailable / دستیاب نہیں</span>
         </button>
         <p className="text-[11px] text-secondary text-center">
@@ -222,12 +222,12 @@ export function NovelAccessPanel({
   // B. Owner Buyer State (NO price, NO payment-guarantee card)
   if (state === 'owner_buyer') {
     return (
-      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-emerald-200/80 bg-emerald-50/20 shadow-sm space-y-4">
-        <div className="flex items-center gap-2 text-emerald-800 bg-emerald-100/70 p-2.5 rounded-xl border border-emerald-200">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-success-border bg-success-soft/20 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 text-success-text bg-success-soft/70 p-2.5 rounded-xl border border-success-border">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <div className="min-w-0">
             <span className="font-bold text-xs block">You own this novel</span>
-            <UrduText as="span" size="xs" className="text-emerald-900 block py-0 leading-tight font-normal">
+            <UrduText as="span" size="xs" className="text-success-text block py-0 leading-tight font-normal">
               آپ کے پاس مکمل رسائی ہے
             </UrduText>
           </div>
@@ -235,7 +235,7 @@ export function NovelAccessPanel({
 
         <Link
           href={`/read/${novelSlug}/${continueInfo.chapterNumber}`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-sm cursor-pointer"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-success hover:bg-success text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-sm cursor-pointer"
         >
           <BookOpen className="w-4 h-4" />
           <span>{continueInfo.labelEn}</span>
@@ -257,9 +257,9 @@ export function NovelAccessPanel({
   // C. Author State
   if (state === 'author') {
     return (
-      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-amber-200 bg-amber-50/30 shadow-sm space-y-4">
-        <div className="flex items-center gap-2 text-amber-900 bg-amber-100/70 p-2.5 rounded-xl border border-amber-200">
-          <Feather className="w-4 h-4 text-amber-700 shrink-0" />
+      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-warning-border bg-warning-soft/30 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 text-warning-text bg-warning-soft/70 p-2.5 rounded-xl border border-warning-border">
+          <Feather className="w-4 h-4 text-warning-text shrink-0" />
           <span className="font-bold text-xs">Author View / مصنف</span>
         </div>
 
@@ -273,7 +273,7 @@ export function NovelAccessPanel({
 
         <Link
           href={`/read/${novelSlug}/${lastReadChapterNumber ?? 1}`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2.5 px-4 rounded-xl transition-all text-xs"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-2.5 px-4 rounded-xl transition-all text-xs"
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Read as Author</span>
@@ -285,9 +285,9 @@ export function NovelAccessPanel({
   // D. Admin State
   if (state === 'admin') {
     return (
-      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-rose-200 bg-rose-50/30 shadow-sm space-y-4">
-        <div className="flex items-center gap-2 text-rose-900 bg-rose-100/70 p-2.5 rounded-xl border border-rose-200">
-          <ShieldAlert className="w-4 h-4 text-rose-700 shrink-0" />
+      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-danger-border bg-danger-soft/30 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 text-danger-text bg-danger-soft/70 p-2.5 rounded-xl border border-danger-border">
+          <ShieldAlert className="w-4 h-4 text-danger-text shrink-0" />
           <span className="font-bold text-xs">Admin View / منتظم</span>
         </div>
 
@@ -301,7 +301,7 @@ export function NovelAccessPanel({
 
         <Link
           href={`/read/${novelSlug}/${lastReadChapterNumber ?? 1}`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-2.5 px-4 rounded-xl transition-all text-xs"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-2.5 px-4 rounded-xl transition-all text-xs"
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Read as Admin</span>
@@ -313,20 +313,20 @@ export function NovelAccessPanel({
   // E. Pending Verification State
   if (state === 'pending_verification') {
     return (
-      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-amber-200 bg-amber-50/30 shadow-sm space-y-4">
-        <div className="space-y-1.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-warning-border bg-warning-soft/30 shadow-sm space-y-4">
+        <div className="space-y-1.5 p-3 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs">
           <div className="flex items-center gap-1.5 font-bold">
-            <Clock className="w-4 h-4 text-amber-700 shrink-0" />
+            <Clock className="w-4 h-4 text-warning-text shrink-0" />
             <span>Waiting for writer verification</span>
           </div>
-          <UrduText as="p" size="xs" className="text-amber-800 leading-tight py-0 font-normal">
+          <UrduText as="p" size="xs" className="text-warning-text leading-tight py-0 font-normal">
             مصنف کی جانب سے ادائیگی کی تصدیق کا انتظار ہے۔
           </UrduText>
         </div>
 
         <Link
           href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all text-sm"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all text-sm"
         >
           <Clock className="w-4 h-4" />
           <span>View your order</span>
@@ -348,17 +348,17 @@ export function NovelAccessPanel({
   // F. Rejected / Disputed State
   if (state === 'rejected' || state === 'disputed') {
     return (
-      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-rose-200 bg-rose-50/30 shadow-sm space-y-4">
-        <div className="space-y-1.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs">
+      <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-danger-border bg-danger-soft/30 shadow-sm space-y-4">
+        <div className="space-y-1.5 p-3 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs">
           <div className="flex items-center gap-1.5 font-bold">
-            <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
             <span>
               {state === 'rejected'
                 ? 'Payment proof was rejected'
                 : 'Order is under dispute review'}
             </span>
           </div>
-          <p className="text-[11px] text-rose-800 leading-normal">
+          <p className="text-[11px] text-danger-text leading-normal">
             {state === 'rejected'
               ? 'The author was unable to verify your bank deposit. Please check remarks.'
               : 'Our mediation team is actively reviewing payment evidence.'}
@@ -367,7 +367,7 @@ export function NovelAccessPanel({
 
         <Link
           href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-hover text-navy font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all text-sm"
+          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all text-sm"
         >
           <span>View your order</span>
         </Link>

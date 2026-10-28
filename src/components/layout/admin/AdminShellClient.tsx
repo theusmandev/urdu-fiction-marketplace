@@ -78,21 +78,21 @@ export function AdminShellClient({
           label: 'Tips (Say Thanks)',
           icon: Heart,
           badge: counts.flaggedTipsCount,
-          badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+          badgeColor: 'bg-warning-soft text-warning-text border-warning-border',
         },
         {
           href: '/admin/disputes',
           label: 'Disputes',
           icon: Scale,
           badge: counts.openDisputesCount,
-          badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
+          badgeColor: 'bg-danger-soft text-danger-text border-danger-border',
         },
         {
           href: '/admin/refunds',
           label: 'Refunds',
           icon: RotateCcw,
           badge: counts.pendingRefundsCount,
-          badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+          badgeColor: 'bg-warning-soft text-warning-text border-warning-border',
         },
         { href: '/admin/support', label: 'Support', icon: LifeBuoy },
       ],
@@ -105,7 +105,7 @@ export function AdminShellClient({
           label: 'Platform Fee',
           icon: DollarSign,
           badge: counts.pendingReportsCount,
-          badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          badgeColor: 'bg-success-soft text-success-text border-success-border',
         },
         { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
       ],
@@ -118,14 +118,14 @@ export function AdminShellClient({
           label: 'Writers',
           icon: Feather,
           badge: counts.pendingWritersCount,
-          badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+          badgeColor: 'bg-warning-soft text-warning-text border-warning-border',
         },
         {
           href: '/admin/novels',
           label: 'Novels',
           icon: BookOpen,
           badge: counts.underReviewNovelsCount,
-          badgeColor: 'bg-blue-50 text-blue-800 border-blue-200',
+          badgeColor: 'bg-info-soft text-info-text border-info-border',
         },
         { href: '/admin/genres', label: 'Genres', icon: Tags },
       ],
@@ -169,23 +169,26 @@ export function AdminShellClient({
   };
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-ivory text-main flex flex-col font-sans">
+    <div
+      data-area="admin"
+      className="h-screen w-full overflow-hidden bg-bg text-text flex flex-col font-sans"
+    >
       {/* Skip to Content Link (Accessibility) */}
       <a
         href="#admin-main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent-admin focus:text-white focus:font-semibold focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-accent"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent-admin focus:text-white focus:font-semibold focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-ring"
       >
         Skip to main content
       </a>
 
       {/* Top Bar (Fixed at top, zero scroll) */}
-      <header className="bg-navy text-white shrink-0 z-30 h-14 sm:h-16 border-b border-navy-light flex items-center justify-between px-4 sm:px-6 shadow-md">
+      <header className="bg-surface text-text shrink-0 z-30 h-14 sm:h-16 border-b border-border flex items-center justify-between px-4 sm:px-6 shadow-xs">
         <div className="flex items-center gap-3">
           {/* Mobile Drawer Toggle */}
           <button
             type="button"
             onClick={() => setMobileDrawerOpen((prev) => !prev)}
-            className="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-navy-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent-admin/40"
+            className="lg:hidden p-2 rounded-xl text-text-muted hover:text-text hover:bg-surface-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             aria-label={mobileDrawerOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
           >
             {mobileDrawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -198,22 +201,22 @@ export function AdminShellClient({
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-serif text-base font-bold tracking-tight text-white leading-none">
+                <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
                   Admin Control
                 </span>
-                <span className="text-[10px] bg-accent-admin-light text-accent-admin border border-accent-admin-border px-1.5 py-0.5 rounded font-bold tracking-wider">
+                <span className="text-[10px] bg-accent-admin-soft text-accent-admin border border-accent-admin-border px-1.5 py-0.5 rounded font-bold tracking-wider">
                   ADMIN
                 </span>
               </div>
-              <span className="text-[10px] text-accent font-medium mt-0.5">
+              <span className="text-[10px] text-accent-strong font-medium mt-0.5">
                 UNB Premium
               </span>
             </div>
           </Link>
 
           {/* Breadcrumb / Page Title */}
-          <div className="hidden sm:flex items-center text-xs border-l border-navy-light pl-3 ml-1">
-            <span className="font-semibold text-white">{getPageTitle()}</span>
+          <div className="hidden sm:flex items-center text-xs border-l border-border pl-3 ml-1">
+            <span className="font-semibold text-text">{getPageTitle()}</span>
           </div>
         </div>
 
@@ -223,10 +226,10 @@ export function AdminShellClient({
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-white hover:bg-navy-light/60 px-2.5 py-1.5 rounded-lg border border-navy-light transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text hover:bg-surface-muted px-2.5 py-1.5 rounded-lg border border-border transition-colors"
             title="Open Public Marketplace in new tab"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-accent" />
+            <ExternalLink className="w-3.5 h-3.5 text-accent-strong" />
             <span>View Site</span>
           </Link>
 
@@ -254,14 +257,14 @@ export function AdminShellClient({
           {/* Sidebar Collapse Toggle Button */}
           <div className="p-2.5 sm:p-3 border-b border-border flex items-center justify-between shrink-0">
             {!isCollapsed && (
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-secondary">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
                 Navigation
               </span>
             )}
             <button
               type="button"
               onClick={() => setIsCollapsed((prev) => !prev)}
-              className="p-1.5 rounded-lg text-secondary hover:text-navy hover:bg-ivory transition-colors ml-auto focus:outline-none focus:ring-2 focus:ring-accent-admin/40"
+              className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface-muted transition-colors ml-auto focus:outline-none focus:ring-2 focus:ring-ring"
               title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
@@ -278,7 +281,7 @@ export function AdminShellClient({
             {navSections.map((section) => (
               <div key={section.title} className="space-y-0.5">
                 {!isCollapsed && (
-                  <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-secondary mt-3 mb-1 first:mt-0">
+                  <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-text-muted mt-3 mb-1 first:mt-0">
                     {section.title}
                   </div>
                 )}
@@ -295,14 +298,14 @@ export function AdminShellClient({
                         className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[13px] font-medium transition-all group ${
                           active
                             ? 'bg-accent-admin text-white font-semibold shadow-sm'
-                            : 'text-secondary hover:text-navy hover:bg-ivory'
+                            : 'text-text-muted hover:text-text hover:bg-surface-muted'
                         } ${isCollapsed ? 'justify-center px-2' : ''}`}
                       >
                         <Icon
                           className={`w-4 h-4 shrink-0 transition-colors ${
                             active
                               ? 'text-white'
-                              : 'text-secondary group-hover:text-navy'
+                              : 'text-text-muted group-hover:text-text'
                           }`}
                         />
                         {!isCollapsed && (
@@ -313,7 +316,7 @@ export function AdminShellClient({
                             className={`px-1.5 py-0.2 text-[10px] font-bold rounded-full border ${
                               active
                                 ? 'bg-white/20 text-white border-white/30'
-                                : item.badgeColor || 'bg-amber-50 text-amber-800 border-amber-200'
+                                : item.badgeColor || 'bg-warning-soft text-warning-text border-warning-border'
                             }`}
                           >
                             {item.badge}
@@ -328,15 +331,15 @@ export function AdminShellClient({
           </nav>
 
           {/* Sidebar Bottom Footer */}
-          <div className="p-2.5 sm:p-3 border-t border-border bg-ivory/60 text-xs shrink-0">
+          <div className="p-2.5 sm:p-3 border-t border-border bg-surface-muted/60 text-xs shrink-0">
             <Link
               href="/"
-              className={`flex items-center gap-2.5 text-secondary hover:text-navy px-3 py-1.5 rounded-xl transition-colors ${
+              className={`flex items-center gap-2.5 text-text-muted hover:text-text px-3 py-1.5 rounded-xl transition-colors ${
                 isCollapsed ? 'justify-center' : ''
               }`}
               title="Return to Marketplace"
             >
-              <ExternalLink className="w-4 h-4 text-accent shrink-0" />
+              <ExternalLink className="w-4 h-4 text-accent-strong shrink-0" />
               {!isCollapsed && <span>Marketplace</span>}
             </Link>
           </div>
@@ -363,12 +366,12 @@ export function AdminShellClient({
                 <div className="w-7 h-7 rounded-lg bg-accent-admin text-white flex items-center justify-center font-bold">
                   <ShieldAlert className="w-4 h-4" />
                 </div>
-                <span className="font-bold text-sm text-navy">Admin Navigation</span>
+                <span className="font-bold text-sm text-text">Admin Navigation</span>
               </div>
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(false)}
-                className="p-1.5 rounded-lg text-secondary hover:text-navy hover:bg-ivory"
+                className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface-muted"
                 aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
@@ -378,7 +381,7 @@ export function AdminShellClient({
             <nav className="flex-1 overflow-y-auto py-3 space-y-4 no-scrollbar">
               {navSections.map((section) => (
                 <div key={section.title} className="space-y-1">
-                  <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-secondary">
+                  <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-text-muted">
                     {section.title}
                   </div>
                   <div className="space-y-0.5">
@@ -394,13 +397,13 @@ export function AdminShellClient({
                           className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
                             active
                               ? 'bg-accent-admin text-white font-semibold'
-                              : 'text-secondary hover:text-navy hover:bg-ivory'
+                              : 'text-text-muted hover:text-text hover:bg-surface-muted'
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <Icon
                               className={`w-4 h-4 ${
-                                active ? 'text-white' : 'text-secondary'
+                                active ? 'text-white' : 'text-text-muted'
                               }`}
                             />
                             <span>{item.label}</span>
@@ -410,7 +413,7 @@ export function AdminShellClient({
                               className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full border ${
                                 active
                                   ? 'bg-white/20 text-white border-white/30'
-                                  : item.badgeColor || 'bg-amber-50 text-amber-800 border-amber-200'
+                                  : item.badgeColor || 'bg-warning-soft text-warning-text border-warning-border'
                               }`}
                             >
                               {item.badge}
@@ -428,9 +431,9 @@ export function AdminShellClient({
               <Link
                 href="/"
                 onClick={() => setMobileDrawerOpen(false)}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium text-secondary hover:text-navy hover:bg-ivory"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium text-text-muted hover:text-text hover:bg-surface-muted"
               >
-                <ExternalLink className="w-4 h-4 text-accent" />
+                <ExternalLink className="w-4 h-4 text-accent-strong" />
                 <span>View Public Marketplace</span>
               </Link>
             </div>

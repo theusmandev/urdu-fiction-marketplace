@@ -126,7 +126,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
           <div className="text-lg font-bold text-navy">
             PKR {order.amount_pkr.toLocaleString()}
           </div>
-          <span className="inline-block text-[11px] font-medium uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+          <span className="inline-block text-[11px] font-medium uppercase px-2 py-0.5 rounded bg-surface-muted text-text">
             {order.payment_method}
           </span>
         </div>
@@ -165,7 +165,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
       {(activeSubmission?.screenshot_storage_path || latestSubmission?.screenshot_storage_path) && (
         <div className="pt-2 border-t border-border flex items-center justify-between">
           <div className="text-xs text-secondary flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-success" />
             <span>Secure deposit proof (private bucket)</span>
           </div>
 
@@ -196,7 +196,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
             <span>Secure Signed Proof Preview (valid 60 seconds):</span>
             <button
               onClick={() => setProofUrl(null)}
-              className="text-rose-600 hover:underline font-medium"
+              className="text-danger-text hover:underline font-medium"
             >
               Close
             </button>
@@ -219,7 +219,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
             type="button"
             onClick={() => setRejectModalOpen(true)}
             disabled={isVerifying || isRejecting}
-            className="inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors"
+            className="inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-semibold text-danger-text bg-danger-soft hover:bg-danger-soft border border-danger-border transition-colors"
           >
             <XCircle className="w-3.5 h-3.5 mr-1.5" />
             Reject Deposit
@@ -229,7 +229,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
             type="button"
             onClick={handleVerify}
             disabled={isVerifying || isRejecting}
-            className="inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 shadow-sm transition-colors"
+            className="inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-semibold text-white bg-success hover:bg-success-hover shadow-sm transition-colors"
           >
             {isVerifying ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
@@ -246,8 +246,8 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
         <div
           className={`text-xs p-3 rounded-lg border ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border-rose-200 text-rose-800'
+              ? 'bg-success-soft border-success-border text-success-text'
+              : 'bg-danger-soft border-danger-border text-danger-text'
           }`}
         >
           {feedback.message}
@@ -289,7 +289,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
                 required
                 rows={3}
                 placeholder="Enter clear rejection reason..."
-                className="w-full text-xs p-3 rounded-lg border border-border bg-ivory focus:bg-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none"
+                className="w-full text-xs p-3 rounded-lg border border-border bg-ivory focus:bg-white focus:border-danger-border focus:ring-1 focus:ring-danger outline-none"
               />
             </div>
 
@@ -304,7 +304,7 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
               <button
                 type="submit"
                 disabled={isRejecting || rejectionReason.trim().length < 5}
-                className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50"
+                className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-danger text-white hover:bg-danger-hover disabled:opacity-50"
               >
                 {isRejecting ? 'Rejecting...' : 'Confirm Rejection'}
               </button>
