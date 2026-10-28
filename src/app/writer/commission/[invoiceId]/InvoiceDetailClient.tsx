@@ -148,7 +148,7 @@ export function InvoiceDetailClient({
                 UNB Premium
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-navy text-white">
-                COMMISSION STATEMENT
+                PLATFORM FEE STATEMENT
               </span>
             </div>
             <p className="text-xs text-secondary">
@@ -201,7 +201,7 @@ export function InvoiceDetailClient({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface p-4 rounded-xl border border-border space-y-1 text-center sm:text-left">
             <span className="text-[10px] uppercase font-semibold text-secondary">
-              Total Invoiced Commission
+              Total Invoiced Platform Fee
             </span>
             <div className="text-xl font-bold font-mono text-navy">
               {formatPKR2(invoice.total_commission_owed_pkr)}
@@ -250,7 +250,7 @@ export function InvoiceDetailClient({
                   <th className="py-2.5 px-3">Type</th>
                   <th className="py-2.5 px-3 text-right">Gross</th>
                   <th className="py-2.5 px-3 text-right">Rate</th>
-                  <th className="py-2.5 px-3 text-right">Commission</th>
+                  <th className="py-2.5 px-3 text-right">Platform Fee</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -288,7 +288,7 @@ export function InvoiceDetailClient({
               <tfoot className="bg-ivory font-semibold text-navy border-t border-border">
                 <tr>
                   <td colSpan={7} className="py-2.5 px-3 text-right uppercase text-[10px] tracking-wider">
-                    Total Statement Commission:
+                    Total Statement Platform Fee:
                   </td>
                   <td className="py-2.5 px-3 text-right font-mono font-bold text-sm text-navy">
                     {formatPKR2(invoice.total_commission_owed_pkr)}
@@ -340,7 +340,7 @@ export function InvoiceDetailClient({
                 Official Platform Payment Accounts
               </h2>
               <p className="text-xs text-secondary mt-0.5">
-                Remit your commission to any of the verified platform accounts below using mobile banking or wallets.
+                Remit your platform fee to any of the verified platform accounts below using mobile banking or wallets.
               </p>
             </div>
             <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
@@ -438,7 +438,7 @@ export function InvoiceDetailClient({
               <span>Independent Verification Rule</span>
             </div>
             <p>
-              Reporting your payment registers a claim. Platform commission is ONLY marked settled and deducted
+              Reporting your payment registers a claim. The platform fee is ONLY marked settled and deducted
               from your outstanding balance after an administrator verifies the receipt against our bank statement.
             </p>
           </div>

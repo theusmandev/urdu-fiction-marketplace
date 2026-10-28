@@ -114,13 +114,13 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
     const parsedWindowMinutes = Number(chapterReadWindow);
 
     if (isNaN(parsedRate) || parsedRate < 0 || parsedRate > 100) {
-      setError('Default commission rate must be between 0% and 100%.');
+      setError('Default platform fee rate must be between 0% and 100%.');
       setLoading(false);
       return;
     }
 
     if (isNaN(parsedLimit) || parsedLimit < 0) {
-      setError('Unpaid commission limit cannot be negative.');
+      setError('Unpaid platform fee limit cannot be negative.');
       setLoading(false);
       return;
     }
@@ -304,7 +304,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             Financial Scope Notice:
           </span>
           <p className="text-amber-800 leading-relaxed">
-            Modifications to the platform commission rate or unpaid limits apply strictly to <strong className="text-main">future sales and verifications</strong>.
+            Modifications to the platform fee rate or unpaid limits apply strictly to <strong className="text-main">future sales and verifications</strong>.
             Existing orders and historical entries in the <code className="bg-amber-100/80 px-1 py-0.5 rounded text-amber-900 font-mono">sales_ledger</code> maintain their locked snapshot rates. Every change produces an audit log entry.
           </p>
         </div>
@@ -312,12 +312,12 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
 
       {/* Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Default Commission Rate */}
+        {/* Default Platform Fee Rate */}
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
               <Percent className="w-4 h-4 text-accent-admin" />
-              <span>Default Platform Commission (%)</span>
+              <span>Default Platform Fee (%)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">0.00% – 100.00%</span>
           </div>
@@ -341,17 +341,17 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
           </div>
         </div>
 
-        {/* Default Unpaid Commission Limit */}
+        {/* Default Unpaid Platform Fee Limit */}
         <div className="bg-surface border border-border rounded-2xl p-5 space-y-3 shadow-card">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-main flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-emerald-600" />
-              <span>Unpaid Commission Pause Limit (PKR)</span>
+              <span>Unpaid Platform Fee Pause Limit (PKR)</span>
             </label>
             <span className="text-[10px] text-muted font-mono">Default: 5,000 PKR</span>
           </div>
           <p className="text-xs text-muted leading-relaxed">
-            Threshold balance of accrued platform commission. When a writer exceeds this, their order acceptance is automatically paused.
+            Threshold balance of accrued platform fee. When a writer exceeds this, their order acceptance is automatically paused.
           </p>
           <div className="relative">
             <input
@@ -530,7 +530,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
             <span className="text-[10px] text-muted font-mono">1 – 90 days (Default: 7)</span>
           </div>
           <p className="text-xs text-muted leading-relaxed">
-            Standard number of days from issuance until an author commission invoice becomes due.
+            Standard number of days from issuance until an author platform fee invoice becomes due.
           </p>
           <input
             type="number"

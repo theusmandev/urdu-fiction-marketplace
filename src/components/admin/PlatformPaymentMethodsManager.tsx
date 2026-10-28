@@ -177,7 +177,7 @@ export function PlatformPaymentMethodsManager({
             </h2>
           </div>
           <p className="text-xs text-muted mt-0.5">
-            Banking and mobile wallet accounts shown to authors who have an open commission invoice.
+            Banking and mobile wallet accounts shown to authors who have an open platform fee invoice.
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export function PlatformPaymentMethodsManager({
               No platform remittance accounts configured yet
             </p>
             <p className="text-xs text-muted max-w-sm mx-auto">
-              Authors who have open commission invoices will see a placeholder notice until you add official banking details.
+              Authors who have open platform fee invoices will see a placeholder notice until you add official banking details.
             </p>
           </div>
           <button

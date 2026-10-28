@@ -90,7 +90,7 @@ export default async function AdminTipsPage({ searchParams }: AdminTipsPageProps
                 Appreciation Tips
               </h1>
               <p className="text-xs text-secondary">
-                Direct reader-to-author appreciation gifts with 0% platform commission.
+                Direct reader-to-author appreciation gifts with 0% platform fee.
               </p>
             </div>
           </div>

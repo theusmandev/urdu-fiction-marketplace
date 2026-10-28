@@ -568,7 +568,7 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
                 <span>
                   Confirm Adjudication:{' '}
                   {selectedOutcome === 'verify_reader'
-                    ? 'Verify for Reader (Access + Commission)'
+                    ? 'Verify for Reader (Access + Platform Fee)'
                     : selectedOutcome === 'refund_adjustment'
                     ? 'Refund Adjustment (Ledger - & Revoke)'
                     : selectedOutcome === 'resolve_writer'
@@ -601,9 +601,9 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
               </div>
               <p className="leading-relaxed">
                 {selectedOutcome === 'verify_reader' &&
-                  'This action will grant reading access to the reader, append a verified sale to the immutable sales ledger, and accrue platform commission against the writer. This cannot be undone.'}
+                  'This action will grant reading access to the reader, append a verified sale to the immutable sales ledger, and accrue platform fee against the writer. This cannot be undone.'}
                 {selectedOutcome === 'refund_adjustment' &&
-                  'This action records an append-only negative refund_adjustment row in sales ledger, revokes the reader access entitlement, and reduces platform commission debt. The platform does NOT handle bank cash.'}
+                  'This action records an append-only negative refund_adjustment row in sales ledger, revokes the reader access entitlement, and reduces platform fee debt. The platform does NOT handle bank cash.'}
                 {selectedOutcome === 'resolve_writer' &&
                   'This action confirms the payment was not received or unverified. No financial ledger changes are made and the order remains rejected.'}
                 {selectedOutcome === 'close_dispute' &&

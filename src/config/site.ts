@@ -107,13 +107,13 @@ export const siteConfig: SiteConfig = {
       { title: "Verify Reader Payments", titleUrdu: "ادائیگیوں کی تصدیق", href: "/writer/orders", badge: "Live" },
       { title: "My Novels & Chapters", titleUrdu: "ناولز اور ابواب", href: "/writer/novels" },
       { title: "Direct Bank & Wallets", titleUrdu: "بینک اور والٹ تفصیلات", href: "/writer/payment-methods" },
-      { title: "Commission Ledger", titleUrdu: "کمیشن لیجر", href: "/writer/commission" },
+      { title: "Platform Fee Ledger", titleUrdu: "پلیٹ فارم فیس لیجر", href: "/writer/commission" },
     ],
     admin: [
       { title: "Platform Dashboard", href: "/admin" },
       { title: "Novels Moderation", href: "/admin/novels" },
       { title: "Writers Management", href: "/admin/writers" },
-      { title: "Commission Remittance", href: "/admin/commission" },
+      { title: "Platform Fee Remittance", href: "/admin/commission" },
       { title: "Audit Ledger", href: "/admin/audit" },
     ],
     footer: {
@@ -126,7 +126,7 @@ export const siteConfig: SiteConfig = {
       writers: [
         { title: "Sell Your Novels", href: "/become-a-writer" },
         { title: "Writer Guidelines & Integrity", href: "/content-policy" },
-        { title: "Commission & Payout Policy", href: "/writer/agreement" },
+        { title: "Platform Fee & Payout Policy", href: "/writer/agreement" },
         { title: "Writer Studio", href: "/writer" },
       ],
       readers: [

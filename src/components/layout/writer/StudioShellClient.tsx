@@ -72,7 +72,7 @@ export function StudioShellClient({
       badgeColor: 'bg-rose-500 text-white font-bold',
     },
     { href: '/writer/earnings', label: 'Earnings', icon: TrendingUp },
-    { href: '/writer/commission', label: 'Commission', icon: Receipt },
+    { href: '/writer/commission', label: 'Platform Fee', icon: Receipt },
     { href: '/writer/payment-methods', label: 'Payment Methods', icon: Landmark },
     { href: '/writer/profile', label: 'Profile', icon: User },
     { href: '/writer/agreement', label: 'Author Agreement', icon: FileText },

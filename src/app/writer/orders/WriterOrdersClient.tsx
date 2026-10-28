@@ -317,16 +317,16 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
           <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h2 className="text-xs font-bold uppercase tracking-wider text-amber-800">
-              Writer Verification Agreement & Commission Policy
+              Writer Verification Agreement & Platform Fee Policy
             </h2>
             <p className="text-xs text-stone-700 leading-relaxed">
               Verifying an order immediately creates the reader’s permanent access to your novel and records a platform
-              commission obligation on your writer balance. False verification or hiding completed sales violates the writer agreement
+              fee obligation on your writer balance. False verification or hiding completed sales violates the writer agreement
               and can result in store suspension.
             </p>
             <div className="pt-0.5">
               <UrduText as="p" size="xs" className="text-amber-900 leading-[2.2]">
-                تصدیق کرنے سے قاری کو فوری رسائی مل جائے گی اور پلیٹ فارم کمیشن ریکارڈ ہو گا۔ غلط تصدیق یا خفیہ فروخت معاہدے کی خلاف ورزی ہے۔
+                تصدیق کرنے سے قاری کو فوری رسائی مل جائے گی اور پلیٹ فارم فیس ریکارڈ ہو گی۔ غلط تصدیق یا خفیہ فروخت معاہدے کی خلاف ورزی ہے۔
               </UrduText>
             </div>
           </div>
@@ -625,7 +625,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                       <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 space-y-1">
                         <span className="font-bold block">Refund Adjusted</span>
                         <p className="text-[11px] text-purple-700">
-                          Sale reversed: Negative commission line recorded in ledger & access revoked.
+                          Sale reversed: Negative platform fee line recorded in ledger & access revoked.
                         </p>
                       </div>
                     )}
@@ -813,7 +813,7 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
               </p>
               <p className="text-[11px] text-amber-800">
                 After an administrator reviews and approves this request, a negative adjustment row will be
-                appended to your sales ledger (reducing your commission balance) and the reader&apos;s library
+                appended to your sales ledger (reducing your platform fee balance) and the reader&apos;s library
                 access will be revoked.
               </p>
             </div>

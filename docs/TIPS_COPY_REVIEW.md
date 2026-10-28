@@ -5,7 +5,7 @@ This document catalogs all reader- and writer-facing microcopy in the Tip Jar / 
 
 ### Mandatory Linguistic & Policy Guardrails:
 1. **Appreciation, Never Begging**: Prohibits words like "donate", "donation", "please help", "charity", "support me", or "fundraiser".
-2. **0% Commission Disclosure**: The reader is always reminded that 100% of the funds go directly into the author's account with zero platform commission.
+2. **0% Platform Fee Disclosure**: The reader is always reminded that 100% of the funds go directly into the author's account with zero platform fee.
 3. **Voluntary Gift**: Unlocks nothing; completely voluntary; never a substitute for buying book chapters.
 4. **Authentic Urdu Nastaliq**: Renders through `font-urdu` with safe line-heights (`leading-[2.2]`+) to avoid calligraphy clipping.
 

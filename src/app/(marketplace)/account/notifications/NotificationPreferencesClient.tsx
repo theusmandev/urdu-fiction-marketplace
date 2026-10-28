@@ -121,7 +121,7 @@ export function NotificationPreferencesClient({
           </li>
           <li className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-border shadow-sm">
             <ShieldCheck className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>Commission Invoice &amp; Overdue Warnings</span>
+            <span>Platform Fee Invoice &amp; Overdue Warnings</span>
           </li>
           <li className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-border shadow-sm">
             <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0" />

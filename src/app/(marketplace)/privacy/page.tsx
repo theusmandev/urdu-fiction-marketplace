@@ -60,7 +60,7 @@ export default function PrivacyPage() {
           <p>
             Your information is used strictly to provide access to the digital catalog,
             facilitate peer-to-peer payment verification between readers and authors,
-            track platform commission obligations, prevent fraudulent transactions,
+            track platform fee obligations, prevent fraudulent transactions,
             and maintain audit logs.
           </p>
         </section>

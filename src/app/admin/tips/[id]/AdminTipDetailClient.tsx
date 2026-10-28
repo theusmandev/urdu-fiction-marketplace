@@ -229,7 +229,7 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
             <div className="text-2xl font-bold text-navy">
               PKR {Number(tip.amount_pkr).toLocaleString()}
             </div>
-            <div className="text-[11px] text-secondary">0% platform commission</div>
+            <div className="text-[11px] text-secondary">0% platform fee</div>
           </div>
         </div>
 

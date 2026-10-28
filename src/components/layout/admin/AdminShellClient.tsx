@@ -102,7 +102,7 @@ export function AdminShellClient({
       items: [
         {
           href: '/admin/commission',
-          label: 'Commission',
+          label: 'Platform Fee',
           icon: DollarSign,
           badge: counts.pendingReportsCount,
           badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',

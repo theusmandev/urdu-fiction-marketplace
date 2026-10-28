@@ -990,7 +990,7 @@ export function WriterTipsClient({
               <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-200">
                 PKR {Number(summary.confirmed_total_pkr || 0).toLocaleString()}
               </div>
-              <p className="text-[11px] text-secondary">0% platform commission deducted</p>
+              <p className="text-[11px] text-secondary">0% platform fee deducted</p>
             </div>
 
             <div className="p-6 rounded-2xl bg-surface border border-border/80 shadow-xs space-y-1">

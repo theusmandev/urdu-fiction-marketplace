@@ -64,6 +64,23 @@ export function AuditLogViewer({
     return `/admin/audit?${params.toString()}`;
   };
 
+  const ACTION_DISPLAY_LABELS: Record<string, string> = {
+    SET_WRITER_COMMISSION_TERMS: 'Set Writer Platform Fee Terms',
+    CONFIRM_COMMISSION_SETTLEMENT: 'Confirm Platform Fee Settlement',
+    REJECT_COMMISSION_REPORT: 'Reject Platform Fee Report',
+    RECORD_COMMISSION_ADJUSTMENT: 'Record Platform Fee Adjustment',
+    VOID_COMMISSION_INVOICE: 'Void Platform Fee Invoice',
+    REPORT_COMMISSION_PAYMENT: 'Report Platform Fee Payment',
+    GENERATE_COMMISSION_INVOICE: 'Generate Platform Fee Invoice',
+  };
+
+  const formatActionDisplayLabel = (actionType: string): string => {
+    if (ACTION_DISPLAY_LABELS[actionType]) {
+      return ACTION_DISPLAY_LABELS[actionType];
+    }
+    return actionType.replace(/_/g, ' ');
+  };
+
   const getActionBadgeColor = (action: string) => {
     const act = action.toUpperCase();
     if (act.includes('DELETE') || act.includes('REJECT') || act.includes('SUSPEND')) {
@@ -102,14 +119,20 @@ export function AuditLogViewer({
                       <span suppressHydrationWarning>{new Date(entry.created_at).toLocaleString()}</span>
                     </td>
 
-                    <td className="py-2.5 px-3 whitespace-nowrap w-[150px]">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
-                          entry.action_type
-                        )}`}
-                      >
-                        {entry.action_type}
-                      </span>
+                    <td className="py-2.5 px-3 whitespace-nowrap w-[170px]">
+                      <div>
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
+                            entry.action_type
+                          )}`}
+                          title={`Technical Action Type: ${entry.action_type}`}
+                        >
+                          {formatActionDisplayLabel(entry.action_type)}
+                        </span>
+                        <span className="block text-[10px] text-muted font-mono mt-0.5">
+                          {entry.action_type}
+                        </span>
+                      </div>
                     </td>
 
                     <td className="py-2.5 px-3 font-sans w-[160px]">
@@ -162,13 +185,19 @@ export function AuditLogViewer({
               className="bg-surface border border-border shadow-card rounded-2xl p-4 space-y-3 text-xs"
             >
               <div className="flex items-start justify-between gap-2">
-                <span
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
-                    entry.action_type
-                  )}`}
-                >
-                  {entry.action_type}
-                </span>
+                <div>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getActionBadgeColor(
+                      entry.action_type
+                    )}`}
+                    title={`Technical Action Type: ${entry.action_type}`}
+                  >
+                    {formatActionDisplayLabel(entry.action_type)}
+                  </span>
+                  <span className="block text-[10px] text-muted font-mono mt-0.5">
+                    {entry.action_type}
+                  </span>
+                </div>
                 <span suppressHydrationWarning className="text-[11px] text-secondary font-mono">
                   {new Date(entry.created_at).toLocaleDateString()}
                 </span>
@@ -246,7 +275,10 @@ export function AuditLogViewer({
                         selectedEntry.action_type
                       )}`}
                     >
-                      {selectedEntry.action_type}
+                      {formatActionDisplayLabel(selectedEntry.action_type)}
+                    </span>
+                    <span className="text-xs text-muted font-mono">
+                      ({selectedEntry.action_type})
                     </span>
                     <span className="text-xs text-secondary">
                       {selectedEntry.entity_type}

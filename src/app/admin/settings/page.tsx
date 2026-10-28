@@ -172,7 +172,7 @@ export default async function AdminSettingsPage() {
             <h1 className="text-xl font-bold text-main">Global Platform Configuration</h1>
           </div>
           <p className="text-xs text-muted mt-0.5">
-            Configure default platform commission, author balance pause limits, dispute windows, and pricing ceilings.
+            Configure default platform fee, author balance pause limits, dispute windows, and pricing ceilings.
           </p>
         </div>
       </div>

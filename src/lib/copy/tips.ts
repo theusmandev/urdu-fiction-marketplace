@@ -4,7 +4,7 @@
  * Strict Repository Copy Guardrails:
  * 1. Appreciation, never begging.
  * 2. Words like "donate", "donation", "please help", "charity", "fundraiser" are FORBIDDEN.
- * 3. Honest disclosure: Optional gift, 100% direct to author, 0% platform commission, unlocks nothing.
+ * 3. Honest disclosure: Optional gift, 100% direct to author, no platform fee, unlocks nothing.
  * 4. Dual-language (English and Urdu Nastaliq).
  */
 
@@ -50,8 +50,8 @@ export const tipsCopy = {
     titleUrdu: 'مصنف کو شکریہ کہیں',
     taglineEnglish: 'Did you enjoy this story? You can send a direct appreciation gift to the author.',
     taglineUrdu: 'یہ کہانی پسند آئی؟ آپ مصنف کو براہِ راست شکریہ کا تحفہ بھیج سکتے ہیں۔',
-    honestLineEnglish: 'Optional. The whole amount goes directly to the author; UNB Premium takes no share.',
-    honestLineUrdu: 'اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔',
+    honestLineEnglish: 'Optional. The whole amount goes directly to the author; no platform fee.',
+    honestLineUrdu: 'اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ کوئی پلیٹ فارم فیس نہیں ہے۔',
     customAmountLabelEnglish: 'Custom amount (PKR)',
     customAmountLabelUrdu: 'اپنی مرضی کی رقم (روپے)',
     messageLabelEnglish: 'Add an appreciation note (optional)',
@@ -81,10 +81,10 @@ export const tipsCopy = {
         descUrdu: 'آپ رقم براہِ راست مصنف کے اپنے اکاؤنٹ میں بھیجتے ہیں۔ یو این بی پریمیم اس رقم کو نہ تو لیتا ہے اور نہ روکتا ہے۔',
       },
       {
-        titleEnglish: 'Zero Platform Commission',
-        titleUrdu: 'پلیٹ فارم کا زیرو کمیشن',
+        titleEnglish: 'Zero Platform Fee',
+        titleUrdu: 'زیرو پلیٹ فارم فیس',
         descEnglish: 'The platform takes 0% cut. Every single rupee goes directly into the writer\'s pocket.',
-        descUrdu: 'پلیٹ فارم کوئی فیس یا کمیشن نہیں کاٹتا۔ پورا روپیہ مصنف کی محنت کا صلہ ہے۔',
+        descUrdu: 'پلیٹ فارم کوئی فیس نہیں کاٹتا۔ پورا روپیہ مصنف کی محنت کا صلہ ہے۔',
       },
       {
         titleEnglish: 'Voluntary Gift — Unlocks Nothing',
@@ -224,8 +224,8 @@ export const TIP_CARD_COPY = {
   titleUrdu: 'شکریہ کہیں',
   tagline: 'Did you enjoy this story? You can send a direct appreciation gift to the author.',
   taglineUrdu: 'یہ کہانی پسند آئی؟ مصنف کو شکریہ کہیں',
-  honestLine: 'Optional. The whole amount goes directly to the author; UNB Premium takes no share.',
-  honestLineUrdu: 'اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔',
+  honestLine: 'Optional. The whole amount goes directly to the author; no platform fee.',
+  honestLineUrdu: 'اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ کوئی پلیٹ فارم فیس نہیں ہے۔',
   customLabel: 'Custom',
   customLabelUrdu: 'دیگر رقم',
   messagePlaceholder: 'Write a warm note to encourage the author...',
@@ -246,10 +246,10 @@ export const TIP_CARD_COPY = {
 export const HOW_TIPS_WORK = {
   title: 'How Appreciation Works',
   titleUrdu: 'قاری کی طرف سے داد اور شکریہ کا طریقہ کار',
-  honestLine: 'Optional. The whole amount goes directly to the author; UNB Premium takes no share.',
-  honestLineUrdu: 'اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔',
+  honestLine: 'Optional. The whole amount goes directly to the author; no platform fee.',
+  honestLineUrdu: 'اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ کوئی پلیٹ فارم فیس نہیں ہے۔',
   points: {
-    zeroCommission: '100% Direct to the Author (0% Commission)',
+    zeroCommission: '100% Direct to the Author (0% Platform Fee)',
     zeroCommissionDesc: 'You transfer funds directly to the author\'s own Pakistani account (JazzCash, EasyPaisa, Raast, or Bank). UNB Premium never touches or holds this money.',
     giftOnly: 'Voluntary Gift — Unlocks Nothing',
     giftOnlyDesc: 'A tip is a non-refundable gift to say thanks. It does not unlock any novels, chapters, or special features.',

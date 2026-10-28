@@ -159,17 +159,17 @@ export default async function WriterDashboardPage() {
         </div>
       </div>
 
-      {/* Commission Status Alert if threshold reached */}
+      {/* Platform Fee Status Alert if threshold reached */}
       {writerProfile.is_orders_paused_for_commission && (
         <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 shrink-0 text-rose-600 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-semibold text-sm">
-              Reader Orders Temporarily Paused (Commission Limit Exceeded)
+              Reader Orders Temporarily Paused (Platform Fee Limit Exceeded)
             </div>
             <p>
-              Your accrued unpaid platform commission has exceeded PKR {effectiveLimit.toLocaleString()}.
-              New reader purchases are paused until commission is remitted. Please contact platform administration to settle your balance.
+              Your accrued unpaid platform fee has exceeded PKR {effectiveLimit.toLocaleString()}.
+              New reader purchases are paused until the platform fee is remitted. Please contact platform administration to settle your balance.
             </p>
           </div>
         </div>
@@ -222,13 +222,13 @@ export default async function WriterDashboardPage() {
           </p>
         </Link>
 
-        {/* Outstanding Commission Balance */}
+        {/* Outstanding Platform Fee Balance */}
         <Link
           href="/writer/commission"
           className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2 hover:border-slate-300 transition-colors block"
         >
           <div className="flex items-center justify-between text-secondary">
-            <span className="text-xs font-semibold uppercase tracking-wider">Outstanding Commission Balance</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Platform Fee Due</span>
             <ShieldCheck className="w-4 h-4 text-navy" />
           </div>
           <div className="text-2xl font-bold text-navy">

@@ -85,7 +85,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
             <h1 className="text-xl font-bold text-main">Writer Directory & Approvals</h1>
           </div>
           <p className="text-xs text-muted mt-0.5">
-            Manage author onboarding, credentials, custom commission rates, and suspension states.
+            Manage author onboarding, credentials, custom platform fee rates, and suspension states.
           </p>
         </div>
       </div>
@@ -162,7 +162,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                     <th className="py-2.5 px-3 sm:px-4">Author / Pen Name</th>
                     <th className="py-2.5 px-3 sm:px-4">Account / Email</th>
                     <th className="py-2.5 px-3 sm:px-4">Status</th>
-                    <th className="py-2.5 px-3 sm:px-4">Commission Terms</th>
+                    <th className="py-2.5 px-3 sm:px-4">Platform Fee Terms</th>
                     <th className="py-2.5 px-3 sm:px-4">Unpaid Balance</th>
                     <th className="py-2.5 px-3 sm:px-4 text-right">Actions</th>
                   </tr>

@@ -111,14 +111,14 @@ export function AdminCommissionOverviewClient({
               Financial Control
             </span>
             <span className="text-xs text-secondary font-medium">
-              Platform Commission
+              Platform Fee
             </span>
           </div>
           <h1 className="text-2xl font-serif font-bold text-navy mt-1">
-            Platform Commission & Author Ledgers
+            Platform Fee & Author Ledgers
           </h1>
           <p className="text-xs text-secondary mt-0.5">
-            Monitor author commission balances, invoices, pending payments, and threshold limits.
+            Monitor author platform fee balances, invoices, pending payments, and threshold limits.
           </p>
         </div>
 
@@ -343,7 +343,7 @@ export function AdminCommissionOverviewClient({
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-rose-600" />
                 <h3 className="font-serif font-bold text-lg text-navy">
-                  Review Overdue Commission Rules
+                  Review Overdue Platform Fee Rules
                 </h3>
               </div>
               <button
@@ -373,7 +373,7 @@ export function AdminCommissionOverviewClient({
                 )}
 
                 <p className="text-secondary">
-                  Writers whose commission invoices have remained unpaid past the platform due date and grace period are identified below. No writer is suspended automatically; you must explicitly confirm to pause their new orders.
+                  Writers whose platform fee invoices have remained unpaid past the platform due date and grace period are identified below. No writer is suspended automatically; you must explicitly confirm to pause their new orders.
                 </p>
 
                 <div className="bg-ivory/50 p-4 rounded-xl border border-border space-y-2">

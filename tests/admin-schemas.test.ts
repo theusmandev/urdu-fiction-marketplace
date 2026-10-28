@@ -23,7 +23,7 @@ describe('Admin Validation Schemas (Zod)', () => {
       assert.equal(result.success, true);
     });
 
-    it('rejects commission rate over 100% or below 0%', () => {
+    it('rejects platform fee rate over 100% or below 0%', () => {
       const tooHigh = platformSettingsSchema.safeParse({
         defaultCommissionRate: 101,
         defaultUnpaidCommissionLimit: 5000,

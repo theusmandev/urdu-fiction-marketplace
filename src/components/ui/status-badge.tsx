@@ -106,14 +106,14 @@ const statusMap: Record<string, StatusMeta> = {
 
   // Commission Ledger & Invoices
   commission_unpaid: {
-    labelEn: "Commission Accruing",
-    labelUrdu: "کمیشن واجب الادا",
+    labelEn: "Platform Fee Accruing",
+    labelUrdu: "پلیٹ فارم فیس واجب الادا",
     classes: "bg-amber-50 text-amber-800 border-amber-200",
     icon: Clock,
   },
   commission_cleared: {
     labelEn: "Remitted & Cleared",
-    labelUrdu: "کمیشن ادا شدہ",
+    labelUrdu: "پلیٹ فارم فیس ادا شدہ",
     classes: "bg-teal-50 text-teal-800 border-teal-200",
     icon: CheckCircle2,
   },

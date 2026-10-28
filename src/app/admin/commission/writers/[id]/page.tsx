@@ -60,7 +60,7 @@ export default async function AdminWriterCommissionDetailPage({
         <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 flex items-start gap-3">
           <ShieldAlert className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
           <div>
-            <h3 className="font-semibold text-sm">Failed to load author commission profile</h3>
+            <h3 className="font-semibold text-sm">Failed to load author platform fee profile</h3>
             <p className="text-xs text-rose-700 mt-1">{writerError.message}</p>
           </div>
         </div>

@@ -23,7 +23,7 @@ export default async function BecomeWriterPage() {
             اپنے اردو ناولز اور کہانیاں قارئین تک براہِ راست پہنچائیں
           </UrduText>
           <p className="text-sm text-secondary max-w-xl mx-auto">
-            Sell full serials and novels with direct reader-to-writer bank deposits, zero automated gateway middlemen, and transparent commission reconciliation.
+            Sell full serials and novels with direct reader-to-writer bank deposits, zero automated gateway middlemen, and transparent platform fee reconciliation.
           </p>
         </div>
 

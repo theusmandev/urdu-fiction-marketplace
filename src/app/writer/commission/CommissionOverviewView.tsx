@@ -70,10 +70,10 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
             </span>
           </div>
           <h1 className="text-2xl font-serif font-bold text-navy mt-1">
-            Platform Commission & Billing Invoices
+            Platform Fee & Billing Invoices
           </h1>
           <p className="text-xs text-secondary mt-0.5">
-            Track your unpaid platform balance, inspect monthly commission statements, and report settlements.
+            Track your unpaid platform fee, inspect monthly platform fee statements, and report settlements.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Outstanding Commission Balance
+              Platform Fee Due
             </span>
             <div className="flex items-baseline gap-3 mt-1">
               <span className={`text-3xl font-bold font-mono ${meterTextColor}`}>
@@ -132,17 +132,17 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
         <div className="bg-ivory rounded-xl p-4 border border-border space-y-3">
           <div className="flex items-center gap-2 text-xs font-bold text-navy">
             <Info className="w-4 h-4 text-accent" />
-            <span>How UNB Commission & Direct Payments Work</span>
+            <span>How UNB Platform Fee & Direct Payments Work</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
             <div className="bg-surface p-3 rounded-lg border border-border space-y-1">
-              <span className="font-semibold text-navy">1. Accrued Commission</span>
+              <span className="font-semibold text-navy">1. Accrued Platform Fee</span>
               <p className="text-[11px] text-secondary">
-                When you verify a reader&apos;s direct payment, UNB accrues its platform commission (e.g. 20%) in your ledger.
+                When you verify a reader&apos;s direct payment, UNB accrues its platform fee (e.g. 20%) in your ledger.
               </p>
             </div>
             <div className="bg-surface p-3 rounded-lg border border-border space-y-1">
-              <span className="font-semibold text-navy">2. Commission Invoice</span>
+              <span className="font-semibold text-navy">2. Platform Fee Invoice</span>
               <p className="text-[11px] text-secondary">
                 At billing cycles, administrators issue a formal invoice grouping uninvoiced transactions with a designated due date.
               </p>
@@ -170,7 +170,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-accent" />
             <h2 className="font-serif font-bold text-base text-navy">
-              Commission Invoices ({invoices.length})
+              Platform Fee Invoices ({invoices.length})
             </h2>
           </div>
 
@@ -231,7 +231,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
               <p className="text-xs font-semibold text-main">No invoices in this view</p>
               <p className="text-[11px] text-secondary max-w-sm mx-auto">
                 {invoices.length === 0
-                  ? 'You currently have no billing invoices. When administrators package your sales into invoices, they will appear here.'
+                  ? 'You currently have no platform fee invoices. When administrators package your sales into invoices, they will appear here.'
                   : 'No invoices match the selected filter.'}
               </p>
             </div>

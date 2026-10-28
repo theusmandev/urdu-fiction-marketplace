@@ -77,7 +77,7 @@ export function AdminCommissionReportsClient({
             className="inline-flex items-center text-xs font-semibold text-secondary hover:text-navy mb-2 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-1.5" />
-            Back to Commission Overview
+            Back to Platform Fee Overview
           </Link>
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-accent-admin-light text-accent-admin border border-accent-admin-border">
@@ -91,7 +91,7 @@ export function AdminCommissionReportsClient({
             Author Payment Reports Queue
           </h1>
           <p className="text-xs text-secondary mt-0.5">
-            Claims submitted by authors stating commission was transferred. Bank deposit verification required.
+            Claims submitted by authors stating platform fee was transferred. Bank deposit verification required.
           </p>
         </div>
 

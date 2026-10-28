@@ -129,9 +129,9 @@ export function AdminWriterCommissionDetailClient({
         setPreviewData(res.preview);
         if (res.preview.total_commission_pkr <= 0) {
           setInvoiceModalError(
-            `Total uninvoiced commission for this period is ${formatPKR2(
+            `Total uninvoiced platform fee for this period is ${formatPKR2(
               res.preview.total_commission_pkr
-            )}. Invoices must have a positive commission total.`
+            )}. Invoices must have a positive platform fee total.`
           );
         }
       }
@@ -196,7 +196,7 @@ export function AdminWriterCommissionDetailClient({
       if (!res.success) {
         setAdjustmentError(res.error || 'Failed to record adjustment.');
       } else {
-        setAdjustmentSuccess('Manual commission adjustment recorded successfully in sales ledger.');
+        setAdjustmentSuccess('Manual platform fee adjustment recorded successfully in sales ledger.');
         setAdjustmentAmount('');
         setAdjustmentReason('');
         router.refresh();
@@ -218,7 +218,7 @@ export function AdminWriterCommissionDetailClient({
             className="inline-flex items-center text-xs font-semibold text-muted hover:text-main mb-2 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-1.5" />
-            Back to Commission Overview
+            Back to Platform Fee Overview
           </Link>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-serif font-bold text-main">
@@ -240,7 +240,7 @@ export function AdminWriterCommissionDetailClient({
             className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-accent-admin hover:bg-accent-admin-dark text-white shadow-sm transition-colors"
           >
             <FilePlus className="w-4 h-4 mr-1.5" />
-            Issue Commission Invoice
+            Issue Platform Fee Invoice
           </button>
           <button
             type="button"
@@ -268,7 +268,7 @@ export function AdminWriterCommissionDetailClient({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-surface border border-border rounded-xl p-5 shadow-card space-y-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Outstanding Commission
+            Outstanding Platform Fee
           </span>
           <div className="text-2xl font-bold font-mono text-main">
             {formatPKR2(writer.current_unpaid_commission)}
@@ -323,7 +323,7 @@ export function AdminWriterCommissionDetailClient({
 
         {invoices.length === 0 ? (
           <div className="p-8 text-center text-muted text-xs">
-            No invoices have been issued for this author yet. Use &quot;Issue Commission Invoice&quot; to bill accrued sales.
+            No invoices have been issued for this author yet. Use &quot;Issue Platform Fee Invoice&quot; to bill accrued sales.
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -392,7 +392,7 @@ export function AdminWriterCommissionDetailClient({
                   <th className="py-2.5 px-3">Date (PKT)</th>
                   <th className="py-2.5 px-3">Type</th>
                   <th className="py-2.5 px-3 text-right">Gross</th>
-                  <th className="py-2.5 px-3 text-right">Commission</th>
+                  <th className="py-2.5 px-3 text-right">Platform Fee</th>
                   <th className="py-2.5 px-3 text-right">Writer Net</th>
                   <th className="py-2.5 px-3">Notes</th>
                 </tr>
@@ -434,7 +434,7 @@ export function AdminWriterCommissionDetailClient({
               <div className="flex items-center gap-2">
                 <FilePlus className="w-5 h-5 text-accent-admin" />
                 <h3 className="font-serif font-bold text-lg text-main">
-                  Generate Commission Invoice
+                  Generate Platform Fee Invoice
                 </h3>
               </div>
               <button
@@ -555,7 +555,7 @@ export function AdminWriterCommissionDetailClient({
                         </div>
                       </div>
                       <div>
-                        <span className="text-[10px] text-muted uppercase font-semibold">Total Commission:</span>
+                        <span className="text-[10px] text-muted uppercase font-semibold">Total Platform Fee:</span>
                         <div className="font-mono font-bold text-rose-700">
                           {formatPKR2(previewData.total_commission_pkr)}
                         </div>
@@ -601,7 +601,7 @@ export function AdminWriterCommissionDetailClient({
               <div className="flex items-center gap-2">
                 <Sliders className="w-5 h-5 text-amber-600" />
                 <h3 className="font-serif font-bold text-lg text-main">
-                  Record Commission Adjustment
+                  Record Platform Fee Adjustment
                 </h3>
               </div>
               <button
@@ -637,12 +637,12 @@ export function AdminWriterCommissionDetailClient({
                 )}
 
                 <p className="text-muted">
-                  Inserts an auditable <code className="text-accent-admin font-mono">manual_correction</code> row into the sales ledger. Positive amounts increase platform commission liability. Negative amounts credit the writer.
+                  Inserts an auditable <code className="text-accent-admin font-mono">manual_correction</code> row into the sales ledger. Positive amounts increase platform fee liability. Negative amounts credit the writer.
                 </p>
 
                 <div>
                   <label className="block text-main font-medium mb-1">
-                    Commission Adjustment Amount (PKR) *
+                    Platform Fee Adjustment Amount (PKR) *
                   </label>
                   <input
                     type="number"
@@ -654,7 +654,7 @@ export function AdminWriterCommissionDetailClient({
                     className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-main font-mono focus:outline-none focus:ring-2 focus:ring-accent-admin focus:border-accent-admin"
                   />
                   <p className="text-[10px] text-muted mt-1">
-                    Use negative numbers to reduce author commission debt.
+                    Use negative numbers to reduce author platform fee debt.
                   </p>
                 </div>
 

@@ -399,8 +399,8 @@ export function AdminRefundsClient({
               </div>
               <p className="leading-relaxed">
                 {actionType === 'approve'
-                  ? `Approving confirms that author ${activeRequest.writer_pen_name} refunded ${formatPKR(activeRequest.amount_pkr)} off-platform. A negative adjustment entry will be written to the sales ledger, reducing the author's platform commission debt and revoking reader ${activeRequest.reader_name}'s novel reading access.`
-                  : `Declining dismisses the author's request for platform commission reduction. Reader access and original verified sale remain unchanged.`}
+                  ? `Approving confirms that author ${activeRequest.writer_pen_name} refunded ${formatPKR(activeRequest.amount_pkr)} off-platform. A negative adjustment entry will be written to the sales ledger, reducing the author's platform fee debt and revoking reader ${activeRequest.reader_name}'s novel reading access.`
+                  : `Declining dismisses the author's request for platform fee reduction. Reader access and original verified sale remain unchanged.`}
               </p>
             </div>
 

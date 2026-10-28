@@ -78,7 +78,7 @@ export function getInvoiceStatusMeta(status: CommissionInvoiceStatus): {
       return {
         label: 'Awaiting Payment',
         badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-        description: 'Invoice issued. Waiting for writer to transfer commission.',
+        description: 'Invoice issued. Waiting for writer to transfer platform fee.',
       };
     case 'payment_reported':
       return {
@@ -96,7 +96,7 @@ export function getInvoiceStatusMeta(status: CommissionInvoiceStatus): {
       return {
         label: 'Fully Settled',
         badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-        description: 'Commission payment confirmed and reconciled.',
+        description: 'Platform fee payment confirmed and reconciled.',
       };
     case 'void':
       return {

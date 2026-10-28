@@ -127,7 +127,7 @@ export function EarningsView({
             Author Earnings & Sales Ledger
           </h1>
           <p className="text-xs text-secondary mt-0.5">
-            Real-time auditable record of verified reader sales, platform commissions, and refunds.
+            Real-time auditable record of verified reader sales, platform fees, and refunds.
           </p>
         </div>
 
@@ -145,7 +145,7 @@ export function EarningsView({
             className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-surface text-secondary hover:text-navy hover:bg-ivory shadow-sm transition-colors"
           >
             <ShieldCheck className="w-4 h-4 mr-1.5 text-accent" />
-            Commission & Invoices
+            Platform Fee & Invoices
           </Link>
         </div>
       </div>
@@ -156,10 +156,10 @@ export function EarningsView({
           <AlertTriangle className="w-5 h-5 shrink-0 text-rose-600 mt-0.5" />
           <div className="text-xs space-y-1">
             <div className="font-semibold text-sm">
-              New Reader Orders Paused (Commission Threshold Exceeded)
+              New Reader Orders Paused (Platform Fee Threshold Exceeded)
             </div>
             <p>
-              Your outstanding platform commission has exceeded PKR{' '}
+              Your outstanding platform fee has exceeded PKR{' '}
               {summary?.unpaid_commission_limit_pkr?.toLocaleString() ?? '5,000'}. New reader checkouts
               are paused. Please view your open invoice and report payment to resume sales.
             </p>
@@ -197,10 +197,10 @@ export function EarningsView({
           </p>
         </div>
 
-        {/* Accrued Platform Commission */}
+        {/* Accrued Platform Fee */}
         <div className="bg-surface rounded-xl border border-border p-5 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-secondary">
-            <span className="text-xs font-semibold uppercase tracking-wider">Accrued Commission</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Accrued Platform Fee</span>
             <ShieldCheck className="w-4 h-4 text-navy" />
           </div>
           <div className="text-2xl font-bold text-navy">
@@ -369,7 +369,7 @@ export function EarningsView({
                     <th className="py-3 px-4">Type</th>
                     <th className="py-3 px-4 text-right">Gross</th>
                     <th className="py-3 px-4 text-right">Rate</th>
-                    <th className="py-3 px-4 text-right">Commission</th>
+                    <th className="py-3 px-4 text-right">Platform Fee</th>
                     <th className="py-3 px-4 text-right">Net</th>
                     <th className="py-3 px-4">Invoice</th>
                   </tr>
@@ -449,7 +449,7 @@ export function EarningsView({
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-secondary uppercase">Commission</div>
+                      <div className="text-[10px] text-secondary uppercase">Platform Fee</div>
                       <div className="font-mono font-semibold text-rose-700">
                         {formatPKR2(entry.platform_commission_pkr)}
                       </div>

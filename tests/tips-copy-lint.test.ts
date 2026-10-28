@@ -42,12 +42,12 @@ test('Tip Jar Copy Lint — Prohibits Begging and Donation Terminology', async (
   await t.test('Includes mandatory honest disclosure line', () => {
     assert.match(
       copyContent,
-      /Optional\. The whole amount goes directly to the author; UNB Premium takes no share\./,
+      /Optional\. The whole amount goes directly to the author; no platform fee\./,
       'Mandatory English disclosure line missing from tips copy'
     );
     assert.match(
       copyContent,
-      /اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔/,
+      /اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ کوئی پلیٹ فارم فیس نہیں ہے۔/,
       'Mandatory Urdu disclosure line missing from tips copy'
     );
   });

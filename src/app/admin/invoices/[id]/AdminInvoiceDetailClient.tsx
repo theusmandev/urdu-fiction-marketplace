@@ -341,7 +341,7 @@ export function AdminInvoiceDetailClient({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print:grid-cols-3">
         <div className="bg-surface border border-border rounded-xl p-5 shadow-card space-y-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Total Statement Commission
+            Total Statement Platform Fee
           </span>
           <div className="text-2xl font-bold font-mono text-main">
             {formatPKR2(invoice.total_commission_owed_pkr)}
@@ -527,7 +527,7 @@ export function AdminInvoiceDetailClient({
                 <th className="py-2.5 px-3">Type</th>
                 <th className="py-2.5 px-3 text-right">Gross</th>
                 <th className="py-2.5 px-3 text-right">Rate</th>
-                <th className="py-2.5 px-3 text-right">Commission</th>
+                <th className="py-2.5 px-3 text-right">Platform Fee</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -594,7 +594,7 @@ export function AdminInvoiceDetailClient({
               )}
 
               <p className="text-muted">
-                Type the exact amount verified in the platform bank account. This creates an auditable <code className="text-emerald-800 font-mono">commission_payments</code> record and reduces the author&apos;s outstanding commission.
+                Type the exact amount verified in the platform bank account. This creates an auditable payment settlement record and reduces the author&apos;s outstanding platform fee.
               </p>
 
               <div>

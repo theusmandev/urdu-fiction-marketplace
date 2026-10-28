@@ -26,6 +26,9 @@ export default function WriterAgreementPage() {
               </UrduText>
             </div>
           </div>
+          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-900 font-medium">
+            Draft — pending legal review
+          </div>
         </div>
 
         <div className="space-y-6 text-sm text-secondary leading-relaxed">
@@ -42,10 +45,10 @@ export default function WriterAgreementPage() {
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-navy flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              2. Platform Commission & Accrual Threshold
+              2. Platform Fee & Accrual Threshold — Draft, Pending Legal Review
             </h2>
             <p>
-              The platform records an automated 20% platform commission (or agreed custom rate) on each verified sale. You agree to settle accrued commissions with the platform once your balance reaches the unpaid limit of PKR 5,000. Orders remain active and uninterrupted while within this limit.
+              The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. The platform records an automated 20% platform fee (or agreed custom rate) on each verified sale. You agree to settle accrued platform fees with the platform once your balance reaches the unpaid limit of PKR 5,000. Orders remain active and uninterrupted while within this limit.
             </p>
           </section>
 
@@ -75,7 +78,7 @@ export default function WriterAgreementPage() {
               5. Reader Appreciation Gifts (&quot;Tips&quot;) — Draft, Pending Legal Review
             </h2>
             <p>
-              Eligible authors may opt in to accept voluntary reader appreciation gifts (&quot;Tips&quot;). Tips are non-refundable voluntary gifts from readers. UNB Premium takes 0% commission on tips and never holds or processes tip funds.
+              Eligible authors may opt in to accept voluntary reader appreciation gifts (&quot;Tips&quot;). Tips are non-refundable voluntary gifts from readers. UNB Premium charges 0% platform fee on tips and never holds or processes tip funds.
             </p>
             <p>
               Tips unlock no content. Authors are strictly prohibited from demanding tips, locking content behind tips, conditioning releases on tips, or substituting tips for book sales. Any such attempt constitutes a material breach of this Agreement.

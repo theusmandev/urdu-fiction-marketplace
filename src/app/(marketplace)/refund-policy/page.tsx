@@ -105,7 +105,7 @@ export default function RefundPolicyPage() {
               If the writer is unable or unwilling to fulfill access, the writer must refund
               the reader directly via mobile wallet/bank transfer. The writer&apos;s platform
               sales ledger is adjusted with a negative reconciliation entry, reversing any
-              associated commission accrual.
+              associated platform fee accrual.
             </li>
             <li>
               Writers with repeated unresolved disputes are suspended and disqualified

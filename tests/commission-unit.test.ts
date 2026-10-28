@@ -9,7 +9,7 @@ import {
   getInvoiceStatusMeta,
 } from '../src/lib/commission/schemas.ts';
 
-describe('Commission & Settlement Domain Helpers', () => {
+describe('Platform Fee & Settlement Domain Helpers', () => {
   describe('CSV Export & Formula Injection Prevention', () => {
     it('neutralizes formula injection triggers (=, +, -, @) with single quote prefix', () => {
       assert.strictEqual(escapeCsvCell('=1+1'), '"\'=1+1"');
@@ -63,7 +63,7 @@ describe('Commission & Settlement Domain Helpers', () => {
     });
   });
 
-  describe('Commission Schemas Validation', () => {
+  describe('Platform Fee Schemas Validation', () => {
     const validUuid = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
     it('validates correct payment reporting input', () => {

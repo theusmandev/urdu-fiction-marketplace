@@ -191,7 +191,7 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
             >
               Writer Platform Agreement
             </Link>{' '}
-            (including direct bank verification rules and the 20% platform commission schedule).
+            (including direct bank verification rules and the 20% platform fee schedule).
           </span>
         </label>
       </div>

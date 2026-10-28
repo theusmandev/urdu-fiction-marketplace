@@ -340,7 +340,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
                   <span className="text-emerald-700">{formatPKR(row.gross_amount_pkr)}</span>
                 </div>
                 <div>
-                  <span className="text-muted text-[10px] block">Platform Comm.</span>
+                  <span className="text-muted text-[10px] block">Platform Fee</span>
                   <span className="text-accent-admin">{formatPKR(row.platform_commission_pkr)}</span>
                 </div>
                 <div>
@@ -399,7 +399,7 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
               <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 space-y-1">
                 <p className="font-bold">Financial & Access Impact Warning:</p>
                 <p className="text-[11px] leading-relaxed">
-                  Force-verifying order <strong>{order.order_number}</strong> immediately grants the reader full access to the novel and creates a <strong>sale_verified</strong> financial ledger entry, establishing a platform commission debt for author <strong>{writer.pen_name}</strong>.
+                  Force-verifying order <strong>{order.order_number}</strong> immediately grants the reader full access to the novel and creates a <strong>sale_verified</strong> financial ledger entry, establishing a platform fee debt for author <strong>{writer.pen_name}</strong>.
                 </p>
               </div>
 

@@ -624,7 +624,7 @@ export default async function AdminDashboardPage() {
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-accent-admin" />
               <h2 className="text-sm font-bold text-navy tracking-tight">
-                Writers Near or Over Commission Threshold
+                Writers Near or Over Platform Fee Threshold
               </h2>
             </div>
             <span className="text-xs font-semibold text-secondary">
@@ -634,7 +634,7 @@ export default async function AdminDashboardPage() {
 
           {atRiskWriters.length === 0 ? (
             <div className="py-8 text-center text-xs text-secondary">
-              All writers are within safe commission limits.
+              All writers are within safe platform fee limits.
             </div>
           ) : (
             <div className="divide-y divide-border">

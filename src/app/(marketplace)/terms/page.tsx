@@ -82,13 +82,13 @@ export default function TermsPage() {
 
         <section className="space-y-2">
           <h2 className="font-serif text-base sm:text-lg font-bold text-navy">
-            4. Platform Commission & Financial Accrual
+            4. Platform Fee & Financial Accrual — Draft, Pending Legal Review
           </h2>
           <p>
-            The platform charges a percentage commission (default 20%, subject to
-            contractual adjustments in the writer profile) on verified sales. Commission is
+            The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. The platform charges a percentage platform fee (default 20%, subject to
+            contractual adjustments in the writer profile) on verified sales. The platform fee is
             tracked on an append-only sales ledger and settled periodically against the
-            unpaid commission threshold.
+            unpaid platform fee limit.
           </p>
         </section>
 
@@ -112,7 +112,7 @@ export default function TermsPage() {
             Readers may voluntarily send direct monetary gifts (&quot;Tips&quot;) to eligible authors as a token of appreciation. Tips are 100% voluntary, non-refundable gifts. A tip unlocks no novel, chapter, digital file, or special platform privilege.
           </p>
           <p>
-            UNB Premium charges 0% platform commission on tips and never receives, touches, or holds tip funds. Readers transfer tips directly to the author&apos;s verified payment account outside the platform. Authors may never solicit, demand, or promise content or privileges in exchange for tips.
+            UNB Premium charges 0% platform fee on tips and never receives, touches, or holds tip funds. Readers transfer tips directly to the author&apos;s verified payment account outside the platform. Authors may never solicit, demand, or promise content or privileges in exchange for tips.
           </p>
         </section>
       </div>

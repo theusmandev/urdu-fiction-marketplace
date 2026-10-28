@@ -48,7 +48,7 @@ export default async function AdminInvoiceDetailPage({
         <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
           <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
             <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
-            <span>Database Error Loading Commission Invoice</span>
+            <span>Database Error Loading Platform Fee Invoice</span>
           </div>
           <p className="text-xs text-rose-800/90 leading-relaxed">
             Unable to retrieve invoice statement from the database:

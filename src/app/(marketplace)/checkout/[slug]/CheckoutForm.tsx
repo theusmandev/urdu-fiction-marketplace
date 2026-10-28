@@ -323,8 +323,8 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                 <span className="font-mono text-navy font-semibold">{formatPKR(novel.price_pkr)}</span>
               </div>
               <div className="flex justify-between text-secondary">
-                <span>Platform Fee</span>
-                <span className="text-emerald-700 font-semibold font-mono">Free (PKR 0)</span>
+                <span>Fees</span>
+                <span className="text-emerald-700 font-semibold font-mono">None (PKR 0)</span>
               </div>
               <div className="flex justify-between text-sm font-bold text-navy pt-2 border-t border-border">
                 <span>Total Amount Due</span>

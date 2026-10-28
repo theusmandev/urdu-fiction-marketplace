@@ -88,10 +88,10 @@ export function AdminInvoicesListClient({
             </span>
           </div>
           <h1 className="text-2xl font-serif font-bold text-main mt-1">
-            Platform Commission Invoices
+            Platform Fee Invoices
           </h1>
           <p className="text-xs text-muted mt-0.5">
-            Inspect all author commission statements, verify settlement reports, and record bank payments.
+            Inspect all author platform fee statements, verify settlement reports, and record bank payments.
           </p>
         </div>
 
@@ -100,7 +100,7 @@ export function AdminInvoicesListClient({
             href="/admin/commission"
             className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-surface-muted text-main border border-border shadow-sm transition-colors"
           >
-            Commission Overview
+            Platform Fee Overview
           </Link>
           <Link
             href="/admin/commission/reports"

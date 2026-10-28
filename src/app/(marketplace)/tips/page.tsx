@@ -72,7 +72,7 @@ export default async function MyTipsPage() {
             </UrduText>
           </div>
           <p className="text-xs text-secondary max-w-lg">
-            Direct reader-to-author appreciation gifts. 100% of your tip goes to the author with zero platform commission.
+            Direct reader-to-author appreciation gifts. 100% of your tip goes to the author with no platform fee.
           </p>
         </div>
 

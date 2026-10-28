@@ -101,7 +101,7 @@ export function WriterActions({
   const handleUpdateTerms = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!termsReason || termsReason.trim().length < 3) {
-      setError('A justification reason is required to update commission terms.');
+      setError('A justification reason is required to update platform fee terms.');
       return;
     }
 
@@ -119,9 +119,9 @@ export function WriterActions({
       );
 
       if (!res.success) {
-        setError(res.error || 'Failed to update commission terms');
+        setError(res.error || 'Failed to update platform fee terms');
       } else {
-        setSuccessMsg('Writer commission terms successfully updated!');
+        setSuccessMsg('Writer platform fee terms successfully updated!');
         setActiveDialog(null);
         router.refresh();
       }
@@ -202,7 +202,7 @@ export function WriterActions({
           className="px-4 py-2 rounded-xl bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
         >
           <Sliders className="w-4 h-4 text-muted" />
-          <span>Edit Commission Terms</span>
+          <span>Edit Platform Fee Terms</span>
         </button>
       </div>
 
@@ -260,7 +260,7 @@ export function WriterActions({
               </div>
               <div>
                 <h3 className="text-base font-bold text-main">
-                  Custom Commission & Limits
+                  Custom Platform Fee & Limits
                 </h3>
                 <p className="text-xs text-muted mt-1">
                   Changes affect future sales only.
@@ -271,7 +271,7 @@ export function WriterActions({
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-main block mb-1">
-                  Custom Commission Rate (%)
+                  Custom Platform Fee Rate (%)
                 </label>
                 <input
                   type="number"
@@ -290,7 +290,7 @@ export function WriterActions({
 
               <div>
                 <label className="text-xs font-semibold text-main block mb-1">
-                  Unpaid Commission Limit (PKR)
+                  Unpaid Platform Fee Limit (PKR)
                 </label>
                 <input
                   type="number"

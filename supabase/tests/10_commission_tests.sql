@@ -487,7 +487,7 @@ BEGIN
             PERFORM public.get_platform_payment_instructions();
             INSERT INTO test_results VALUES (15, 'Payment instructions gated', 'FAIL', 'Reader without invoice was able to access instructions');
         EXCEPTION WHEN OTHERS THEN
-            IF SQLERRM LIKE '%accessible only to writers with an active commission invoice%' THEN
+            IF SQLERRM LIKE '%accessible only to writers with an active platform fee invoice%' THEN
                 INSERT INTO test_results VALUES (15, 'Payment instructions gated', 'PASS', 'Correctly rejected: ' || SQLERRM);
             ELSE
                 INSERT INTO test_results VALUES (15, 'Payment instructions gated', 'FAIL', 'Wrong error: ' || SQLERRM);

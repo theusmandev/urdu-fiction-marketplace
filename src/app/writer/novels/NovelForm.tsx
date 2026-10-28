@@ -476,7 +476,7 @@ export function NovelForm({
                 </div>
 
                 <div className="flex items-center justify-between text-secondary text-[11px]">
-                  <span>Platform Commission ({platformRate}%):</span>
+                  <span>Platform Fee ({platformRate}%):</span>
                   <span className="font-mono">
                     PKR {estimatedCommission.toLocaleString()}
                   </span>

@@ -52,11 +52,11 @@ export const platformSettingsSchema = z
   .object({
     defaultCommissionRate: z.coerce
       .number()
-      .min(0, 'Commission rate cannot be less than 0%')
-      .max(100, 'Commission rate cannot exceed 100%'),
+      .min(0, 'Platform fee rate cannot be less than 0%')
+      .max(100, 'Platform fee rate cannot exceed 100%'),
     defaultUnpaidCommissionLimit: z.coerce
       .number()
-      .min(0, 'Unpaid commission threshold cannot be negative'),
+      .min(0, 'Unpaid platform fee threshold cannot be negative'),
     disputeWindowDays: z.coerce
       .number()
       .int('Dispute window must be whole days')

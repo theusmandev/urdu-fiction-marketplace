@@ -214,12 +214,12 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
           <div className="bg-surface border border-border rounded-2xl p-5 space-y-4 shadow-card">
             <h2 className="text-sm font-bold text-main flex items-center gap-2">
               <Shield className="w-4 h-4 text-accent-admin" />
-              <span>Commission & Ledger Status</span>
+              <span>Platform Fee & Ledger Status</span>
             </h2>
 
             <div className="space-y-3 text-xs font-mono">
               <div className="flex justify-between items-center py-1.5 border-b border-border">
-                <span className="text-muted font-sans">Applicable Commission:</span>
+                <span className="text-muted font-sans">Applicable Platform Fee:</span>
                 <span className="font-semibold text-main">
                   {writer.custom_commission_rate !== null ? (
                     <span className="text-accent-admin font-semibold">{writer.custom_commission_rate}% (Custom)</span>
@@ -258,7 +258,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
             </div>
 
             <div className="p-3 rounded-xl bg-surface-muted border border-border text-[11px] text-muted">
-              Platform rule: If unpaid commission reaches PKR {Number(writer.unpaid_commission_limit).toLocaleString()}, new orders are paused automatically until an invoice settlement is recorded.
+              Platform rule: If unpaid platform fee reaches PKR {Number(writer.unpaid_commission_limit).toLocaleString()}, new orders are paused automatically until an invoice settlement is recorded.
             </div>
           </div>
 

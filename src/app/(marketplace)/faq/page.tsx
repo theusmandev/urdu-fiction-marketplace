@@ -47,7 +47,7 @@ const FAQS: FaqItem[] = [
   {
     q: "How do authors receive their earnings?",
     qUrdu: "مصنفین کو ان کا معاوضہ کیسے ملتا ہے؟",
-    a: "Authors receive 100% of reader payments directly into their own bank or wallet accounts in real-time. Platform commission (default 20%) is calculated automatically and tracked against the writer's commission ledger.",
+    a: "Authors receive 100% of reader payments directly into their own bank or wallet accounts in real-time. The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. Platform fee (default 20%) is calculated automatically and tracked against the writer's sales ledger.",
   },
   {
     q: "What if a writer does not unlock my novel after payment?",
@@ -59,6 +59,11 @@ const FAQS: FaqItem[] = [
 export default function FaqPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      {/* Draft Legal Notice */}
+      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs text-center font-medium">
+        Draft — pending legal review
+      </div>
+
       {/* Header */}
       <div className="space-y-4 text-center border-b border-border pb-8">
         <span className="text-xs font-semibold text-accent uppercase tracking-wider">

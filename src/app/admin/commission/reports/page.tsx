@@ -35,10 +35,10 @@ export default async function AdminCommissionReportsPage({
         <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 space-y-3 shadow-card">
           <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
             <ShieldAlert className="w-5 h-5 shrink-0 text-rose-600" />
-            <span>Database Error Loading Commission Reports</span>
+            <span>Database Error Loading Platform Fee Reports</span>
           </div>
           <p className="text-xs text-rose-900 leading-relaxed">
-            Unable to retrieve commission payment reports from the database:
+            Unable to retrieve platform fee payment reports from the database:
           </p>
           <div className="p-3 rounded-xl bg-surface border border-rose-200 text-xs font-mono text-rose-800">
             {queryError.message} {queryError.code ? `(Code: ${queryError.code})` : ''}
