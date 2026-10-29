@@ -74,7 +74,7 @@ export default function DevThemeShowcasePage() {
                   <BrandLogo variant="lockup" size={48} />
                 </div>
                 <p className="text-xs text-text-muted max-w-[200px]">
-                  Header &amp; mobile drawer emblem with integrated ribbon.
+                  Header &amp; mobile drawer composed vector lockup.
                 </p>
               </div>
 

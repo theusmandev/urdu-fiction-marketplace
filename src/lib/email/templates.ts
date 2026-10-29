@@ -194,7 +194,7 @@ This is an automated system notification.
           <img
             src="${escapeHtml(baseUrl)}/brand/logo-email.png"
             width="140"
-            height="91"
+            height="151"
             alt="UNB Premium"
             style="display:block;margin:0 auto 10px auto;max-width:140px;height:auto;border:0;outline:none;"
           />

@@ -4,49 +4,60 @@ import React from 'react';
 import Image from 'next/image';
 import { siteConfig } from '@/config/site';
 
-export type BrandLogoVariant = 'full' | 'lockup' | 'mark';
+export type BrandLogoVariant = 'full' | 'roundel' | 'lockup' | 'mark' | 'wordmark' | 'tag';
 
 export interface BrandLogoProps {
   /**
    * Logo visual variant:
-   * - "full": Circular badge with live-text "PREMIUM" ribbon overlapping below (About, auth, footer, error).
-   * - "lockup": Compact circular badge with scaled-down ribbon for Marketplace header and mobile drawer.
-   * - "mark": Standalone circle badge (with optional light plate for dark bars) for Writer Studio and Admin shells.
+   * - "full": Complete vector logo with roundel and ribbon (footer, auth, about, error/404).
+   * - "roundel": Circular roundel alone without ribbon (quill, book, calligraphy, swoosh, English text).
+   * - "lockup": Header lockup composed of mark + calligraphy wordmark + flat tag.
+   * - "mark": Quill and book inside circle ring (favicon, tiny avatars, studio/admin top bars).
+   * - "wordmark": Urdu calligraphy with ink swoosh underline.
+   * - "tag": Flat "PREMIUM" ribbon tag (18-22px height).
    */
   variant?: BrandLogoVariant;
 
   /**
-   * Circle badge diameter in pixels.
-   * Defaults per variant:
-   * - "full": 96px
-   * - "lockup": 48px
-   * - "mark": 36px
+   * Primary dimension in pixels (width or diameter depending on variant).
+   * Defaults:
+   * - "full": 96px width (103px height)
+   * - "roundel": 96px diameter
+   * - "lockup": 48px mark (composed lockup)
+   * - "mark": 36px diameter
+   * - "wordmark": 40px height (~105px width)
+   * - "tag": 20px height (~145px width)
    */
   size?: number;
 
   /**
-   * Next.js Image priority loading (recommended for above-the-fold header logo).
+   * Explicit width override in pixels.
+   */
+  width?: number;
+
+  /**
+   * Explicit height override in pixels.
+   */
+  height?: number;
+
+  /**
+   * Above-the-fold priority loading (recommended for header lockup).
    */
   priority?: boolean;
 
   /**
-   * When true, renders a subtle light plate / ring behind the circle badge.
-   * Recommended for dark top bars (e.g. Writer Studio, Admin shells)
-   * so the cream circle maintains crisp contrast against any background hue.
+   * Subtle light circular plate/ring behind roundel/mark for high contrast on dark shells.
    */
   plate?: boolean;
 
   /**
-   * Accessible alt text for the circle graphic.
-   * Per WCAG specifications:
-   * - In "full" and "lockup" variants, defaults to empty alt="" because the parent link
-   *   or container has an aria-label, and the live "PREMIUM" text is decorative to screen readers.
-   * - In "mark" variant, defaults to siteConfig.brandName.
+   * Accessible alt text for screen readers.
+   * Defaults to siteConfig.brandName for standalone views, or empty if decorative/nested inside an aria-labeled link.
    */
   alt?: string;
 
   /**
-   * Additional wrapper class names.
+   * Optional additional CSS classes.
    */
   className?: string;
 }
@@ -54,177 +65,35 @@ export interface BrandLogoProps {
 /**
  * BrandLogo
  *
- * Official UNB Premium Brand Mark component.
- * Combines the original circular badge artwork with a live-text CSS/SVG "PREMIUM" ribbon
- * that dynamically inherits the active site palette (ivory_ink, paper_teal, cream_maroon).
+ * Official UNB Premium Vector Brand Mark component.
+ * Sourced directly from public/brand vector SVGs:
+ * - logo-full.svg (viewBox 0 0 1250 1345)
+ * - logo-roundel.svg (viewBox 25 25 1200 1200)
+ * - logo-mark.svg (viewBox 25 25 1200 1200)
+ * - logo-wordmark.svg (viewBox 150 632 950 362)
+ * - tag-premium.svg (viewBox 95 1172 1060 146)
  */
 export function BrandLogo({
   variant = 'full',
   size: userSize,
+  width: userWidth,
+  height: userHeight,
   priority = false,
   plate = false,
   alt: userAlt,
   className = '',
 }: BrandLogoProps) {
-  // 1. Resolve dimensions based on variant
-  const defaultSize = variant === 'full' ? 96 : variant === 'lockup' ? 48 : 36;
-  const size = userSize ?? defaultSize;
-
-  // 2. Geometry calculations for the heraldic ribbon
-  // For small/lockup variants (e.g. header), allow ribbon width to comfortably fit "PREMIUM"
-  // without any clipping against the swallowtail notches.
-  const isCompact = variant === 'lockup' || size < 64;
-
-  const ribbonWidth = isCompact
-    ? Math.max(58, Math.round(size * 1.18))
-    : Math.round(size * 0.92);
-
-  const ribbonHeight = isCompact
-    ? Math.max(14, Math.round(size * 0.28))
-    : Math.max(13, Math.round(size * 0.26));
-
-  const circleOverlap = isCompact
-    ? Math.round(size * 0.14)
-    : Math.round(size * 0.16);
-
-  const totalHeight = size + ribbonHeight - circleOverlap;
-
-  // 3. Notch and inner border geometry (crisp exact pixel values)
-  const notchDepth = isCompact
-    ? Math.max(3.5, Math.round(ribbonHeight * 0.28))
-    : Math.max(3.5, Math.round(ribbonHeight * 0.32));
-
-  const insetX = isCompact ? 1.2 : Math.min(2.5, Math.max(1.2, Math.round(ribbonHeight * 0.08 * 10) / 10));
-  const insetY = isCompact ? 1.0 : Math.min(2, Math.max(1, Math.round(ribbonHeight * 0.07 * 10) / 10));
-
-  const outerPoints = [
-    `0,0`,
-    `${ribbonWidth},0`,
-    `${ribbonWidth - notchDepth},${ribbonHeight / 2}`,
-    `${ribbonWidth},${ribbonHeight}`,
-    `0,${ribbonHeight}`,
-    `${notchDepth},${ribbonHeight / 2}`,
-  ].join(' ');
-
-  const innerPoints = [
-    `${insetX},${insetY}`,
-    `${ribbonWidth - insetX},${insetY}`,
-    `${ribbonWidth - insetX - notchDepth},${ribbonHeight / 2}`,
-    `${ribbonWidth - insetX},${ribbonHeight - insetY}`,
-    `${insetX},${ribbonHeight - insetY}`,
-    `${insetX + notchDepth},${ribbonHeight / 2}`,
-  ].join(' ');
-
-  // 4. Proportional typography scaling
-  const fontSize = isCompact ? 8.5 : Math.max(7, Math.round(ribbonHeight * 0.44 * 10) / 10);
-  const letterSpacing = isCompact ? 0.14 : ribbonHeight >= 16 ? 0.15 : 0.11;
-
-  // 5. Accessible description
-  const altText = userAlt !== undefined
-    ? userAlt
-    : variant === 'mark'
-      ? siteConfig.brandName
-      : '';
-
   // ---------------------------------------------------------------------------
-  // Variant: "mark" (Circle alone, for Writer Studio, Admin shells)
+  // Variant: "mark" (quill + book inside circle ring, with optional plate)
   // ---------------------------------------------------------------------------
   if (variant === 'mark') {
+    const s = userWidth ?? userSize ?? 36;
+    const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
+
     return (
       <div
         className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
-        style={{ width: size, height: size }}
-      >
-        {plate && (
-          <div
-            className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
-            aria-hidden="true"
-          />
-        )}
-        <div className="relative w-full h-full rounded-full overflow-hidden shadow-xs">
-          <Image
-            src="/brand/logo-circle-512.png"
-            alt={altText}
-            width={size}
-            height={size}
-            priority={priority}
-            unoptimized
-            className="w-full h-full object-contain"
-            style={{ imageRendering: '-webkit-optimize-contrast' }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Live-Text Ribbon Element
-  // Notched swallowtail ends, double gold border, active palette primary fill, ivory live text.
-  // Never truncated; full word "PREMIUM" is always 100% visible.
-  // ---------------------------------------------------------------------------
-  const ribbonElement = (
-    <div
-      className={`relative inline-flex items-center justify-center select-none shadow-xs transition-colors forced-colors:outline forced-colors:outline-1 forced-colors:outline-CanvasText ${
-        variant === 'lockup' ? 'max-[359px]:hidden' : ''
-      }`}
-      style={{
-        width: ribbonWidth,
-        height: ribbonHeight,
-      }}
-      aria-hidden="true"
-    >
-      {/* Crisp Notched Ribbon Background Plate with Double Border */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-xs"
-        viewBox={`0 0 ${ribbonWidth} ${ribbonHeight}`}
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Outer Notched Plate (Active Palette Primary Fill + Outer Hairline) */}
-        <polygon
-          points={outerPoints}
-          fill="var(--brand-ribbon-bg, var(--color-primary))"
-          stroke="var(--brand-ribbon-border-outer, var(--color-accent-strong))"
-          strokeWidth="0.75"
-          strokeLinejoin="round"
-        />
-        {/* Inner Accent Border (Active Palette Gold Accent) */}
-        <polygon
-          points={innerPoints}
-          fill="none"
-          stroke="var(--brand-ribbon-border, var(--color-accent))"
-          strokeWidth="1"
-          strokeOpacity="0.9"
-          strokeLinejoin="round"
-        />
-      </svg>
-
-      {/* Live Text: Editable from siteConfig.brandSuffix ("Premium") */}
-      <span
-        className="relative z-10 font-serif uppercase font-semibold text-[var(--brand-ribbon-text,#FBF8F2)] leading-none text-center whitespace-nowrap px-1 select-none"
-        style={{
-          fontSize: `${fontSize}px`,
-          letterSpacing: `${letterSpacing}em`,
-          paddingLeft: `${letterSpacing}em`, // offsets trailing letter-spacing to ensure optical center
-        }}
-      >
-        {siteConfig.brandSuffix || 'Premium'}
-      </span>
-    </div>
-  );
-
-  // ---------------------------------------------------------------------------
-  // Variants: "full" and "lockup" (Stacked: circle badge + overlapping ribbon)
-  // ---------------------------------------------------------------------------
-  return (
-    <div
-      className={`relative inline-flex flex-col items-center justify-start shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
-      style={{ width: Math.max(size, ribbonWidth), height: totalHeight }}
-    >
-      {/* Circle Badge (with circular mask & optional plate) */}
-      <div
-        className="relative rounded-full overflow-hidden shadow-xs shrink-0"
-        style={{ width: size, height: size }}
+        style={{ width: s, height: s }}
       >
         {plate && (
           <div
@@ -233,24 +102,196 @@ export function BrandLogo({
           />
         )}
         <Image
-          src="/brand/logo-circle-512.png"
-          alt={altText}
-          width={size}
-          height={size}
+          src="/brand/logo-mark.svg"
+          alt={resolvedAlt}
+          width={s}
+          height={s}
           priority={priority}
           unoptimized
-          className="w-full h-full object-contain transition-transform group-hover:scale-105"
-          style={{ imageRendering: '-webkit-optimize-contrast' }}
+          loading={priority ? 'eager' : 'lazy'}
+          className="w-full h-full object-contain"
         />
       </div>
+    );
+  }
 
-      {/* Live-Text Ribbon overlapping bottom of circle by ~14-16% */}
+  // ---------------------------------------------------------------------------
+  // Variant: "roundel" (complete circle without ribbon)
+  // ---------------------------------------------------------------------------
+  if (variant === 'roundel') {
+    const s = userWidth ?? userSize ?? 96;
+    const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
+
+    return (
       <div
-        className="absolute z-10 left-1/2 -translate-x-1/2"
-        style={{ top: `${size - circleOverlap}px` }}
+        className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+        style={{ width: s, height: s }}
       >
-        {ribbonElement}
+        {plate && (
+          <div
+            className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
+            aria-hidden="true"
+          />
+        )}
+        <Image
+          src="/brand/logo-roundel.svg"
+          alt={resolvedAlt}
+          width={s}
+          height={s}
+          priority={priority}
+          unoptimized
+          loading={priority ? 'eager' : 'lazy'}
+          className="w-full h-full object-contain"
+        />
       </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Variant: "wordmark" (Urdu calligraphy + ink swoosh)
+  // ---------------------------------------------------------------------------
+  if (variant === 'wordmark') {
+    const h = userHeight ?? userSize ?? 40;
+    const w = userWidth ?? Math.round(h * (950 / 362));
+    const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
+
+    return (
+      <div
+        className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+        style={{ width: w, height: h }}
+      >
+        <Image
+          src="/brand/logo-wordmark.svg"
+          alt={resolvedAlt}
+          width={w}
+          height={h}
+          priority={priority}
+          unoptimized
+          loading={priority ? 'eager' : 'lazy'}
+          className="h-full w-full object-contain"
+        />
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Variant: "tag" (flat ribbon "PREMIUM")
+  // ---------------------------------------------------------------------------
+  if (variant === 'tag') {
+    const h = userHeight ?? userSize ?? 20;
+    const w = userWidth ?? Math.round(h * (1060 / 146));
+    const resolvedAlt = userAlt !== undefined ? userAlt : 'Premium';
+
+    return (
+      <div
+        className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+        style={{ width: w, height: h }}
+      >
+        <Image
+          src="/brand/tag-premium.svg"
+          alt={resolvedAlt}
+          width={w}
+          height={h}
+          priority={priority}
+          unoptimized
+          loading={priority ? 'eager' : 'lazy'}
+          className="h-full w-full object-contain"
+        />
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Variant: "lockup" (Marketplace Header & Drawer: Mark + Wordmark + Tag)
+  // Composed in code from vector parts. Responsive: collapses to mark below 360px.
+  // ---------------------------------------------------------------------------
+  if (variant === 'lockup') {
+    const markSize = userSize ?? 48;
+    const wmHeight = Math.round(markSize * 0.58);
+    const wmWidth = Math.round(wmHeight * (950 / 362));
+    const tagHeight = Math.max(12, Math.round(markSize * 0.28));
+    const tagWidth = Math.round(tagHeight * (1060 / 146));
+    const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
+
+    return (
+      <div
+        className={`relative inline-flex items-center gap-2.5 sm:gap-3 shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+      >
+        {/* Vector Mark (Quill + Book in Ring) */}
+        <div
+          className="relative shrink-0 flex items-center justify-center"
+          style={{ width: markSize, height: markSize }}
+        >
+          {plate && (
+            <div
+              className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
+              aria-hidden="true"
+            />
+          )}
+          <Image
+            src="/brand/logo-mark.svg"
+            alt={resolvedAlt}
+            width={markSize}
+            height={markSize}
+            priority={priority}
+            unoptimized
+            loading={priority ? 'eager' : 'lazy'}
+            className="w-full h-full object-contain transition-transform group-hover:scale-105"
+          />
+        </div>
+
+        {/* Text Block: Urdu Calligraphy Wordmark + Flat Premium Tag */}
+        {/* Hidden on ultra-small screens (<360px) to keep mark prominent & prevent header overflow */}
+        <div className="flex flex-col items-start justify-center gap-1 max-[359px]:hidden">
+          <Image
+            src="/brand/logo-wordmark.svg"
+            alt=""
+            width={wmWidth}
+            height={wmHeight}
+            priority={priority}
+            unoptimized
+            loading={priority ? 'eager' : 'lazy'}
+            className="h-auto object-contain transition-opacity group-hover:opacity-90"
+            style={{ height: `${wmHeight}px`, width: 'auto' }}
+          />
+          <Image
+            src="/brand/tag-premium.svg"
+            alt=""
+            width={tagWidth}
+            height={tagHeight}
+            priority={priority}
+            unoptimized
+            loading={priority ? 'eager' : 'lazy'}
+            className="h-auto object-contain"
+            style={{ height: `${tagHeight}px`, width: 'auto' }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Variant: "full" (Complete Roundel + Ribbon) — Default
+  // ---------------------------------------------------------------------------
+  const w = userWidth ?? userSize ?? 96;
+  const h = userHeight ?? Math.round(w * (1345 / 1250));
+  const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
+
+  return (
+    <div
+      className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+      style={{ width: w, height: h }}
+    >
+      <Image
+        src="/brand/logo-full.svg"
+        alt={resolvedAlt}
+        width={w}
+        height={h}
+        priority={priority}
+        unoptimized
+        loading={priority ? 'eager' : 'lazy'}
+        className="w-full h-full object-contain"
+      />
     </div>
   );
 }

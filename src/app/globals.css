@@ -71,12 +71,6 @@
   --color-accent-admin-contrast: var(--accent-admin-contrast);
   --color-accent-admin-border: var(--accent-admin-border);
 
-  /* Brand Ribbon Tokens */
-  --color-brand-ribbon-bg: var(--brand-ribbon-bg);
-  --color-brand-ribbon-border: var(--brand-ribbon-border);
-  --color-brand-ribbon-border-outer: var(--brand-ribbon-border-outer);
-  --color-brand-ribbon-text: var(--brand-ribbon-text);
-
   /* Reader Tokens */
   --color-reader-light-bg: var(--reader-light-bg);
   --color-reader-light-surface: var(--reader-light-surface);

@@ -84,12 +84,6 @@ html:not([data-palette]) {
   --accent-admin-strong: #312E81;
   --accent-admin-contrast: #FFFFFF;
   --accent-admin-border: #C7D2FE;
-
-  /* Brand Ribbon Tokens (Live-Text "PREMIUM" Ribbon) */
-  --brand-ribbon-bg: #1B2A41;
-  --brand-ribbon-border: #B98A3E;
-  --brand-ribbon-border-outer: #8A6A2B;
-  --brand-ribbon-text: #FBF8F2;
 }
 
 /* --------------------------------------------------------------------------
@@ -167,12 +161,6 @@ html[data-palette="b"],
   --accent-admin-strong: #312E81;
   --accent-admin-contrast: #FFFFFF;
   --accent-admin-border: #C7D2FE;
-
-  /* Brand Ribbon Tokens (Live-Text "PREMIUM" Ribbon) */
-  --brand-ribbon-bg: #0F5E5A;
-  --brand-ribbon-border: #D39A2A;
-  --brand-ribbon-border-outer: #8E6410;
-  --brand-ribbon-text: #FAF7F0;
 }
 
 /* --------------------------------------------------------------------------
@@ -250,12 +238,6 @@ html[data-palette="c"],
   --accent-admin-strong: #5E212B;
   --accent-admin-contrast: #FFFFFF;
   --accent-admin-border: #E8BFC5;
-
-  /* Brand Ribbon Tokens (Live-Text "PREMIUM" Ribbon) */
-  --brand-ribbon-bg: #7A2E3A;
-  --brand-ribbon-border: #B98A3E;
-  --brand-ribbon-border-outer: #8A6A2B;
-  --brand-ribbon-text: #FCF9F4;
 }
 
 /* --------------------------------------------------------------------------

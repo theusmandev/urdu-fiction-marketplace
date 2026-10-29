@@ -1,97 +1,112 @@
-# UNB Premium — Brand Identity & Asset Architecture
+# UNB Premium — Vector Brand Identity & Asset Architecture
 
-This document outlines the brand assets, component architecture, derivative sizes, where each asset is used, and how to replace artwork and rebuild all derivatives.
-
----
-
-## 1. Brand Logo Architecture
-
-The UNB Premium brand identity combines two layers:
-1. **The Circular Badge Artwork (`public/brand/logo-circle.png`)**:
-   - Original master artwork: Cream circular badge with warm brown calligraphy (*اردو ناول بینک*), open book, quill, and spaced Latin text (*URDU NOVEL BANK*).
-   - Rendered via Next.js `<Image />` inside a circular mask (`rounded-full overflow-hidden`) to guarantee clean circular boundaries even if an artwork without transparent corners is supplied.
-2. **The Live-Text "PREMIUM" Ribbon**:
-   - Built with pure SVG and CSS live text rather than being baked into the raster image.
-   - Positioned directly below the circle badge, overlapping its bottom rim by ~16% (`z-10`), sitting snugly over the bottom curve like a heraldic crest badge.
-   - Spans ~92% of the circle width (wider than the circle's 71% bottom curve) with swallowtail notched ends and generous horizontal text padding to prevent any clipping.
-   - Double border: Outer hairline stroke (`--brand-ribbon-border-outer`) and inner accent gold stroke (`--brand-ribbon-border`) with palette primary fill (`--brand-ribbon-bg`).
-   - Text source: **`siteConfig.brandSuffix`** in [`src/config/site.ts`](file:///e:/git-workstation/urdu-fiction-marketplace/src/config/site.ts) (default: `"Premium"`).
-   - Dynamically inherits the active site palette:
-     - **Palette A (`ivory_ink`)**: Editorial Navy fill (`#1B2A41`), gold border (`#B98A3E`), ivory text (`#FBF8F2`).
-     - **Palette B (`paper_teal`)**: Deep Teal fill (`#0F5E5A`), amber gold border (`#D39A2A`), paper text (`#FAF7F0`).
-     - **Palette C (`cream_maroon`)**: Rich Maroon fill (`#7A2E3A`), gold border (`#B98A3E`), cream text (`#FCF9F4`).
+This document defines the official vector logo system, SVG variants, component architecture, raster derivatives, placement across the site, and the rebuild workflow.
 
 ---
 
-## 2. Component: `<BrandLogo />`
+## 1. Master Vector Source
+
+- **File**: `public/brand/source/logo-source.svg` (viewBox: `0 0 1250 1345`)
+- **Structure**: Self-contained, pure vector SVG. All text (Urdu calligraphy, Latin *"URDU NOVEL BANK"*, and ribbon *"PREMIUM"*) is converted to paths; no external web fonts or scripts are required.
+- **Color Gradients**:
+  - `paper`: warm radial gradient (`#fff7ec` → `#fdf0e1` → `#f8e3cb`)
+  - `ring`: gold/bronze gradient (`#c4731f` → `#ad5e14` → `#8f4a0e`)
+  - `feather`: quill gradient (`#c8741f` → `#9a4b09` → `#622a06`)
+  - `book`: open book gradient (`#b9681b` → `#93470c` → `#5c2706`)
+  - `urdu`: calligraphy gradient (`#a95a14` → `#8a400a` → `#6d3007`)
+  - `ink`: dark ink swoosh gradient (`#6b2f09` → `#5a2607`)
+  - `gold` / `band` / `gloss` / `cream`: ribbon banner, border, gloss highlight, and *"PREMIUM"* lettering
+
+> [!IMPORTANT]
+> **"PREMIUM" is part of the artwork:** The word *"PREMIUM"* in the bottom ribbon consists of vector paths drawn directly into the source artwork. It is **not** a CSS live-text overlay. Any future brand name or suffix modification requires updating the ribbon path vectors in the source SVG before rebuilding.
+
+---
+
+## 2. Generated Vector Variants
+
+All variants are extracted directly from the semantic groups of `logo-source.svg` and optimized with SVGO (`preset-default` + `prefixIds` to eliminate ID collisions when multiple variants appear on the same page):
+
+| Variant File | Dimensions / ViewBox | Groups Included | Usage & Placement |
+| :--- | :--- | :--- | :--- |
+| **`logo-full.svg`** | `0 0 1250 1345` | Complete roundel + ribbon + ornaments + "PREMIUM" | About page, Auth pages (Login, Register, Forgot/Reset Password), Footer, Error/404 pages |
+| **`logo-roundel.svg`** | `25 25 1200 1200` (1:1 square) | Roundel alone (circle, quill, book, Urdu calligraphy, ink swoosh, English text; no ribbon) | Circular profile avatars, standalone brand badges, invoice print views |
+| **`logo-mark.svg`** | `25 25 1200 1200` (1:1 square) | Quill pen and open book inside the gold ring | Favicon.ico (16/32/48), tiny avatars, Writer Studio shell, Admin shell top bar |
+| **`logo-wordmark.svg`** | `150 632 950 362` (~2.62:1 ratio) | Urdu calligraphy (*اردو ناول بینک*) + ink swoosh underline + diamond | Marketplace header lockup (desktop & mobile), landing hero accents |
+| **`tag-premium.svg`** | `95 1172 1060 146` (~7.26:1 ratio) | Flat ribbon (gold edge, brown band, inner rule, ornaments, "PREMIUM" text; no gloss or shadow) | Header lockup (scaled to 14-22px height), compact product badges |
+| **`tag-premium-full.svg`** | `80 1165 1090 175` | Full ribbon with original gloss gradient and drop shadow | Large standalone ribbon displays, marketing hero graphics |
+
+---
+
+## 3. Component: `<BrandLogo />`
 
 Located at: [`src/components/brand/BrandLogo.tsx`](file:///e:/git-workstation/urdu-fiction-marketplace/src/components/brand/BrandLogo.tsx)
 
-### Variants
+### Supported Variants
 
-| Variant | Purpose | Default Size | Locations Used |
-| :--- | :--- | :---: | :--- |
-| **`"full"`** | Circle badge + live-text ribbon below | `96px` (scaled up to `104px`) | About page, Auth pages (Login, Register, Forgot Password, Reset Password), Footer, Global 404 & Error pages |
-| **`"lockup"`** | Compact emblem + ribbon below | `48px` (42px on mobile) | Sticky Marketplace Header, Slide-Over Navigation Drawer |
-| **`"mark"`** | Standalone circle badge with circular mask and optional contrast plate | `36px` | Writer Studio top bar, Admin Shell top bar, compact badges |
+1. **`variant="full"`**: Complete artwork (roundel + ribbon). Renders `/brand/logo-full.svg`.
+2. **`variant="roundel"`**: 1:1 circular badge without ribbon. Renders `/brand/logo-roundel.svg`.
+3. **`variant="mark"`**: Simplified quill + book inside ring. Renders `/brand/logo-mark.svg`. Supports `plate` prop for dark bars.
+4. **`variant="wordmark"`**: Urdu calligraphy vector cropped to its bounding box. Renders `/brand/logo-wordmark.svg`.
+5. **`variant="tag"`**: Flat "PREMIUM" ribbon tag. Renders `/brand/tag-premium.svg`.
+6. **`variant="lockup"`**: Composed header identity:
+   - On the left: `[mark 44-48px]`
+   - On the right: a flex column with `[wordmark 25-28px high]` and `[flat tag 12-14px high]`
+   - Ultra-small viewports (<360px): The text column is hidden via `max-[359px]:hidden`, keeping the mark prominent.
 
-### Key Properties
+### Properties
 
-- `variant`: `'full' | 'lockup' | 'mark'` (default: `'full'`)
-- `size`: circle diameter in pixels.
-- `priority`: boolean (used on above-the-fold header to eliminate LCP delay).
-- `plate`: boolean (renders a light contrast backing plate / ring behind the circle for dark or indigo bars like Writer Studio and Admin top bars).
-- `alt`: string (accessible alt text; defaults to `""` for full/lockup when live text is present, or `siteConfig.brandName` for standalone mark).
+- `variant`: `'full' | 'roundel' | 'lockup' | 'mark' | 'wordmark' | 'tag'` (default: `'full'`)
+- `size`: Primary dimension in pixels (width or diameter).
+- `width` / `height`: Explicit override dimensions in pixels.
+- `priority`: boolean (used on the sticky marketplace header for instant above-the-fold render).
+- `plate`: boolean (applies subtle light backing plate behind mark/roundel on dark shells).
+- `alt`: string (accessible alt text; defaults to `siteConfig.brandName`).
 
 ---
 
-## 3. Generated Brand Assets Inventory
+## 4. Raster Derivatives Inventory
 
-All derivative assets are generated automatically from `public/brand/logo-circle.png` by running:
+Generated automatically by `scripts/build-brand-assets.mjs` via Sharp with `lanczos3` resampling and maximum compression:
 
-```bash
-npm run build:brand
-```
-
-| Asset Path | Format & Dimensions | Purpose & Usage |
+| Asset Path | Resolution | Description & Purpose |
 | :--- | :--- | :--- |
-| `public/brand/logo-circle.png` | PNG (512x512) | **Original Master Artwork** (kept untouched). |
-| `public/brand/logo-circle-64.(png\|webp)` | 64x64 | Small viewports, mobile header derivatives. |
-| `public/brand/logo-circle-96.(png\|webp)` | 96x96 | Desktop header, auth page headers. |
-| `public/brand/logo-circle-128.(png\|webp)` | 128x128 | High-DPI screens, About page hero. |
-| `public/brand/logo-circle-192.(png\|webp)` | 192x192 | Retina 2x displays. |
-| `public/brand/logo-circle-256.(png\|webp)` | 256x256 | High-resolution brand displays. |
-| `public/brand/logo-circle-512.(png\|webp)` | 512x512 | Full-resolution master raster. |
-| `public/brand/logo-circle-16.png` | 16x16 | Browser tab favicon entry. |
-| `public/brand/logo-circle-32.png` | 32x32 | Standard desktop browser tab favicon. |
-| `public/brand/logo-circle-48.png` | 48x48 | High-DPI browser tab favicon entry. |
-| `public/favicon.ico` | Multi-size ICO (16, 32, 48) | Root browser tab icon. |
-| `public/apple-touch-icon.png` | PNG (180x180) | iOS Home Screen bookmark icon with safe padding. |
-| `public/icon-192.png` | PNG (192x192) | Progressive Web App maskable icon (80% safe zone). |
-| `public/icon-512.png` | PNG (512x512) | Progressive Web App splash/install icon (80% safe zone). |
-| `public/site.webmanifest` | JSON Web Manifest | Web app manifest linking PWA icons and brand name. |
-| `public/brand/logo-email.png` | PNG (400x260 @ 2x) | Pre-rendered composite for email clients (circle + Default Palette A ribbon). Email clients cannot parse CSS clip-paths or variables. |
-| `public/brand/og-image.png` | PNG (1200x630) | Social sharing card for Open Graph / Twitter previews. |
-| `public/og-image.jpg` | JPEG (1200x630) | Legacy fallback social sharing card. |
+| `public/favicon.ico` | 16x16, 32x32, 48x48 | Multi-size root browser tab icon generated from `logo-mark.svg`. |
+| `public/apple-touch-icon.png` | 180x180 | iOS Home Screen bookmark icon on cream background with safe margin. |
+| `public/icon-192.png` | 192x192 | Progressive Web App maskable icon on cream background. |
+| `public/icon-512.png` | 512x512 | Progressive Web App splash/install icon on cream background. |
+| `public/brand/logo-email.png` | 280x301 (@ 2x) | High-DPI PNG for email clients (displays at 140x151 in HTML emails). |
+| `public/brand/og-image.png` | 1200x630 | Open Graph card composed with `logo-full` on ivory site background. |
+| `public/og-image.jpg` | 1200x630 | JPEG fallback for social sharing preview crawlers. |
+| `public/brand/*@2x.png`, `*@3x.png` | Multi-DPI PNGs | High-resolution raster fallbacks for `logo-full`, `logo-roundel`, `logo-mark`, `logo-wordmark`, and `tag-premium`. |
 
 ---
 
-## 4. How to Replace Artwork & Rebuild
+## 5. Development Inspection Page
 
-To replace the circle logo:
-1. Place the new circle graphic at **`public/brand/logo-circle.png`** (recommended: 512x512 transparent PNG or high-res square).
-   > [!TIP]
-   > For optimal results, supply a PNG with transparent corners. If a file with solid corners is provided, the `<BrandLogo />` component will automatically apply a `rounded-full overflow-hidden` CSS mask.
-2. If the brand name or suffix text needs to be changed, edit `brandSuffix` or `brandName` in [`src/config/site.ts`](file:///e:/git-workstation/urdu-fiction-marketplace/src/config/site.ts).
-3. Run the automated build script:
+A dedicated visual testing page is available in development mode:
+- **Route**: [`/dev/brand`](http://localhost:3000/dev/brand) (`src/app/dev/brand/page.tsx`)
+- **Features**:
+  - Live palette switcher (Palette A, B, C)
+  - Interactive size ladder: `16px`, `24px`, `32px`, `44px`, `64px`, `96px`, `140px`, `220px`
+  - Background contrast matrix: White (`#FFFFFF`), Ivory (`#FBF8F2`), Muted (`#F4ECD8`), Studio Navy (`#1B2A41`), Dark (`#111827`)
+  - Visual display of all 6 vector variants plus raster previews
+  - Excluded from production builds (`notFound()` in `NODE_ENV === 'production'`, `noindex, nofollow`)
+
+---
+
+## 6. How to Replace Artwork & Rebuild
+
+To update the vector logo artwork:
+1. Place the new master SVG at **`public/brand/source/logo-source.svg`** (viewBox: `0 0 1250 1345`).
+2. Run the build script:
    ```bash
    npm run build:brand
    ```
-4. Verify tests and visual display:
+3. Run verification tests:
    ```bash
-   npm run check:contrast
    npm run check:colors
+   npm run check:contrast
+   npm run check:frontend
    npm test
    npm run build
    ```
-

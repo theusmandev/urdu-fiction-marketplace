@@ -37,7 +37,7 @@ The UNB Premium brand identity consists of:
 
 ## 3. Circular Badge Artwork & Live Ribbon Palette Harmonization Analysis
 
-The master circular badge artwork (`public/brand/logo-circle.png`) features a warm cream circular background (`#FAF5EB`), brown calligraphy (*اردو ناول بینک*), and an open book/quill emblem. The live-text "PREMIUM" ribbon is overlaid beneath this circle.
+The master vector artwork (`public/brand/source/logo-source.svg`) features a warm cream circular background (`#fff7ec`), brown calligraphy (*اردو ناول بینک*), an open book/quill emblem, and a vector "PREMIUM" ribbon banner.
 
 ### Palette Match Comparison
 
