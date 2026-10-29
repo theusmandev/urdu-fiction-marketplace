@@ -108,59 +108,32 @@ async function buildBrandAssets() {
   console.log('🎨 UNB Premium — Building Brand Assets from logo-circle.png ...\n');
 
   // 1. Derivative Circle Sizes (PNG + WebP)
-  // sharp.kernel.lanczos3 ensures fine Urdu calligraphy strokes stay ultra-sharp
   const sizes = [64, 96, 128, 192, 256, 512];
   for (const s of sizes) {
     const pngPath = path.join(BRAND_DIR, `logo-circle-${s}.png`);
     const webpPath = path.join(BRAND_DIR, `logo-circle-${s}.webp`);
 
     await sharp(SOURCE_CIRCLE)
-      .resize(s, s, {
-        kernel: sharp.kernel.lanczos3,
-        fit: 'contain',
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      })
-      .png({ quality: 100, compressionLevel: 9 })
+      .resize(s, s, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png({ compressionLevel: 9 })
       .toFile(pngPath);
 
     await sharp(SOURCE_CIRCLE)
-      .resize(s, s, {
-        kernel: sharp.kernel.lanczos3,
-        fit: 'contain',
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      })
-      .webp({ quality: 100, lossless: true })
+      .resize(s, s, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .webp({ quality: 90 })
       .toFile(webpPath);
 
-    console.log(`  ✓ Generated circle ${s}x${s} (PNG & WebP, lanczos3 lossless)`);
+    console.log(`  ✓ Generated circle ${s}x${s} (PNG & WebP)`);
   }
 
   // 2. Favicons (16, 32, 48) & favicon.ico
-  const fav16 = await sharp(SOURCE_CIRCLE)
-    .resize(16, 16, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
-  const fav32 = await sharp(SOURCE_CIRCLE)
-    .resize(32, 32, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
-  const fav48 = await sharp(SOURCE_CIRCLE)
-    .resize(48, 48, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
+  const fav16 = await sharp(SOURCE_CIRCLE).resize(16, 16).png().toBuffer();
+  const fav32 = await sharp(SOURCE_CIRCLE).resize(32, 32).png().toBuffer();
+  const fav48 = await sharp(SOURCE_CIRCLE).resize(48, 48).png().toBuffer();
 
-  await sharp(SOURCE_CIRCLE)
-    .resize(16, 16, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toFile(path.join(BRAND_DIR, 'logo-circle-16.png'));
-  await sharp(SOURCE_CIRCLE)
-    .resize(32, 32, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toFile(path.join(BRAND_DIR, 'logo-circle-32.png'));
-  await sharp(SOURCE_CIRCLE)
-    .resize(48, 48, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toFile(path.join(BRAND_DIR, 'logo-circle-48.png'));
+  await sharp(SOURCE_CIRCLE).resize(16, 16).png().toFile(path.join(BRAND_DIR, 'logo-circle-16.png'));
+  await sharp(SOURCE_CIRCLE).resize(32, 32).png().toFile(path.join(BRAND_DIR, 'logo-circle-32.png'));
+  await sharp(SOURCE_CIRCLE).resize(48, 48).png().toFile(path.join(BRAND_DIR, 'logo-circle-48.png'));
 
   const icoBuffer = createIco([
     { width: 16, height: 16, buffer: fav16 },
@@ -173,43 +146,34 @@ async function buildBrandAssets() {
   if (fs.existsSync(path.join(ROOT, 'src', 'app', 'favicon.ico'))) {
     fs.writeFileSync(path.join(ROOT, 'src', 'app', 'favicon.ico'), icoBuffer);
   }
-  console.log('  ✓ Generated multi-size favicon.ico (16, 32, 48, lanczos3)');
+  console.log('  ✓ Generated multi-size favicon.ico (16, 32, 48)');
 
   // 3. Apple Touch Icon (180x180) & PWA Icons (192, 512)
   // Maskable icon requires safe-zone padding (~80% content diameter on #FBF8F2 background)
-  const appleTouchCircle = await sharp(SOURCE_CIRCLE)
-    .resize(156, 156, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
+  const appleTouchCircle = await sharp(SOURCE_CIRCLE).resize(156, 156).png().toBuffer();
   await sharp({
     create: { width: 180, height: 180, channels: 4, background: '#FBF8F2' },
   })
     .composite([{ input: appleTouchCircle, top: 12, left: 12 }])
-    .png({ quality: 100, compressionLevel: 9 })
+    .png()
     .toFile(path.join(PUBLIC_DIR, 'apple-touch-icon.png'));
   console.log('  ✓ Generated apple-touch-icon.png (180x180)');
 
-  const pwa192Circle = await sharp(SOURCE_CIRCLE)
-    .resize(152, 152, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
+  const pwa192Circle = await sharp(SOURCE_CIRCLE).resize(152, 152).png().toBuffer();
   await sharp({
     create: { width: 192, height: 192, channels: 4, background: '#FBF8F2' },
   })
     .composite([{ input: pwa192Circle, top: 20, left: 20 }])
-    .png({ quality: 100, compressionLevel: 9 })
+    .png()
     .toFile(path.join(PUBLIC_DIR, 'icon-192.png'));
   console.log('  ✓ Generated icon-192.png (192x192 maskable)');
 
-  const pwa512Circle = await sharp(SOURCE_CIRCLE)
-    .resize(410, 410, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
+  const pwa512Circle = await sharp(SOURCE_CIRCLE).resize(410, 410).png().toBuffer();
   await sharp({
     create: { width: 512, height: 512, channels: 4, background: '#FBF8F2' },
   })
     .composite([{ input: pwa512Circle, top: 51, left: 51 }])
-    .png({ quality: 100, compressionLevel: 9 })
+    .png()
     .toFile(path.join(PUBLIC_DIR, 'icon-512.png'));
   console.log('  ✓ Generated icon-512.png (512x512 maskable)');
 
@@ -221,10 +185,7 @@ async function buildBrandAssets() {
   const emailRibbonW = 160;
   const emailRibbonH = 46;
 
-  const emailCircle = await sharp(SOURCE_CIRCLE)
-    .resize(emailCircleSize, emailCircleSize, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
+  const emailCircle = await sharp(SOURCE_CIRCLE).resize(emailCircleSize, emailCircleSize).png().toBuffer();
   const emailRibbon = Buffer.from(generateRibbonSvg(emailRibbonW, emailRibbonH, 'PREMIUM'));
 
   const emailCircleX = Math.round((emailCanvasW - emailCircleSize) / 2);
@@ -245,7 +206,7 @@ async function buildBrandAssets() {
       { input: emailCircle, top: emailCircleY, left: emailCircleX },
       { input: emailRibbon, top: emailRibbonY, left: emailRibbonX },
     ])
-    .png({ quality: 100, compressionLevel: 9 })
+    .png()
     .toFile(path.join(BRAND_DIR, 'logo-email.png'));
   console.log('  ✓ Generated logo-email.png (400x260 @ 2x)');
 
@@ -256,10 +217,7 @@ async function buildBrandAssets() {
   const ogRibbonW = 208;
   const ogRibbonH = 58;
 
-  const ogCircle = await sharp(SOURCE_CIRCLE)
-    .resize(ogCircleSize, ogCircleSize, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100, compressionLevel: 9 })
-    .toBuffer();
+  const ogCircle = await sharp(SOURCE_CIRCLE).resize(ogCircleSize, ogCircleSize).png().toBuffer();
   const ogRibbon = Buffer.from(generateRibbonSvg(ogRibbonW, ogRibbonH, 'PREMIUM'));
 
   const ogCircleX = Math.round((ogW - ogCircleSize) / 2);
@@ -318,15 +276,15 @@ async function buildBrandAssets() {
       { input: ogCircle, top: ogCircleY, left: ogCircleX },
       { input: ogRibbon, top: ogRibbonY, left: ogRibbonX },
     ])
-    .png({ quality: 100, compressionLevel: 9 })
+    .png({ quality: 92 })
     .toFile(path.join(BRAND_DIR, 'og-image.png'));
 
   // Also write to public/og-image.jpg for backward compatibility
   await sharp(path.join(BRAND_DIR, 'og-image.png'))
-    .jpeg({ quality: 95 })
+    .jpeg({ quality: 90 })
     .toFile(path.join(PUBLIC_DIR, 'og-image.jpg'));
 
-  console.log('  ✓ Generated og-image.png & og-image.jpg (1200x630, quality 100)');
+  console.log('  ✓ Generated og-image.png & og-image.jpg (1200x630)');
 
   console.log('\n✅ All brand assets generated successfully!');
 }
@@ -335,3 +293,4 @@ buildBrandAssets().catch((err) => {
   console.error('❌ Build brand assets failed:', err);
   process.exit(1);
 });
+
