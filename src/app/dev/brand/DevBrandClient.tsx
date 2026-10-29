@@ -262,12 +262,12 @@ export function DevBrandClient() {
             <span className="text-xs text-text-muted font-mono">Marketplace Header &amp; Mobile Drawer</span>
           </div>
           <div className="flex flex-wrap items-end gap-6 overflow-x-auto py-2">
-            {[40, 44, 48, 54].map((sz) => (
-              <div key={sz} className="flex flex-col items-center gap-1.5 shrink-0">
+            {[90, 110, 130, 150].map((w) => (
+              <div key={w} className="flex flex-col items-center gap-1.5 shrink-0">
                 <div className="p-3 rounded-xl bg-surface-muted border border-border">
-                  <BrandLogo variant="lockup" size={sz} />
+                  <BrandLogo variant="lockup" width={w} />
                 </div>
-                <span className="text-[11px] font-mono text-text-muted">mark: {sz}px</span>
+                <span className="text-[11px] font-mono text-text-muted">width: {w}px</span>
               </div>
             ))}
           </div>

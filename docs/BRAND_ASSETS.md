@@ -48,10 +48,10 @@ Located at: [`src/components/brand/BrandLogo.tsx`](file:///e:/git-workstation/ur
 3. **`variant="mark"`**: Simplified quill + book inside ring. Renders `/brand/logo-mark.svg`. Supports `plate` prop for dark bars.
 4. **`variant="wordmark"`**: Urdu calligraphy vector cropped to its bounding box. Renders `/brand/logo-wordmark.svg`.
 5. **`variant="tag"`**: Flat "PREMIUM" ribbon tag. Renders `/brand/tag-premium.svg`.
-6. **`variant="lockup"`**: Composed header identity:
-   - On the left: `[mark 44-48px]`
-   - On the right: a flex column with `[wordmark 25-28px high]` and `[flat tag 12-14px high]`
-   - Ultra-small viewports (<360px): The text column is hidden via `max-[359px]:hidden`, keeping the mark prominent.
+6. **`variant="lockup"`**: Composed header identity (typography-only):
+   - Vertical stack: Urdu calligraphy (`logo-wordmark.svg`) on top, flat "PREMIUM" tag (`tag-premium.svg`) on bottom.
+   - Responsive width: `w-[110px]` on mobile, `w-[130px]` on desktop.
+   - Visible across all screen sizes (no circular mark, no `<360px` hiding).
 
 ### Properties
 

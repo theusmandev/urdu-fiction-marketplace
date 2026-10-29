@@ -11,7 +11,7 @@ export interface BrandLogoProps {
    * Logo visual variant:
    * - "full": Complete vector logo with roundel and ribbon (footer, auth, about, error/404).
    * - "roundel": Circular roundel alone without ribbon (quill, book, calligraphy, swoosh, English text).
-   * - "lockup": Header lockup composed of mark + calligraphy wordmark + flat tag.
+   * - "lockup": Header lockup composed of calligraphy wordmark + flat tag.
    * - "mark": Quill and book inside circle ring (favicon, tiny avatars, studio/admin top bars).
    * - "wordmark": Urdu calligraphy with ink swoosh underline.
    * - "tag": Flat "PREMIUM" ribbon tag (18-22px height).
@@ -23,7 +23,7 @@ export interface BrandLogoProps {
    * Defaults:
    * - "full": 96px width (103px height)
    * - "roundel": 96px diameter
-   * - "lockup": 48px mark (composed lockup)
+   * - "lockup": 110px-130px responsive width (composed typography lockup)
    * - "mark": 36px diameter
    * - "wordmark": 40px height (~105px width)
    * - "tag": 20px height (~145px width)
@@ -202,68 +202,44 @@ export function BrandLogo({
   }
 
   // ---------------------------------------------------------------------------
-  // Variant: "lockup" (Marketplace Header & Drawer: Mark + Wordmark + Tag)
-  // Composed in code from vector parts. Responsive: collapses to mark below 360px.
+  // Variant: "lockup" (Marketplace Header & Drawer: Wordmark + Tag only)
+  // Clean typography stack: Urdu Calligraphy on top, Flat Premium Tag on bottom.
+  // Visible across all screen sizes (no mark, no max-[359px]:hidden).
   // ---------------------------------------------------------------------------
   if (variant === 'lockup') {
-    const markSize = userSize ?? 48;
-    const wmHeight = Math.round(markSize * 0.58);
-    const wmWidth = Math.round(wmHeight * (950 / 362));
-    const tagHeight = Math.max(12, Math.round(markSize * 0.28));
-    const tagWidth = Math.round(tagHeight * (1060 / 146));
+    const explicitWidth = userWidth ?? (userSize && userSize >= 70 ? userSize : undefined);
     const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
 
     return (
       <div
-        className={`relative inline-flex items-center gap-2.5 sm:gap-3 shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+        className={`relative inline-flex flex-col items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 w-[110px] sm:w-[130px] gap-0.5 sm:gap-1 ${className}`}
+        style={explicitWidth ? { width: explicitWidth } : undefined}
       >
-        {/* Vector Mark (Quill + Book in Ring) */}
-        <div
-          className="relative shrink-0 flex items-center justify-center"
-          style={{ width: markSize, height: markSize }}
-        >
-          {plate && (
-            <div
-              className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
-              aria-hidden="true"
-            />
-          )}
+        {/* Top: Urdu Calligraphy Wordmark (950 x 362) - proportionally frames inside tag */}
+        <div className="w-[89.6%] flex items-center justify-center">
           <Image
-            src="/brand/logo-mark.svg"
+            src="/brand/logo-wordmark.svg"
             alt={resolvedAlt}
-            width={markSize}
-            height={markSize}
+            width={950}
+            height={362}
             priority={priority}
             unoptimized
             loading={priority ? 'eager' : 'lazy'}
-            className="w-full h-full object-contain transition-transform group-hover:scale-105"
+            className="w-full h-auto object-contain transition-opacity group-hover:opacity-90"
           />
         </div>
 
-        {/* Text Block: Urdu Calligraphy Wordmark + Flat Premium Tag */}
-        {/* Hidden on ultra-small screens (<360px) to keep mark prominent & prevent header overflow */}
-        <div className="flex flex-col items-start justify-center gap-1 max-[359px]:hidden">
-          <Image
-            src="/brand/logo-wordmark.svg"
-            alt=""
-            width={wmWidth}
-            height={wmHeight}
-            priority={priority}
-            unoptimized
-            loading={priority ? 'eager' : 'lazy'}
-            className="h-auto object-contain transition-opacity group-hover:opacity-90"
-            style={{ height: `${wmHeight}px`, width: 'auto' }}
-          />
+        {/* Bottom: Flat Premium Tag (1060 x 146) */}
+        <div className="w-full flex items-center justify-center">
           <Image
             src="/brand/tag-premium.svg"
             alt=""
-            width={tagWidth}
-            height={tagHeight}
+            width={1060}
+            height={146}
             priority={priority}
             unoptimized
             loading={priority ? 'eager' : 'lazy'}
-            className="h-auto object-contain"
-            style={{ height: `${tagHeight}px`, width: 'auto' }}
+            className="w-full h-auto object-contain"
           />
         </div>
       </div>

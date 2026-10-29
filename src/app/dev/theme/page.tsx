@@ -68,13 +68,13 @@ export default function DevThemeShowcasePage() {
               {/* Lockup Variant */}
               <div className="rounded-2xl border border-border bg-bg p-6 flex flex-col items-center justify-center gap-4 text-center">
                 <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
-                  variant=&quot;lockup&quot; (size=48)
+                  variant=&quot;lockup&quot; (Header)
                 </span>
                 <div className="p-3 bg-surface rounded-xl border border-border shadow-xs">
-                  <BrandLogo variant="lockup" size={48} />
+                  <BrandLogo variant="lockup" />
                 </div>
                 <p className="text-xs text-text-muted max-w-[200px]">
-                  Header &amp; mobile drawer composed vector lockup.
+                  Header &amp; mobile drawer typography lockup (wordmark + tag).
                 </p>
               </div>
 
