@@ -23,7 +23,7 @@ export interface BrandLogoProps {
    * Defaults:
    * - "full": 96px width (103px height)
    * - "roundel": 96px diameter
-   * - "lockup": 95px-115px responsive width (composed typography lockup)
+   * - "lockup": 82px-115px responsive width (composed typography lockup)
    * - "mark": 36px diameter
    * - "wordmark": 40px height (~105px width)
    * - "tag": 20px height (~145px width)
@@ -212,7 +212,7 @@ export function BrandLogo({
 
     return (
       <div
-        className={`relative inline-flex flex-col items-center justify-center shrink-0 select-none outline-none focus:outline-none print:grayscale print:contrast-125 w-[95px] sm:w-[115px] gap-0.5 sm:gap-1 ${className}`}
+        className={`relative inline-flex flex-col items-center justify-center shrink-0 select-none outline-none focus:outline-none print:grayscale print:contrast-125 w-[82px] sm:w-[115px] gap-0.5 sm:gap-1 ${className}`}
         style={explicitWidth ? { width: explicitWidth } : undefined}
       >
         {/* Top: Urdu Calligraphy Wordmark (950 x 362) - proportionally frames inside tag */}

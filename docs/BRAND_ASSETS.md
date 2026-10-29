@@ -50,7 +50,7 @@ Located at: [`src/components/brand/BrandLogo.tsx`](file:///e:/git-workstation/ur
 5. **`variant="tag"`**: Flat "PREMIUM" ribbon tag. Renders `/brand/tag-premium.svg`.
 6. **`variant="lockup"`**: Composed header identity (typography-only):
    - Vertical stack: Urdu calligraphy (`logo-wordmark.svg`) on top, flat "PREMIUM" tag (`tag-premium.svg`) on bottom.
-   - Responsive width: `w-[95px]` on mobile, `w-[115px]` on desktop.
+   - Responsive width: `w-[82px]` on mobile, `w-[115px]` on desktop.
    - Visible across all screen sizes (no circular mark, no `<360px` hiding).
 
 ### Properties
