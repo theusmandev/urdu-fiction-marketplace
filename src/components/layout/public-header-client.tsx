@@ -242,16 +242,13 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
       <header className="sticky top-0 z-40 w-full bg-surface/95 backdrop-blur-md border-b border-border transition-all pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-14 sm:h-16 md:h-20 gap-2 sm:gap-4">
-            {/* Brand Identity: Horizontal circle + pill lockup (responsive sizes) */}
+            {/* Brand Identity: Single Circular Emblem + "PREMIUM" ribbon */}
             <Link
               href="/"
               className="flex items-center group shrink-0 min-h-[44px] py-1"
               aria-label={`${siteConfig.brandName} — home`}
             >
-              {/* Mobile: 44px circle */}
-              <BrandLogo variant="lockup" size={44} priority className="sm:hidden" />
-              {/* sm+: 52px circle */}
-              <BrandLogo variant="lockup" size={52} priority className="hidden sm:inline-flex" />
+              <BrandLogo variant="lockup" size={46} priority className="shrink-0" />
             </Link>
 
             {/* Desktop Search Field */}
