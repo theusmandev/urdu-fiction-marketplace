@@ -52,19 +52,6 @@ export interface BrandLogoProps {
 }
 
 /**
- * Helper to select the optimal pre-generated derivative circle asset.
- * Guarantees crisp high-DPI rendering with minimal bandwidth footprint.
- */
-function getCircleSrc(size: number): string {
-  if (size <= 64) return '/brand/logo-circle-64.png';
-  if (size <= 96) return '/brand/logo-circle-96.png';
-  if (size <= 128) return '/brand/logo-circle-128.png';
-  if (size <= 192) return '/brand/logo-circle-192.png';
-  if (size <= 256) return '/brand/logo-circle-256.png';
-  return '/brand/logo-circle-512.png';
-}
-
-/**
  * BrandLogo
  *
  * Official UNB Premium Brand Mark component.
@@ -84,19 +71,31 @@ export function BrandLogo({
   const size = userSize ?? defaultSize;
 
   // 2. Geometry calculations for the heraldic ribbon
-  // - Ribbon width: ~92% of circle diameter (spans slightly wider than the circle's bottom curve)
-  // - Ribbon height: ~26% of circle diameter
-  // - Overlap: ribbon overlaps bottom 16% of circle, sitting snugly over the bottom rim
-  const ribbonWidth = Math.round(size * 0.92);
-  const ribbonHeight = Math.max(13, Math.round(size * 0.26));
-  const circleOverlap = Math.round(size * 0.16);
+  // For small/lockup variants (e.g. header), allow ribbon width to comfortably fit "PREMIUM"
+  // without any clipping against the swallowtail notches.
+  const isCompact = variant === 'lockup' || size < 64;
+
+  const ribbonWidth = isCompact
+    ? Math.max(58, Math.round(size * 1.18))
+    : Math.round(size * 0.92);
+
+  const ribbonHeight = isCompact
+    ? Math.max(14, Math.round(size * 0.28))
+    : Math.max(13, Math.round(size * 0.26));
+
+  const circleOverlap = isCompact
+    ? Math.round(size * 0.14)
+    : Math.round(size * 0.16);
+
   const totalHeight = size + ribbonHeight - circleOverlap;
 
   // 3. Notch and inner border geometry (crisp exact pixel values)
-  const notchDepth = Math.max(3.5, Math.round(ribbonHeight * 0.32));
-  const insetX = Math.min(2.5, Math.max(1.2, Math.round(ribbonHeight * 0.08 * 10) / 10));
-  const insetY = Math.min(2, Math.max(1, Math.round(ribbonHeight * 0.07 * 10) / 10));
-  const usableWidth = Math.max(20, ribbonWidth - (notchDepth + insetX) * 2);
+  const notchDepth = isCompact
+    ? Math.max(3.5, Math.round(ribbonHeight * 0.28))
+    : Math.max(3.5, Math.round(ribbonHeight * 0.32));
+
+  const insetX = isCompact ? 1.2 : Math.min(2.5, Math.max(1.2, Math.round(ribbonHeight * 0.08 * 10) / 10));
+  const insetY = isCompact ? 1.0 : Math.min(2, Math.max(1, Math.round(ribbonHeight * 0.07 * 10) / 10));
 
   const outerPoints = [
     `0,0`,
@@ -117,8 +116,8 @@ export function BrandLogo({
   ].join(' ');
 
   // 4. Proportional typography scaling
-  const fontSize = Math.max(7, Math.round(ribbonHeight * 0.44 * 10) / 10);
-  const letterSpacing = ribbonHeight >= 16 ? 0.15 : 0.11;
+  const fontSize = isCompact ? 8.5 : Math.max(7, Math.round(ribbonHeight * 0.44 * 10) / 10);
+  const letterSpacing = isCompact ? 0.14 : ribbonHeight >= 16 ? 0.15 : 0.11;
 
   // 5. Accessible description
   const altText = userAlt !== undefined
@@ -126,8 +125,6 @@ export function BrandLogo({
     : variant === 'mark'
       ? siteConfig.brandName
       : '';
-
-  const circleSrc = getCircleSrc(size);
 
   // ---------------------------------------------------------------------------
   // Variant: "mark" (Circle alone, for Writer Studio, Admin shells)
@@ -146,12 +143,14 @@ export function BrandLogo({
         )}
         <div className="relative w-full h-full rounded-full overflow-hidden shadow-xs">
           <Image
-            src={circleSrc}
+            src="/brand/logo-circle-512.png"
             alt={altText}
             width={size}
             height={size}
             priority={priority}
+            unoptimized
             className="w-full h-full object-contain"
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
           />
         </div>
       </div>
@@ -161,6 +160,7 @@ export function BrandLogo({
   // ---------------------------------------------------------------------------
   // Live-Text Ribbon Element
   // Notched swallowtail ends, double gold border, active palette primary fill, ivory live text.
+  // Never truncated; full word "PREMIUM" is always 100% visible.
   // ---------------------------------------------------------------------------
   const ribbonElement = (
     <div
@@ -201,12 +201,11 @@ export function BrandLogo({
 
       {/* Live Text: Editable from siteConfig.brandSuffix ("Premium") */}
       <span
-        className="relative z-10 font-serif uppercase font-semibold text-[var(--brand-ribbon-text,#FBF8F2)] leading-none text-center whitespace-nowrap overflow-hidden text-ellipsis px-1 select-none"
+        className="relative z-10 font-serif uppercase font-semibold text-[var(--brand-ribbon-text,#FBF8F2)] leading-none text-center whitespace-nowrap px-1 select-none"
         style={{
           fontSize: `${fontSize}px`,
           letterSpacing: `${letterSpacing}em`,
           paddingLeft: `${letterSpacing}em`, // offsets trailing letter-spacing to ensure optical center
-          maxWidth: `${usableWidth}px`,
         }}
       >
         {siteConfig.brandSuffix || 'Premium'}
@@ -234,16 +233,18 @@ export function BrandLogo({
           />
         )}
         <Image
-          src={circleSrc}
+          src="/brand/logo-circle-512.png"
           alt={altText}
           width={size}
           height={size}
           priority={priority}
+          unoptimized
           className="w-full h-full object-contain transition-transform group-hover:scale-105"
+          style={{ imageRendering: '-webkit-optimize-contrast' }}
         />
       </div>
 
-      {/* Live-Text Ribbon overlapping bottom of circle by ~16% */}
+      {/* Live-Text Ribbon overlapping bottom of circle by ~14-16% */}
       <div
         className="absolute z-10 left-1/2 -translate-x-1/2"
         style={{ top: `${size - circleOverlap}px` }}

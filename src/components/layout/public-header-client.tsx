@@ -248,8 +248,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               className="flex items-center group shrink-0 min-h-[44px] py-1"
               aria-label={`${siteConfig.brandName} — home`}
             >
-              <BrandLogo variant="lockup" size={42} priority className="shrink-0 sm:hidden" />
-              <BrandLogo variant="lockup" size={50} priority className="shrink-0 hidden sm:inline-flex" />
+              <BrandLogo variant="lockup" size={48} priority className="shrink-0" />
             </Link>
 
             {/* Desktop Search Field */}
