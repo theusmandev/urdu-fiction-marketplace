@@ -18,7 +18,7 @@ export function PublicFooter() {
           {/* Brand Info & Mission Statement (full width on phones/tablets, 2 cols on desktop) */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2 space-y-4">
             <div>
-              <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="inline-block group hover:opacity-95 transition-opacity">
+              <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="inline-block group hover:opacity-95 transition-opacity rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface">
                 <BrandLogo variant="full" size={88} />
               </Link>
             </div>

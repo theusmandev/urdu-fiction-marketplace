@@ -245,7 +245,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
             {/* Brand Identity: Circular Emblem + "PREMIUM" ribbon only (no adjacent wordmark) */}
             <Link
               href="/"
-              className="flex items-center group shrink-0 min-h-[44px] py-1"
+              className="flex items-center group shrink-0 min-h-[44px] py-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               aria-label={`${siteConfig.brandName} — home`}
             >
               <BrandLogo variant="lockup" priority className="shrink-0" />
@@ -496,7 +496,7 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               <Link
                 href="/"
                 onClick={closeMobileMenu}
-                className="flex items-center group"
+                className="flex items-center group rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                 aria-label={`${siteConfig.brandName} — home`}
               >
                 <BrandLogo variant="lockup" className="shrink-0" />

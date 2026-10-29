@@ -134,7 +134,7 @@ export function StudioShellClient({
           </button>
 
           {/* Brand Logo in Top Bar */}
-          <Link href="/writer" className="flex items-center gap-2.5 group" aria-label="Writer Studio — UNB Premium">
+          <Link href="/writer" className="flex items-center gap-2.5 group rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface" aria-label="Writer Studio — UNB Premium">
             <BrandLogo variant="mark" size={36} plate priority className="group-hover:scale-105 transition-transform" />
             <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
               Writer Studio
