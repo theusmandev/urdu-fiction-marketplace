@@ -526,6 +526,21 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
     Confirm all functions exist with `prosecdef = true`.
   - Execute automated test suite: `supabase/tests/20_tips_tests.sql` (23/23 PASS).
 
+### 35. `supabase/migrations/0035_rename_commission_to_platform_fee.sql` [RENAME USER-FACING COMMISSION TO PLATFORM FEE]
+- **Purpose**: System-wide terminology alignment replacing human-readable commission references with "Platform fee" / "پلیٹ فارم فیس" while preserving internal identifiers and RPC signatures.
+- **Action**: Paste contents of `supabase/migrations/0035_rename_commission_to_platform_fee.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `npm run check:terms`.
+
+### 36. `supabase/migrations/0036_site_palette_settings.sql` [ADMIN-CONTROLLED CURATED SITE PALETTE]
+- **Purpose**: Adds `site_palette` (CHECK: `ivory_ink`, `paper_teal`, `cream_maroon`), `get_public_site_settings()` RPC for anon/authenticated, and audited `set_site_palette()` RPC for administrators.
+- **Action**: Paste contents of `supabase/migrations/0036_site_palette_settings.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Execute automated test suite: `supabase/tests/21_site_palette_tests.sql` (12/12 PASS).
+
+### 37. `supabase/migrations/0037_fix_db_verification_issues.sql` [DATABASE VERIFICATION ISSUES RESOLUTION]
+- **Purpose**: Drops redundant 15-parameter overload of `update_platform_settings` (retaining the single canonical 21-parameter signature) and restores valid column references (`account_number_or_iban`, `instructions_note`) in `get_checkout_options(uuid)`.
+- **Action**: Paste contents of `supabase/migrations/0037_fix_db_verification_issues.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Execute `supabase/tests/00_post_migration_verification.sql` and verify Check ID 44 (OVERLOADS) and Check ID 156 (plpgsql_check) both return PASS with 0 failures.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import type { UserRole, WriterStatus } from "@/types/database";
 import {
   BookMarked,
@@ -244,12 +245,10 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
             {/* Brand Identity */}
             <Link
               href="/"
-              className="flex items-center gap-2 sm:gap-3 group shrink-0 min-h-[44px]"
-              aria-label={`${siteConfig.brandName} Home`}
+              className="flex items-center gap-2.5 sm:gap-3 group shrink-0 min-h-[44px]"
+              aria-label={`${siteConfig.brandName} — home`}
             >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl bg-primary text-primary-contrast flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform border border-border shrink-0">
-                <BookMarked className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-accent" />
-              </div>
+              <BrandLogo variant="lockup" size={44} priority className="shrink-0" />
               <div className="flex flex-col">
                 <span className="font-serif text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-primary leading-none">
                   {siteConfig.brandName}
@@ -506,14 +505,17 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
           >
             {/* Drawer Top Header with Brand & Close Button */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary text-primary-contrast flex items-center justify-center border border-border">
-                  <BookMarked className="w-4 h-4 text-accent" />
-                </div>
+              <Link
+                href="/"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2.5"
+                aria-label={`${siteConfig.brandName} — home`}
+              >
+                <BrandLogo variant="lockup" size={38} className="shrink-0" />
                 <span className="font-serif text-base font-bold text-primary">
                   {siteConfig.brandName}
                 </span>
-              </div>
+              </Link>
               <button
                 type="button"
                 onClick={closeMobileMenu}

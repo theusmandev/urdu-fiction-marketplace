@@ -29,7 +29,39 @@ The UNB Premium brand identity consists of:
    - On solid maroon badges, the gold icon meets 4.18:1 contrast, exceeding the 3:1 WCAG AA threshold for graphical elements and user interface components.
 
 ## 2. Invariants & Isolation
-- **Email Communications**: Keep fixed brand colors (`src/lib/email/*` uses inline email-safe colors independent of the active site palette).
+- **Email Communications**: Keep fixed brand colors (`src/lib/email/*` uses inline email-safe colors independent of the active site palette; `logo-email.png` uses fixed Palette A colors).
 - **Reader Themes**: Independent reader preferences (Light, Sepia, Dark) are isolated within reading routes (`/read/*`) and remain completely unaffected by site palette changes.
 - **Admin Shell Area**: Uses dedicated role accent tokens (`--accent-admin`) to preserve administrative authority and recognition regardless of which site palette is selected.
+
+---
+
+## 3. Circular Badge Artwork & Live Ribbon Palette Harmonization Analysis
+
+The master circular badge artwork (`public/brand/logo-circle.png`) features a warm cream circular background (`#FAF5EB`), brown calligraphy (*اردو ناول بینک*), and an open book/quill emblem. The live-text "PREMIUM" ribbon is overlaid beneath this circle.
+
+### Palette Match Comparison
+
+1. **Palette A (Ivory & Ink) — Best Overall Match (Recommended)**:
+   - Ribbon fill: Editorial Navy (`#1B2A41`)
+   - Ribbon border: Burnished Gold (`#B98A3E`)
+   - Ribbon text: Warm Ivory (`#FBF8F2`, **13.62:1 contrast — AAA**)
+   - **Analysis**: The warm cream tones of the circular badge contrast cleanly and authoritatively with the navy ribbon plate. The gold border echoes the calligraphy accents. Visually grounds the badge with maximum contrast on both white headers and ivory page bodies.
+
+2. **Palette B (Paper & Teal)**:
+   - Ribbon fill: Deep Botanical Teal (`#0F5E5A`)
+   - Ribbon border: Warm Amber Gold (`#D39A2A`)
+   - Ribbon text: Soft Paper Ivory (`#FAF7F0`, **7.09:1 contrast — AAA**)
+   - **Analysis**: Creates a very natural, organic literary atmosphere. The deep teal ribbon harmonizes beautifully with the brown calligraphy without feeling overwhelming.
+
+3. **Palette C (Cream & Maroon)**:
+   - Ribbon fill: Velvet Maroon (`#7A2E3A`)
+   - Ribbon border: Burnished Gold (`#B98A3E`)
+   - Ribbon text: Cream Ivory (`#FCF9F4`, **8.77:1 contrast — AAA**)
+   - **Analysis**: Traditional classical bookplate aesthetic reminiscent of leatherbound Urdu anthologies. Excellent visual cohesion with the cream badge.
+
+### Background Contrast & Shell Mitigation
+
+- **Problem Identified**: When placing the circular badge on dark shell headers (e.g. Writer Studio or Admin top bars with indigo/navy backgrounds), the dark brown edge text of the circular artwork could experience reduced legibility.
+- **Solution Implemented**: Added the `plate` prop to `<BrandLogo variant="mark" plate />`. This applies a subtle light backing plate (`bg-surface/90 border border-border shadow-xs`) behind the circle, providing a clean separation ring and ensuring 100% legibility on any shell background color.
+
 

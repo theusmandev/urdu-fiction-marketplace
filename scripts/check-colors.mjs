@@ -10,7 +10,6 @@
  *  - src/lib/email/* (email clients require inline safe colors)
  *  - src/styles/tokens.css (token definition source)
  *  - src/app/globals.css (theme mapping)
- *  - src/app/dev/theme/* (dev theme showcase & swatch display)
  *  - src/app/read/* (reading engine theme preferences: light, sepia, dark)
  *  - src/components/catalog/FreePreviewReaderClient.tsx (in-app preview reader)
  *  - src/app/(marketplace)/dev/fonts/* (typography & reading theme test lab)
@@ -31,7 +30,6 @@ const ALLOWED_PATH_PATTERNS = [
   /[\\/]src[\\/]lib[\\/]email[\\/]/,
   /[\\/]src[\\/]styles[\\/]tokens\.css$/,
   /[\\/]src[\\/]app[\\/]globals\.css$/,
-  /[\\/]src[\\/]app[\\/]dev[\\/]theme[\\/]/,
   /[\\/]src[\\/]app[\\/]read[\\/]/,
   /[\\/]src[\\/]components[\\/]catalog[\\/]FreePreviewReaderClient\.tsx$/,
   /[\\/]src[\\/]app[\\/]\(marketplace\)[\\/]dev[\\/]fonts[\\/]/,

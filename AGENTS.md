@@ -41,7 +41,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
    - **PRE-COMMIT / CI GATE**: Run `npm run check:terms`. This script (`scripts/check-terminology.mjs`) scans `src/` and new migrations (`0035+`) and exits non-zero if any forbidden user-facing terminology is introduced.
 7. **Semantic Design Tokens & Color Discipline (`npm run check:colors` & `npm run check:contrast`)**:
    - **Unified Light Theme & Semantic Tokens**: All UI across Marketplace, Writer Studio, and Admin MUST use ONE shared set of semantic tokens mapped from CSS variables (`src/styles/tokens.css`, `src/app/globals.css`). Arbitrary hex colors (`bg-[#...]`) and hard-coded Tailwind palette colors (`bg-slate-*`, `text-gray-*`, `border-stone-*`, etc.) are strictly forbidden in `src/`.
-   - **Allow-list**: Hard-coded colors are permitted ONLY in `src/lib/email/*` (for email client compatibility), `src/styles/tokens.css` (token definitions), `src/app/globals.css` (Tailwind theme mapping), `src/app/dev/theme/*` (dev theme showcase & swatch display), `src/app/read/*` & `FreePreviewReaderClient.tsx` (reader preference tokens: light, sepia, dark), and book cover placeholder gradients.
+   - **Allow-list**: Hard-coded colors are permitted ONLY in `src/lib/email/*` (for email client compatibility), `src/styles/tokens.css` (token definitions), `src/app/globals.css` (Tailwind theme mapping), `src/app/read/*` & `FreePreviewReaderClient.tsx` (reader preference tokens: light, sepia, dark), and book cover placeholder gradients.
    - **Palettes**: Three selectable palettes via `data-palette` on `<html>`:
      - Palette A ("Ivory & Ink", Default)
      - Palette B ("Paper & Teal")

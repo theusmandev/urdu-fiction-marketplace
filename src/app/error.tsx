@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { AlertCircle, RotateCcw, Home } from "lucide-react";
 
 export default function GlobalErrorPage({
@@ -19,6 +20,9 @@ export default function GlobalErrorPage({
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center space-y-6">
+      <Link href="/" aria-label="UNB Premium — home" className="hover:opacity-95 transition-opacity">
+        <BrandLogo variant="full" size={80} />
+      </Link>
       <div className="w-16 h-16 rounded-3xl bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center shadow-sm">
         <AlertCircle className="w-8 h-8" />
       </div>

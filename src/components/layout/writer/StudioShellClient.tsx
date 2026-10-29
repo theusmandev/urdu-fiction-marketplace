@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { AccountMenu, NotificationBell } from '../shared';
 import { AdminPalettePreview } from '@/components/admin/AdminPalettePreview';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 import type { ProfileRow, WriterProfileRow } from '@/types/database';
 
 export interface StudioShellClientProps {
@@ -133,10 +134,8 @@ export function StudioShellClient({
           </button>
 
           {/* Brand Logo in Top Bar */}
-          <Link href="/writer" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-role-accent text-role-accent-contrast flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
-              <Feather className="w-4 h-4" />
-            </div>
+          <Link href="/writer" className="flex items-center gap-2.5 group" aria-label="Writer Studio — UNB Premium">
+            <BrandLogo variant="mark" size={36} plate priority className="group-hover:scale-105 transition-transform" />
             <div className="flex flex-col">
               <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
                 Writer Studio

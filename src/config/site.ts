@@ -36,6 +36,8 @@ export interface GenreMeta {
 export interface SiteConfig {
   brandName: string;
   brandNameUrdu: string;
+  brandSuffix: string;
+  brandPrefix?: string;
   tagline: string;
   taglineUrdu: string;
   description: string;
@@ -69,6 +71,8 @@ export interface SiteConfig {
 export const siteConfig: SiteConfig = {
   brandName: "UNB Premium",
   brandNameUrdu: "یو این بی پریمیم",
+  brandSuffix: "Premium",
+  brandPrefix: "Urdu Novel Bank",
   tagline: "Independent Marketplace for Premium Digital Urdu Fiction",
   taglineUrdu: "معیاری اردو فکشن اور ناولز کی خود مختار ڈیجیٹل مارکیٹ پلیس",
   description: 

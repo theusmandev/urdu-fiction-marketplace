@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { siteConfig } from "@/config/site";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Feather, Heart, Smartphone } from "lucide-react";
 
 export const revalidate = 86400; // 24 hours ISR
@@ -18,12 +19,17 @@ export default function AboutPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Page Header */}
       <div className="space-y-4 text-center border-b border-border pb-8">
-        <span className="text-xs font-semibold text-accent uppercase tracking-wider">
-          Our Vision & Heritage
-        </span>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-navy">
-          About {siteConfig.brandName}
-        </h1>
+        <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="inline-block hover:opacity-95 transition-opacity">
+          <BrandLogo variant="full" size={96} className="mx-auto mb-2" />
+        </Link>
+        <div>
+          <span className="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">
+            Our Vision & Heritage
+          </span>
+          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-navy">
+            About {siteConfig.brandName}
+          </h1>
+        </div>
         <UrduText
           as="p"
           size="2xl"

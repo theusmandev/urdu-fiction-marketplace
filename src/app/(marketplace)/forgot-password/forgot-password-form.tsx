@@ -4,6 +4,7 @@ import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowLeft, ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { forgotPassword } from '@/app/actions/auth';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
@@ -34,15 +35,10 @@ export function ForgotPasswordForm() {
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-ivory text-main">
       <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-surface p-8 shadow-card">
         <div className="text-center">
-          <Link href="/" className="inline-block">
-            <span className="font-urdu text-4xl tracking-tight text-accent">
-              یو این بی پریمیم
-            </span>
-            <span className="block text-xs uppercase tracking-widest text-secondary font-sans mt-0.5 font-bold">
-              UNB Premium
-            </span>
+          <Link href="/" className="inline-block hover:opacity-95 transition-opacity" aria-label="UNB Premium — home">
+            <BrandLogo variant="full" size={88} className="mx-auto" />
           </Link>
-          <h1 className="mt-6 text-2xl font-bold font-serif tracking-tight text-navy">
+          <h1 className="mt-5 text-2xl font-bold font-serif tracking-tight text-navy">
             Reset your password
           </h1>
           <p className="mt-2 text-sm text-secondary">

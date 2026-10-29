@@ -190,6 +190,15 @@ This is an automated system notification.
   <div class="wrapper">
     <div class="card">
       <div class="header">
+        <a href="${escapeHtml(baseUrl)}" style="text-decoration:none;display:inline-block;" target="_blank" rel="noopener noreferrer">
+          <img
+            src="${escapeHtml(baseUrl)}/brand/logo-email.png"
+            width="140"
+            height="91"
+            alt="UNB Premium"
+            style="display:block;margin:0 auto 10px auto;max-width:140px;height:auto;border:0;outline:none;"
+          />
+        </a>
         <h1 class="brand-title">UNB PREMIUM</h1>
         <p class="brand-subtitle">اردو فکشن کی سب سے معتبر آن لائن مارکیٹ</p>
       </div>

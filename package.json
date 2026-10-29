@@ -13,7 +13,8 @@
     "check:links": "node scripts/check-internal-links.mjs",
     "check:terms": "node scripts/check-terminology.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "check:colors": "node scripts/check-colors.mjs"
+    "check:colors": "node scripts/check-colors.mjs",
+    "build:brand": "node scripts/build-brand-assets.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

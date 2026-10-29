@@ -162,6 +162,12 @@ function run() {
       bgToken: '--color-surface',
       min: 4.5,
     },
+    {
+      name: 'brand-ribbon-text on brand-ribbon-bg',
+      fgToken: '--brand-ribbon-text',
+      bgToken: '--brand-ribbon-bg',
+      min: 4.5,
+    },
   ];
 
   let hasFailure = false;

@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Cormorant_Garamond, Gulzar, Amiri } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
-import { DevFloatingPaletteSwitcher } from "@/components/dev/DevFloatingPaletteSwitcher";
 import { getSitePalette } from "@/lib/settings/site-palette";
 import { getPaletteThemeColor } from "@/lib/settings/palette";
 
@@ -39,6 +38,7 @@ const arabicFont = Amiri({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: `${siteConfig.brandName} — ${siteConfig.tagline}`,
     template: `%s | ${siteConfig.brandName}`,
@@ -63,7 +63,32 @@ export const metadata: Metadata = {
     siteName: siteConfig.brandName,
     locale: "en_PK",
     type: "website",
+    images: [
+      {
+        url: "/brand/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.brandName} — ${siteConfig.tagline}`,
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.brandName,
+    description: siteConfig.tagline,
+    images: ["/brand/og-image.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/brand/logo-circle-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/brand/logo-circle-16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {
@@ -90,20 +115,12 @@ export default async function RootLayout({
     >
       <head>
         <meta name="theme-color" content={metaThemeColor} />
-        {process.env.NODE_ENV === "development" && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `(function(){try{var p=localStorage.getItem("unb_dev_palette");if(p==="A"||p==="B"||p==="C"||p==="ivory_ink"||p==="paper_teal"||p==="cream_maroon"){document.documentElement.setAttribute("data-palette",p);}}catch(e){}})();`,
-            }}
-          />
-        )}
       </head>
       <body
         suppressHydrationWarning
         className="min-h-screen bg-bg font-sans antialiased text-text flex flex-col selection:bg-accent-soft selection:text-text"
       >
         {children}
-        {process.env.NODE_ENV === "development" && <DevFloatingPaletteSwitcher />}
       </body>
     </html>
   );

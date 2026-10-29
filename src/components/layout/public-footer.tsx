@@ -2,7 +2,8 @@ import React from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
-import { BookMarked, ShieldCheck, Heart, ArrowUpRight } from "lucide-react";
+import { BrandLogo } from "@/components/brand/BrandLogo";
+import { ShieldCheck, Heart, ArrowUpRight } from "lucide-react";
 
 export function PublicFooter() {
   const currentYear = 2026;
@@ -16,10 +17,10 @@ export function PublicFooter() {
           
           {/* Brand Info & Mission Statement (full width on phones/tablets, 2 cols on desktop) */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent-soft text-accent-strong border border-border flex items-center justify-center font-bold shrink-0">
-                <BookMarked className="w-6 h-6" />
-              </div>
+            <div className="flex items-center gap-3.5">
+              <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="shrink-0 hover:opacity-95 transition-opacity">
+                <BrandLogo variant="full" size={72} />
+              </Link>
               <div>
                 <span className="font-serif text-2xl font-bold text-text tracking-tight">
                   {siteConfig.brandName}

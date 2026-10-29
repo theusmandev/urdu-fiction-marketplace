@@ -3,6 +3,7 @@ import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { BookOpen, Home, CreditCard, HelpCircle, LifeBuoy } from "lucide-react";
 
 export default function GlobalNotFoundPage() {
@@ -10,6 +11,9 @@ export default function GlobalNotFoundPage() {
     <div className="min-h-screen flex flex-col bg-background text-main">
       <PublicHeader />
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center space-y-6">
+        <Link href="/" aria-label="UNB Premium — home" className="hover:opacity-95 transition-opacity">
+          <BrandLogo variant="full" size={80} />
+        </Link>
         <div className="w-16 h-16 rounded-3xl bg-navy text-accent flex items-center justify-center font-serif text-2xl font-bold shadow-lg">
           404
         </div>
