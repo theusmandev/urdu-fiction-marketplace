@@ -17,22 +17,10 @@ export function PublicFooter() {
           
           {/* Brand Info & Mission Statement (full width on phones/tablets, 2 cols on desktop) */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3.5">
-              <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="shrink-0 hover:opacity-95 transition-opacity">
-                <BrandLogo variant="full" size={72} />
+            <div>
+              <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="inline-block group hover:opacity-95 transition-opacity">
+                <BrandLogo variant="full" size={88} />
               </Link>
-              <div>
-                <span className="font-serif text-2xl font-bold text-text tracking-tight">
-                  {siteConfig.brandName}
-                </span>
-                <span
-                  dir="rtl"
-                  lang="ur"
-                  className="block font-urdu text-xs text-accent-strong mt-0.5"
-                >
-                  {siteConfig.brandNameUrdu}
-                </span>
-              </div>
             </div>
 
             <p className="text-sm text-text-muted leading-relaxed max-w-sm">

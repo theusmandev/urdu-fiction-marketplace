@@ -68,13 +68,13 @@ export default function DevThemeShowcasePage() {
               {/* Lockup Variant */}
               <div className="rounded-2xl border border-border bg-bg p-6 flex flex-col items-center justify-center gap-4 text-center">
                 <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
-                  variant=&quot;lockup&quot; (size=44)
+                  variant=&quot;lockup&quot; (size=48)
                 </span>
                 <div className="p-3 bg-surface rounded-xl border border-border shadow-xs">
-                  <BrandLogo variant="lockup" size={44} showWordmark />
+                  <BrandLogo variant="lockup" size={48} />
                 </div>
                 <p className="text-xs text-text-muted max-w-[200px]">
-                  Header &amp; drawer lockup with live wordmark.
+                  Header &amp; mobile drawer emblem with integrated ribbon.
                 </p>
               </div>
 
@@ -89,7 +89,6 @@ export default function DevThemeShowcasePage() {
                     <span className="block font-serif text-sm font-bold text-white leading-none">
                       Writer Studio
                     </span>
-                    <span className="text-[10px] text-accent-soft font-medium">UNB Premium</span>
                   </div>
                 </div>
                 <p className="text-xs text-white/70 max-w-[200px]">

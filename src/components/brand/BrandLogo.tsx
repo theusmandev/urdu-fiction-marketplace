@@ -9,17 +9,17 @@ export type BrandLogoVariant = 'full' | 'lockup' | 'mark';
 export interface BrandLogoProps {
   /**
    * Logo visual variant:
-   * - "full": Circle badge with live-text "PREMIUM" ribbon overlapping below (About, auth, footer, error).
-   * - "lockup": Circle with scaled-down ribbon (and optional adjacent wordmark) for header & drawer.
-   * - "mark": Circle alone (with optional light plate for dark bars) for Studio, Admin, and compact badges.
+   * - "full": Circular badge with live-text "PREMIUM" ribbon overlapping below (About, auth, footer, error).
+   * - "lockup": Compact circular badge with scaled-down ribbon for Marketplace header and mobile drawer.
+   * - "mark": Standalone circle badge (with optional light plate for dark bars) for Writer Studio and Admin shells.
    */
   variant?: BrandLogoVariant;
 
   /**
    * Circle badge diameter in pixels.
-   * If omitted, sensible defaults per variant are applied:
+   * Defaults per variant:
    * - "full": 96px
-   * - "lockup": 46px (38px on mobile)
+   * - "lockup": 48px
    * - "mark": 36px
    */
   size?: number;
@@ -30,14 +30,8 @@ export interface BrandLogoProps {
   priority?: boolean;
 
   /**
-   * In lockup variant: whether to render the adjacent English & Urdu brand wordmark.
-   * Defaults to false (caller can render custom layout or enable this for a complete lockup).
-   */
-  showWordmark?: boolean;
-
-  /**
    * When true, renders a subtle light plate / ring behind the circle badge.
-   * Highly recommended for dark top bars (e.g. Writer Studio, Admin shells, dark headers)
+   * Recommended for dark top bars (e.g. Writer Studio, Admin shells)
    * so the cream circle maintains crisp contrast against any background hue.
    */
   plate?: boolean;
@@ -45,9 +39,9 @@ export interface BrandLogoProps {
   /**
    * Accessible alt text for the circle graphic.
    * Per WCAG specifications:
-   * - In "full" and "lockup" variants, defaults to empty alt="" because the live "PREMIUM" text
-   *   and adjacent text already name the brand, preventing repetitive screen-reader announcements.
-   * - In "mark" variant without adjacent text, defaults to siteConfig.brandName.
+   * - In "full" and "lockup" variants, defaults to empty alt="" because the parent link
+   *   or container has an aria-label, and the live "PREMIUM" text is decorative to screen readers.
+   * - In "mark" variant, defaults to siteConfig.brandName.
    */
   alt?: string;
 
@@ -81,35 +75,62 @@ export function BrandLogo({
   variant = 'full',
   size: userSize,
   priority = false,
-  showWordmark = false,
   plate = false,
   alt: userAlt,
   className = '',
 }: BrandLogoProps) {
   // 1. Resolve dimensions based on variant
-  const defaultSize = variant === 'full' ? 96 : variant === 'lockup' ? 46 : 36;
+  const defaultSize = variant === 'full' ? 96 : variant === 'lockup' ? 48 : 36;
   const size = userSize ?? defaultSize;
 
-  // 2. Geometry calculations for the overlapping ribbon
-  // - Ribbon width: ~76% of circle diameter
-  // - Ribbon height: ~28% of circle diameter
-  // - Overlap: ribbon overlaps bottom 15% of circle
-  const ribbonWidth = Math.round(size * 0.78);
-  const ribbonHeight = Math.max(16, Math.round(size * 0.28));
-  const circleOverlap = Math.round(size * 0.15);
+  // 2. Geometry calculations for the heraldic ribbon
+  // - Ribbon width: ~92% of circle diameter (spans slightly wider than the circle's bottom curve)
+  // - Ribbon height: ~26% of circle diameter
+  // - Overlap: ribbon overlaps bottom 16% of circle, sitting snugly over the bottom rim
+  const ribbonWidth = Math.round(size * 0.92);
+  const ribbonHeight = Math.max(13, Math.round(size * 0.26));
+  const circleOverlap = Math.round(size * 0.16);
   const totalHeight = size + ribbonHeight - circleOverlap;
 
-  // 3. Resolve accessible description
+  // 3. Notch and inner border geometry (crisp exact pixel values)
+  const notchDepth = Math.max(3.5, Math.round(ribbonHeight * 0.32));
+  const insetX = Math.min(2.5, Math.max(1.2, Math.round(ribbonHeight * 0.08 * 10) / 10));
+  const insetY = Math.min(2, Math.max(1, Math.round(ribbonHeight * 0.07 * 10) / 10));
+  const usableWidth = Math.max(20, ribbonWidth - (notchDepth + insetX) * 2);
+
+  const outerPoints = [
+    `0,0`,
+    `${ribbonWidth},0`,
+    `${ribbonWidth - notchDepth},${ribbonHeight / 2}`,
+    `${ribbonWidth},${ribbonHeight}`,
+    `0,${ribbonHeight}`,
+    `${notchDepth},${ribbonHeight / 2}`,
+  ].join(' ');
+
+  const innerPoints = [
+    `${insetX},${insetY}`,
+    `${ribbonWidth - insetX},${insetY}`,
+    `${ribbonWidth - insetX - notchDepth},${ribbonHeight / 2}`,
+    `${ribbonWidth - insetX},${ribbonHeight - insetY}`,
+    `${insetX},${ribbonHeight - insetY}`,
+    `${insetX + notchDepth},${ribbonHeight / 2}`,
+  ].join(' ');
+
+  // 4. Proportional typography scaling
+  const fontSize = Math.max(7, Math.round(ribbonHeight * 0.44 * 10) / 10);
+  const letterSpacing = ribbonHeight >= 16 ? 0.15 : 0.11;
+
+  // 5. Accessible description
   const altText = userAlt !== undefined
     ? userAlt
     : variant === 'mark'
       ? siteConfig.brandName
-      : ''; // Decorative when live text / wordmark is present
+      : '';
 
   const circleSrc = getCircleSrc(size);
 
   // ---------------------------------------------------------------------------
-  // Variant: "mark" (Circle alone, for Studio, Admin, compact headers)
+  // Variant: "mark" (Circle alone, for Writer Studio, Admin shells)
   // ---------------------------------------------------------------------------
   if (variant === 'mark') {
     return (
@@ -117,7 +138,6 @@ export function BrandLogo({
         className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
         style={{ width: size, height: size }}
       >
-        {/* Optional light plate for high contrast on dark or tinted shell bars */}
         {plate && (
           <div
             className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
@@ -140,7 +160,7 @@ export function BrandLogo({
 
   // ---------------------------------------------------------------------------
   // Live-Text Ribbon Element
-  // Notched dovetail ends, double gold border, active palette fill, ivory live text.
+  // Notched swallowtail ends, double gold border, active palette primary fill, ivory live text.
   // ---------------------------------------------------------------------------
   const ribbonElement = (
     <div
@@ -155,34 +175,38 @@ export function BrandLogo({
     >
       {/* Crisp Notched Ribbon Background Plate with Double Border */}
       <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        viewBox="0 0 100 28"
-        preserveAspectRatio="none"
+        className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-xs"
+        viewBox={`0 0 ${ribbonWidth} ${ribbonHeight}`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* Outer Notched Plate (Active Palette Primary Fill + Outer Hairline) */}
         <polygon
-          points="0,0 100,0 92,14 100,28 0,28 8,14"
+          points={outerPoints}
           fill="var(--brand-ribbon-bg, var(--color-primary))"
           stroke="var(--brand-ribbon-border-outer, var(--color-accent-strong))"
           strokeWidth="0.75"
+          strokeLinejoin="round"
         />
         {/* Inner Accent Border (Active Palette Gold Accent) */}
         <polygon
-          points="3,2.5 97,2.5 90,14 97,25.5 3,25.5 10,14"
+          points={innerPoints}
           fill="none"
           stroke="var(--brand-ribbon-border, var(--color-accent))"
           strokeWidth="1"
           strokeOpacity="0.9"
+          strokeLinejoin="round"
         />
       </svg>
 
       {/* Live Text: Editable from siteConfig.brandSuffix ("Premium") */}
       <span
-        className="relative z-10 font-serif uppercase tracking-[0.22em] font-semibold text-[var(--brand-ribbon-text,#FBF8F2)] leading-none text-center pl-[0.22em]"
+        className="relative z-10 font-serif uppercase font-semibold text-[var(--brand-ribbon-text,#FBF8F2)] leading-none text-center whitespace-nowrap overflow-hidden text-ellipsis px-1 select-none"
         style={{
-          fontSize: `${Math.max(8, Math.round(ribbonHeight * 0.44))}px`,
+          fontSize: `${fontSize}px`,
+          letterSpacing: `${letterSpacing}em`,
+          paddingLeft: `${letterSpacing}em`, // offsets trailing letter-spacing to ensure optical center
+          maxWidth: `${usableWidth}px`,
         }}
       >
         {siteConfig.brandSuffix || 'Premium'}
@@ -191,103 +215,43 @@ export function BrandLogo({
   );
 
   // ---------------------------------------------------------------------------
-  // Variant: "full" (Stacked: circle on top, centered ribbon overlapping below)
-  // ---------------------------------------------------------------------------
-  if (variant === 'full') {
-    return (
-      <div
-        className={`relative inline-flex flex-col items-center justify-start shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
-        style={{ width: size, height: totalHeight }}
-      >
-        {/* Circle Badge (with circular mask & optional plate) */}
-        <div
-          className="relative rounded-full overflow-hidden shadow-xs shrink-0"
-          style={{ width: size, height: size }}
-        >
-          {plate && (
-            <div
-              className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
-              aria-hidden="true"
-            />
-          )}
-          <Image
-            src={circleSrc}
-            alt={altText}
-            width={size}
-            height={size}
-            priority={priority}
-            className="w-full h-full object-contain"
-          />
-        </div>
-
-        {/* Live-Text Ribbon overlapping bottom of circle by ~15% */}
-        <div
-          className="absolute z-10 left-1/2 -translate-x-1/2"
-          style={{ top: `${size - circleOverlap}px` }}
-        >
-          {ribbonElement}
-        </div>
-      </div>
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Variant: "lockup" (Compact for header & drawer)
-  // Responsive: on widths < 360px ribbon is hidden automatically.
+  // Variants: "full" and "lockup" (Stacked: circle badge + overlapping ribbon)
   // ---------------------------------------------------------------------------
   return (
-    <div className={`inline-flex items-center gap-2.5 sm:gap-3 group shrink-0 print:grayscale print:contrast-125 ${className}`}>
-      {/* Stacked Badge + Overlapping Ribbon */}
+    <div
+      className={`relative inline-flex flex-col items-center justify-start shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+      style={{ width: Math.max(size, ribbonWidth), height: totalHeight }}
+    >
+      {/* Circle Badge (with circular mask & optional plate) */}
       <div
-        className="relative inline-flex flex-col items-center justify-start shrink-0"
-        style={{ width: size, height: totalHeight }}
+        className="relative rounded-full overflow-hidden shadow-xs shrink-0"
+        style={{ width: size, height: size }}
       >
-        <div
-          className="relative rounded-full overflow-hidden shadow-xs shrink-0"
-          style={{ width: size, height: size }}
-        >
-          {plate && (
-            <div
-              className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
-              aria-hidden="true"
-            />
-          )}
-          <Image
-            src={circleSrc}
-            alt={altText}
-            width={size}
-            height={size}
-            priority={priority}
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+        {plate && (
+          <div
+            className="absolute inset-0 rounded-full bg-surface/90 border border-border shadow-xs pointer-events-none"
+            aria-hidden="true"
           />
-        </div>
-
-        <div
-          className="absolute z-10 left-1/2 -translate-x-1/2"
-          style={{ top: `${size - circleOverlap}px` }}
-        >
-          {ribbonElement}
-        </div>
+        )}
+        <Image
+          src={circleSrc}
+          alt={altText}
+          width={size}
+          height={size}
+          priority={priority}
+          className="w-full h-full object-contain transition-transform group-hover:scale-105"
+        />
       </div>
 
-      {/* Optional Wordmark adjacent to badge */}
-      {showWordmark && (
-        <div className="flex flex-col">
-          <span className="font-serif text-lg sm:text-xl font-bold tracking-tight text-primary leading-none">
-            {siteConfig.brandPrefix || 'Urdu Novel Bank'}
-          </span>
-          <span
-            dir="rtl"
-            lang="ur"
-            className="font-urdu text-[10px] sm:text-xs text-accent-strong font-medium leading-none mt-0.5"
-          >
-            {siteConfig.brandNameUrdu}
-          </span>
-        </div>
-      )}
+      {/* Live-Text Ribbon overlapping bottom of circle by ~16% */}
+      <div
+        className="absolute z-10 left-1/2 -translate-x-1/2"
+        style={{ top: `${size - circleOverlap}px` }}
+      >
+        {ribbonElement}
+      </div>
     </div>
   );
 }
 
 export default BrandLogo;
-

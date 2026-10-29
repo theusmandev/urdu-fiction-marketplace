@@ -242,25 +242,14 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
       <header className="sticky top-0 z-40 w-full bg-surface/95 backdrop-blur-md border-b border-border transition-all pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-14 sm:h-16 md:h-20 gap-2 sm:gap-4">
-            {/* Brand Identity */}
+            {/* Brand Identity: Circular Emblem + "PREMIUM" ribbon only (no adjacent wordmark) */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 sm:gap-3 group shrink-0 min-h-[44px]"
+              className="flex items-center group shrink-0 min-h-[44px] py-1"
               aria-label={`${siteConfig.brandName} — home`}
             >
-              <BrandLogo variant="lockup" size={44} priority className="shrink-0" />
-              <div className="flex flex-col">
-                <span className="font-serif text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-primary leading-none">
-                  {siteConfig.brandName}
-                </span>
-                <span
-                  dir="rtl"
-                  lang="ur"
-                  className="font-urdu text-[10px] sm:text-xs text-accent-strong font-medium leading-none mt-0.5"
-                >
-                  {siteConfig.brandNameUrdu}
-                </span>
-              </div>
+              <BrandLogo variant="lockup" size={42} priority className="shrink-0 sm:hidden" />
+              <BrandLogo variant="lockup" size={50} priority className="shrink-0 hidden sm:inline-flex" />
             </Link>
 
             {/* Desktop Search Field */}
@@ -508,13 +497,10 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
               <Link
                 href="/"
                 onClick={closeMobileMenu}
-                className="flex items-center gap-2.5"
+                className="flex items-center group"
                 aria-label={`${siteConfig.brandName} — home`}
               >
-                <BrandLogo variant="lockup" size={38} className="shrink-0" />
-                <span className="font-serif text-base font-bold text-primary">
-                  {siteConfig.brandName}
-                </span>
+                <BrandLogo variant="lockup" size={44} className="shrink-0" />
               </Link>
               <button
                 type="button"

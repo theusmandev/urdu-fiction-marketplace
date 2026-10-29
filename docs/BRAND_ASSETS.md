@@ -12,8 +12,9 @@ The UNB Premium brand identity combines two layers:
    - Rendered via Next.js `<Image />` inside a circular mask (`rounded-full overflow-hidden`) to guarantee clean circular boundaries even if an artwork without transparent corners is supplied.
 2. **The Live-Text "PREMIUM" Ribbon**:
    - Built with pure SVG and CSS live text rather than being baked into the raster image.
-   - Positioned directly below the circle badge, overlapping its bottom by ~15%.
-   - Notched/dovetail ends on both sides with a double gold border.
+   - Positioned directly below the circle badge, overlapping its bottom rim by ~16% (`z-10`), sitting snugly over the bottom curve like a heraldic crest badge.
+   - Spans ~92% of the circle width (wider than the circle's 71% bottom curve) with swallowtail notched ends and generous horizontal text padding to prevent any clipping.
+   - Double border: Outer hairline stroke (`--brand-ribbon-border-outer`) and inner accent gold stroke (`--brand-ribbon-border`) with palette primary fill (`--brand-ribbon-bg`).
    - Text source: **`siteConfig.brandSuffix`** in [`src/config/site.ts`](file:///e:/git-workstation/urdu-fiction-marketplace/src/config/site.ts) (default: `"Premium"`).
    - Dynamically inherits the active site palette:
      - **Palette A (`ivory_ink`)**: Editorial Navy fill (`#1B2A41`), gold border (`#B98A3E`), ivory text (`#FBF8F2`).
@@ -31,7 +32,7 @@ Located at: [`src/components/brand/BrandLogo.tsx`](file:///e:/git-workstation/ur
 | Variant | Purpose | Default Size | Locations Used |
 | :--- | :--- | :---: | :--- |
 | **`"full"`** | Circle badge + live-text ribbon below | `96px` (scaled up to `104px`) | About page, Auth pages (Login, Register, Forgot Password, Reset Password), Footer, Global 404 & Error pages |
-| **`"lockup"`** | Circle at 44–48px (38px on phones) with scaled-down ribbon and optional wordmark | `46px` | Sticky Marketplace Header, Slide-Over Navigation Drawer |
+| **`"lockup"`** | Compact emblem + ribbon below | `48px` (42px on mobile) | Sticky Marketplace Header, Slide-Over Navigation Drawer |
 | **`"mark"`** | Standalone circle badge with circular mask and optional contrast plate | `36px` | Writer Studio top bar, Admin Shell top bar, compact badges |
 
 ### Key Properties
@@ -39,7 +40,6 @@ Located at: [`src/components/brand/BrandLogo.tsx`](file:///e:/git-workstation/ur
 - `variant`: `'full' | 'lockup' | 'mark'` (default: `'full'`)
 - `size`: circle diameter in pixels.
 - `priority`: boolean (used on above-the-fold header to eliminate LCP delay).
-- `showWordmark`: boolean (in `lockup`, renders adjacent brand title and Urdu subtitle).
 - `plate`: boolean (renders a light contrast backing plate / ring behind the circle for dark or indigo bars like Writer Studio and Admin top bars).
 - `alt`: string (accessible alt text; defaults to `""` for full/lockup when live text is present, or `siteConfig.brandName` for standalone mark).
 

@@ -136,14 +136,9 @@ export function StudioShellClient({
           {/* Brand Logo in Top Bar */}
           <Link href="/writer" className="flex items-center gap-2.5 group" aria-label="Writer Studio — UNB Premium">
             <BrandLogo variant="mark" size={36} plate priority className="group-hover:scale-105 transition-transform" />
-            <div className="flex flex-col">
-              <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
-                Writer Studio
-              </span>
-              <span className="text-[10px] text-accent-strong font-medium mt-0.5">
-                UNB Premium
-              </span>
-            </div>
+            <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
+              Writer Studio
+            </span>
           </Link>
 
           {/* Breadcrumb / Page Title */}

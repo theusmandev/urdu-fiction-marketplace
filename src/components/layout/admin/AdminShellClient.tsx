@@ -199,17 +199,12 @@ export function AdminShellClient({
           {/* Brand Logo in Top Bar */}
           <Link href="/admin" className="flex items-center gap-2.5 group" aria-label="Admin Control — UNB Premium">
             <BrandLogo variant="mark" size={36} plate priority className="group-hover:scale-105 transition-transform" />
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
-                  Admin Control
-                </span>
-                <span className="text-[10px] bg-accent-admin-soft text-accent-admin border border-accent-admin-border px-1.5 py-0.5 rounded font-bold tracking-wider">
-                  ADMIN
-                </span>
-              </div>
-              <span className="text-[10px] text-accent-strong font-medium mt-0.5">
-                UNB Premium
+            <div className="flex items-center gap-2">
+              <span className="font-serif text-base font-bold tracking-tight text-text leading-none">
+                Admin Control
+              </span>
+              <span className="text-[10px] bg-accent-admin-soft text-accent-admin border border-accent-admin-border px-1.5 py-0.5 rounded font-bold tracking-wider">
+                ADMIN
               </span>
             </div>
           </Link>
