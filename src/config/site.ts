@@ -77,7 +77,7 @@ export const siteConfig: SiteConfig = {
   taglineUrdu: "معیاری اردو فکشن اور ناولز کی خود مختار ڈیجیٹل مارکیٹ پلیس",
   description: 
     "A direct-to-writer digital marketplace for Urdu fiction lovers. Readers pay Pakistani authors directly via JazzCash, EasyPaisa, or Bank Transfer. Instant chapter delivery upon writer verification.",
-  url: "https://unbpremium.pk",
+  url: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://premium.urdunovelbanks.com",
   ogImage: "/og-image.jpg",
   
   // Financial & Commission Architecture

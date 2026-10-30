@@ -1,7 +1,17 @@
 /**
- * In-memory sliding-window rate limiter for sensitive writer endpoints
+ * Sliding-window rate limiter for sensitive writer endpoints
  * (such as manuscript uploads and chapter parsing).
+ *
+ * Supports both:
+ * 1. Database-backed atomic rate limiting via Supabase RPC `check_rate_limit` (production/Cloudflare Workers).
+ * 2. In-memory sliding-window fallback for unit tests and local mock environments.
  */
+
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+}
 
 interface RateLimitRecord {
   count: number;
@@ -11,17 +21,13 @@ interface RateLimitRecord {
 const rateLimitMap = new Map<string, RateLimitRecord>();
 
 /**
- * Checks if a given identifier (e.g. user ID or IP) is within the rate limit.
- *
- * @param identifier Unique string identifying the requester (e.g. user.id)
- * @param limit Maximum allowed requests within the time window (default 10)
- * @param windowMs Duration of the window in milliseconds (default 60,000ms = 1 minute)
+ * Synchronous in-memory rate limit check (used by tests & local fallback).
  */
 export function checkRateLimit(
   identifier: string,
   limit: number = 10,
   windowMs: number = 60 * 1000
-): { allowed: boolean; remaining: number; resetAt: number } {
+): RateLimitResult {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
 
@@ -57,9 +63,71 @@ export function checkRateLimit(
   };
 }
 
+export interface SupabaseRpcCaller {
+  rpc(
+    fn: string,
+    args?: Record<string, unknown>
+  ): PromiseLike<{ data: unknown; error: { message: string } | null }>;
+}
+
 /**
- * Clears the rate limit for a specific identifier (primarily for testing).
+ * Database-backed rate limit check via Supabase RPC `check_rate_limit`.
+ * Falls back to in-memory check if client is omitted or query fails.
+ */
+export async function checkRateLimitAsync(
+  identifier: string,
+  limit: number = 10,
+  windowMs: number = 60 * 1000,
+  client?: SupabaseRpcCaller | null
+): Promise<RateLimitResult> {
+  if (client && typeof client.rpc === 'function') {
+    try {
+      const windowSeconds = Math.max(1, Math.ceil(windowMs / 1000));
+      const { data, error } = await client.rpc('check_rate_limit', {
+        p_identifier: identifier,
+        p_max_requests: limit,
+        p_window_seconds: windowSeconds,
+      });
+
+      if (!error && data && typeof data === 'object') {
+        const payload = data as { allowed?: boolean; remaining?: number; reset_at?: string };
+        return {
+          allowed: Boolean(payload.allowed),
+          remaining: Number(payload.remaining ?? 0),
+          resetAt: payload.reset_at ? new Date(payload.reset_at).getTime() : Date.now() + windowMs,
+        };
+      }
+      if (error) {
+        console.warn('[RateLimit] Database RPC returned error, using fallback:', error.message);
+      }
+    } catch (err) {
+      console.warn('[RateLimit] Database rate limit RPC failed, using fallback:', err);
+    }
+  }
+
+  return checkRateLimit(identifier, limit, windowMs);
+}
+
+/**
+ * Clears the rate limit for a specific identifier.
  */
 export function resetRateLimit(identifier: string): void {
   rateLimitMap.delete(identifier);
+}
+
+/**
+ * Asynchronously clears rate limits from database and memory.
+ */
+export async function resetRateLimitAsync(
+  identifier: string,
+  client?: SupabaseRpcCaller | null
+): Promise<void> {
+  resetRateLimit(identifier);
+  if (client && typeof client.rpc === 'function') {
+    try {
+      await client.rpc('reset_rate_limit', { p_identifier: identifier });
+    } catch {
+      // Ignored
+    }
+  }
 }

@@ -18,9 +18,13 @@ export async function createClient() {
       },
       setAll(cookiesToSet) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Strict security invariant: enforce host-only auth cookies (no Domain attribute)
+            // to ensure session cookies are NEVER shared across other subdomains of urdunovelbanks.com.
+            const hostOnlyOptions = { ...(options || {}) };
+            delete hostOnlyOptions.domain;
+            cookieStore.set(name, value, hostOnlyOptions);
+          });
         } catch {
           // The `setAll` method was called from a Server Component.
           // This can be ignored if you have proxy/middleware refreshing user sessions.

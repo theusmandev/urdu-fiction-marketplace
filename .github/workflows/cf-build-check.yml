@@ -1,0 +1,55 @@
+name: Cloudflare Workers Build Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-worker:
+    name: Build OpenNext Cloudflare Worker (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run SQL syntax & privilege checks
+        run: npm run check:sql
+
+      - name: Run user-facing terminology checks
+        run: npm run check:terms
+
+      - name: Run semantic color & contrast checks
+        run: |
+          npm run check:colors
+          npm run check:contrast
+
+      - name: Run frontend query & internal link checks
+        run: |
+          npm run check:frontend
+          npm run check:links
+
+      - name: Run unit & integration test suite
+        run: npm test
+
+      - name: Run OpenNext Cloudflare Worker Build
+        run: npx opennextjs-cloudflare build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://premium.urdunovelbanks.com' }}
+
+      - name: Dry-run Wrangler Deployment & Inspect Script Size
+        run: npx wrangler deploy --dry-run
+

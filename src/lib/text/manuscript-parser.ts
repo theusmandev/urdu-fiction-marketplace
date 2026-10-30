@@ -1,4 +1,3 @@
-import mammoth from 'mammoth';
 import {
   cleanUrduText,
   countUrduWords,
@@ -56,7 +55,9 @@ export async function extractTextFromBuffer(
   const lowerName = fileName.toLowerCase();
 
   if (lowerName.endsWith('.docx') || (buffer.length > 4 && buffer[0] === 0x50 && buffer[1] === 0x4B)) {
-    // DOCX format via mammoth
+    // DOCX format via dynamic mammoth import to keep worker bundles lean
+    const mammothModule = await import('mammoth');
+    const mammoth = mammothModule.default || mammothModule;
     const result = await mammoth.extractRawText({ buffer });
     return result.value || '';
   }

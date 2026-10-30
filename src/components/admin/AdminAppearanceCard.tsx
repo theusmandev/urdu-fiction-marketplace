@@ -83,6 +83,7 @@ export function AdminAppearanceCard({
       if (res.success && res.data) {
         setActivePalette(res.data.palette);
         setLastChangedTime(res.data.updatedAt);
+        setLastChangedActor({ name: 'You (Administrator)' });
         clearAdminPreviewCookie();
         setAdminNote('');
         setSuccessMessage(

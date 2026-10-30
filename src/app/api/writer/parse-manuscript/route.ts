@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireWriter } from '@/lib/auth/requireRole';
+import { createClient } from '@/lib/supabase/server';
 import { extractTextFromBuffer, splitManuscriptIntoChapters } from '@/lib/text/manuscript-parser';
-import { checkRateLimit } from '@/lib/writer/rate-limit';
+import { checkRateLimitAsync } from '@/lib/writer/rate-limit';
 
 // Strict 5 MB file size limit
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -27,8 +28,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Per-user rate limiting
-    const rateCheck = checkRateLimit(user.id, MAX_REQUESTS_PER_MINUTE, RATE_LIMIT_WINDOW_MS);
+    // 2. Per-user database-backed rate limiting (Cloudflare Workers & Edge compatible)
+    const supabase = await createClient();
+    const rateCheck = await checkRateLimitAsync(user.id, MAX_REQUESTS_PER_MINUTE, RATE_LIMIT_WINDOW_MS, supabase);
     if (!rateCheck.allowed) {
       const retryAfterSeconds = Math.max(1, Math.ceil((rateCheck.resetAt - Date.now()) / 1000));
       return NextResponse.json(

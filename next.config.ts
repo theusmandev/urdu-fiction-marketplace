@@ -6,13 +6,29 @@ const scriptSrc = isDev
   ? "'self' 'unsafe-eval' 'unsafe-inline'"
   : "'self' 'unsafe-inline'";
 
+function getSupabaseHost(): string | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return null;
+  try {
+    return new URL(url).host;
+  } catch {
+    return null;
+  }
+}
+
+const supabaseHost = getSupabaseHost();
+const prodSupabaseConnect = supabaseHost
+  ? `https://${supabaseHost} wss://${supabaseHost}`
+  : "https://*.supabase.co wss://*.supabase.co";
+const prodSupabaseImg = supabaseHost ? `https://${supabaseHost}` : "https://*.supabase.co";
+
 const connectSrc = isDev
-  ? "'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.in wss://*.supabase.in http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* ws: wss:"
-  : "'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.in wss://*.supabase.in";
+  ? `'self' ${prodSupabaseConnect} https://*.supabase.in wss://*.supabase.in http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* ws: wss:`
+  : `'self' ${prodSupabaseConnect}`;
 
 const imgSrc = isDev
-  ? "'self' blob: data: https://*.supabase.co https://*.supabase.in http://127.0.0.1:* http://localhost:*"
-  : "'self' blob: data: https://*.supabase.co https://*.supabase.in";
+  ? `'self' blob: data: ${prodSupabaseImg} https://*.supabase.in http://127.0.0.1:* http://localhost:*`
+  : `'self' blob: data: ${prodSupabaseImg}`;
 
 const upgradeInsecureRequests = isDev ? "" : "upgrade-insecure-requests;";
 
@@ -34,24 +50,44 @@ const cspHeader = `
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.supabase.in',
-      },
-      {
-        protocol: 'http',
-        hostname: '127.0.0.1',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-      },
-    ],
+    unoptimized: true,
+    remotePatterns: supabaseHost
+      ? [
+          {
+            protocol: 'https',
+            hostname: supabaseHost,
+          },
+          {
+            protocol: 'https',
+            hostname: '**.supabase.co',
+          },
+          {
+            protocol: 'http',
+            hostname: '127.0.0.1',
+          },
+          {
+            protocol: 'http',
+            hostname: 'localhost',
+          },
+        ]
+      : [
+          {
+            protocol: 'https',
+            hostname: '**.supabase.co',
+          },
+          {
+            protocol: 'https',
+            hostname: '**.supabase.in',
+          },
+          {
+            protocol: 'http',
+            hostname: '127.0.0.1',
+          },
+          {
+            protocol: 'http',
+            hostname: 'localhost',
+          },
+        ],
   },
   turbopack: {
     rules: {

@@ -197,6 +197,10 @@ export default async function AdminSettingsPage() {
     ? rawSettings.site_palette
     : 'ivory_ink';
 
+  const isEdgePurgeConfigured = Boolean(
+    process.env.CACHE_PURGE_ZONE_ID && process.env.CACHE_PURGE_API_TOKEN
+  );
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
@@ -230,6 +234,21 @@ export default async function AdminSettingsPage() {
         lastUpdatedBy={lastPaletteUpdatedBy}
         lastUpdatedAt={rawSettings?.site_palette_updated_at}
       />
+
+      {/* Cloudflare Edge Cache Purge Notice */}
+      {!isEdgePurgeConfigured && (
+        <div className="p-4 rounded-xl border border-warning-border bg-warning-soft text-warning-text flex items-start gap-3 text-xs">
+          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-warning-text" />
+          <div className="space-y-1">
+            <p className="font-semibold text-warning-text">
+              Edge Cache Invalidation: Operating in TTL-only mode
+            </p>
+            <p className="text-warning-text/90">
+              Instant Cloudflare CDN purge is unconfigured (<code className="bg-warning-soft px-1 rounded border border-warning-border">CACHE_PURGE_ZONE_ID</code> and <code className="bg-warning-soft px-1 rounded border border-warning-border">CACHE_PURGE_API_TOKEN</code> runtime secrets are missing). Palette switches and novel publishing will update the database and worker cache immediately, but external CDN edge nodes will revalidate via standard 2-minute TTL.
+            </p>
+          </div>
+        </div>
+      )}
 
       <PlatformSettingsForm initialSettings={currentSettings} />
 

@@ -1650,8 +1650,44 @@ export interface Database {
         Update: Partial<TipRow>;
         Relationships: [];
       };
+      api_rate_limits: {
+        Row: {
+          identifier: string;
+          window_start: string;
+          call_count: number;
+        };
+        Insert: {
+          identifier: string;
+          window_start?: string;
+          call_count?: number;
+        };
+        Update: {
+          identifier?: string;
+          window_start?: string;
+          call_count?: number;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_identifier: string;
+          p_max_requests?: number;
+          p_window_seconds?: number;
+        };
+        Returns: {
+          allowed: boolean;
+          remaining: number;
+          reset_at: string;
+        };
+      };
+      reset_rate_limit: {
+        Args: {
+          p_identifier: string;
+        };
+        Returns: boolean;
+      };
       is_admin: {
         Args: Record<string, never>;
         Returns: boolean;

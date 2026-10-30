@@ -1,5 +1,3 @@
-import imageCompression from 'browser-image-compression';
-
 export type UploadPreset = 'avatar' | 'cover' | 'payment-screenshot';
 
 export interface CompressionOptions {
@@ -110,6 +108,8 @@ export async function compressImage(
 
   let compressedFile: File;
   try {
+    const imageCompressionModule = await import('browser-image-compression');
+    const imageCompression = imageCompressionModule.default || imageCompressionModule;
     const compressedBlob = await imageCompression(file, options);
     // Ensure WebP extension & name
     const newName = file.name.replace(/\.[^/.]+$/, '') + '.webp';
