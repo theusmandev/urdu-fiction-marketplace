@@ -22,9 +22,9 @@ export interface BrandLogoProps {
    * Primary dimension in pixels (width or diameter depending on variant).
    * Defaults:
    * - "full": 96px width (103px height)
-   * - "roundel": 96px diameter
+   * - "roundel": 96px diameter (fallback to mark)
    * - "lockup": 82px-115px responsive width (composed typography lockup)
-   * - "mark": 36px diameter
+   * - "mark": 40px diameter
    * - "wordmark": 40px height (~105px width)
    * - "tag": 20px height (~145px width)
    */
@@ -68,7 +68,6 @@ export interface BrandLogoProps {
  * Official UNB Premium Vector Brand Mark component.
  * Sourced directly from public/brand vector SVGs:
  * - logo-full.svg (viewBox 0 0 1250 1345)
- * - logo-roundel.svg (viewBox 25 25 1200 1200)
  * - logo-mark.svg (viewBox 25 25 1200 1200)
  * - logo-wordmark.svg (viewBox 150 632 950 362)
  * - tag-premium.svg (viewBox 95 1172 1060 146)
@@ -87,12 +86,12 @@ export function BrandLogo({
   // Variant: "mark" (quill + book inside circle ring, with optional plate)
   // ---------------------------------------------------------------------------
   if (variant === 'mark') {
-    const s = userWidth ?? userSize ?? 36;
+    const s = userWidth ?? userSize ?? 40;
     const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
 
     return (
       <div
-        className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+        className={`relative inline-flex items-center justify-center shrink-0 select-none outline-none focus:outline-none print:grayscale print:contrast-125 ${className}`}
         style={{ width: s, height: s }}
       >
         {plate && (
@@ -116,15 +115,15 @@ export function BrandLogo({
   }
 
   // ---------------------------------------------------------------------------
-  // Variant: "roundel" (complete circle without ribbon)
+  // Variant: "roundel" (legacy alias to mark)
   // ---------------------------------------------------------------------------
   if (variant === 'roundel') {
-    const s = userWidth ?? userSize ?? 96;
+    const s = userWidth ?? userSize ?? 48;
     const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
 
     return (
       <div
-        className={`relative inline-flex items-center justify-center shrink-0 select-none print:grayscale print:contrast-125 ${className}`}
+        className={`relative inline-flex items-center justify-center shrink-0 select-none outline-none focus:outline-none print:grayscale print:contrast-125 ${className}`}
         style={{ width: s, height: s }}
       >
         {plate && (
@@ -134,7 +133,7 @@ export function BrandLogo({
           />
         )}
         <Image
-          src="/brand/logo-roundel.svg"
+          src="/brand/logo-mark.svg"
           alt={resolvedAlt}
           width={s}
           height={s}
@@ -209,10 +208,12 @@ export function BrandLogo({
   if (variant === 'lockup') {
     const explicitWidth = userWidth ?? (userSize && userSize >= 70 ? userSize : undefined);
     const resolvedAlt = userAlt !== undefined ? userAlt : siteConfig.brandName;
+    const hasCustomWidth = className.includes('w-') || explicitWidth !== undefined;
+    const widthClasses = hasCustomWidth ? '' : 'w-[82px] sm:w-[115px]';
 
     return (
       <div
-        className={`relative inline-flex flex-col items-center justify-center shrink-0 select-none outline-none focus:outline-none print:grayscale print:contrast-125 w-[82px] sm:w-[115px] gap-0.5 sm:gap-1 ${className}`}
+        className={`relative inline-flex flex-col items-center justify-center shrink-0 select-none outline-none focus:outline-none print:grayscale print:contrast-125 ${widthClasses} gap-0.5 sm:gap-1 ${className}`}
         style={explicitWidth ? { width: explicitWidth } : undefined}
       >
         {/* Top: Urdu Calligraphy Wordmark (950 x 362) - proportionally frames inside tag */}

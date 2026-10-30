@@ -84,7 +84,7 @@ export default function DevThemeShowcasePage() {
                   variant=&quot;mark&quot; on Dark Bar
                 </span>
                 <div className="flex items-center gap-3 p-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/20">
-                  <BrandLogo variant="mark" size={36} plate />
+                  <BrandLogo variant="mark" size={40} plate />
                   <div className="text-left">
                     <span className="block font-serif text-sm font-bold text-white leading-none">
                       Writer Studio

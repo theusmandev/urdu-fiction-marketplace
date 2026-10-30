@@ -4,22 +4,24 @@
  *
  * UNB Premium — Vector Brand Assets & Raster Generator
  *
- * Sourced from: public/brand/source/logo-source.svg (original master vector artwork).
- * Generates:
- *   1. Optimized SVGs (SVGO with prefixIds):
- *      - logo-full.svg (complete roundel + ribbon)
- *      - logo-roundel.svg (roundel without ribbon)
- *      - logo-mark.svg (quill + book inside circle ring)
+ * Sourced strictly from: public/brand/source/logo-source.svg (canonical master vector artwork).
+ *
+ * Generates ONLY the required production assets:
+ *   1. Vector SVGs (in public/brand/):
+ *      - logo-full.svg (complete roundel + ribbon, for footer, auth, about)
+ *      - logo-mark.svg (re-centered, 1.75x zoomed high-contrast quill + book medallion)
  *      - logo-wordmark.svg (Urdu calligraphy + ink swoosh + diamond)
- *      - tag-premium.svg (flat ribbon without gloss or shadow, 18-22px height)
- *      - tag-premium-full.svg (full gloss + drop shadow ribbon)
- *   2. Rasters (sharp):
- *      - 1x, 2x, 3x PNGs for each variant
- *      - favicon.ico (16, 32, 48 multi-size) from logo-mark
- *      - apple-touch-icon.png (180x180, cream background, safe padding)
- *      - icon-192.png & icon-512.png (PWA maskable icons)
- *      - og-image.png & og-image.jpg (1200x630 Open Graph card)
- *      - logo-email.png (high-DPI PNG for email clients)
+ *      - tag-premium.svg (flat "PREMIUM" ribbon tag for header lockups)
+ *   2. Production Rasters:
+ *      - public/brand/logo-email.png (280x301 @ 2x for email clients)
+ *      - public/brand/og-image.png (1200x630 OpenGraph social share card)
+ *      - public/og-image.jpg (1200x630 JPEG fallback)
+ *      - public/favicon.ico & src/app/favicon.ico (16, 32, 48 multi-size from high-contrast logo-mark)
+ *      - public/apple-touch-icon.png (180x180 from logo-mark on #fff7ec)
+ *      - public/icon-192.png & public/icon-512.png (PWA maskable icons on #fff7ec)
+ *
+ * Automatically deletes all unused/duplicate files in public/brand/ and never creates
+ * @2x/@3x PNG bloat.
  */
 
 import fs from 'node:fs';
@@ -38,19 +40,18 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const SOURCE_SVG_PATH = path.join(SOURCE_DIR, 'logo-source.svg');
 
 if (!fs.existsSync(SOURCE_SVG_PATH)) {
-  // If not in source/, check directly in public/brand/
   const fallback = path.join(BRAND_DIR, 'logo-source.svg');
   if (fs.existsSync(fallback)) {
     fs.mkdirSync(SOURCE_DIR, { recursive: true });
     fs.copyFileSync(fallback, SOURCE_SVG_PATH);
   } else {
-    console.error(`❌ Source SVG not found at ${SOURCE_SVG_PATH}`);
+    console.error(`❌ Master source SVG not found at ${SOURCE_SVG_PATH}`);
     process.exit(1);
   }
 }
 
 // -----------------------------------------------------------------------------
-// Helper: ICO Builder
+// Helper: Multi-Size ICO Builder (16, 32, 48)
 // -----------------------------------------------------------------------------
 function createIco(images) {
   const count = images.length;
@@ -101,10 +102,9 @@ function optimizeSvg(svgString, prefix) {
 }
 
 // -----------------------------------------------------------------------------
-// Source SVG Deconstruction Components
-// Sourced strictly from public/brand/source/logo-source.svg groups.
+// Source SVG Deconstruction Definitions
 // -----------------------------------------------------------------------------
-const DEFS_RAW = `
+const DEFS_SHARED = `
   <defs>
     <radialGradient id="paper" cx="50%" cy="40%" r="75%">
       <stop offset="0" stop-color="#fff7ec"/>
@@ -161,6 +161,35 @@ const DEFS_RAW = `
   </defs>
 `;
 
+// High-contrast, deeper gradients for the zoomed logo-mark and favicons
+const DEFS_MARK_HIGH_CONTRAST = `
+  <defs>
+    <radialGradient id="paper" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#fff7ec"/>
+      <stop offset="0.65" stop-color="#fdf0e1"/>
+      <stop offset="1" stop-color="#f8e3cb"/>
+    </radialGradient>
+    <linearGradient id="ring" gradientUnits="userSpaceOnUse" x1="120" y1="80" x2="1130" y2="1170">
+      <stop offset="0" stop-color="#9b4c08"/>
+      <stop offset="0.5" stop-color="#7a3404"/>
+      <stop offset="1" stop-color="#511e02"/>
+    </linearGradient>
+    <linearGradient id="feather" gradientUnits="userSpaceOnUse" x1="815" y1="136" x2="600" y2="460">
+      <stop offset="0" stop-color="#b85f10"/>
+      <stop offset="0.45" stop-color="#7e3603"/>
+      <stop offset="1" stop-color="#461601"/>
+    </linearGradient>
+    <linearGradient id="book" gradientUnits="userSpaceOnUse" x1="0" y1="490" x2="0" y2="644">
+      <stop offset="0" stop-color="#aa5209"/>
+      <stop offset="0.55" stop-color="#732f02"/>
+      <stop offset="1" stop-color="#3d1200"/>
+    </linearGradient>
+    <clipPath id="mark-clip">
+      <circle cx="625" cy="625" r="570"/>
+    </clipPath>
+  </defs>
+`;
+
 const ROUNDEL_CIRCLES = `
   <g id="group-roundel-circles">
     <circle cx="625" cy="625" r="588" fill="url(#paper)"/>
@@ -169,12 +198,9 @@ const ROUNDEL_CIRCLES = `
   </g>
 `;
 
-const QUILL_BOOK_GROUP = `
-  <g id="group-quill-book" transform="translate(18.5 0)">
-    <g id="group-feather" fill="url(#feather)"><path fill-rule="evenodd" d="M619.7 444.4C618.1 443.8 616.6 443.2 615.2 442.5C618 428.4 622.8 414.2 627.5 400.5C644.9 350.5 666.8 302.2 696.1 257.9C705.2 244.3 714.8 231.1 724.9 218.2C729.2 212.8 733.9 207.4 738.4 202.2C739.6 200.8 744.2 197.1 744.5 195.6C744.5 195.4 744 195.3 744.1 195.1C728.8 207.4 714.7 225.4 702.6 240.9C676.8 274.3 656.7 311.2 639.5 349.5C635.1 359.4 630.3 369.5 626.9 379.9C623.5 390.3 618.9 400.4 615.9 410.9C613.2 420.4 610.7 430.3 607.4 439.5C606.7 439 605.4 439.4 604.8 438.3C604.3 437.4 606 431 606.2 429.5C606.7 424.6 605.8 419.4 604.7 414.7C602.7 406.6 599.7 398.8 597.9 390.7C593.3 370.1 594 350.6 601.3 330.8C603.3 339.4 605.3 348 608.6 356.4C609.2 357.9 611.2 363.7 612.4 364.5C612.7 364.6 613.1 364.3 613.3 364.6C612.3 357 610.6 349.5 609.7 341.9C606.9 316.4 615 291.2 628.4 269.7C630.4 266.7 640.6 250.5 642.9 249.4C643.1 249.3 643.4 249.6 643.5 249.5C640.4 262 638.9 283.9 644.5 295.4C645.9 281.5 645.7 267.7 650.1 254.1C660.4 222.1 684.7 196.6 713.5 179.9C707.7 189.2 701.6 199.3 699.8 210.2C702.4 206.2 704.8 201.7 707.3 197.5C712.2 189.2 719 181.9 725.9 175.4C747.9 154.8 792.6 137.4 822.4 136C810.4 148.2 800.7 161.5 792.3 176.6C784.2 191.3 778.7 206.9 768.4 220.4C755.5 237.1 740.7 246.6 722.4 256.1C728.4 256.2 716 257.6 723.9 256.7C740 254.9 756.5 243.7 768.3 233.4C762.4 263.9 746.5 292.9 722.1 312.7C714.5 318.8 706.3 324 697.7 328.3C693.6 330.4 689.1 332.1 685.3 334.2C699.9 333.8 715.6 326.1 727.5 317.8C730.8 315.6 734.1 313.1 737 310.5C737.8 309.7 738.7 307.9 739.7 307.6C740 307.5 740.3 307.8 740.6 307.6C731.7 336 719.8 358.5 693.7 374.8C682.5 381.8 672.7 384.3 661.1 389.4C674.9 391 689.7 385.3 701.8 378.8C693.9 393 679.2 404 664.4 410.4C661.3 411.8 646.4 415.3 646.2 415.6C646 415.8 646.3 416.2 646 416.4C655.1 417.3 664 417.3 672.7 414.6C672.5 414.8 672.9 415.2 672.8 415.4C671.3 418.5 659 423.9 655.6 425.3C639.3 431.7 631.7 427.8 619.7 444.4ZM599.7 444.3C600.3 442.8 599.6 440.8 602 440.4C604.2 440 621 447.5 621.9 449.3C622.7 451 621.4 451.6 621.2 453C615.3 453 625.4 454.1 619.3 453.6C617.8 453.4 602.5 446.8 600.9 445.8C595.5 442.1 604.6 448.2 599.7 444.3ZM598.7 449.5C603.2 450.1 596 447.8 600.6 449.3C603.3 450.1 617.9 455.4 619.5 456.6C648.1 479.1 592.5 435.6 620.6 458.2C620 459.8 620.5 461.4 618.3 462.3C615.8 463.4 599.2 457.4 597.8 455C596.4 452.7 597.9 451.4 598.7 449.5ZM586.7 555.6C586.6 555.3 586 555.4 585.9 555.2C585.5 554.6 585.8 546.5 585.8 545.2C585.7 535.8 586.1 526.6 585.5 517.2C585.2 512.9 584.5 508.5 583.7 504.3C583.2 502.3 582 499.5 582.2 497.5C582.2 496.4 588.3 487.4 589.3 485.5C593.8 477.4 597.1 468.4 599.8 459.6C600.1 459.7 600.4 459.4 600.7 459.5C602.7 460 604.8 462.1 606.5 463.1C607.2 463.5 607.8 463 608.5 463C610.2 463.2 612.4 464.4 614.1 464.9C614 473.7 612.5 482.7 613.1 491.7C613.2 494.3 615.3 505.2 614.9 506.6C614.9 506.7 604.2 520.4 602.9 522.5C596.2 533 592 544.5 586.7 555.6ZM588.1 546.3C591.2 537 593.5 527.1 595.8 517.4C596.7 513.3 597.3 508.8 598.8 504.8C599.8 502.3 603.1 501.9 603.7 498.7C604.2 495.9 601.4 494.7 601.4 492.4C601.5 489.6 604.4 475.8 605.3 472.7C605.6 471.9 606.9 465.3 606.7 464.9C606.5 464.6 605.9 464.8 605.9 464.5C603.9 469.8 602.1 475.9 600.9 481.6C600.2 484.7 599.7 488.5 598.6 491.4C597.6 493.7 594.2 493.4 593.6 497.2C593.2 499.6 594.9 500.7 595.2 502.8C595.5 505.3 593.1 514.6 592.5 517.6C590.7 526.7 588.4 535.9 587.2 545.1C586.5 551.5 587.7 541.9 588.1 546.3Z"/></g>
-    <g id="group-book" fill="url(#book)"><path fill-rule="evenodd" d="M597.3 617.6C590.9 610.5 585 602.8 578.1 595.9C536.1 554.2 483.3 525.3 424.6 515.8C409.7 513.4 394.6 513.3 379.7 514.1C375.2 514.3 370.5 515.5 366.4 515.6C374 512.1 382.1 509.8 390.2 508C453.3 493.6 521.2 526.6 564 571.8C575.4 583.8 590.4 602.8 597.3 617.6ZM614.7 618C618.2 610 623.6 602.4 628.6 595.1C659.8 549.2 711.4 515.1 767.1 508.9C790.2 506.3 821.7 507.7 842.1 519.6C828.2 518 814.5 516.6 800.4 517C750 518.7 697.3 541.7 658.4 573C648.1 581.4 638 590.4 629.2 600.4C624.2 606.1 619.7 612.5 614.7 618ZM586.7 619.7C580.2 615.2 574.4 609.5 567.9 604.9C555.9 596.5 542.8 589.6 529.8 583C518.3 577.2 505.8 572.4 493.6 568.6C434.3 550.3 384 548.7 324.3 565.6C328.3 562.1 333.5 559.7 338.5 557.3C357.5 548.3 377.7 544.8 398.6 543.5C458.2 539.6 521.6 563.4 566.8 601.7C573.6 607.5 580.8 613.1 586.7 619.7ZM626.3 619.4C635 607.8 650 597.3 662 588.6C705.7 556.9 762.1 541.3 815.8 544.6C837.1 545.8 872.8 553.3 888.7 567.5C835.8 551.1 776.2 550 723.2 567.1C713.3 570.3 703.8 574.1 694.1 577.7C677.5 583.9 661 592.9 646.5 603.1C639.4 608 633 613.8 626.3 619.4ZM592.3 638.7C575.1 630.2 558.4 620.2 540.1 613.9C494.3 597.9 450.3 590.1 401.6 591.5C377.9 592.2 354.4 595.3 331 598.9C321.4 600.3 311.9 602.3 302.4 603.8C300.5 604.1 295.1 605.9 293.6 605.7C293.3 605.6 293.2 605.1 293 605.2C315.9 589.2 343.2 581.7 370.5 577.6C436.3 567.8 507.5 579 563.6 615.7C573.7 622.3 584.2 629.8 592.3 638.7ZM620.4 638.2C676 585.4 760 569.5 834.2 578.4C863.3 581.8 898.7 590 921.9 608.6C905.1 605.7 888 602 871 599.2C820.7 590.9 756.4 590.1 707 604C689 609.1 671.4 614.7 654.1 621.9C648.9 624.1 643.6 626.5 638.6 629C632.5 632 626.4 636 620.4 638.2Z"/></g>
-  </g>
-`;
+const FEATHER_PATH = `M619.7 444.4C618.1 443.8 616.6 443.2 615.2 442.5C618 428.4 622.8 414.2 627.5 400.5C644.9 350.5 666.8 302.2 696.1 257.9C705.2 244.3 714.8 231.1 724.9 218.2C729.2 212.8 733.9 207.4 738.4 202.2C739.6 200.8 744.2 197.1 744.5 195.6C744.5 195.4 744 195.3 744.1 195.1C728.8 207.4 714.7 225.4 702.6 240.9C676.8 274.3 656.7 311.2 639.5 349.5C635.1 359.4 630.3 369.5 626.9 379.9C623.5 390.3 618.9 400.4 615.9 410.9C613.2 420.4 610.7 430.3 607.4 439.5C606.7 439 605.4 439.4 604.8 438.3C604.3 437.4 606 431 606.2 429.5C606.7 424.6 605.8 419.4 604.7 414.7C602.7 406.6 599.7 398.8 597.9 390.7C593.3 370.1 594 350.6 601.3 330.8C603.3 339.4 605.3 348 608.6 356.4C609.2 357.9 611.2 363.7 612.4 364.5C612.7 364.6 613.1 364.3 613.3 364.6C612.3 357 610.6 349.5 609.7 341.9C606.9 316.4 615 291.2 628.4 269.7C630.4 266.7 640.6 250.5 642.9 249.4C643.1 249.3 643.4 249.6 643.5 249.5C640.4 262 638.9 283.9 644.5 295.4C645.9 281.5 645.7 267.7 650.1 254.1C660.4 222.1 684.7 196.6 713.5 179.9C707.7 189.2 701.6 199.3 699.8 210.2C702.4 206.2 704.8 201.7 707.3 197.5C712.2 189.2 719 181.9 725.9 175.4C747.9 154.8 792.6 137.4 822.4 136C810.4 148.2 800.7 161.5 792.3 176.6C784.2 191.3 778.7 206.9 768.4 220.4C755.5 237.1 740.7 246.6 722.4 256.1C728.4 256.2 716 257.6 723.9 256.7C740 254.9 756.5 243.7 768.3 233.4C762.4 263.9 746.5 292.9 722.1 312.7C714.5 318.8 706.3 324 697.7 328.3C693.6 330.4 689.1 332.1 685.3 334.2C699.9 333.8 715.6 326.1 727.5 317.8C730.8 315.6 734.1 313.1 737 310.5C737.8 309.7 738.7 307.9 739.7 307.6C740 307.5 740.3 307.8 740.6 307.6C731.7 336 719.8 358.5 693.7 374.8C682.5 381.8 672.7 384.3 661.1 389.4C674.9 391 689.7 385.3 701.8 378.8C693.9 393 679.2 404 664.4 410.4C661.3 411.8 646.4 415.3 646.2 415.6C646 415.8 646.3 416.2 646 416.4C655.1 417.3 664 417.3 672.7 414.6C672.5 414.8 672.9 415.2 672.8 415.4C671.3 418.5 659 423.9 655.6 425.3C639.3 431.7 631.7 427.8 619.7 444.4ZM599.7 444.3C600.3 442.8 599.6 440.8 602 440.4C604.2 440 621 447.5 621.9 449.3C622.7 451 621.4 451.6 621.2 453C615.3 453 625.4 454.1 619.3 453.6C617.8 453.4 602.5 446.8 600.9 445.8C595.5 442.1 604.6 448.2 599.7 444.3ZM598.7 449.5C603.2 450.1 596 447.8 600.6 449.3C603.3 450.1 617.9 455.4 619.5 456.6C648.1 479.1 592.5 435.6 620.6 458.2C620 459.8 620.5 461.4 618.3 462.3C615.8 463.4 599.2 457.4 597.8 455C596.4 452.7 597.9 451.4 598.7 449.5ZM586.7 555.6C586.6 555.3 586 555.4 585.9 555.2C585.5 554.6 585.8 546.5 585.8 545.2C585.7 535.8 586.1 526.6 585.5 517.2C585.2 512.9 584.5 508.5 583.7 504.3C583.2 502.3 582 499.5 582.2 497.5C582.2 496.4 588.3 487.4 589.3 485.5C593.8 477.4 597.1 468.4 599.8 459.6C600.1 459.7 600.4 459.4 600.7 459.5C602.7 460 604.8 462.1 606.5 463.1C607.2 463.5 607.8 463 608.5 463C610.2 463.2 612.4 464.4 614.1 464.9C614 473.7 612.5 482.7 613.1 491.7C613.2 494.3 615.3 505.2 614.9 506.6C614.9 506.7 604.2 520.4 602.9 522.5C596.2 533 592 544.5 586.7 555.6ZM588.1 546.3C591.2 537 593.5 527.1 595.8 517.4C596.7 513.3 597.3 508.8 598.8 504.8C599.8 502.3 603.1 501.9 603.7 498.7C604.2 495.9 601.4 494.7 601.4 492.4C601.5 489.6 604.4 475.8 605.3 472.7C605.6 471.9 606.9 465.3 606.7 464.9C606.5 464.6 605.9 464.8 605.9 464.5C603.9 469.8 602.1 475.9 600.9 481.6C600.2 484.7 599.7 488.5 598.6 491.4C597.6 493.7 594.2 493.4 593.6 497.2C593.2 499.6 594.9 500.7 595.2 502.8C595.5 505.3 593.1 514.6 592.5 517.6C590.7 526.7 588.4 535.9 587.2 545.1C586.5 551.5 587.7 541.9 588.1 546.3Z`;
+
+const BOOK_PATH = `M597.3 617.6C590.9 610.5 585 602.8 578.1 595.9C536.1 554.2 483.3 525.3 424.6 515.8C409.7 513.4 394.6 513.3 379.7 514.1C375.2 514.3 370.5 515.5 366.4 515.6C374 512.1 382.1 509.8 390.2 508C453.3 493.6 521.2 526.6 564 571.8C575.4 583.8 590.4 602.8 597.3 617.6ZM614.7 618C618.2 610 623.6 602.4 628.6 595.1C659.8 549.2 711.4 515.1 767.1 508.9C790.2 506.3 821.7 507.7 842.1 519.6C828.2 518 814.5 516.6 800.4 517C750 518.7 697.3 541.7 658.4 573C648.1 581.4 638 590.4 629.2 600.4C624.2 606.1 619.7 612.5 614.7 618ZM586.7 619.7C580.2 615.2 574.4 609.5 567.9 604.9C555.9 596.5 542.8 589.6 529.8 583C518.3 577.2 505.8 572.4 493.6 568.6C434.3 550.3 384 548.7 324.3 565.6C328.3 562.1 333.5 559.7 338.5 557.3C357.5 548.3 377.7 544.8 398.6 543.5C458.2 539.6 521.6 563.4 566.8 601.7C573.6 607.5 580.8 613.1 586.7 619.7ZM626.3 619.4C635 607.8 650 597.3 662 588.6C705.7 556.9 762.1 541.3 815.8 544.6C837.1 545.8 872.8 553.3 888.7 567.5C835.8 551.1 776.2 550 723.2 567.1C713.3 570.3 703.8 574.1 694.1 577.7C677.5 583.9 661 592.9 646.5 603.1C639.4 608 633 613.8 626.3 619.4ZM592.3 638.7C575.1 630.2 558.4 620.2 540.1 613.9C494.3 597.9 450.3 590.1 401.6 591.5C377.9 592.2 354.4 595.3 331 598.9C321.4 600.3 311.9 602.3 302.4 603.8C300.5 604.1 295.1 605.9 293.6 605.7C293.3 605.6 293.2 605.1 293 605.2C315.9 589.2 343.2 581.7 370.5 577.6C436.3 567.8 507.5 579 563.6 615.7C573.7 622.3 584.2 629.8 592.3 638.7ZM620.4 638.2C676 585.4 760 569.5 834.2 578.4C863.3 581.8 898.7 590 921.9 608.6C905.1 605.7 888 602 871 599.2C820.7 590.9 756.4 590.1 707 604C689 609.1 671.4 614.7 654.1 621.9C648.9 624.1 643.6 626.5 638.6 629C632.5 632 626.4 636 620.4 638.2Z`;
 
 const URDU_SWOOSH_GROUP = `
   <g id="group-urdu-swoosh" transform="translate(4.5 0)">
@@ -229,13 +255,16 @@ const RIBBON_FLAT = `
 // SVG Variant Templates
 // -----------------------------------------------------------------------------
 
-// 1. logo-full: complete artwork exactly as designed
+// 1. logo-full: complete vector emblem with roundel and ribbon (footer, auth, about)
 const SVG_LOGO_FULL = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1250 1345" role="img" aria-label="Urdu Novel Bank Premium">
-  ${DEFS_RAW}
+  ${DEFS_SHARED}
   ${ROUNDEL_CIRCLES}
   <g id="group-artwork" transform="translate(0 22)">
-    ${QUILL_BOOK_GROUP}
+    <g id="group-quill-book" transform="translate(18.5 0)">
+      <g id="group-feather" fill="url(#feather)"><path fill-rule="evenodd" d="${FEATHER_PATH}"/></g>
+      <g id="group-book" fill="url(#book)"><path fill-rule="evenodd" d="${BOOK_PATH}"/></g>
+    </g>
     ${URDU_SWOOSH_GROUP}
     ${ENGLISH_TEXT_PATH}
   </g>
@@ -243,55 +272,49 @@ const SVG_LOGO_FULL = `
 </svg>
 `.trim();
 
-// 2. logo-roundel: roundel alone without ribbon, tightened viewBox (square)
-const SVG_LOGO_ROUNDEL = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 25 1200 1200" role="img" aria-label="Urdu Novel Bank Roundel">
-  ${DEFS_RAW}
-  ${ROUNDEL_CIRCLES}
-  <g id="group-artwork" transform="translate(0 22)">
-    ${QUILL_BOOK_GROUP}
-    ${URDU_SWOOSH_GROUP}
-    ${ENGLISH_TEXT_PATH}
-  </g>
-</svg>
-`.trim();
-
-// 3. logo-mark: quill and book inside circle ring (no calligraphy, no text, no ribbon)
+// 2. logo-mark: bold, high-contrast, re-centered and 1.75x scaled quill + book medallion
 const SVG_LOGO_MARK = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="25 25 1200 1200" role="img" aria-label="Urdu Novel Bank Mark">
-  ${DEFS_RAW}
-  ${ROUNDEL_CIRCLES}
-  <g id="group-artwork" transform="translate(0 22)">
-    ${QUILL_BOOK_GROUP}
+  ${DEFS_MARK_HIGH_CONTRAST}
+  <circle cx="625" cy="625" r="588" fill="url(#paper)"/>
+  <circle cx="625" cy="625" r="588" fill="none" stroke="url(#ring)" stroke-width="28"/>
+  <circle cx="625" cy="625" r="558" fill="none" stroke="#7a3404" stroke-opacity="0.45" stroke-width="3"/>
+  <g clip-path="url(#mark-clip)">
+    <g id="group-quill-book" transform="translate(625 625) scale(1.75) translate(-625.95 -387.35)">
+      <g id="group-feather" transform="translate(18.5 0)" fill="url(#feather)"><path fill-rule="evenodd" d="${FEATHER_PATH}"/></g>
+      <g id="group-book" transform="translate(18.5 0)" fill="url(#book)"><path fill-rule="evenodd" d="${BOOK_PATH}"/></g>
+    </g>
   </g>
 </svg>
 `.trim();
 
-// 4. logo-wordmark: Urdu calligraphy + ink swoosh + diamond cropped to tight bounding box
+// 3. logo-wordmark: Urdu calligraphy + ink swoosh + diamond cropped to tight bounding box
 const SVG_LOGO_WORDMARK = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="150 632 950 362" role="img" aria-label="Urdu Novel Bank Calligraphy">
-  ${DEFS_RAW}
+  ${DEFS_SHARED}
   <g id="group-artwork" transform="translate(0 22)">
     ${URDU_SWOOSH_GROUP}
   </g>
 </svg>
 `.trim();
 
-// 5. tag-premium: flat ribbon alone (no gloss, no drop shadow) for 18-22px height lockup
+// 4. tag-premium: flat ribbon alone (no gloss, no drop shadow) for header lockup
 const SVG_TAG_PREMIUM = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="95 1172 1060 146" role="img" aria-label="Premium Tag">
-  ${DEFS_RAW}
+  ${DEFS_SHARED}
   ${RIBBON_FLAT}
 </svg>
 `.trim();
 
-// 6. tag-premium-full: full ribbon with original gloss and drop shadow for large uses
-const SVG_TAG_PREMIUM_FULL = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="80 1165 1090 175" role="img" aria-label="Premium Tag (Full)">
-  ${DEFS_RAW}
-  ${RIBBON_FULL}
-</svg>
-`.trim();
+// Allowed files in public/brand/ (strictly enforced)
+const ALLOWED_BRAND_FILES = new Set([
+  'logo-full.svg',
+  'logo-mark.svg',
+  'logo-wordmark.svg',
+  'tag-premium.svg',
+  'logo-email.png',
+  'og-image.png',
+]);
 
 // -----------------------------------------------------------------------------
 // Main Build Task
@@ -299,17 +322,27 @@ const SVG_TAG_PREMIUM_FULL = `
 async function buildBrandAssets() {
   console.log('🎨 UNB Premium — Building Vector Brand Assets & Rasters ...\n');
 
-  // --- Step 1: Optimize & Write SVG Variants ---
-  const variants = [
+  // --- Step 1: Clean Up Duplicate Master in public/brand/ & Legacy Circle in source/ ---
+  const dupMaster = path.join(BRAND_DIR, 'logo-source.svg');
+  if (fs.existsSync(dupMaster)) {
+    fs.unlinkSync(dupMaster);
+    console.log('  🗑 Deleted duplicate public/brand/logo-source.svg (kept source/logo-source.svg)');
+  }
+  const legacyCircle = path.join(SOURCE_DIR, 'legacy-logo-circle.png');
+  if (fs.existsSync(legacyCircle)) {
+    fs.unlinkSync(legacyCircle);
+    console.log('  🗑 Cleaned up legacy raster in source/: legacy-logo-circle.png');
+  }
+
+  // --- Step 2: Optimize & Write Canonical SVG Variants ---
+  const svgVariants = [
     { name: 'logo-full.svg', svg: SVG_LOGO_FULL, prefix: 'lf' },
-    { name: 'logo-roundel.svg', svg: SVG_LOGO_ROUNDEL, prefix: 'lr' },
     { name: 'logo-mark.svg', svg: SVG_LOGO_MARK, prefix: 'lm' },
     { name: 'logo-wordmark.svg', svg: SVG_LOGO_WORDMARK, prefix: 'lw' },
     { name: 'tag-premium.svg', svg: SVG_TAG_PREMIUM, prefix: 'tp' },
-    { name: 'tag-premium-full.svg', svg: SVG_TAG_PREMIUM_FULL, prefix: 'tpf' },
   ];
 
-  for (const v of variants) {
+  for (const v of svgVariants) {
     const opt = optimizeSvg(v.svg, v.prefix);
     const dest = path.join(BRAND_DIR, v.name);
     fs.writeFileSync(dest, opt, 'utf8');
@@ -317,32 +350,10 @@ async function buildBrandAssets() {
     console.log(`  ✓ Generated ${v.name} (${bytes} B, prefix: ${v.prefix})`);
   }
 
-  // --- Step 2: Multi-Resolution PNGs for Variants (1x, 2x, 3x) ---
-  const pngOutputs = [
-    { svg: SVG_LOGO_FULL, base: 'logo-full', w: 96, h: 103 },
-    { svg: SVG_LOGO_ROUNDEL, base: 'logo-roundel', w: 96, h: 96 },
-    { svg: SVG_LOGO_MARK, base: 'logo-mark', w: 48, h: 48 },
-    { svg: SVG_LOGO_WORDMARK, base: 'logo-wordmark', w: 130, h: 50 },
-    { svg: SVG_TAG_PREMIUM, base: 'tag-premium', w: 145, h: 20 },
-  ];
+  // --- Step 3: High-Contrast Favicon Suite (from centered logo-mark.svg) ---
+  const markOptSvg = fs.readFileSync(path.join(BRAND_DIR, 'logo-mark.svg'), 'utf8');
+  const markBuf = Buffer.from(markOptSvg);
 
-  for (const p of pngOutputs) {
-    const buf = Buffer.from(p.svg);
-    for (const scale of [1, 2, 3]) {
-      const w = p.w * scale;
-      const h = p.h * scale;
-      const suffix = scale === 1 ? '' : `@${scale}x`;
-      const outFile = path.join(BRAND_DIR, `${p.base}${suffix}.png`);
-      await sharp(buf, { density: 300 })
-        .resize(w, h, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: sharp.kernel.lanczos3 })
-        .png({ quality: 100, compressionLevel: 9 })
-        .toFile(outFile);
-    }
-    console.log(`  ✓ Generated PNG 1x/2x/3x for ${p.base}`);
-  }
-
-  // --- Step 3: Favicon Suite (from logo-mark.svg) ---
-  const markBuf = Buffer.from(SVG_LOGO_MARK);
   const fav16 = await sharp(markBuf, { density: 300 })
     .resize(16, 16, { kernel: sharp.kernel.lanczos3 })
     .png({ quality: 100 })
@@ -363,17 +374,13 @@ async function buildBrandAssets() {
   ]);
 
   fs.writeFileSync(path.join(PUBLIC_DIR, 'favicon.ico'), icoBuffer);
-  fs.writeFileSync(path.join(BRAND_DIR, 'logo-mark-16.png'), fav16);
-  fs.writeFileSync(path.join(BRAND_DIR, 'logo-mark-32.png'), fav32);
-  fs.writeFileSync(path.join(BRAND_DIR, 'logo-mark-48.png'), fav48);
   if (fs.existsSync(path.join(ROOT, 'src', 'app', 'favicon.ico'))) {
     fs.writeFileSync(path.join(ROOT, 'src', 'app', 'favicon.ico'), icoBuffer);
   }
-  console.log('  ✓ Generated favicon.ico & logo-mark-(16,32,48).png');
+  console.log('  ✓ Generated multi-size favicon.ico (16, 32, 48) for public/ and src/app/');
 
-  // --- Step 4: Apple Touch Icon (180x180) & PWA Icons (192, 512) ---
-  const roundelBuf = Buffer.from(SVG_LOGO_ROUNDEL);
-  const appleTouchCircle = await sharp(roundelBuf, { density: 300 })
+  // --- Step 4: Apple Touch Icon & PWA Icons (from high-contrast logo-mark) ---
+  const appleTouchCircle = await sharp(markBuf, { density: 300 })
     .resize(156, 156, { kernel: sharp.kernel.lanczos3 })
     .png()
     .toBuffer();
@@ -386,7 +393,7 @@ async function buildBrandAssets() {
     .toFile(path.join(PUBLIC_DIR, 'apple-touch-icon.png'));
   console.log('  ✓ Generated apple-touch-icon.png (180x180)');
 
-  const pwa192Circle = await sharp(roundelBuf, { density: 300 })
+  const pwa192Circle = await sharp(markBuf, { density: 300 })
     .resize(152, 152, { kernel: sharp.kernel.lanczos3 })
     .png()
     .toBuffer();
@@ -399,7 +406,7 @@ async function buildBrandAssets() {
     .toFile(path.join(PUBLIC_DIR, 'icon-192.png'));
   console.log('  ✓ Generated icon-192.png (192x192 maskable)');
 
-  const pwa512Circle = await sharp(roundelBuf, { density: 300 })
+  const pwa512Circle = await sharp(markBuf, { density: 300 })
     .resize(410, 410, { kernel: sharp.kernel.lanczos3 })
     .png()
     .toBuffer();
@@ -413,14 +420,15 @@ async function buildBrandAssets() {
   console.log('  ✓ Generated icon-512.png (512x512 maskable)');
 
   // --- Step 5: Email Logo (logo-email.png @ 2x: 280x301 for 140x151 display) ---
-  const fullBuf = Buffer.from(SVG_LOGO_FULL);
+  const fullOptSvg = fs.readFileSync(path.join(BRAND_DIR, 'logo-full.svg'), 'utf8');
+  const fullBuf = Buffer.from(fullOptSvg);
   await sharp(fullBuf, { density: 300 })
     .resize(280, 301, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: sharp.kernel.lanczos3 })
     .png({ quality: 100, compressionLevel: 9 })
     .toFile(path.join(BRAND_DIR, 'logo-email.png'));
   console.log('  ✓ Generated logo-email.png (280x301 @ 2x)');
 
-  // --- Step 6: Open Graph Image (1200x630) ---
+  // --- Step 6: Open Graph Card (1200x630) ---
   const ogW = 1200;
   const ogH = 630;
   const ogLogoH = 340;
@@ -483,30 +491,24 @@ async function buildBrandAssets() {
     .png({ quality: 95 })
     .toFile(path.join(BRAND_DIR, 'og-image.png'));
 
-  // Also write to public/og-image.jpg for backward compatibility
+  // Also write to public/og-image.jpg
   await sharp(path.join(BRAND_DIR, 'og-image.png'))
     .jpeg({ quality: 90 })
     .toFile(path.join(PUBLIC_DIR, 'og-image.jpg'));
 
   console.log('  ✓ Generated og-image.png & og-image.jpg (1200x630)');
 
-  // --- Step 7: Clean up old legacy circle rasters if present ---
-  const legacyCircleFiles = fs.readdirSync(BRAND_DIR).filter((f) => f.startsWith('logo-circle-'));
-  for (const f of legacyCircleFiles) {
-    fs.unlinkSync(path.join(BRAND_DIR, f));
-    console.log(`  🗑 Cleaned up legacy raster: ${f}`);
-  }
-  if (fs.existsSync(path.join(BRAND_DIR, 'logo-circle.png'))) {
-    // Move legacy raster source to source/ if not already backed up
-    const dest = path.join(SOURCE_DIR, 'legacy-logo-circle.png');
-    if (!fs.existsSync(dest)) {
-      fs.renameSync(path.join(BRAND_DIR, 'logo-circle.png'), dest);
-    } else {
-      fs.unlinkSync(path.join(BRAND_DIR, 'logo-circle.png'));
+  // --- Step 7: Delete All Unused Bloat in public/brand/ ---
+  const existingFiles = fs.readdirSync(BRAND_DIR);
+  for (const file of existingFiles) {
+    if (file === 'source') continue; // keep source/ folder
+    if (!ALLOWED_BRAND_FILES.has(file)) {
+      fs.unlinkSync(path.join(BRAND_DIR, file));
+      console.log(`  🗑 Deleted unused file: ${file}`);
     }
   }
 
-  console.log('\n✅ All vector brand assets and rasters built successfully!');
+  console.log('\n✅ Minimal brand assets and rasters built cleanly (zero bloat)!');
 }
 
 buildBrandAssets().catch((err) => {

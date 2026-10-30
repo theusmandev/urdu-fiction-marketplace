@@ -29,11 +29,9 @@ All variants are extracted directly from the semantic groups of `logo-source.svg
 | Variant File | Dimensions / ViewBox | Groups Included | Usage & Placement |
 | :--- | :--- | :--- | :--- |
 | **`logo-full.svg`** | `0 0 1250 1345` | Complete roundel + ribbon + ornaments + "PREMIUM" | About page, Auth pages (Login, Register, Forgot/Reset Password), Footer, Error/404 pages |
-| **`logo-roundel.svg`** | `25 25 1200 1200` (1:1 square) | Roundel alone (circle, quill, book, Urdu calligraphy, ink swoosh, English text; no ribbon) | Circular profile avatars, standalone brand badges, invoice print views |
-| **`logo-mark.svg`** | `25 25 1200 1200` (1:1 square) | Quill pen and open book inside the gold ring | Favicon.ico (16/32/48), tiny avatars, Writer Studio shell, Admin shell top bar |
+| **`logo-mark.svg`** | `25 25 1200 1200` (1:1 square) | Re-centered, 1.75x zoomed quill pen & open book inside high-contrast gold ring | Favicon.ico (16/32/48), Apple Touch icon, PWA icons, compact medallion badges |
 | **`logo-wordmark.svg`** | `150 632 950 362` (~2.62:1 ratio) | Urdu calligraphy (*اردو ناول بینک*) + ink swoosh underline + diamond | Marketplace header lockup (desktop & mobile), landing hero accents |
 | **`tag-premium.svg`** | `95 1172 1060 146` (~7.26:1 ratio) | Flat ribbon (gold edge, brown band, inner rule, ornaments, "PREMIUM" text; no gloss or shadow) | Header lockup (scaled to 14-22px height), compact product badges |
-| **`tag-premium-full.svg`** | `80 1165 1090 175` | Full ribbon with original gloss gradient and drop shadow | Large standalone ribbon displays, marketing hero graphics |
 
 ---
 
@@ -44,18 +42,17 @@ Located at: [`src/components/brand/BrandLogo.tsx`](file:///e:/git-workstation/ur
 ### Supported Variants
 
 1. **`variant="full"`**: Complete artwork (roundel + ribbon). Renders `/brand/logo-full.svg`.
-2. **`variant="roundel"`**: 1:1 circular badge without ribbon. Renders `/brand/logo-roundel.svg`.
-3. **`variant="mark"`**: Simplified quill + book inside ring. Renders `/brand/logo-mark.svg`. Supports `plate` prop for dark bars.
-4. **`variant="wordmark"`**: Urdu calligraphy vector cropped to its bounding box. Renders `/brand/logo-wordmark.svg`.
-5. **`variant="tag"`**: Flat "PREMIUM" ribbon tag. Renders `/brand/tag-premium.svg`.
-6. **`variant="lockup"`**: Composed header identity (typography-only):
+2. **`variant="mark"`**: Centered, 1.75x zoomed quill + book inside ring. Renders `/brand/logo-mark.svg`. Supports `plate` prop for dark bars.
+3. **`variant="wordmark"`**: Urdu calligraphy vector cropped to its bounding box. Renders `/brand/logo-wordmark.svg`.
+4. **`variant="tag"`**: Flat "PREMIUM" ribbon tag. Renders `/brand/tag-premium.svg`.
+5. **`variant="lockup"`**: Composed header identity (typography-only):
    - Vertical stack: Urdu calligraphy (`logo-wordmark.svg`) on top, flat "PREMIUM" tag (`tag-premium.svg`) on bottom.
-   - Responsive width: `w-[82px]` on mobile, `w-[115px]` on desktop.
+   - Responsive width: `w-[82px]` on mobile, `w-[115px]` on desktop (or customizable via `className`, e.g. `w-[78px] md:w-[92px]` in Writer Studio & Admin top bars).
    - Visible across all screen sizes (no circular mark, no `<360px` hiding).
 
 ### Properties
 
-- `variant`: `'full' | 'roundel' | 'lockup' | 'mark' | 'wordmark' | 'tag'` (default: `'full'`)
+- `variant`: `'full' | 'lockup' | 'mark' | 'wordmark' | 'tag' | 'roundel'` (default: `'full'`)
 - `size`: Primary dimension in pixels (width or diameter).
 - `width` / `height`: Explicit override dimensions in pixels.
 - `priority`: boolean (used on the sticky marketplace header for instant above-the-fold render).
@@ -77,7 +74,6 @@ Generated automatically by `scripts/build-brand-assets.mjs` via Sharp with `lanc
 | `public/brand/logo-email.png` | 280x301 (@ 2x) | High-DPI PNG for email clients (displays at 140x151 in HTML emails). |
 | `public/brand/og-image.png` | 1200x630 | Open Graph card composed with `logo-full` on ivory site background. |
 | `public/og-image.jpg` | 1200x630 | JPEG fallback for social sharing preview crawlers. |
-| `public/brand/*@2x.png`, `*@3x.png` | Multi-DPI PNGs | High-resolution raster fallbacks for `logo-full`, `logo-roundel`, `logo-mark`, `logo-wordmark`, and `tag-premium`. |
 
 ---
 

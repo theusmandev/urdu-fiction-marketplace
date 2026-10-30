@@ -183,24 +183,6 @@ export function DevBrandClient() {
           </div>
         </div>
 
-        {/* 2. Logo Roundel (Circle alone) */}
-        <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-4">
-          <div className="border-b border-border pb-2 flex items-center justify-between">
-            <span className="font-serif font-bold text-sm text-primary">variant=&quot;roundel&quot; (logo-roundel.svg)</span>
-            <span className="text-xs text-text-muted font-mono">Tightened 1:1 roundel without ribbon</span>
-          </div>
-          <div className="flex flex-wrap items-end gap-6 overflow-x-auto py-2">
-            {[32, 44, 64, 96, 140].map((sz) => (
-              <div key={sz} className="flex flex-col items-center gap-1.5 shrink-0">
-                <div className="p-2 rounded-xl bg-surface-muted border border-border">
-                  <BrandLogo variant="roundel" size={sz} />
-                </div>
-                <span className="text-[11px] font-mono text-text-muted">{sz}px</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* 3. Logo Mark (Quill + Book in Ring) */}
         <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-4">
           <div className="border-b border-border pb-2 flex items-center justify-between">
