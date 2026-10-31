@@ -955,7 +955,7 @@ export function WriterTipsClient({
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-warning-soft/50 text-[11px] text-secondary">
-                  Optional. The whole amount goes directly to the author; UNB Premium takes no share.
+                  The whole amount goes directly to the author; UNB Premium takes no share.
                 </div>
 
                 <div className="w-full py-2.5 rounded-xl bg-primary text-white font-medium text-xs text-center cursor-default pointer-events-none shadow-none">

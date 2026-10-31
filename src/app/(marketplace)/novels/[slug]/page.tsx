@@ -165,7 +165,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-10 pb-28 md:pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-10 pb-12">
         <NovelAccessProvider novelId={novel.id}>
           {/* Breadcrumb Navigation */}
           <nav
@@ -349,6 +349,15 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                 </div>
               </div>
 
+              {/* Mobile Primary Price & Action Card (md:hidden) */}
+              <div className="md:hidden pt-2 pb-1">
+                <NovelAccessPanel
+                  novelId={novel.id}
+                  novelSlug={novel.slug}
+                  pricePkr={novel.price_pkr}
+                  freePreviewChapterNumber={freeChapters[0]?.chapter_number}
+                />
+              </div>
             </div>
 
             {/* Synopsis Section (Expandable) */}
@@ -395,19 +404,6 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
             <div className="pt-8 pb-4">
               <TipCard writerId={novel.writer_id} novelId={novel.id} />
             </div>
-          </div>
-        </div>
-
-        {/* Sticky Bottom Action Bar on Phones (md:hidden) */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border p-3 px-4 shadow-lg pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <div className="max-w-lg mx-auto">
-            <NovelAccessPanel
-              novelId={novel.id}
-              novelSlug={novel.slug}
-              pricePkr={novel.price_pkr}
-              freePreviewChapterNumber={freeChapters[0]?.chapter_number}
-              compact
-            />
           </div>
         </div>
       </NovelAccessProvider>

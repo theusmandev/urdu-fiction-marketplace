@@ -39,7 +39,7 @@ This document catalogs all reader- and writer-facing microcopy in the Tip Jar / 
   - Chai (PKR 100): `چائے` — `ایک گرما گرم کپ چائے کے ساتھ داد`
   - Mithai (PKR 250): `مٹھائی` — `کہانی کی مٹھاس کا میٹھا سا شکریہ`
   - Eidi (PKR 500): `عیدی` — `خاص موقع پر دل کھول کر حوصلہ افزائی`
-- **Honest line**: `Optional. The whole amount goes directly to the author; UNB Premium takes no share.` / `اختیاری ہے۔ پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔`
+- **Honest line**: `The whole amount goes directly to the author; UNB Premium takes no share.` / `پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔`
 
 ### B. Reader Management (`/tips` & `/tips/[tipNumber]`)
 - **Section title**: `My Thanks / میرے شکریے`
