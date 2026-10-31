@@ -50,8 +50,8 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-ivory text-main">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-surface p-8 shadow-card">
+    <div className="min-h-[85vh] flex items-center justify-center px-3 py-8 sm:px-6 sm:py-12 lg:px-8 bg-ivory text-main">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8 rounded-2xl border border-border bg-surface p-5 sm:p-8 shadow-card">
         <div className="text-center">
           <Link href="/" className="inline-block hover:opacity-95 transition-opacity" aria-label="UNB Premium — home">
             <BrandLogo variant="full" size={88} className="mx-auto" />

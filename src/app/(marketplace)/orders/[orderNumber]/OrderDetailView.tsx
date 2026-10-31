@@ -319,7 +319,7 @@ export function OrderDetailView({
   };
 
   return (
-    <div className="space-y-8 pb-24 sm:pb-8">
+    <div className="space-y-6 sm:space-y-8 pb-12 sm:pb-8">
       {/* Top Navigation */}
       <div className="flex items-center justify-between border-b border-border pb-4 gap-2">
         <Link
@@ -337,9 +337,9 @@ export function OrderDetailView({
       </div>
 
       {/* Main Order Card */}
-      <div className="rounded-3xl bg-surface border border-border p-6 sm:p-8 space-y-6 shadow-card">
+      <div className="rounded-2xl sm:rounded-3xl bg-transparent sm:bg-surface border-0 sm:border border-border p-0 sm:p-8 space-y-5 sm:space-y-6 shadow-none sm:shadow-card">
         {/* Header & Status Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-0 rounded-2xl sm:rounded-none bg-surface sm:bg-transparent border sm:border-0 sm:border-b border-border shadow-xs sm:shadow-none pb-4 sm:pb-6">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span
@@ -465,7 +465,7 @@ export function OrderDetailView({
             </div>
 
             {/* Writer's Payment Instructions Card */}
-            <div className="rounded-2xl bg-surface border border-border p-5 space-y-4 shadow-sm">
+            <div className="rounded-2xl bg-surface border border-border p-4 sm:p-5 space-y-4 shadow-xs sm:shadow-sm">
               <div className="flex items-center justify-between border-b border-border pb-3">
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4 text-accent" />
@@ -502,8 +502,8 @@ export function OrderDetailView({
 
               {/* Exact Amount & Reference Warning */}
               <div className="rounded-xl bg-warning-soft/80 border border-warning-border p-3.5 space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-warning-text font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <span className="text-warning-text font-medium break-all">
                     Payment Reference / Note:{' '}
                     <span className="font-mono font-bold text-warning-text">{order.orderNumber}</span>
                   </span>
@@ -524,7 +524,7 @@ export function OrderDetailView({
             </div>
 
             {/* Payment Proof Submission Form */}
-            <form onSubmit={handlePaymentSubmit} className="space-y-5 rounded-2xl bg-surface border border-border p-5 shadow-sm">
+            <form onSubmit={handlePaymentSubmit} className="space-y-5 rounded-2xl bg-surface border border-border p-4 sm:p-5 shadow-xs sm:shadow-sm">
               <div className="border-b border-border pb-3">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-navy">
                   Step 2: Submit Payment Proof
@@ -654,41 +654,6 @@ export function OrderDetailView({
                 </button>
               </div>
             </form>
-
-            {/* Mobile Sticky Submit Payment Proof Button */}
-            <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border p-3 px-4 shadow-lg pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-              <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
-                <div className="min-w-0">
-                  <div className="text-[10px] text-secondary">Pay Author</div>
-                  <div className="font-serif text-base font-bold text-navy leading-tight truncate">
-                    {formatPKR(order.amountPkr)}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const submitBtn = document.querySelector('form button[type="submit"]') as HTMLButtonElement | null;
-                    if (submitBtn) {
-                      submitBtn.click();
-                    }
-                  }}
-                  disabled={isPending || !tid.trim() || !screenshotPath}
-                  className="flex-1 max-w-[210px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-warning disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
-                >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Submit Payment</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
@@ -698,7 +663,7 @@ export function OrderDetailView({
         {/* ========================================================================= */}
         {order.status === 'payment_submitted' && latestSubmission && (
           <div className="space-y-6 pt-2">
-            <div className="rounded-2xl bg-surface border border-border p-5 space-y-4 shadow-sm">
+            <div className="rounded-2xl bg-surface border border-border p-4 sm:p-5 space-y-4 shadow-xs sm:shadow-sm">
               <div className="flex items-center justify-between border-b border-border pb-3">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-info-text" />
@@ -862,7 +827,7 @@ export function OrderDetailView({
         )}
 
         {order.status === 'cancelled' && (
-          <div className="rounded-2xl bg-surface border border-border p-5 space-y-2 text-xs text-secondary shadow-sm">
+          <div className="rounded-2xl bg-surface border border-border p-4 sm:p-5 space-y-2 text-xs text-secondary shadow-xs sm:shadow-sm">
             <div className="flex items-center gap-2 text-navy font-bold uppercase tracking-wider">
               <XCircle className="w-4 h-4 text-secondary" />
               <span>Order Cancelled</span>
@@ -883,7 +848,7 @@ export function OrderDetailView({
         )}
 
         {order.status === 'refunded_adjusted' && (
-          <div className="rounded-2xl bg-surface border border-border p-5 space-y-2 text-xs text-secondary shadow-sm">
+          <div className="rounded-2xl bg-surface border border-border p-4 sm:p-5 space-y-2 text-xs text-secondary shadow-xs sm:shadow-sm">
             <div className="flex items-center gap-2 text-navy font-bold uppercase tracking-wider">
               <AlertCircle className="w-4 h-4 text-accent" />
               <span>Refunded / Adjusted</span>
