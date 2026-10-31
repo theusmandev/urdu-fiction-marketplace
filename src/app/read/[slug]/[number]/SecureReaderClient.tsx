@@ -56,8 +56,10 @@ export function SecureReaderClient({
   // UI Drawer / Overlay States
   const [tocOpen, setTocOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [showHeader, setShowHeader] = useState(true);
-  const lastScrollY = useRef(0);
+
+  // Live Reading Progress (0 - 100%)
+  const [readingProgress, setReadingProgress] = useState(0);
+  const rafId = useRef<number | null>(null);
 
   // Touch Swipe coordinates
   const touchStartX = useRef<number | null>(null);
@@ -109,24 +111,40 @@ export function SecureReaderClient({
     saveReadingProgressAction(chapter.novel_id, chapter.chapter_number).catch(() => {});
   }, [chapter.novel_id, chapter.chapter_number]);
 
-  // Scroll listener to toggle sticky slim header
+  // Live scroll listener for reading progress bar (60fps requestAnimationFrame)
   useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > 120 && currentY > lastScrollY.current + 10) {
-        // Scrolling down -> hide header
-        setShowHeader(false);
-        setSettingsOpen(false);
-      } else if (currentY < lastScrollY.current - 10 || currentY <= 60) {
-        // Scrolling up or at top -> show header
-        setShowHeader(true);
+    const updateProgress = () => {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) {
+        setReadingProgress(100);
+        return;
       }
-      lastScrollY.current = currentY;
+      const currentY = window.scrollY;
+      const pct = Math.min(100, Math.max(0, (currentY / docHeight) * 100));
+      setReadingProgress(pct);
+    };
+
+    const handleScroll = () => {
+      if (rafId.current !== null) return;
+      rafId.current = window.requestAnimationFrame(() => {
+        updateProgress();
+        rafId.current = null;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('resize', handleScroll, { passive: true });
+    // Initial calculation
+    updateProgress();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      if (rafId.current !== null) {
+        window.cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, [chapter.novel_id, chapter.chapter_number, fontSize, lineHeight, paragraphSpacing]);
 
   // Keyboard navigation (Arrow keys)
   const navigateToChapter = useCallback(
@@ -204,11 +222,9 @@ export function SecureReaderClient({
       {/* 1. STICKY SLIM READER HEADER                                       */}
       {/* ------------------------------------------------------------------ */}
       <header
-        className={`sticky top-0 z-40 border-b px-4 py-2.5 transition-transform duration-300 ${headerBgClasses} ${
-          showHeader ? 'translate-y-0' : '-translate-y-full'
-        }`}
+        className={`sticky top-0 z-40 border-b relative transition-colors duration-200 ${headerBgClasses}`}
       >
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3 px-4 py-2.5">
           {/* Left: Back Link & Novel Slug */}
           <div className="flex items-center gap-2 min-w-0">
             <Link
@@ -370,6 +386,22 @@ export function SecureReaderClient({
               )}
             </div>
           </div>
+        </div>
+
+        {/* Live Reading Progress Bar along bottom edge of sticky header */}
+        <div
+          role="progressbar"
+          aria-label="Reading progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(readingProgress)}
+          dir="ltr"
+          className="absolute -bottom-[1px] inset-x-0 h-[2.5px] bg-current/10 overflow-hidden"
+        >
+          <div
+            className="h-full bg-accent transition-[width] duration-150 ease-out origin-left"
+            style={{ width: `${readingProgress}%` }}
+          />
         </div>
       </header>
 

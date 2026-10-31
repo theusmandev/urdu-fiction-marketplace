@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { ChapterBody } from "@/components/reader/ChapterBody";
@@ -63,6 +63,44 @@ export function FreePreviewReaderClient({
     }
     return "relaxed";
   });
+
+  // Live Reading Progress (0 - 100%)
+  const [readingProgress, setReadingProgress] = useState(0);
+  const rafId = useRef<number | null>(null);
+
+  // Live scroll listener for reading progress bar (60fps requestAnimationFrame)
+  useEffect(() => {
+    const updateProgress = () => {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) {
+        setReadingProgress(100);
+        return;
+      }
+      const currentY = window.scrollY;
+      const pct = Math.min(100, Math.max(0, (currentY / docHeight) * 100));
+      setReadingProgress(pct);
+    };
+
+    const handleScroll = () => {
+      if (rafId.current !== null) return;
+      rafId.current = window.requestAnimationFrame(() => {
+        updateProgress();
+        rafId.current = null;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    updateProgress();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      if (rafId.current !== null) {
+        window.cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, [novel.slug, chapter.chapter_number, fontSize, lineHeight]);
 
   // Track progress locally without mutating state inside effect
   useEffect(() => {
@@ -134,7 +172,7 @@ export function FreePreviewReaderClient({
     <div className={`min-h-screen transition-colors duration-200 ${themeClasses} pb-24`}>
       {/* Sticky Reader Controls Header */}
       <header
-        className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors ${toolbarThemeClasses} px-4 sm:px-6 py-3`}
+        className={`sticky top-0 z-40 backdrop-blur-md border-b relative transition-colors ${toolbarThemeClasses} px-4 sm:px-6 py-3`}
       >
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           {/* Back to Novel */}
@@ -235,6 +273,22 @@ export function FreePreviewReaderClient({
               <AlignJustify className="w-3.5 h-3.5" />
             </button>
           </div>
+        </div>
+
+        {/* Live Reading Progress Bar along bottom edge of sticky header */}
+        <div
+          role="progressbar"
+          aria-label="Reading progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(readingProgress)}
+          dir="ltr"
+          className="absolute -bottom-[1px] inset-x-0 h-[2.5px] bg-current/10 overflow-hidden"
+        >
+          <div
+            className="h-full bg-accent transition-[width] duration-150 ease-out origin-left"
+            style={{ width: `${readingProgress}%` }}
+          />
         </div>
       </header>
 
