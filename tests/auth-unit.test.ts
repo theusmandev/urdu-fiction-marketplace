@@ -20,6 +20,8 @@ describe('Safe Redirect Security Helper', () => {
     assert.equal(sanitizeRedirectPath('/admin'), '/admin');
     assert.equal(sanitizeRedirectPath('/writer/orders'), '/writer/orders');
     assert.equal(sanitizeRedirectPath('/novels/ishq-e-atish'), '/novels/ishq-e-atish');
+    assert.equal(sanitizeRedirectPath('/reset-password'), '/reset-password');
+    assert.equal(isSafeRedirectPath('/reset-password'), true);
   });
 
   test('rejects absolute external URLs and falls back to /', () => {

@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getAppOrigin } from '@/lib/auth/url';
 import {
   registerSchema,
   loginSchema,
@@ -63,6 +64,7 @@ export async function registerUser(formData: FormData): Promise<AuthActionResult
 
   // 2. Perform signup with Supabase Auth
   // Note: Database trigger handle_new_user strictly creates public.profiles with role = 'reader'
+  const origin = await getAppOrigin();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -71,7 +73,7 @@ export async function registerUser(formData: FormData): Promise<AuthActionResult
         full_name: fullName,
         username,
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      emailRedirectTo: `${origin}/auth/callback`,
     },
   });
 
@@ -198,7 +200,7 @@ export async function forgotPassword(formData: FormData): Promise<AuthActionResu
   const { email } = parsed.data;
   const supabase = await createClient();
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const origin = await getAppOrigin();
 
   // Always invoke Supabase reset
   await supabase.auth.resetPasswordForEmail(email, {
