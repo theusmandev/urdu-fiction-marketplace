@@ -102,6 +102,19 @@ export function FreePreviewReaderClient({
     };
   }, [novel.slug, chapter.chapter_number, fontSize, lineHeight]);
 
+  // Keyboard navigation (Arrow keys & Escape)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Track progress locally without mutating state inside effect
   useEffect(() => {
     try {

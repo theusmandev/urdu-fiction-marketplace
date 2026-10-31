@@ -56,6 +56,7 @@ export function SecureReaderClient({
   // UI Drawer / Overlay States
   const [tocOpen, setTocOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
 
   // Live Reading Progress (0 - 100%)
   const [readingProgress, setReadingProgress] = useState(0);
@@ -156,9 +157,36 @@ export function SecureReaderClient({
     [router, novelSlug]
   );
 
+  // Close settings popover on outside click / tap
+  useEffect(() => {
+    if (!settingsOpen) return;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [settingsOpen]);
+
+  // Keyboard navigation (Arrow keys & Escape key dismissal)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is inside an input/modal
+      // Close popover / drawer on Escape key
+      if (e.key === 'Escape') {
+        if (settingsOpen) {
+          setSettingsOpen(false);
+          return;
+        }
+        if (tocOpen) {
+          setTocOpen(false);
+          return;
+        }
+      }
+
+      // Ignore navigation if user is inside an input/modal
       if (tocOpen || settingsOpen) return;
       if (e.key === 'ArrowRight' && chapter.next_chapter_number) {
         navigateToChapter(chapter.next_chapter_number);
@@ -261,19 +289,33 @@ export function SecureReaderClient({
             </button>
 
             {/* Display Settings Trigger */}
-            <div className="relative">
+            <div className="relative" ref={settingsRef}>
               <button
                 type="button"
                 onClick={() => setSettingsOpen((prev) => !prev)}
                 className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
                 title="Reader Display Settings"
+                aria-expanded={settingsOpen}
+                aria-haspopup="true"
               >
                 <Settings2 className="w-4 h-4" />
               </button>
 
+              {/* Invisible Full-Screen Backdrop Overlay for outside click/tap dismissal */}
+              {settingsOpen && (
+                <div
+                  className="fixed inset-0 z-40 bg-transparent cursor-default"
+                  aria-hidden="true"
+                  onClick={() => setSettingsOpen(false)}
+                />
+              )}
+
               {/* Settings Dropdown Popover */}
               {settingsOpen && (
                 <div
+                  role="dialog"
+                  aria-label="Reader Display Settings"
+                  onClick={(e) => e.stopPropagation()}
                   className={`absolute right-0 top-full mt-2 w-72 rounded-2xl p-4 shadow-2xl border z-50 animate-in fade-in zoom-in-95 duration-150 ${
                     theme === 'dark'
                       ? 'bg-stone-900 border-stone-800 text-stone-100'
@@ -534,8 +576,12 @@ export function SecureReaderClient({
       {/* 5. TABLE OF CONTENTS SLIDE-OVER DRAWER                             */}
       {/* ------------------------------------------------------------------ */}
       {tocOpen && (
-        <div className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex justify-end">
+        <div
+          className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex justify-end"
+          onClick={() => setTocOpen(false)}
+        >
           <div
+            onClick={(e) => e.stopPropagation()}
             className={`w-full max-w-md h-full flex flex-col shadow-2xl p-5 overflow-hidden animate-in slide-in-from-right duration-200 ${
               theme === 'dark'
                 ? 'bg-stone-900 border-l border-stone-800 text-stone-100'
