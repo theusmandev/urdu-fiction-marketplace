@@ -38,6 +38,46 @@ function getMethodLabel(type: PaymentMethodType, bankName: string | null): strin
   }
 }
 
+function isPlaceholderPenName(val?: string | null): boolean {
+  if (!val) return true;
+  const s = val.trim().toLowerCase();
+  if (!s) return true;
+  return (
+    s === 'author' ||
+    s === 'writer' ||
+    s === 'مصنف' ||
+    s.includes('تعارف') ||
+    s.includes('بایو') ||
+    s.includes('bio')
+  );
+}
+
+function resolveCleanAuthor(novel: {
+  writer_pen_name?: string | null;
+  writer_pen_name_english?: string | null;
+  writer_pen_name_urdu?: string | null;
+}): { displayName: string; secondaryUrduName?: string } {
+  const en = novel.writer_pen_name_english?.trim();
+  const ur = novel.writer_pen_name_urdu?.trim();
+  const raw = novel.writer_pen_name?.trim();
+
+  // 1. Valid English pen name
+  const validEnglish = !isPlaceholderPenName(en) ? en : undefined;
+  // 2. Valid Urdu pen name
+  const validUrdu = !isPlaceholderPenName(ur)
+    ? ur
+    : (!isPlaceholderPenName(raw) && /[آ-ی]/.test(raw!))
+    ? raw
+    : undefined;
+  // 3. Valid Raw pen name (if Latin and not placeholder)
+  const validRaw = (!isPlaceholderPenName(raw) && !/[آ-ی]/.test(raw!)) ? raw : undefined;
+
+  const primary = validEnglish || validRaw || validUrdu || 'Author';
+  const secondary = validUrdu && validUrdu !== primary ? validUrdu : undefined;
+
+  return { displayName: primary, secondaryUrduName: secondary };
+}
+
 export function CheckoutForm({ options }: CheckoutFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -82,7 +122,7 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
   };
 
   return (
-    <div className="space-y-6 pb-24 lg:pb-0">
+    <div className="space-y-6">
       {/* Back button */}
       <div>
         <Link
@@ -240,39 +280,6 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
               </button>
             </div>
           </form>
-
-          {/* Sticky Mobile Submit Action Bar */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border p-3 px-4 shadow-lg pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
-              <div className="min-w-0">
-                <div className="text-[10px] text-secondary">Total Due</div>
-                <div className="font-serif text-base font-bold text-navy leading-tight truncate">
-                  {formatPKR(novel.price_pkr)}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const formSubmitBtn = document.querySelector('form button[type="submit"]') as HTMLButtonElement | null;
-                  formSubmitBtn?.click();
-                }}
-                disabled={isPending || !selectedMethodId || !termsAccepted}
-                className="flex-1 max-w-[210px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs text-navy bg-accent hover:bg-accent-dark active:bg-warning disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Creating Order...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Create Order</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Right Column: Order Summary Card (5 cols) */}
@@ -305,9 +312,22 @@ export function CheckoutForm({ options }: CheckoutFormProps) {
                 <UrduText as="h4" size="sm" className="text-accent truncate leading-[2.2]">
                   {novel.title_urdu}
                 </UrduText>
-                <p className="text-xs text-secondary pt-1">
-                  By <span className="text-navy font-semibold">{novel.writer_pen_name}</span>
-                </p>
+                {(() => {
+                  const { displayName, secondaryUrduName } = resolveCleanAuthor(novel);
+                  return (
+                    <p className="text-xs text-secondary pt-1 flex items-center flex-wrap gap-1.5" dir="ltr">
+                      <span>By</span>
+                      <bdi className="text-navy font-semibold">{displayName}</bdi>
+                      {secondaryUrduName && (
+                        <span className="inline-flex items-center gap-0.5 text-accent font-urdu text-xs">
+                          <span>(</span>
+                          <bdi>{secondaryUrduName}</bdi>
+                          <span>)</span>
+                        </span>
+                      )}
+                    </p>
+                  );
+                })()}
                 <div className="pt-2">
                   <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-surface-muted border border-border text-secondary">
                     Full Novel Access

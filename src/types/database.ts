@@ -356,6 +356,8 @@ export interface CheckoutNovelSummary {
   cover_url?: string | null;
   writer_id: string;
   writer_pen_name: string;
+  writer_pen_name_english?: string | null;
+  writer_pen_name_urdu?: string | null;
 }
 
 export interface CheckoutPaymentMethod {

@@ -19,12 +19,19 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const { user } = await requireAuth(`/checkout/${slug}`);
   const supabase = await createClient();
 
-  // 1. Fetch novel by slug
-  const novelRes = await supabase
-    .from('novels')
-    .select('id, title_english, title_urdu, slug, status, price_pkr, writer_id')
-    .eq('slug', slug)
-    .maybeSingle();
+  // 1. Fetch novel by slug and metadata
+  const [novelRes, publicNovelRes] = await Promise.all([
+    supabase
+      .from('novels')
+      .select('id, title_english, title_urdu, slug, status, price_pkr, writer_id')
+      .eq('slug', slug)
+      .maybeSingle(),
+    supabase
+      .from('public_novels')
+      .select('writer_pen_name_english, writer_pen_name_urdu, writer_username')
+      .eq('slug', slug)
+      .maybeSingle(),
+  ]);
 
   const { data: novel, error: novelError } = unwrapSingleQuery<{
     id: string;
@@ -36,6 +43,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     writer_id: string;
   }>(novelRes, {
     context: 'CheckoutPage.fetchNovel',
+  });
+
+  const { data: publicNovel } = unwrapSingleQuery<{
+    writer_pen_name_english: string | null;
+    writer_pen_name_urdu: string | null;
+    writer_username: string | null;
+  }>(publicNovelRes, {
+    context: 'CheckoutPage.publicNovel',
   });
 
   if (novelError) {
@@ -98,6 +113,15 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   const options = checkoutData as unknown as CheckoutOptionsResponse;
+
+  if (publicNovel) {
+    if (publicNovel.writer_pen_name_english) {
+      options.novel.writer_pen_name_english = publicNovel.writer_pen_name_english;
+    }
+    if (publicNovel.writer_pen_name_urdu) {
+      options.novel.writer_pen_name_urdu = publicNovel.writer_pen_name_urdu;
+    }
+  }
 
   // 4. If reader already has an open order, redirect to that order
   if (options.existing_order_number) {
