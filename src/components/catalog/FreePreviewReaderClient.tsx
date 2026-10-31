@@ -16,6 +16,7 @@ import {
   BookOpen,
   Sparkles,
   AlignJustify,
+  Lock,
 } from "lucide-react";
 
 interface FreePreviewReaderClientProps {
@@ -68,6 +69,9 @@ export function FreePreviewReaderClient({
   const [readingProgress, setReadingProgress] = useState(0);
   const rafId = useRef<number | null>(null);
 
+  // Privacy Shield State (activated on blur / visibility loss / screenshot combo)
+  const [isPrivacyShieldActive, setIsPrivacyShieldActive] = useState(false);
+
   // Live scroll listener for reading progress bar (60fps requestAnimationFrame)
   useEffect(() => {
     const updateProgress = () => {
@@ -102,10 +106,121 @@ export function FreePreviewReaderClient({
     };
   }, [novel.slug, chapter.chapter_number, fontSize, lineHeight]);
 
-  // Keyboard navigation (Arrow keys & Escape)
+  // Capture-phase keyboard shortcut interceptor & clipboard/drag protection
+  useEffect(() => {
+    const handleKeyDownCapture = (e: KeyboardEvent) => {
+      const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+
+      // 1. Intercept PrintScreen
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        setIsPrivacyShieldActive(true);
+        return;
+      }
+
+      // 2. Intercept Snipping Tool / Screenshot shortcuts (Win+Shift+S, Cmd+Shift+3/4/5, Ctrl+Shift+S)
+      if ((e.metaKey && e.shiftKey) || (e.ctrlKey && e.shiftKey)) {
+        setIsPrivacyShieldActive(true);
+        if (key === 's') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      // 3. Block Save (Ctrl+S / Cmd+S)
+      if (isCtrlOrMeta && key === 's') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // 4. Block Print (Ctrl+P / Cmd+P)
+      if (isCtrlOrMeta && key === 'p') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // 5. Block View Source (Ctrl+U / Cmd+U)
+      if (isCtrlOrMeta && key === 'u') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // 6. Block Copy / Cut (Ctrl+C, Ctrl+X, Cmd+C, Cmd+X)
+      if (isCtrlOrMeta && (key === 'c' || key === 'x')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+    };
+
+    const handleKeyUpCapture = (e: KeyboardEvent) => {
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        setIsPrivacyShieldActive(true);
+      }
+    };
+
+    const preventClipboardOrDrag = (e: Event) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener('keydown', handleKeyDownCapture, { capture: true });
+    window.addEventListener('keyup', handleKeyUpCapture, { capture: true });
+    document.addEventListener('copy', preventClipboardOrDrag);
+    document.addEventListener('cut', preventClipboardOrDrag);
+    document.addEventListener('dragstart', preventClipboardOrDrag);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDownCapture, { capture: true });
+      window.removeEventListener('keyup', handleKeyUpCapture, { capture: true });
+      document.removeEventListener('copy', preventClipboardOrDrag);
+      document.removeEventListener('cut', preventClipboardOrDrag);
+      document.removeEventListener('dragstart', preventClipboardOrDrag);
+    };
+  }, []);
+
+  // Instant Privacy Shield on window blur / tab switch / visibility loss
+  useEffect(() => {
+    const handleBlur = () => {
+      setIsPrivacyShieldActive(true);
+    };
+
+    const handleFocus = () => {
+      setIsPrivacyShieldActive(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsPrivacyShieldActive(true);
+      } else {
+        setIsPrivacyShieldActive(false);
+      }
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Keyboard navigation & Escape key dismissal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (isPrivacyShieldActive) {
+          setIsPrivacyShieldActive(false);
+          return;
+        }
         if (document.activeElement instanceof HTMLElement) {
           document.activeElement.blur();
         }
@@ -113,7 +228,7 @@ export function FreePreviewReaderClient({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [isPrivacyShieldActive]);
 
   // Track progress locally without mutating state inside effect
   useEffect(() => {
@@ -182,7 +297,13 @@ export function FreePreviewReaderClient({
 
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${themeClasses} pb-24`}>
+    <div
+      className={`min-h-screen transition-colors duration-200 ${themeClasses} pb-24 select-none`}
+      onContextMenu={(e) => e.preventDefault()}
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
+    >
       {/* Sticky Reader Controls Header */}
       <header
         className={`sticky top-0 z-40 backdrop-blur-md border-b relative transition-colors ${toolbarThemeClasses} px-4 sm:px-6 py-3`}
@@ -305,8 +426,51 @@ export function FreePreviewReaderClient({
         </div>
       </header>
 
+      {/* Privacy Shield Overlay (blur / visibility / screenshot attempt) */}
+      {isPrivacyShieldActive && (
+        <div
+          role="dialog"
+          aria-label="Protected Chapter Content"
+          onClick={() => setIsPrivacyShieldActive(false)}
+          className="fixed inset-0 z-30 flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-md cursor-pointer select-none animate-in fade-in duration-100"
+        >
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPrivacyShieldActive(false);
+            }}
+            className={`max-w-md w-full p-6 sm:p-8 rounded-2xl shadow-2xl border text-center space-y-4 animate-in zoom-in-95 duration-150 ${
+              theme === "dark"
+                ? "bg-[#1E293B] border-[#334155] text-[#E2E8F0]"
+                : theme === "sepia"
+                ? "bg-[#EFE8DA] border-[#D8CEBA] text-[#2D241E]"
+                : "bg-white border-[#E2E8F0] text-[#17243A]"
+            }`}
+          >
+            <div className="w-12 h-12 rounded-full bg-accent/15 text-accent-dark flex items-center justify-center mx-auto">
+              <Lock className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-bold uppercase tracking-wider">
+                Protected Chapter Content
+              </h3>
+              <UrduText size="base" className="py-0 font-bold leading-relaxed">
+                مطالعہ جاری رکھنے کے لیے اسکرین پر کہیں بھی کلک کریں
+              </UrduText>
+            </div>
+            <p className="text-xs opacity-70">
+              Click or tap anywhere on the screen to resume reading.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Main Reading Canvas (Comfortable measure for Urdu script) */}
-      <main className="max-w-2xl lg:max-w-3xl mx-auto px-5 sm:px-8 pt-10 sm:pt-14 space-y-10">
+      <main
+        className={`max-w-2xl lg:max-w-3xl mx-auto px-5 sm:px-8 pt-10 sm:pt-14 space-y-10 print:hidden ${
+          isPrivacyShieldActive ? "blur-2xl select-none pointer-events-none transition-none" : ""
+        }`}
+      >
         {/* Chapter Header */}
         <div className="text-center space-y-3 pb-8 border-b border-black/10 dark:border-white/10">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-accent/20 text-accent-dark dark:text-accent">
@@ -333,7 +497,7 @@ export function FreePreviewReaderClient({
             text={chapter.content_urdu}
             fontSize={fontSize}
             lineHeight={lineHeight}
-            userSelect="text"
+            userSelect="none"
           />
         </article>
 

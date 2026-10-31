@@ -56,7 +56,9 @@ export function SecureReaderClient({
   // UI Drawer / Overlay States
   const [tocOpen, setTocOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const settingsRef = useRef<HTMLDivElement>(null);
+  const [isPrivacyShieldActive, setIsPrivacyShieldActive] = useState(false);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const settingsCardRef = useRef<HTMLDivElement>(null);
 
   // Live Reading Progress (0 - 100%)
   const [readingProgress, setReadingProgress] = useState(0);
@@ -162,7 +164,13 @@ export function SecureReaderClient({
     if (!settingsOpen) return;
 
     const handlePointerDown = (e: PointerEvent) => {
-      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        settingsCardRef.current &&
+        !settingsCardRef.current.contains(target) &&
+        settingsButtonRef.current &&
+        !settingsButtonRef.current.contains(target)
+      ) {
         setSettingsOpen(false);
       }
     };
@@ -171,11 +179,122 @@ export function SecureReaderClient({
     return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, [settingsOpen]);
 
+  // Capture-phase keyboard shortcut interceptor & clipboard/drag protection
+  useEffect(() => {
+    const handleKeyDownCapture = (e: KeyboardEvent) => {
+      const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+
+      // 1. Intercept PrintScreen
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        setIsPrivacyShieldActive(true);
+        return;
+      }
+
+      // 2. Intercept Snipping Tool / Screenshot shortcuts (Win+Shift+S, Cmd+Shift+3/4/5, Ctrl+Shift+S)
+      if ((e.metaKey && e.shiftKey) || (e.ctrlKey && e.shiftKey)) {
+        setIsPrivacyShieldActive(true);
+        if (key === 's') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      // 3. Block Save (Ctrl+S / Cmd+S)
+      if (isCtrlOrMeta && key === 's') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // 4. Block Print (Ctrl+P / Cmd+P)
+      if (isCtrlOrMeta && key === 'p') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // 5. Block View Source (Ctrl+U / Cmd+U)
+      if (isCtrlOrMeta && key === 'u') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // 6. Block Copy / Cut (Ctrl+C, Ctrl+X, Cmd+C, Cmd+X)
+      if (isCtrlOrMeta && (key === 'c' || key === 'x')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+    };
+
+    const handleKeyUpCapture = (e: KeyboardEvent) => {
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        setIsPrivacyShieldActive(true);
+      }
+    };
+
+    const preventClipboardOrDrag = (e: Event) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener('keydown', handleKeyDownCapture, { capture: true });
+    window.addEventListener('keyup', handleKeyUpCapture, { capture: true });
+    document.addEventListener('copy', preventClipboardOrDrag);
+    document.addEventListener('cut', preventClipboardOrDrag);
+    document.addEventListener('dragstart', preventClipboardOrDrag);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDownCapture, { capture: true });
+      window.removeEventListener('keyup', handleKeyUpCapture, { capture: true });
+      document.removeEventListener('copy', preventClipboardOrDrag);
+      document.removeEventListener('cut', preventClipboardOrDrag);
+      document.removeEventListener('dragstart', preventClipboardOrDrag);
+    };
+  }, []);
+
+  // Instant Privacy Shield on window blur / tab switch / visibility loss
+  useEffect(() => {
+    const handleBlur = () => {
+      setIsPrivacyShieldActive(true);
+    };
+
+    const handleFocus = () => {
+      setIsPrivacyShieldActive(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsPrivacyShieldActive(true);
+      } else {
+        setIsPrivacyShieldActive(false);
+      }
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   // Keyboard navigation (Arrow keys & Escape key dismissal)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Close popover / drawer on Escape key
+      // Close popover / drawer / shield on Escape key
       if (e.key === 'Escape') {
+        if (isPrivacyShieldActive) {
+          setIsPrivacyShieldActive(false);
+          return;
+        }
         if (settingsOpen) {
           setSettingsOpen(false);
           return;
@@ -186,8 +305,8 @@ export function SecureReaderClient({
         }
       }
 
-      // Ignore navigation if user is inside an input/modal
-      if (tocOpen || settingsOpen) return;
+      // Ignore navigation if user is inside an input/modal or shield is active
+      if (tocOpen || settingsOpen || isPrivacyShieldActive) return;
       if (e.key === 'ArrowRight' && chapter.next_chapter_number) {
         navigateToChapter(chapter.next_chapter_number);
       } else if (e.key === 'ArrowLeft' && chapter.previous_chapter_number) {
@@ -197,7 +316,7 @@ export function SecureReaderClient({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [tocOpen, settingsOpen, chapter.next_chapter_number, chapter.previous_chapter_number, navigateToChapter]);
+  }, [tocOpen, settingsOpen, isPrivacyShieldActive, chapter.next_chapter_number, chapter.previous_chapter_number, navigateToChapter]);
 
   // Touch swipe support
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -243,6 +362,9 @@ export function SecureReaderClient({
     <div
       className={`min-h-screen transition-colors duration-200 flex flex-col relative select-none ${themeContainerClasses}`}
       onContextMenu={(e) => e.preventDefault()}
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -289,8 +411,9 @@ export function SecureReaderClient({
             </button>
 
             {/* Display Settings Trigger */}
-            <div className="relative" ref={settingsRef}>
+            <div className="relative">
               <button
+                ref={settingsButtonRef}
                 type="button"
                 onClick={() => setSettingsOpen((prev) => !prev)}
                 className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
@@ -313,6 +436,7 @@ export function SecureReaderClient({
               {/* Settings Dropdown Popover */}
               {settingsOpen && (
                 <div
+                  ref={settingsCardRef}
                   role="dialog"
                   aria-label="Reader Display Settings"
                   onClick={(e) => e.stopPropagation()}
@@ -466,9 +590,54 @@ export function SecureReaderClient({
       )}
 
       {/* ------------------------------------------------------------------ */}
+      {/* 2b. PRIVACY SHIELD OVERLAY (BLUR / VISIBILITY / SCREENSHOT ATTEMPT) */}
+      {/* ------------------------------------------------------------------ */}
+      {isPrivacyShieldActive && (
+        <div
+          role="dialog"
+          aria-label="Protected Chapter Content"
+          onClick={() => setIsPrivacyShieldActive(false)}
+          className="fixed inset-0 z-30 flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-md cursor-pointer select-none animate-in fade-in duration-100"
+        >
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPrivacyShieldActive(false);
+            }}
+            className={`max-w-md w-full p-6 sm:p-8 rounded-2xl shadow-2xl border text-center space-y-4 animate-in zoom-in-95 duration-150 ${
+              theme === 'dark'
+                ? 'bg-stone-900 border-stone-800 text-stone-100'
+                : theme === 'sepia'
+                ? 'bg-[#EFE4CB] border-[#D9CAAA] text-[#4A3B2C]'
+                : 'bg-white border-border text-text'
+            }`}
+          >
+            <div className="w-12 h-12 rounded-full bg-accent/15 text-accent-strong flex items-center justify-center mx-auto">
+              <Lock className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-bold uppercase tracking-wider">
+                Protected Chapter Content
+              </h3>
+              <UrduText size="base" className="py-0 font-bold leading-relaxed">
+                مطالعہ جاری رکھنے کے لیے اسکرین پر کہیں بھی کلک کریں
+              </UrduText>
+            </div>
+            <p className="text-xs opacity-70">
+              Click or tap anywhere on the screen to resume reading.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------------ */}
       {/* 3. CHAPTER MANUSCRIPT READING CANVAS                               */}
       {/* ------------------------------------------------------------------ */}
-      <main className="flex-1 w-full max-w-[65ch] mx-auto px-5 sm:px-6 py-8 sm:py-12 relative z-10 print:hidden">
+      <main
+        className={`flex-1 w-full max-w-[65ch] mx-auto px-5 sm:px-6 py-8 sm:py-12 relative z-10 print:hidden ${
+          isPrivacyShieldActive ? 'blur-2xl select-none pointer-events-none transition-none' : ''
+        }`}
+      >
         {/* Chapter Header */}
         <div className="text-center space-y-2 mb-8 pb-6 border-b border-current/10">
           <div className="flex items-center justify-center gap-1.5 text-xs opacity-70">
