@@ -4,9 +4,44 @@ import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { ShieldCheck, Heart, ArrowUpRight } from "lucide-react";
+import {
+  FacebookIcon,
+  WhatsAppIcon,
+  PinterestIcon,
+  InstagramIcon,
+  YoutubeIcon,
+  TelegramIcon,
+} from "@/components/icons/social";
+import { getSocialLinks } from "@/lib/settings/social";
 
-export function PublicFooter() {
+interface SocialItem {
+  key: string;
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+export async function PublicFooter() {
   const currentYear = 2026;
+  const socialLinks = await getSocialLinks();
+
+  const candidateItems = [
+    { key: "facebook", label: "Facebook", href: socialLinks.facebook, icon: <FacebookIcon className="w-5 h-5" /> },
+    { key: "whatsapp", label: "WhatsApp", href: socialLinks.whatsapp, icon: <WhatsAppIcon className="w-5 h-5" /> },
+    { key: "pinterest", label: "Pinterest", href: socialLinks.pinterest, icon: <PinterestIcon className="w-5 h-5" /> },
+    { key: "instagram", label: "Instagram", href: socialLinks.instagram, icon: <InstagramIcon className="w-5 h-5" /> },
+    { key: "youtube", label: "YouTube", href: socialLinks.youtube, icon: <YoutubeIcon className="w-5 h-5" /> },
+    { key: "telegram", label: "Telegram", href: socialLinks.telegram, icon: <TelegramIcon className="w-5 h-5" /> },
+  ];
+
+  const socialItems: SocialItem[] = candidateItems
+    .filter((item): item is typeof item & { href: string } => typeof item.href === "string" && item.href.trim().length > 0)
+    .map((item) => ({
+      key: item.key,
+      label: item.label,
+      href: item.href.trim(),
+      icon: item.icon,
+    }));
 
   return (
     <footer className="mt-auto bg-surface-muted text-text-muted border-t border-border pt-12 sm:pt-16 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
@@ -106,6 +141,29 @@ export function PublicFooter() {
           </div>
 
         </div>
+
+        {/* Social Media Links Bar */}
+        {socialItems.length > 0 && (
+          <div className="py-6 border-b border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span className="text-xs font-semibold uppercase tracking-wider text-accent-strong font-sans">
+              Connect With Us
+            </span>
+            <div className="flex items-center gap-2">
+              {socialItems.map((item) => (
+                <a
+                  key={item.key}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.label}
+                  className="p-2 rounded-lg text-text-muted hover:text-accent-strong hover:bg-accent-soft transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted"
+                >
+                  {item.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Bottom Bar: Copyright & Direct Payment Protection Notice */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-text-muted">

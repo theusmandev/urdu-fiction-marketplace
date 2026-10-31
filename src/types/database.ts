@@ -98,7 +98,17 @@ export interface PlatformSettingsRow {
   site_palette?: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
   site_palette_updated_at?: string | null;
   site_palette_updated_by?: string | null;
+  social_links?: SocialLinks;
   updated_at: string;
+}
+
+export interface SocialLinks {
+  facebook?: string;
+  whatsapp?: string;
+  pinterest?: string;
+  instagram?: string;
+  youtube?: string;
+  telegram?: string;
 }
 
 export type TipStatus =

@@ -541,6 +541,16 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0037_fix_db_verification_issues.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Execute `supabase/tests/00_post_migration_verification.sql` and verify Check ID 44 (OVERLOADS) and Check ID 156 (plpgsql_check) both return PASS with 0 failures.
 
+### 38. `supabase/migrations/0038_api_rate_limits.sql` [DATABASE-BACKED API RATE LIMITER]
+- **Purpose**: Provisions atomic database-backed sliding-window rate limiting for Edge / Cloudflare Workers runtimes with automated cleanup and RPC interface.
+- **Action**: Paste contents of `supabase/migrations/0038_api_rate_limits.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Confirm table `public.api_rate_limits` and function `public.check_api_rate_limit(text, integer, integer)` exist.
+
+### 39. `supabase/migrations/0039_add_social_links_to_platform_settings.sql` [DYNAMIC SOCIAL MEDIA LINKS IN FOOTER]
+- **Purpose**: Adds `social_links` JSONB column to `public.platform_settings` and seeds official social channels (Facebook, WhatsApp, Pinterest, Instagram, YouTube, Telegram) manageable dynamically via Admin Panel.
+- **Action**: Paste contents of `supabase/migrations/0039_add_social_links_to_platform_settings.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `SELECT social_links FROM public.platform_settings WHERE id = 1;` and verify JSON contains the official seeded social channels.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

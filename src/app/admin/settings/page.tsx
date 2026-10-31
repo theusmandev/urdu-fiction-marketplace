@@ -5,9 +5,10 @@ import { unwrapSingleQuery } from '@/lib/supabase/query';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
 import { AdminAppearanceCard } from '@/components/admin/AdminAppearanceCard';
+import { SocialLinksCard } from '@/components/admin/SocialLinksCard';
 import { isSitePalette, type SitePalette } from '@/lib/settings/palette';
 import { Settings, AlertCircle } from 'lucide-react';
-import type { PlatformPaymentMethodRow } from '@/types/database';
+import type { PlatformPaymentMethodRow, SocialLinks } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +45,7 @@ export default async function AdminSettingsPage() {
         site_palette,
         site_palette_updated_at,
         site_palette_updated_by,
+        social_links,
         updated_at
       `)
       .eq('id', 1)
@@ -77,6 +79,7 @@ export default async function AdminSettingsPage() {
     site_palette?: string;
     site_palette_updated_at?: string | null;
     site_palette_updated_by?: string | null;
+    social_links?: SocialLinks;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
@@ -197,6 +200,8 @@ export default async function AdminSettingsPage() {
     ? rawSettings.site_palette
     : 'ivory_ink';
 
+  const initialSocialLinks: SocialLinks = (rawSettings?.social_links as SocialLinks) ?? {};
+
   const isEdgePurgeConfigured = Boolean(
     process.env.CACHE_PURGE_ZONE_ID && process.env.CACHE_PURGE_API_TOKEN
   );
@@ -253,6 +258,8 @@ export default async function AdminSettingsPage() {
       <PlatformSettingsForm initialSettings={currentSettings} />
 
       <PlatformPaymentMethodsManager initialMethods={paymentMethods} />
+
+      <SocialLinksCard initialLinks={initialSocialLinks} />
     </div>
   );
 }

@@ -507,3 +507,72 @@ export async function adminSetSitePaletteAction(
     },
   };
 }
+
+// -----------------------------------------------------------------------------
+// SOCIAL LINKS ACTION
+// -----------------------------------------------------------------------------
+
+export interface SocialLinksInput {
+  facebook?: string;
+  whatsapp?: string;
+  pinterest?: string;
+  instagram?: string;
+  youtube?: string;
+  telegram?: string;
+}
+
+function isValidUrlOrEmpty(val: string | undefined): boolean {
+  if (!val || val.trim() === '') return true;
+  try {
+    const url = new URL(val.trim());
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export async function updateSocialLinksAction(
+  input: SocialLinksInput
+): Promise<ActionResult> {
+  await requireRole('admin', '/admin');
+
+  const fields = ['facebook', 'whatsapp', 'pinterest', 'instagram', 'youtube', 'telegram'] as const;
+  for (const field of fields) {
+    if (!isValidUrlOrEmpty(input[field])) {
+      return { success: false, error: `Invalid URL for ${field}. Must be a valid http/https URL or empty.` };
+    }
+  }
+
+  // Build clean object — store only non-empty values
+  const social_links: SocialLinksInput = {};
+  for (const field of fields) {
+    const val = input[field]?.trim();
+    if (val) social_links[field] = val;
+  }
+
+  const supabase = await createServerClient();
+  const { error } = await supabase
+    .from('platform_settings')
+    .update({ social_links })
+    .eq('id', 1);
+
+  if (error) {
+    console.error('[updateSocialLinksAction] Supabase error', error.code, error.message);
+    return { success: false, error: error.message };
+  }
+
+  try {
+    revalidateTag('social-links', 'max');
+  } catch (err) {
+    console.warn('[updateSocialLinksAction] revalidateTag warning:', err);
+  }
+
+  try {
+    revalidatePath('/', 'layout');
+    revalidatePath('/admin/settings', 'page');
+  } catch (err) {
+    console.warn('[updateSocialLinksAction] revalidatePath warning:', err);
+  }
+
+  return { success: true };
+}
