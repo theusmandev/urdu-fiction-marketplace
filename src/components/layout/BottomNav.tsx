@@ -11,10 +11,15 @@ import {
   User,
 } from "lucide-react";
 import { useMarketplaceSession } from "./useMarketplaceSession";
+import type { HeaderSessionUser } from "./public-header-client";
 
-export function BottomNav() {
+export interface BottomNavProps {
+  initialUser?: HeaderSessionUser | null;
+}
+
+export function BottomNav({ initialUser }: BottomNavProps = {}) {
   const pathname = usePathname();
-  const sessionUser = useMarketplaceSession();
+  const sessionUser = useMarketplaceSession(initialUser);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   // Detect virtual keyboard on mobile devices to prevent covering input forms

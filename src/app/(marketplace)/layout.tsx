@@ -3,12 +3,15 @@ import { PublicHeader } from '@/components/layout/public-header';
 import { PublicFooter } from '@/components/layout/public-footer';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { AdminPalettePreview } from '@/components/admin/AdminPalettePreview';
+import { getHeaderSessionUser } from '@/lib/auth/getHeaderSessionUser';
 
-export default function MarketplaceLayout({
+export default async function MarketplaceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const sessionUser = await getHeaderSessionUser();
+
   return (
     <div
       data-area="marketplace"
@@ -20,7 +23,7 @@ export default function MarketplaceLayout({
       >
         Skip to main content
       </a>
-      <PublicHeader />
+      <PublicHeader initialUser={sessionUser} />
       <main
         id="main-content"
         className="flex-1 w-full min-w-0 flex flex-col focus:outline-none pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0"
@@ -28,7 +31,7 @@ export default function MarketplaceLayout({
         {children}
       </main>
       <PublicFooter />
-      <BottomNav />
+      <BottomNav initialUser={sessionUser} />
       <AdminPalettePreview />
     </div>
   );
