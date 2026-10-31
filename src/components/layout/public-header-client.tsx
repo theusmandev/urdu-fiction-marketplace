@@ -45,32 +45,15 @@ export interface HeaderSessionUser {
 
 export interface PublicHeaderClientProps {
   user?: HeaderSessionUser | null;
+  initialBannerDismissed?: boolean;
 }
 
 export { LogoutButton };
 
-function subscribePromo(callback: () => void) {
-  window.addEventListener("storage", callback);
-  window.addEventListener("unb_promo_dismissed", callback);
-  return () => {
-    window.removeEventListener("storage", callback);
-    window.removeEventListener("unb_promo_dismissed", callback);
-  };
-}
-
-function getPromoSnapshot() {
-  try {
-    return localStorage.getItem("unb_promo_dismissed_v1") === "true";
-  } catch {
-    return false;
-  }
-}
-
-function getPromoServerSnapshot() {
-  return false;
-}
-
-export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderClientProps) {
+export function PublicHeaderClient({
+  user: initialUser = null,
+  initialBannerDismissed = false,
+}: PublicHeaderClientProps) {
   const router = useRouter();
   const sessionUser = useMarketplaceSession(initialUser);
 
@@ -79,22 +62,41 @@ export function PublicHeaderClient({ user: initialUser = null }: PublicHeaderCli
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
 
-  const promoDismissed = useSyncExternalStore(
-    subscribePromo,
-    getPromoSnapshot,
-    getPromoServerSnapshot
-  );
+  const [promoDismissed, setPromoDismissed] = useState(initialBannerDismissed);
+
+  // Sync across tabs & backfill legacy localStorage dismissal into cookie
+  useEffect(() => {
+    if (!promoDismissed) {
+      try {
+        const localDismissed = localStorage.getItem("unb_promo_dismissed_v1") === "true";
+        if (localDismissed) {
+          setPromoDismissed(true);
+          document.cookie = "unb_banner_dismissed=true; path=/; max-age=31536000; SameSite=Lax";
+        }
+      } catch {}
+    }
+
+    const handleSync = () => setPromoDismissed(true);
+    window.addEventListener("storage", handleSync);
+    window.addEventListener("unb_promo_dismissed", handleSync);
+    return () => {
+      window.removeEventListener("storage", handleSync);
+      window.removeEventListener("unb_promo_dismissed", handleSync);
+    };
+  }, [promoDismissed]);
 
   const genreDropdownRef = useRef<HTMLDivElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const handleDismissPromo = () => {
+    setPromoDismissed(true);
     try {
       localStorage.setItem("unb_promo_dismissed_v1", "true");
+      document.cookie = "unb_banner_dismissed=true; path=/; max-age=31536000; SameSite=Lax";
       window.dispatchEvent(new Event("unb_promo_dismissed"));
     } catch {
-      // Local storage unavailable
+      // Storage or cookie unavailable
     }
   };
 

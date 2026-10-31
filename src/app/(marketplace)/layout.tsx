@@ -1,4 +1,5 @@
 import React from 'react';
+import { cookies } from 'next/headers';
 import { PublicHeader } from '@/components/layout/public-header';
 import { PublicFooter } from '@/components/layout/public-footer';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -10,7 +11,11 @@ export default async function MarketplaceLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sessionUser = await getHeaderSessionUser();
+  const [sessionUser, cookieStore] = await Promise.all([
+    getHeaderSessionUser(),
+    cookies(),
+  ]);
+  const bannerDismissed = cookieStore.get('unb_banner_dismissed')?.value === 'true';
 
   return (
     <div
@@ -23,7 +28,7 @@ export default async function MarketplaceLayout({
       >
         Skip to main content
       </a>
-      <PublicHeader initialUser={sessionUser} />
+      <PublicHeader initialUser={sessionUser} initialBannerDismissed={bannerDismissed} />
       <main
         id="main-content"
         className="flex-1 w-full min-w-0 flex flex-col focus:outline-none pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0"

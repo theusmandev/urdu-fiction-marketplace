@@ -43,14 +43,14 @@ export default async function HomePage() {
               size="4xl"
               className="text-text leading-[2.2] py-1 text-2xl sm:text-4xl md:text-5xl font-normal"
             >
-              معیاری اردو فکشن اور ناولز کا مستند ادبی مرکز
+              بہترین اردو ناولز اور فکشن کا پریمیم پلیٹ فارم
             </UrduText>
 
             {/* One Gold Accent Line */}
             <div className="h-1 w-24 bg-accent rounded-full mx-auto" />
 
             <p className="font-serif text-base sm:text-lg md:text-xl text-text-muted max-w-xl mx-auto font-normal leading-relaxed">
-              Direct reader-to-writer Pakistani fiction marketplace.
+              Connecting readers directly with Pakistan&apos;s finest storytellers.
             </p>
           </div>
 
