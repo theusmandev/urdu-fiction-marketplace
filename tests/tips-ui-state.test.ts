@@ -97,7 +97,11 @@ test('Tip Jar UI State & Visibility Helpers', async (t) => {
     });
     assert.equal(signedOutState.status, 'sign_in_required');
     if (signedOutState.status === 'sign_in_required') {
-      assert.ok(signedOutState.loginUrl.includes('/auth/login?next='));
+      assert.ok(signedOutState.loginUrl.includes('/login?next='));
+      assert.equal(
+        signedOutState.loginUrl,
+        `/login?next=${encodeURIComponent('/writers/nimra-ahmed')}`
+      );
     }
 
     // State 2: Valid reader

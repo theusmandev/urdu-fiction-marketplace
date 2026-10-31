@@ -157,7 +157,7 @@ export function resolveTipCardState({
       status: 'sign_in_required',
       message: 'Sign in to say thanks to the author.',
       messageUrdu: 'مصنف کو شکریہ کہنے کے لیے لاگ ان کریں۔',
-      loginUrl: `/auth/login?next=${encodeURIComponent(currentPath)}`,
+      loginUrl: `/login?next=${encodeURIComponent(currentPath)}`,
     };
   }
 
