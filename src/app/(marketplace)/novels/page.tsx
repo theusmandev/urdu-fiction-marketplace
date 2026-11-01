@@ -59,7 +59,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
   const currentPage = params.page;
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0 py-10 space-y-8">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-w-0 py-6 sm:py-10 space-y-6 sm:space-y-8">
       {/* Page Header */}
       <div className="space-y-3 border-b border-border pb-6 w-full min-w-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 min-w-0">
@@ -107,7 +107,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
             </UrduText>
           </div>
           <p className="text-xs text-secondary max-w-md mx-auto">
-            Try adjusting your search keywords, clearing genre filters, or resetting
+            Try adjusting your search keywords, clearing category filters, or resetting
             the price range.
           </p>
           <Link

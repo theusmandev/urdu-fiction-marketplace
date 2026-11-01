@@ -534,14 +534,13 @@ export function FreePreviewReaderClient({
           )}
         </div>
 
-        {/* End of Preview Support Author Callout */}
+        {/* End of Preview Purchase Callout */}
         <div className="w-full max-w-2xl mx-auto mt-10 p-6 sm:p-8 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center space-y-4">
           <UrduText as="h3" size="xl" className="py-0 text-inherit">
-            کیا آپ کو یہ پیش منظر پسند آیا؟
+            کیا آپ مزید پڑھنا چاہتے ہیں؟
           </UrduText>
-          <p className="text-xs max-w-md mx-auto leading-relaxed opacity-80">
-            مکمل ناول کے تمام ابواب پڑھنے کے لیے مصنف کو براہ راست JazzCash، EasyPaisa،
-            یا بینک کے ذریعے سپورٹ کریں۔
+          <p className="text-xs max-w-md mx-auto leading-relaxed opacity-80" dir="rtl">
+            باقی کہانی پڑھنے اور تمام ابواب اَن لاک (unlock) کرنے کے لیے مصنف کو براہِ راست ادائیگی کریں۔ (Bank Transfer, JazzCash, EasyPaisa)
           </p>
           <div className="pt-2">
             <Link
