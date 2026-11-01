@@ -92,20 +92,22 @@ export function CatalogFilters({
       <div className="flex flex-col lg:flex-row gap-2.5 sm:gap-3 items-stretch lg:items-center justify-between w-full min-w-0">
         {/* Search Input */}
         <form onSubmit={handleSearchSubmit} className="relative w-full lg:flex-1 min-w-0 flex items-center">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary pointer-events-none" />
+          <Search className="hidden sm:block absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary pointer-events-none" />
           <input
             type="text"
             enterKeyHint="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search title in English or Urdu, synopsis, or writer pen name..."
-            className="w-full min-w-0 pl-10 pr-3.5 sm:pr-20 py-2 sm:py-2.5 text-sm min-h-[42px] sm:min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-ring/20 transition-all"
+            className="w-full min-w-0 pl-3.5 sm:pl-10 pr-11 sm:pr-20 py-2 sm:py-2.5 text-sm min-h-[42px] sm:min-h-[44px] bg-ivory/60 focus:bg-white border border-border focus:border-accent rounded-xl outline-none text-main placeholder:text-secondary/70 focus:ring-2 focus:ring-ring/20 transition-all"
           />
           <button
             type="submit"
-            className="hidden sm:inline-flex items-center justify-center absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-semibold bg-navy text-accent hover:bg-navy-light px-3 py-2 min-h-[36px] rounded-lg transition-colors cursor-pointer shrink-0"
+            aria-label="Search"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:px-3 sm:py-2 sm:min-h-[36px] bg-navy text-accent hover:bg-navy-light text-xs font-semibold rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
           >
-            Search
+            <Search className="w-4 h-4 sm:hidden" />
+            <span className="hidden sm:inline">Search</span>
           </button>
         </form>
 
@@ -151,7 +153,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={() => handleGenreClick("")}
-              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer shrink-0 ${
                 !selectedGenre
                   ? "bg-navy text-accent shadow-sm"
                   : "bg-ivory/60 hover:bg-ivory text-secondary hover:text-navy border border-border/80"
@@ -159,7 +161,7 @@ export function CatalogFilters({
             >
               <span>All</span>
               <span className="opacity-60">/</span>
-              <UrduText as="span" size="xs" className="opacity-80 py-0 font-normal">
+              <UrduText as="span" size="xs" className="text-inherit opacity-90 py-0 font-normal">
                 تمام
               </UrduText>
             </button>
@@ -178,7 +180,7 @@ export function CatalogFilters({
                   }`}
                 >
                   <span>{g.name_english}</span>
-                  <UrduText as="span" size="xs" className="opacity-80 py-0 font-normal">
+                  <UrduText as="span" size="xs" className="text-inherit opacity-85 py-0 font-normal">
                     {g.name_urdu}
                   </UrduText>
                   {g.published_novels_count > 0 && (
