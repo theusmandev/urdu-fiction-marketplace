@@ -4,6 +4,7 @@ import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { getSitePalette } from "@/lib/settings/site-palette";
 import { getPaletteThemeColor } from "@/lib/settings/palette";
+import { ConfirmProvider } from "@/components/ui/confirm-provider";
 
 // Primary Latin UI Font: Clean, high-legibility sans-serif for prices, TIDs, dashboards
 const sansFont = Plus_Jakarta_Sans({
@@ -118,7 +119,7 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen bg-bg font-sans antialiased text-text flex flex-col selection:bg-accent-soft selection:text-text"
       >
-        {children}
+        <ConfirmProvider>{children}</ConfirmProvider>
       </body>
     </html>
   );

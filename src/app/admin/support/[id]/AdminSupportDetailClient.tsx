@@ -7,6 +7,7 @@ import { adminReplySupportRequestAction } from '@/app/actions/admin-disputes';
 import { closeSupportRequestAction } from '@/app/actions/support';
 import { getSupportStatusMeta } from '@/lib/disputes/status-meta';
 import type { SupportRequestDetailPayload } from '@/types/database';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import {
   ArrowLeft,
   LifeBuoy,
@@ -24,6 +25,7 @@ interface AdminSupportDetailClientProps {
 
 export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   const { request, messages } = payload;
@@ -53,8 +55,15 @@ export function AdminSupportDetailClient({ payload }: AdminSupportDetailClientPr
     });
   };
 
-  const handleCloseTicket = () => {
-    if (!confirm('Are you sure you want to mark this support ticket as closed?')) return;
+  const handleCloseTicket = async () => {
+    const confirmed = await confirm({
+      title: 'Close Support Ticket',
+      message: 'Are you sure you want to mark this support ticket as closed?',
+      confirmLabel: 'Close Ticket',
+      cancelLabel: 'Keep Open',
+      variant: 'warning',
+    });
+    if (!confirmed) return;
 
     setFeedback(null);
     startTransition(async () => {

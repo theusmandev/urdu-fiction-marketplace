@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { formatPKR } from '@/lib/utils';
 import type { AdminOrderDetailResponse } from '@/types/database';
 import { adminForceVerifyOrderAction } from '@/app/actions/admin-orders';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import {
   ArrowLeft,
   BookOpen,
@@ -28,6 +29,7 @@ interface AdminOrderDetailClientProps {
 
 export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProps) {
   const router = useRouter();
+  const { alert } = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   // Modal states
@@ -58,10 +60,18 @@ export function AdminOrderDetailClient({ orderData }: AdminOrderDetailClientProp
       if (res.ok && data.url) {
         setZoomUrl(data.url);
       } else {
-        alert(data.error || 'Failed to load screenshot signed URL.');
+        await alert({
+          title: 'Screenshot Unavailable',
+          message: data.error || 'Failed to load screenshot signed URL.',
+          variant: 'warning',
+        });
       }
     } catch {
-      alert('Network error loading screenshot.');
+      await alert({
+        title: 'Network Error',
+        message: 'Network error loading screenshot. Please try again.',
+        variant: 'warning',
+      });
     } finally {
       setLoadingProof(null);
     }

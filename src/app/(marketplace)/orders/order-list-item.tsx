@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { cancelOrderAction } from '@/app/actions/orders';
 import { Loader2, XCircle, ArrowUpRight, Eye } from 'lucide-react';
 import { UrduText } from '@/components/urdu/UrduText';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import type { OrderStatus } from '@/types/database';
 
 export interface OrderItemData {
@@ -27,6 +28,7 @@ export interface OrderItemData {
 }
 
 export function OrderListItem({ order }: { order: OrderItemData }) {
+  const { confirm, alert } = useConfirm();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
@@ -34,8 +36,19 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
 
   const canCancel = order.status === 'pending_payment' || order.status === 'rejected';
 
-  const handleCancel = () => {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
+  const handleCancel = async () => {
+    const confirmed = await confirm({
+      title: 'Cancel Order',
+      titleUrdu: 'آرڈر منسوخ کریں',
+      message: 'Are you sure you want to cancel this order? This action cannot be undone.',
+      messageUrdu: 'کیا آپ واقعی اس آرڈر کو منسوخ کرنا چاہتے ہیں؟ یہ عمل واپس نہیں لیا جا سکتا۔',
+      confirmLabel: 'Yes, Cancel Order',
+      confirmLabelUrdu: 'ہاں، منسوخ کریں',
+      cancelLabel: 'Keep Order',
+      cancelLabelUrdu: 'آرڈر برقرار رکھیں',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
     setError(null);
 
     startTransition(async () => {
@@ -60,10 +73,20 @@ export function OrderListItem({ order }: { order: OrderItemData }) {
         setProofUrl(data.url);
         window.open(data.url, '_blank');
       } else {
-        alert(data.error || 'Unable to generate secure receipt link.');
+        await alert({
+          title: 'Receipt Unavailable',
+          titleUrdu: 'رسید دستیاب نہیں',
+          message: data.error || 'Unable to generate secure receipt link.',
+          variant: 'warning',
+        });
       }
     } catch {
-      alert('Network error while requesting receipt link.');
+      await alert({
+        title: 'Network Error',
+        titleUrdu: 'نیٹ ورک کی خرابی',
+        message: 'Network error while requesting receipt link. Please check your connection and try again.',
+        variant: 'warning',
+      });
     } finally {
       setLoadingProof(false);
     }

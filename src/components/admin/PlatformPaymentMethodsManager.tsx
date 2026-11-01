@@ -7,6 +7,7 @@ import {
   deactivatePlatformPaymentMethodAction,
 } from '@/app/actions/admin-commission';
 import type { PlatformPaymentMethodRow } from '@/types/database';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import {
   CreditCard,
   Building,
@@ -26,6 +27,7 @@ export function PlatformPaymentMethodsManager({
   initialMethods,
 }: PlatformPaymentMethodsManagerProps) {
   const router = useRouter();
+  const { confirm, alert } = useConfirm();
 
   const [methods, setMethods] = useState<PlatformPaymentMethodRow[]>(initialMethods);
   const [prevInitial, setPrevInitial] = useState(initialMethods);
@@ -147,14 +149,25 @@ export function PlatformPaymentMethodsManager({
   };
 
   const handleDeactivate = async (id: string) => {
-    if (!confirm('Are you sure you want to deactivate this platform payment account? Authors with open invoices will no longer see it.')) {
+    const confirmed = await confirm({
+      title: 'Deactivate Payment Method',
+      message: 'Are you sure you want to deactivate this platform payment account? Authors with open invoices will no longer see it.',
+      confirmLabel: 'Deactivate Account',
+      cancelLabel: 'Keep Active',
+      variant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
     try {
       const res = await deactivatePlatformPaymentMethodAction(id);
       if (!res.success) {
-        alert(res.error || 'Failed to deactivate account.');
+        await alert({
+          title: 'Deactivation Failed',
+          message: res.error || 'Failed to deactivate account.',
+          variant: 'danger',
+        });
       } else {
         setMethods((prev) =>
           prev.map((m) => (m.id === id ? { ...m, is_active: false } : m))
@@ -162,7 +175,11 @@ export function PlatformPaymentMethodsManager({
         router.refresh();
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Unexpected error.');
+      await alert({
+        title: 'Unexpected Error',
+        message: err instanceof Error ? err.message : 'Unexpected error.',
+        variant: 'danger',
+      });
     }
   };
 

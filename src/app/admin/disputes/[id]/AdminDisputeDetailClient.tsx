@@ -13,6 +13,7 @@ import { addDisputeMessageAction } from '@/app/actions/disputes';
 import { getDisputeStatusMeta } from '@/lib/disputes/status-meta';
 import { formatPKR } from '@/lib/utils';
 import type { DisputeDetailPayload } from '@/types/database';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import {
   ArrowLeft,
   Scale,
@@ -38,6 +39,7 @@ type OutcomeType = 'verify_reader' | 'refund_adjustment' | 'resolve_writer' | 'c
 
 export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientProps) {
   const router = useRouter();
+  const { alert } = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   const { dispute, order, messages, submissions } = payload;
@@ -68,10 +70,18 @@ export function AdminDisputeDetailClient({ payload }: AdminDisputeDetailClientPr
       if (res.ok && data.url) {
         setLightboxUrl(data.url);
       } else {
-        alert(data.error || 'Failed to generate secure preview link for receipt.');
+        await alert({
+          title: 'Preview Unavailable',
+          message: data.error || 'Failed to generate secure preview link for receipt.',
+          variant: 'warning',
+        });
       }
     } catch {
-      alert('Network error while requesting signed proof URL.');
+      await alert({
+        title: 'Network Error',
+        message: 'Network error while requesting signed proof URL. Please try again.',
+        variant: 'warning',
+      });
     } finally {
       setLoadingProof(null);
     }

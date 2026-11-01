@@ -122,7 +122,7 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
               <h1 className="font-serif text-3xl md:text-4xl font-bold text-white">
                 {genre.name_english}
               </h1>
-              <p className="text-xs text-text-muted">
+              <p className="text-xs text-white/80">
                 {totalCount} {totalCount === 1 ? "published novel" : "published novels"} in this collection
               </p>
             </div>
@@ -141,13 +141,13 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
 
         {/* Novels Grid */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
             <h2 className="font-serif text-xl font-bold text-navy">
               Novels in {genre.name_english}
             </h2>
             <Link
               href={`/novels?genre=${genre.slug}`}
-              className="text-xs font-medium text-accent hover:text-accent-dark"
+              className="text-xs font-medium text-accent hover:text-accent-dark shrink-0"
             >
               Filter in Catalog →
             </Link>

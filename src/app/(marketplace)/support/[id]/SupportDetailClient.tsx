@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { addSupportMessageAction, closeSupportRequestAction } from '@/app/actions/support';
 import { getSupportStatusMeta } from '@/lib/disputes/status-meta';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import type { SupportRequestDetailPayload } from '@/types/database';
 import {
   ArrowLeft,
@@ -22,6 +23,7 @@ interface SupportDetailClientProps {
 
 export function SupportDetailClient({ payload }: SupportDetailClientProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   const { request, messages } = payload;
@@ -49,7 +51,18 @@ export function SupportDetailClient({ payload }: SupportDetailClientProps) {
   };
 
   const handleCloseTicket = async () => {
-    if (!confirm('Are you sure you want to close this support ticket?')) return;
+    const confirmed = await confirm({
+      title: 'Close Support Ticket',
+      titleUrdu: 'سپورٹ ٹکٹ بند کریں',
+      message: 'Are you sure you want to close this support ticket? You can submit a new inquiry at any time.',
+      messageUrdu: 'کیا آپ واقعی اس سپورٹ ٹکٹ کو بند کرنا چاہتے ہیں؟',
+      confirmLabel: 'Yes, Close Ticket',
+      confirmLabelUrdu: 'ہاں، ٹکٹ بند کریں',
+      cancelLabel: 'Keep Open',
+      cancelLabelUrdu: 'کھلا رکھیں',
+      variant: 'warning',
+    });
+    if (!confirmed) return;
 
     setErrorMsg(null);
     startTransition(async () => {

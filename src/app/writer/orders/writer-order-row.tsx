@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { verifyOrderPaymentAction, rejectOrderPaymentAction } from '@/app/actions/orders';
+import { useConfirm } from '@/components/ui/confirm-provider';
 
 interface WriterOrderRowProps {
   order: {
@@ -34,6 +35,7 @@ interface WriterOrderRowProps {
 }
 
 export function WriterOrderRow({ order }: WriterOrderRowProps) {
+  const { confirm, alert } = useConfirm();
   const [isVerifying, setIsVerifying] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -55,7 +57,12 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
       }
       setProofUrl(data.signedUrl);
     } catch (err: unknown) {
-      alert((err as Error).message || 'Unable to open private payment screenshot.');
+      await alert({
+        title: 'Screenshot Unavailable',
+        titleUrdu: 'اسکرین شاٹ دستیاب نہیں',
+        message: (err as Error).message || 'Unable to open private payment screenshot.',
+        variant: 'warning',
+      });
     } finally {
       setLoadingProof(false);
     }
@@ -63,7 +70,18 @@ export function WriterOrderRow({ order }: WriterOrderRowProps) {
 
   const handleVerify = async () => {
     if (!activeSubmission) return;
-    if (!confirm('Confirm that you have received PKR ' + order.amount_pkr + ' in your account?')) return;
+    const confirmed = await confirm({
+      title: 'Verify Payment Receipt',
+      titleUrdu: 'ادائیگی کی وصولی کی تصدیق',
+      message: `Please confirm that you have received PKR ${order.amount_pkr} in your account. This will immediately unlock novel access for the reader.`,
+      messageUrdu: `براہ کرم تصدیق کریں کہ آپ کے اکاؤنٹ میں ${order.amount_pkr} روپے موصول ہو چکے ہیں۔ اس سے قاری کے لیے ناول فوری طور پر ان لاک ہو جائے گا۔`,
+      confirmLabel: 'Confirm Payment Received',
+      confirmLabelUrdu: 'ہاں، رقم موصول ہو گئی',
+      cancelLabel: 'Not Yet',
+      cancelLabelUrdu: 'ابھی نہیں',
+      variant: 'primary',
+    });
+    if (!confirmed) return;
 
     setIsVerifying(true);
     setFeedback(null);

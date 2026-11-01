@@ -10,6 +10,7 @@ import {
 import { getRefundStatusMeta } from '@/lib/disputes/status-meta';
 import { formatPKR } from '@/lib/utils';
 import type { RefundRequestItem } from '@/types/database';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import {
   RotateCcw,
   CheckCircle2,
@@ -40,6 +41,7 @@ export function AdminRefundsClient({
   totalPages,
 }: AdminRefundsClientProps) {
   const router = useRouter();
+  const { alert } = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   // Action modals
@@ -62,10 +64,18 @@ export function AdminRefundsClient({
       if (res.ok && data.url) {
         setLightboxUrl(data.url);
       } else {
-        alert(data.error || 'Failed to generate signed preview link.');
+        await alert({
+          title: 'Preview Unavailable',
+          message: data.error || 'Failed to generate signed preview link.',
+          variant: 'warning',
+        });
       }
     } catch {
-      alert('Network error while requesting signed proof.');
+      await alert({
+        title: 'Network Error',
+        message: 'Network error while requesting signed proof. Please try again.',
+        variant: 'warning',
+      });
     } finally {
       setLoadingProof(null);
     }

@@ -30,6 +30,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { ChapterSplitterWizard } from './ChapterSplitterWizard';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import { useDraftSync } from '@/lib/drafts/sync-engine';
 import {
   getLocalDraft,
@@ -79,6 +80,7 @@ export function ChapterEditor({
   userId,
 }: ChapterEditorProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [formData, setFormData] = useState<ChapterFormInput>({
@@ -309,9 +311,17 @@ export function ChapterEditor({
     if (chapterId && initialData?.updated_at) {
       const checkRes = await getLiveChapterStatusAction(chapterId);
       if (checkRes.success && checkRes.data && checkRes.data.updated_at !== initialData.updated_at) {
-        const proceed = window.confirm(
-          'This chapter was edited elsewhere since you started. Saving now will overwrite those changes. Do you want to proceed?'
-        );
+        const proceed = await confirm({
+          title: 'Concurrent Chapter Edit Detected',
+          titleUrdu: 'باب میں بیک وقت تبدیلی',
+          message: 'This chapter was edited elsewhere since you started. Saving now will overwrite those changes. Do you want to proceed?',
+          messageUrdu: 'یہ باب کسی دوسری جگہ تبدیل کیا جا چکا ہے۔ ابھی محفوظ کرنے سے وہ تبدیلیاں ضائع ہو جائیں گی۔ کیا آپ واقعی محفوظ کرنا چاہتے ہیں؟',
+          confirmLabel: 'Overwrite & Save',
+          confirmLabelUrdu: 'اوور رائٹ کریں',
+          cancelLabel: 'Cancel & Review',
+          cancelLabelUrdu: 'منسوخ کریں',
+          variant: 'danger',
+        });
         if (!proceed) {
           setIsSubmitting(false);
           return;

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/browser';
 import { getTipStatusMeta } from '@/lib/tips/state';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import type { TipStatus } from '@/types/database';
 
 export interface AdminTipDetail {
@@ -67,6 +68,7 @@ interface AdminTipDetailClientProps {
 
 export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) {
   const router = useRouter();
+  const { alert } = useConfirm();
   const [tip, setTip] = useState<AdminTipDetail>(initialTip);
 
   // Review action modal
@@ -108,11 +110,19 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
       if (res.ok && data.url) {
         window.open(data.url, '_blank', 'noopener,noreferrer');
       } else {
-        alert(data.error || 'Failed to load receipt.');
+        await alert({
+          title: 'Receipt Unavailable',
+          message: data.error || 'Failed to load receipt.',
+          variant: 'warning',
+        });
       }
     } catch (err) {
       console.error('Receipt loading error:', err);
-      alert('Unable to load receipt.');
+      await alert({
+        title: 'Network Error',
+        message: 'Unable to load receipt. Please check your network connection.',
+        variant: 'warning',
+      });
     } finally {
       setProofLoading(false);
     }
@@ -121,7 +131,11 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewNotes.trim()) {
-      alert('Please enter review notes for the audit trail.');
+      await alert({
+        title: 'Review Notes Required',
+        message: 'Please enter review notes for the audit trail.',
+        variant: 'warning',
+      });
       return;
     }
 
@@ -135,7 +149,11 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
       });
 
       if (error) {
-        alert(error.message || 'Failed to record review.');
+        await alert({
+          title: 'Review Failed',
+          message: error.message || 'Failed to record review.',
+          variant: 'danger',
+        });
         setIsReviewing(false);
         return;
       }
@@ -152,7 +170,11 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
   const handleRemoveMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!removeReason.trim()) {
-      alert('Please enter a moderation reason.');
+      await alert({
+        title: 'Moderation Reason Required',
+        message: 'Please enter a moderation reason.',
+        variant: 'warning',
+      });
       return;
     }
 
@@ -165,7 +187,11 @@ export function AdminTipDetailClient({ initialTip }: AdminTipDetailClientProps) 
       });
 
       if (error) {
-        alert(error.message || 'Failed to remove message.');
+        await alert({
+          title: 'Message Removal Failed',
+          message: error.message || 'Failed to remove message.',
+          variant: 'danger',
+        });
         setIsRemovingMessage(false);
         return;
       }

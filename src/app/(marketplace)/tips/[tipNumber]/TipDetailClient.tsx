@@ -23,6 +23,7 @@ import { createClient } from '@/lib/supabase/browser';
 import { getTipStatusMeta } from '@/lib/tips/state';
 import { validateTid } from '@/lib/tips/validation';
 import { HOW_TIPS_WORK } from '@/lib/copy/tips';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import type { TipStatus } from '@/types/database';
 
 export interface TipDetailPayload {
@@ -69,6 +70,7 @@ export function TipDetailClient({
   isWaitingOver72Hours = false,
 }: TipDetailClientProps) {
   const router = useRouter();
+  const { confirm, alert } = useConfirm();
   const [tip, setTip] = useState<TipDetailPayload>(initialTip);
 
   // Form states for pending payment
@@ -145,7 +147,18 @@ export function TipDetailClient({
   };
 
   const handleCancelTip = async () => {
-    if (!window.confirm('Are you sure you want to cancel this tip?')) {
+    const confirmed = await confirm({
+      title: 'Cancel Tip',
+      titleUrdu: 'شکریہ منسوخ کریں',
+      message: 'Are you sure you want to cancel this tip? You can send appreciation to the author at any time.',
+      messageUrdu: 'کیا آپ واقعی اس تحفہ/شکریہ کو منسوخ کرنا چاہتے ہیں؟',
+      confirmLabel: 'Yes, Cancel Tip',
+      confirmLabelUrdu: 'ہاں، منسوخ کریں',
+      cancelLabel: 'Keep Tip',
+      cancelLabelUrdu: 'برقرار رکھیں',
+      variant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
@@ -157,7 +170,12 @@ export function TipDetailClient({
       });
 
       if (error) {
-        alert(error.message || 'Unable to cancel tip.');
+        await alert({
+          title: 'Unable to Cancel Tip',
+          titleUrdu: 'منسوخی ممکن نہیں',
+          message: error.message || 'Unable to cancel tip. Please try again.',
+          variant: 'warning',
+        });
         setIsCancelling(false);
         return;
       }
@@ -187,11 +205,21 @@ export function TipDetailClient({
       if (res.ok && data.url) {
         window.open(data.url, '_blank', 'noopener,noreferrer');
       } else {
-        alert(data.error || 'Failed to load receipt proof.');
+        await alert({
+          title: 'Receipt Unavailable',
+          titleUrdu: 'رسید دستیاب نہیں',
+          message: data.error || 'Failed to load receipt proof.',
+          variant: 'warning',
+        });
       }
     } catch (err) {
       console.error('Proof loading error:', err);
-      alert('Unable to load receipt proof.');
+      await alert({
+        title: 'Network Error',
+        titleUrdu: 'نیٹ ورک کی خرابی',
+        message: 'Unable to load receipt proof. Please check your network connection.',
+        variant: 'warning',
+      });
     } finally {
       setProofLoading(false);
     }

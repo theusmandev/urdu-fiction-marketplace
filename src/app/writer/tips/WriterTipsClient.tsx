@@ -24,6 +24,7 @@ import { createClient } from '@/lib/supabase/browser';
 import { validatePresetAmounts } from '@/lib/tips/validation';
 import { getTipStatusMeta } from '@/lib/tips/state';
 import { WRITER_STUDIO_COPY, PRESET_LABELS } from '@/lib/copy/tips';
+import { useConfirm } from '@/components/ui/confirm-provider';
 import type {
   WriterTipSettingsRow,
   WriterPaymentMethodRow,
@@ -72,6 +73,7 @@ export function WriterTipsClient({
   writerPenName,
 }: WriterTipsClientProps) {
   const router = useRouter();
+  const { alert } = useConfirm();
   const [activeTab, setActiveTab] = useState<MainTab>('queue');
   const [queueFilter, setQueueFilter] = useState<QueueFilter>('payment_submitted');
 
@@ -117,11 +119,21 @@ export function WriterTipsClient({
       if (res.ok && data.url) {
         window.open(data.url, '_blank', 'noopener,noreferrer');
       } else {
-        alert(data.error || 'Failed to load receipt.');
+        await alert({
+          title: 'Receipt Unavailable',
+          titleUrdu: 'رسید دستیاب نہیں',
+          message: data.error || 'Failed to load receipt.',
+          variant: 'warning',
+        });
       }
     } catch (err) {
       console.error('Proof loading error:', err);
-      alert('Unable to load receipt.');
+      await alert({
+        title: 'Network Error',
+        titleUrdu: 'نیٹ ورک کی خرابی',
+        message: 'Unable to load receipt. Please check your network connection.',
+        variant: 'warning',
+      });
     } finally {
       setProofLoadingId(null);
     }
@@ -146,7 +158,12 @@ export function WriterTipsClient({
       });
 
       if (error) {
-        alert(error.message || 'Failed to confirm tip.');
+        await alert({
+          title: 'Tip Confirmation Failed',
+          titleUrdu: 'تصدیق میں ناکامی',
+          message: error.message || 'Failed to confirm tip. Please try again.',
+          variant: 'danger',
+        });
         setIsConfirming(false);
         return;
       }
@@ -199,7 +216,12 @@ export function WriterTipsClient({
       });
 
       if (error) {
-        alert(error.message || 'Failed to mark tip as not received.');
+        await alert({
+          title: 'Action Failed',
+          titleUrdu: 'کارروائی نامکمل',
+          message: error.message || 'Failed to mark tip as not received.',
+          variant: 'danger',
+        });
         setIsRejecting(false);
         return;
       }
@@ -243,7 +265,12 @@ export function WriterTipsClient({
       });
 
       if (error) {
-        alert(error.message || 'Failed to update message status.');
+        await alert({
+          title: 'Status Update Failed',
+          titleUrdu: 'حیثیت تبدیل نہ ہو سکی',
+          message: error.message || 'Failed to update message status.',
+          variant: 'warning',
+        });
         return;
       }
 
@@ -321,7 +348,12 @@ export function WriterTipsClient({
         .eq('id', methodId);
 
       if (error) {
-        alert(error.message || 'Failed to update payment method.');
+        await alert({
+          title: 'Payment Method Error',
+          titleUrdu: 'طریقہ کار میں خرابی',
+          message: error.message || 'Failed to update payment method.',
+          variant: 'warning',
+        });
         return;
       }
 
