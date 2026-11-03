@@ -6,9 +6,8 @@ import {
   getPublicNovelBySlug,
   getFreePreviewChapter,
   getPublicNovelChapters,
-  searchPublicNovels,
+  getPublicSupabase,
 } from "@/lib/supabase/public";
-import { parseCatalogParams } from "@/lib/catalog/params";
 import { siteConfig } from "@/config/site";
 import { resolveCoverUrl } from "@/lib/utils";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -16,8 +15,22 @@ import { JsonLd } from "@/components/seo/JsonLd";
 export const revalidate = 120; // 2 minutes ISR revalidation
 
 export async function generateStaticParams() {
-  const { novels } = await searchPublicNovels(parseCatalogParams({ limit: "20" }));
-  return novels.map((n) => ({ slug: n.slug, number: "1" }));
+  const supabase = getPublicSupabase();
+  const { data: previews, error } = await supabase
+    .from("public_free_preview_chapters")
+    .select("novel_slug, chapter_number")
+    .limit(50);
+
+  if (error) {
+    console.error("[generateStaticParams] public_free_preview_chapters query error:", error.code, error.message);
+    return [];
+  }
+
+  if (!previews) return [];
+  return previews.map((p) => ({
+    slug: p.novel_slug,
+    number: String(p.chapter_number),
+  }));
 }
 
 interface ReaderPageProps {
@@ -44,7 +57,11 @@ export async function generateMetadata({
   }
 
   const title = `Chapter ${chapter.chapter_number}: ${chapter.title_urdu} — Free Preview — ${novel.title_urdu}`;
-  const description = `Read free preview of chapter ${chapter.chapter_number} from ${novel.title_urdu} by ${novel.writer_pen_name_english}.`;
+  const rawDescription = `Read free preview of chapter ${chapter.chapter_number} from ${novel.title_urdu} by ${novel.writer_pen_name_english}.`;
+  const description =
+    rawDescription.length > 155
+      ? `${rawDescription.slice(0, 152).trim()}...`
+      : rawDescription;
 
   const rawCover = resolveCoverUrl(novel.cover_url);
   const ogImageUrl = rawCover

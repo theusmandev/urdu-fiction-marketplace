@@ -96,7 +96,9 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', pathname);
-    return NextResponse.redirect(url);
+    const redirectRes = NextResponse.redirect(url);
+    redirectRes.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return redirectRes;
   }
 
   // Auth pages: Redirect authenticated users to their role dashboard unless handling a valid internal target
@@ -127,7 +129,9 @@ export async function updateSession(request: NextRequest) {
         const errorUrl = request.nextUrl.clone();
         errorUrl.pathname = '/login';
         errorUrl.searchParams.set('error', 'account_deactivated');
-        return NextResponse.redirect(errorUrl);
+        const redirectRes = NextResponse.redirect(errorUrl);
+        redirectRes.headers.set('X-Robots-Tag', 'noindex, nofollow');
+        return redirectRes;
       }
 
       const { data: writerProfile } = (await supabase
@@ -138,7 +142,13 @@ export async function updateSession(request: NextRequest) {
 
       url.pathname = getRoleDashboard(profile?.role, writerProfile?.status);
     }
-    return NextResponse.redirect(url);
+    const redirectRes = NextResponse.redirect(url);
+    redirectRes.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return redirectRes;
+  }
+
+  if (isProtected || isAuthRoute) {
+    supabaseResponse.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
 
   return supabaseResponse;
