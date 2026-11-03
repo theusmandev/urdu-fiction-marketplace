@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition, use } from 'react';
+import React, { useState, useTransition, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, AlertCircle, ArrowRight, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react';
@@ -24,6 +24,14 @@ export function LoginForm({ searchParams }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    // If landing on login page, clear any stale client display caches
+    try {
+      localStorage.removeItem('unb_user_display');
+      localStorage.removeItem('unb_has_session');
+    } catch {}
+  }, []);
 
   const getSystemError = () => {
     if (errorCode === 'account_deactivated') {
@@ -54,6 +62,9 @@ export function LoginForm({ searchParams }: LoginFormProps) {
       if (!result.success) {
         setError(result.error || 'Failed to log in. Please verify your credentials.');
       } else if (result.redirectTo) {
+        try {
+          localStorage.setItem('unb_has_session', '1');
+        } catch {}
         router.push(result.redirectTo);
         router.refresh();
       }

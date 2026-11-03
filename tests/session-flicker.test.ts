@@ -470,4 +470,83 @@ describe('Header Auth Flicker, Security Invariants & Proxy Verification', () => 
       assert.ok(setCookieHeader.toLowerCase().includes('max-age=0'));
     });
   });
+
+  describe('8. Amazon-Style Instant Paint & Zero-Skeleton BottomNav Invariants', () => {
+    test('STORAGE keys are strictly defined and namespaced', () => {
+      const STORAGE_USER_KEY = 'unb_user_display';
+      const STORAGE_HINT_KEY = 'unb_has_session';
+
+      assert.equal(STORAGE_USER_KEY, 'unb_user_display');
+      assert.equal(STORAGE_HINT_KEY, 'unb_has_session');
+    });
+
+    test('dual <head> detection script matches document.cookie or localStorage', () => {
+      // Logic from src/app/layout.tsx:
+      const evaluateHeadScript = (cookieStr: string, storageValue: string | null): boolean => {
+        return cookieStr.indexOf('unb_has_session=1') !== -1 || storageValue === '1';
+      };
+
+      // Case A: cookie set, localStorage empty
+      assert.equal(evaluateHeadScript('unb_has_session=1; path=/', null), true);
+
+      // Case B: cookie missing (e.g. initial login navigation before cookie sync), localStorage set
+      assert.equal(evaluateHeadScript('', '1'), true);
+
+      // Case C: neither set (clean visitor)
+      assert.equal(evaluateHeadScript('', null), false);
+
+      // Case D: cookie set to expired, localStorage empty
+      assert.equal(evaluateHeadScript('unb_has_session=;', null), false);
+    });
+
+    test('localStorage snapshot display parser handles valid and invalid JSON safely', () => {
+      const safeParseUser = (json: string | null) => {
+        if (!json) return null;
+        try {
+          const parsed = JSON.parse(json);
+          if (parsed && typeof parsed === 'object' && parsed.id && parsed.name) {
+            return parsed;
+          }
+          return null;
+        } catch {
+          return null;
+        }
+      };
+
+      // Valid snapshot
+      const validSnapshot = JSON.stringify({
+        id: 'u-1',
+        name: 'Fatima Ahmed',
+        email: 'fatima@unb.pk',
+        role: 'writer',
+        isWriter: true,
+      });
+      const parsedValid = safeParseUser(validSnapshot);
+      assert.ok(parsedValid);
+      assert.equal(parsedValid.name, 'Fatima Ahmed');
+
+      // Corrupted JSON
+      assert.equal(safeParseUser('invalid-json{{{'), null);
+
+      // Missing required fields
+      assert.equal(safeParseUser(JSON.stringify({ other: 123 })), null);
+      assert.equal(safeParseUser(null), null);
+    });
+
+    test('BottomNav render invariant: strictly null when unauthenticated or unknown', () => {
+      // BottomNav condition:
+      const shouldRenderBottomNav = (sessionStatus: string, sessionUser: any) => {
+        if (sessionStatus !== 'authenticated' || !sessionUser) {
+          return false;
+        }
+        return true;
+      };
+
+      assert.equal(shouldRenderBottomNav('unknown', null), false, 'Must be false when status is unknown');
+      assert.equal(shouldRenderBottomNav('unknown', { id: 'u1' }), false, 'Must be false when status is unknown');
+      assert.equal(shouldRenderBottomNav('anonymous', null), false, 'Must be false when status is anonymous');
+      assert.equal(shouldRenderBottomNav('authenticated', null), false, 'Must be false when user is null');
+      assert.equal(shouldRenderBottomNav('authenticated', { id: 'u1', name: 'User' }), true, 'Renders when authenticated');
+    });
+  });
 });

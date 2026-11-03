@@ -75,36 +75,11 @@ export function BottomNav({ initialUser }: BottomNavProps = {}) {
     return null;
   }
 
-  // Strict condition: unrendered for anonymous visitors
-  if (sessionStatus === "anonymous") {
+  // Strict invariant: BottomNav is completely unrendered unless authenticated with a valid session user.
+  // Zero skeleton is rendered on mobile or desktop to avoid intrusive layout blocking.
+  if (sessionStatus !== "authenticated" || !sessionUser) {
     return null;
   }
-
-  // When status is unknown (during initial load), render reserved skeleton slot
-  // for hinted users to prevent layout pop, while staying hidden for no-hint visitors via CSS
-  if (sessionStatus === "unknown") {
-    return (
-      <nav
-        aria-label="Mobile Bottom Navigation Skeleton"
-        aria-hidden="true"
-        className="auth-bottom-nav-slot md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border shadow-lg pb-[max(0.5rem,env(safe-area-inset-bottom))]"
-      >
-        <div className="flex items-center justify-around h-14 max-w-md mx-auto px-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="flex-1 flex flex-col items-center justify-center min-h-[44px] py-1"
-            >
-              <div className="w-5 h-5 rounded bg-surface-muted animate-pulse" />
-              <div className="w-8 h-2 mt-1.5 rounded bg-surface-muted animate-pulse" />
-            </div>
-          ))}
-        </div>
-      </nav>
-    );
-  }
-
-  if (!sessionUser) return null;
 
   const tabs = [
     {

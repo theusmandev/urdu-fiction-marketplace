@@ -3,6 +3,7 @@
 import React, { useTransition } from 'react';
 import { LogOut, Loader2 } from 'lucide-react';
 import { logoutUser } from '@/app/actions/auth';
+import { clearMarketplaceSessionCache } from '@/components/layout/useMarketplaceSession';
 
 export interface LogoutButtonProps {
   onLoggedOut?: () => void;
@@ -22,6 +23,7 @@ export function LogoutButton({
 
   const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    clearMarketplaceSessionCache();
     startTransition(async () => {
       onLoggedOut?.();
       await logoutUser();

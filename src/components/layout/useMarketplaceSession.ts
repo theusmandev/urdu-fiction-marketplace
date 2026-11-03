@@ -16,6 +16,9 @@ export interface MarketplaceSessionState {
   status: MarketplaceSessionStatus;
 }
 
+export const STORAGE_USER_KEY = "unb_user_display";
+export const STORAGE_HINT_KEY = "unb_has_session";
+
 let cachedState: MarketplaceSessionState = {
   user: null,
   status: "unknown",
@@ -32,13 +35,27 @@ function syncSessionHintCookie(isAuthenticated: boolean) {
       const secureFlag = isSecure ? "; Secure" : "";
       document.cookie = `unb_has_session=1; Path=/; Max-Age=2592000; SameSite=Lax${secureFlag}`;
       document.documentElement.setAttribute("data-session-hint", "1");
+      try {
+        localStorage.setItem(STORAGE_HINT_KEY, "1");
+      } catch {}
     } else {
       document.cookie = "unb_has_session=; Path=/; Max-Age=0; SameSite=Lax";
       document.documentElement.removeAttribute("data-session-hint");
+      try {
+        localStorage.removeItem(STORAGE_HINT_KEY);
+        localStorage.removeItem(STORAGE_USER_KEY);
+      } catch {}
     }
   } catch {
     // Ignore in non-cookie environments
   }
+}
+
+export function clearMarketplaceSessionCache(): void {
+  hasInitiatedFetch = false;
+  cachedState = { user: null, status: "anonymous" };
+  syncSessionHintCookie(false);
+  listeners.forEach((l) => l());
 }
 
 export function setMarketplaceSessionUser(user: HeaderSessionUser | null) {
@@ -52,6 +69,9 @@ export function setMarketplaceSessionState(
   cachedState = { user, status };
   if (status === "authenticated" && user) {
     syncSessionHintCookie(true);
+    try {
+      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
+    } catch {}
   } else if (status === "anonymous") {
     syncSessionHintCookie(false);
   }
@@ -129,6 +149,22 @@ export function useMarketplaceSession(
       cachedState = { user: initialUser, status: "authenticated" };
       syncSessionHintCookie(true);
       return;
+    }
+
+    // Instant paint reconciliation from localStorage display snapshot
+    if (cachedState.status === "unknown" && typeof window !== "undefined") {
+      try {
+        const cachedUserJson = localStorage.getItem(STORAGE_USER_KEY);
+        if (cachedUserJson) {
+          const parsed = JSON.parse(cachedUserJson);
+          if (parsed && typeof parsed === "object" && parsed.id && parsed.name) {
+            cachedState = { user: parsed as HeaderSessionUser, status: "authenticated" };
+            listeners.forEach((l) => l());
+          }
+        }
+      } catch {
+        // Ignore localStorage parse errors
+      }
     }
 
     if (hasInitiatedFetch) {

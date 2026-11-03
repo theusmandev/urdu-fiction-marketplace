@@ -131,7 +131,7 @@ export default async function RootLayout({
         <script
           id="unb-session-hint"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(document.cookie.indexOf('unb_has_session=1')!==-1){document.documentElement.setAttribute('data-session-hint','1');window.__UNB_SESSION=fetch('/api/auth/session',{credentials:'same-origin',cache:'no-store'});}}catch(e){}})();`,
+            __html: `(function(){try{if(document.cookie.indexOf('unb_has_session=1')!==-1||localStorage.getItem('unb_has_session')==='1'){document.documentElement.setAttribute('data-session-hint','1');window.__UNB_SESSION=fetch('/api/auth/session',{credentials:'same-origin',cache:'no-store'});}}catch(e){}})();`,
           }}
         />
         <JsonLd data={getSiteJsonLd()} />

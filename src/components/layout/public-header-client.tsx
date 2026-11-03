@@ -401,8 +401,8 @@ export function PublicHeaderClient({
                     className="auth-skeleton-slot items-center gap-2 w-[140px] h-[36px]"
                     aria-hidden="true"
                   >
-                    <div className="w-8 h-8 rounded-full bg-surface-muted animate-pulse border border-border shrink-0" />
-                    <div className="w-24 h-8 rounded-lg bg-surface-muted animate-pulse border border-border" />
+                    <div className="w-8 h-8 rounded-full bg-surface-muted/80 border border-border shrink-0 flex items-center justify-center" />
+                    <div className="w-20 h-3.5 rounded-md bg-surface-muted/70 border border-border/40" />
                   </div>
                 </>
               )}
@@ -461,7 +461,7 @@ export function PublicHeaderClient({
                     className="auth-skeleton-slot min-w-[44px] min-h-[44px] items-center justify-center"
                     aria-hidden="true"
                   >
-                    <div className="w-7 h-7 rounded-full bg-surface-muted animate-pulse border border-border" />
+                    <div className="w-7 h-7 rounded-full bg-surface-muted/80 border border-border flex items-center justify-center" />
                   </div>
                 </>
               )}
@@ -652,13 +652,13 @@ export function PublicHeaderClient({
                     </div>
                   </div>
                   <div
-                    className="auth-skeleton-slot p-3 bg-surface-muted rounded-xl border border-border items-center gap-3"
+                    className="auth-skeleton-slot p-3 bg-surface-muted/60 rounded-xl border border-border items-center gap-3"
                     aria-hidden="true"
                   >
-                    <div className="w-10 h-10 rounded-full bg-surface-muted border border-border animate-pulse shrink-0" />
+                    <div className="w-10 h-10 rounded-full bg-surface-muted border border-border shrink-0 flex items-center justify-center" />
                     <div className="space-y-2 flex-1">
-                      <div className="h-4 bg-border/40 rounded animate-pulse w-24" />
-                      <div className="h-3 bg-border/40 rounded animate-pulse w-36" />
+                      <div className="h-3.5 bg-border/50 rounded w-24" />
+                      <div className="h-2.5 bg-border/40 rounded w-36" />
                     </div>
                   </div>
                 </>
