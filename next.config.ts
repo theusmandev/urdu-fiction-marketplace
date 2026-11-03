@@ -137,6 +137,33 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: '/:path(api|account|orders|library|checkout|disputes|support|notifications|tips)/:subpath*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
+      {
+        source: '/:path(api|account|orders|library|checkout|disputes|support|notifications|tips)',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
+      {
+        source: '/:path(login|register|forgot-password|reset-password)',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ];
   },
 };
