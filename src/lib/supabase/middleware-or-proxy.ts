@@ -4,6 +4,52 @@ import type { ProfileRow, WriterProfileRow } from '@/types/database';
 import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Protected route prefixes requiring authentication
+  const protectedPrefixes = [
+    '/account',
+    '/library',
+    '/orders',
+    '/checkout',
+    '/writer',
+    '/admin',
+    '/read',
+    '/notifications',
+    '/disputes',
+    '/support',
+    '/tips',
+    '/become-a-writer',
+  ];
+
+  const isProtected = protectedPrefixes.some((prefix) =>
+    pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+
+  // Auth pages & callbacks requiring session handling / redirection
+  const authRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/auth',
+    '/api/auth',
+  ];
+
+  const isAuthRoute = authRoutes.some((route) =>
+    pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // SEO & Core Web Vitals optimization:
+  // For public static/ISR routes, NEVER read cookies or call Supabase auth.
+  // Returning plain NextResponse.next() preserves static / ISR edge caching and avoids
+  // unnecessary network roundtrips to Supabase auth for anonymous visitors and search crawlers.
+  if (!isProtected && !isAuthRoute) {
+    return NextResponse.next({
+      request,
+    });
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -46,22 +92,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
-
-  // Protected route prefixes requiring authentication
-  const protectedPrefixes = [
-    '/account',
-    '/library',
-    '/orders',
-    '/writer',
-    '/admin',
-    '/become-a-writer',
-  ];
-
-  const isProtected = protectedPrefixes.some((prefix) =>
-    pathname === prefix || pathname.startsWith(`${prefix}/`)
-  );
-
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -70,7 +100,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Auth pages: Redirect authenticated users to their role dashboard unless handling a valid internal target
-  const authRoutes = ['/login', '/register', '/forgot-password'];
   if (user && authRoutes.includes(pathname)) {
     const nextParam = request.nextUrl.searchParams.get('next');
     const url = request.nextUrl.clone();
