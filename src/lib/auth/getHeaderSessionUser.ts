@@ -1,6 +1,6 @@
-import { getCurrentUser } from '@/lib/auth/getCurrentUser';
 import { createClient } from '@/lib/supabase/server';
 import type { HeaderSessionUser } from '@/components/layout/public-header-client';
+import { clearSessionHintCookie } from '@/lib/auth/session-hint';
 
 function isDynamicServerError(err: unknown): boolean {
   if (typeof err !== 'object' || err === null) return false;
@@ -14,27 +14,68 @@ function isDynamicServerError(err: unknown): boolean {
 /**
  * Server-side session resolver for Header & Navigation layouts.
  * Authoritatively retrieves authenticated user profile and unread notifications count
- * directly on the server to prevent initial client-side auth UI flickering.
+ * directly from cryptographically signed Supabase auth tokens.
+ *
+ * Security Invariant: Zero header trust. Identity is established strictly via
+ * Supabase auth tokens, never from unverified request headers.
+ * Queries profiles, writer_profiles, and unread notification count in parallel via Promise.all.
  */
 export async function getHeaderSessionUser(): Promise<HeaderSessionUser | null> {
   try {
-    const { user, profile, writerProfile } = await getCurrentUser();
+    const supabase = await createClient();
 
-    if (!user || !profile) {
+    // 1. Authoritative verification of signed JWT via Supabase Auth (handles token refresh automatically)
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return null;
     }
 
-    const supabase = await createClient();
-    const { data: unreadCount, error: countErr } = await supabase.rpc(
-      'get_my_unread_notification_count'
-    );
-    if (countErr) {
-      console.error('getHeaderSessionUser: unread count RPC error:', countErr);
+    // 2. Parallel execution of profile, writer_profile, and unread notification count
+    const [profileRes, writerProfileRes, unreadCountRes] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url, role, is_active, email')
+        .eq('id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('writer_profiles')
+        .select('status')
+        .eq('id', user.id)
+        .maybeSingle(),
+      supabase.rpc('get_my_unread_notification_count'),
+    ]);
+
+    if (profileRes.error) {
+      console.error('getHeaderSessionUser: failed to fetch profile:', profileRes.error);
     }
+    if (writerProfileRes.error) {
+      console.error('getHeaderSessionUser: failed to fetch writer profile:', writerProfileRes.error);
+    }
+    if (unreadCountRes.error) {
+      console.error('getHeaderSessionUser: unread count RPC error:', unreadCountRes.error);
+    }
+
+    const profile = profileRes.data;
+    if (!profile) {
+      return null;
+    }
+
+    if (!profile.is_active) {
+      await supabase.auth.signOut();
+      await clearSessionHintCookie();
+      return null;
+    }
+
+    const writerProfile = writerProfileRes.data;
+    const unreadCount = unreadCountRes.data ?? 0;
 
     const sessionUser: HeaderSessionUser = {
       id: user.id,
-      email: user.email || profile.email,
+      email: profile.email || user.email || '',
       name: profile.full_name || profile.username || user.email?.split('@')[0] || 'User',
       username: profile.username,
       avatarUrl: profile.avatar_url,
@@ -44,7 +85,7 @@ export async function getHeaderSessionUser(): Promise<HeaderSessionUser | null> 
         writerProfile?.status === 'approved' ||
         writerProfile?.status === 'pending_approval',
       writerStatus: writerProfile?.status ?? null,
-      unreadNotificationsCount: unreadCount ?? 0,
+      unreadNotificationsCount: unreadCount,
     };
 
     return sessionUser;
@@ -56,4 +97,3 @@ export async function getHeaderSessionUser(): Promise<HeaderSessionUser | null> 
     return null;
   }
 }
-

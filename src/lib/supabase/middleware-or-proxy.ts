@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { ProfileRow, WriterProfileRow } from '@/types/database';
 import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
+import { removeSessionHintCookie } from '@/lib/auth/session-hint';
 
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -50,8 +51,45 @@ export async function updateSession(request: NextRequest) {
     });
   }
 
+  const allCookies = request.cookies.getAll();
+  const hasAuthToken = allCookies.some(
+    (c) => c.name.startsWith('sb-') && c.name.includes('-auth-token')
+  );
+
+  // Fast anonymous path: If an unauthenticated client requests /api/auth/session
+  // and has no Supabase auth cookies, return user: null in <1ms without calling Supabase.
+  const isSessionPath = pathname === '/api/auth/session' || pathname === '/api/auth/session/';
+  if (isSessionPath && !hasAuthToken) {
+    const headers = new Headers();
+    headers.set('Cache-Control', 'private, no-store');
+    headers.set('Vary', 'Cookie');
+    headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return NextResponse.json({ user: null }, { headers });
+  }
+
+  // CRITICAL SECURITY RULE: Clean incoming internal headers to prevent spoofing
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.delete('x-user-id');
+  requestHeaders.delete('x-user-email');
+
+  // Option (b) Security Invariant: Drop proxy-to-route header trust.
+  // For /api/auth/session with auth cookies, proxy skips calling getUser() to avoid
+  // duplicate Supabase calls, allowing route handler to authoritatively resolve session
+  // and handle token refresh with zero header trust.
+  if (isSessionPath) {
+    const res = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return res;
+  }
+
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: requestHeaders,
+    },
   });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -74,7 +112,9 @@ export async function updateSession(request: NextRequest) {
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
-            request,
+            request: {
+              headers: requestHeaders,
+            },
           });
           cookiesToSet.forEach(({ name, value, options }) => {
             // Strict security invariant: enforce host-only auth cookies (no Domain attribute)
@@ -91,6 +131,22 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (user) {
+    requestHeaders.set('x-user-id', user.id);
+    if (user.email) {
+      requestHeaders.set('x-user-email', user.email);
+    }
+    const finalResponse = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+    supabaseResponse.cookies.getAll().forEach((c) => {
+      finalResponse.cookies.set(c.name, c.value, c);
+    });
+    supabaseResponse = finalResponse;
+  }
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
@@ -131,6 +187,7 @@ export async function updateSession(request: NextRequest) {
         errorUrl.searchParams.set('error', 'account_deactivated');
         const redirectRes = NextResponse.redirect(errorUrl);
         redirectRes.headers.set('X-Robots-Tag', 'noindex, nofollow');
+        removeSessionHintCookie(redirectRes);
         return redirectRes;
       }
 

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSafeRedirectUrl } from '@/lib/auth/safe-redirect';
 import { siteConfig } from '@/config/site';
+import { attachSessionHintCookie } from '@/lib/auth/session-hint';
 
 /**
  * Route Handler for Supabase Auth OAuth, Email Confirmation, and Password Recovery callbacks.
@@ -36,7 +37,9 @@ export async function GET(request: NextRequest) {
 
     if (!error) {
       const destination = getSafeRedirectUrl(nextParam, '/account');
-      return NextResponse.redirect(new URL(destination, baseUrl));
+      const response = NextResponse.redirect(new URL(destination, baseUrl));
+      attachSessionHintCookie(response);
+      return response;
     }
   }
 

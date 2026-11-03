@@ -11,6 +11,10 @@ import {
 } from '@/lib/auth/schemas';
 import { getSafeRedirectUrl } from '@/lib/auth/safe-redirect';
 import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
+import {
+  setSessionHintCookie,
+  clearSessionHintCookie,
+} from '@/lib/auth/session-hint';
 
 export interface AuthActionResult {
   success?: boolean;
@@ -92,6 +96,11 @@ export async function registerUser(formData: FormData): Promise<AuthActionResult
     };
   }
 
+  // Session active immediately upon signup
+  if (data.session) {
+    await setSessionHintCookie();
+  }
+
   return {
     success: true,
     redirectTo: '/account',
@@ -147,6 +156,7 @@ export async function loginUser(
 
   if (profile && !profile.is_active) {
     await supabase.auth.signOut();
+    await clearSessionHintCookie();
     return {
       success: false,
       error: 'Your account has been deactivated. Please contact support.',
@@ -163,6 +173,9 @@ export async function loginUser(
     console.error('signInAction: writerProfile check error:', writerProfileErr);
   }
 
+  // Set aesthetic session display hint for zero-flicker client rendering
+  await setSessionHintCookie();
+
   const roleDashboard = getRoleDashboard(profile?.role, writerProfile?.status);
   const safeDestination = getSafeRedirectUrl(nextParam, roleDashboard);
   return {
@@ -177,6 +190,7 @@ export async function loginUser(
 export async function logoutUser(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  await clearSessionHintCookie();
   redirect('/login');
 }
 

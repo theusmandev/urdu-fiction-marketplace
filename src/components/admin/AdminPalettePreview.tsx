@@ -37,7 +37,7 @@ export function setAdminPreviewCookie(palette: SitePalette) {
 }
 
 export function AdminPalettePreview({ role }: AdminPalettePreviewProps) {
-  const sessionUser = useMarketplaceSession();
+  const { user: sessionUser } = useMarketplaceSession();
   const effectiveRole = role || sessionUser?.role;
   const isAdmin = effectiveRole === 'admin';
 

@@ -318,6 +318,24 @@ textarea.font-urdu::placeholder {
   cursor: not-allowed;
 }
 
+/* Session Hint UI Flicker Prevention Slots & State Selectors */
+.auth-skeleton-slot {
+  display: none !important;
+}
+.auth-bottom-nav-slot {
+  display: none !important;
+}
+
+html[data-session-hint="1"] .auth-anonymous-slot {
+  display: none !important;
+}
+html[data-session-hint="1"] .auth-skeleton-slot {
+  display: flex !important;
+}
+html[data-session-hint="1"] .auth-bottom-nav-slot {
+  display: block !important;
+}
+
 /* Print Styles for Invoices and Receipts */
 @media print {
   html, body {

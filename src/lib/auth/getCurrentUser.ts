@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { ProfileRow, WriterProfileRow } from '@/types/database';
 import type { User } from '@supabase/supabase-js';
+import { clearSessionHintCookie } from '@/lib/auth/session-hint';
 
 export interface CurrentUserResult {
   user: User | null;
@@ -40,6 +41,7 @@ export async function getCurrentUser(): Promise<CurrentUserResult> {
   if (profile && !profile.is_active) {
     // Security enforcement: Deactivated users are immediately signed out
     await supabase.auth.signOut();
+    await clearSessionHintCookie();
     return {
       user: null,
       profile: null,

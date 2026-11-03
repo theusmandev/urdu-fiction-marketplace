@@ -121,6 +121,19 @@ export default async function RootLayout({
     >
       <head>
         <meta name="theme-color" content={metaThemeColor} />
+        {/*
+          Synchronous session display hint & early fetch script.
+          Runs before first paint to set data-session-hint="1" on <html> if the user has an active session hint,
+          instantly rendering neutral skeletons and eliminating 1-2s auth header flicker on static/ISR pages.
+          Fires early non-blocking fetch to /api/auth/session to minimize Time-to-Interactive.
+          Compatible with CSP script-src 'self' 'unsafe-inline'.
+        */}
+        <script
+          id="unb-session-hint"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(document.cookie.indexOf('unb_has_session=1')!==-1){document.documentElement.setAttribute('data-session-hint','1');window.__UNB_SESSION=fetch('/api/auth/session',{credentials:'same-origin',cache:'no-store'});}}catch(e){}})();`,
+          }}
+        />
         <JsonLd data={getSiteJsonLd()} />
       </head>
       <body

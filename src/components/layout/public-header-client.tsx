@@ -55,7 +55,7 @@ export function PublicHeaderClient({
   initialBannerDismissed = false,
 }: PublicHeaderClientProps) {
   const router = useRouter();
-  const sessionUser = useMarketplaceSession(initialUser);
+  const { user: sessionUser, status: sessionStatus } = useMarketplaceSession(initialUser);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -334,17 +334,17 @@ export function PublicHeaderClient({
               {sessionUser?.isWriter ? (
                 <Link
                   href="/writer"
-                  className="flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline transition-colors min-w-[130px]"
                 >
-                  <Feather className="w-3.5 h-3.5" />
+                  <Feather className="w-3.5 h-3.5 shrink-0" />
                   <span>Writer Studio</span>
                 </Link>
               ) : (
                 <Link
                   href="/become-a-writer"
-                  className="flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline transition-colors min-w-[130px]"
                 >
-                  <Feather className="w-3.5 h-3.5" />
+                  <Feather className="w-3.5 h-3.5 shrink-0" />
                   <span>Sell Your Novels</span>
                 </Link>
               )}
@@ -352,7 +352,7 @@ export function PublicHeaderClient({
 
             {/* Desktop Auth / Session Menu Area */}
             <div className="hidden sm:flex items-center gap-2">
-              {sessionUser ? (
+              {sessionStatus === "authenticated" && sessionUser ? (
                 <>
                   <NotificationBell
                     unreadCount={sessionUser.unreadNotificationsCount}
@@ -360,7 +360,7 @@ export function PublicHeaderClient({
                   />
                   <AccountMenu user={sessionUser} variant="marketplace" />
                 </>
-              ) : (
+              ) : sessionStatus === "anonymous" ? (
                 /* Signed-out CTAs */
                 <>
                   <Link
@@ -376,6 +376,32 @@ export function PublicHeaderClient({
                     <Sparkles className="w-3.5 h-3.5 text-accent" />
                     <span>Join Free</span>
                   </Link>
+                </>
+              ) : (
+                /* Unknown status (initial load): Render both anonymous and neutral skeleton slots */
+                <>
+                  <div className="auth-anonymous-slot items-center gap-2">
+                    <Link
+                      href="/login"
+                      className="text-sm font-medium text-text hover:text-primary px-3.5 py-2 rounded-lg transition-colors min-h-[44px] flex items-center"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="btn-primary text-xs !min-h-[40px] !py-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-accent" />
+                      <span>Join Free</span>
+                    </Link>
+                  </div>
+                  <div
+                    className="auth-skeleton-slot items-center gap-2 w-[140px] h-[36px]"
+                    aria-hidden="true"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-surface-muted animate-pulse border border-border shrink-0" />
+                    <div className="w-24 h-8 rounded-lg bg-surface-muted animate-pulse border border-border" />
+                  </div>
                 </>
               )}
             </div>
@@ -393,7 +419,7 @@ export function PublicHeaderClient({
               </button>
 
               {/* Mobile User Avatar or Quick Sign In */}
-              {sessionUser ? (
+              {sessionStatus === "authenticated" && sessionUser ? (
                 <Link
                   href="/account"
                   className="min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -413,13 +439,28 @@ export function PublicHeaderClient({
                     </div>
                   )}
                 </Link>
-              ) : (
+              ) : sessionStatus === "anonymous" ? (
                 <Link
                   href="/login"
                   className="min-w-[44px] min-h-[44px] px-2 flex items-center justify-center text-xs font-semibold text-primary hover:text-accent-strong transition-colors"
                 >
                   Sign In
                 </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="auth-anonymous-slot min-w-[44px] min-h-[44px] px-2 items-center justify-center text-xs font-semibold text-primary hover:text-accent-strong transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <div
+                    className="auth-skeleton-slot min-w-[44px] min-h-[44px] items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-surface-muted animate-pulse border border-border" />
+                  </div>
+                </>
               )}
 
               {/* Mobile Hamburger Menu Button */}
@@ -516,30 +557,7 @@ export function PublicHeaderClient({
             {/* Scrollable Content Container */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
               {/* Top: Signed-Out Login & Register CTAs OR Signed-In Account Card */}
-              {!sessionUser ? (
-                <div className="p-3 bg-surface-muted rounded-xl border border-border space-y-2">
-                  <p className="text-xs font-semibold text-text">Welcome to UNB Premium</p>
-                  <p className="text-[11px] text-text-muted">
-                    Sign in to access your personal library and reader orders.
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <Link
-                      href="/login"
-                      onClick={closeMobileMenu}
-                      className="min-h-[44px] flex items-center justify-center text-center py-2 text-xs font-semibold text-text border border-border rounded-lg bg-surface hover:bg-surface-muted transition-colors"
-                    >
-                      Log In
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={closeMobileMenu}
-                      className="btn-primary !min-h-[44px] text-xs font-semibold"
-                    >
-                      Join Free
-                    </Link>
-                  </div>
-                </div>
-              ) : (
+              {sessionStatus === "authenticated" && sessionUser ? (
                 /* Account Card (Name, Role badge, Email) */
                 <div className="p-3 bg-surface-muted rounded-xl border border-border flex items-center gap-3">
                   {sessionUser.avatarUrl ? (
@@ -582,6 +600,64 @@ export function PublicHeaderClient({
                     </div>
                   </div>
                 </div>
+              ) : sessionStatus === "anonymous" ? (
+                <div className="p-3 bg-surface-muted rounded-xl border border-border space-y-2">
+                  <p className="text-xs font-semibold text-text">Welcome to UNB Premium</p>
+                  <p className="text-[11px] text-text-muted">
+                    Sign in to access your personal library and reader orders.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <Link
+                      href="/login"
+                      onClick={closeMobileMenu}
+                      className="min-h-[44px] flex items-center justify-center text-center py-2 text-xs font-semibold text-text border border-border rounded-lg bg-surface hover:bg-surface-muted transition-colors"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={closeMobileMenu}
+                      className="btn-primary !min-h-[44px] text-xs font-semibold"
+                    >
+                      Join Free
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="auth-anonymous-slot p-3 bg-surface-muted rounded-xl border border-border flex-col space-y-2">
+                    <p className="text-xs font-semibold text-text">Welcome to UNB Premium</p>
+                    <p className="text-[11px] text-text-muted">
+                      Sign in to access your personal library and reader orders.
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <Link
+                        href="/login"
+                        onClick={closeMobileMenu}
+                        className="min-h-[44px] flex items-center justify-center text-center py-2 text-xs font-semibold text-text border border-border rounded-lg bg-surface hover:bg-surface-muted transition-colors"
+                      >
+                        Log In
+                      </Link>
+                      <Link
+                        href="/register"
+                        onClick={closeMobileMenu}
+                        className="btn-primary !min-h-[44px] text-xs font-semibold"
+                      >
+                        Join Free
+                      </Link>
+                    </div>
+                  </div>
+                  <div
+                    className="auth-skeleton-slot p-3 bg-surface-muted rounded-xl border border-border items-center gap-3"
+                    aria-hidden="true"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-surface-muted border border-border animate-pulse shrink-0" />
+                    <div className="space-y-2 flex-1">
+                      <div className="h-4 bg-border/40 rounded animate-pulse w-24" />
+                      <div className="h-3 bg-border/40 rounded animate-pulse w-36" />
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Quick links for signed-in users */}
