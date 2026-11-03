@@ -130,7 +130,7 @@ export const siteConfig: SiteConfig = {
       writers: [
         { title: "Sell Your Novels", href: "/become-a-writer" },
         { title: "Writer Guidelines & Integrity", href: "/content-policy" },
-        { title: "Platform Fee & Payout Policy", href: "/writer/agreement" },
+        { title: "Platform Fee & Payout Policy", href: "/terms" },
         { title: "Writer Studio", href: "/writer" },
       ],
       readers: [
