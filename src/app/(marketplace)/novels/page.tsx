@@ -13,6 +13,8 @@ import {
   getPublicGenres,
 } from "@/lib/supabase/public";
 import { BookMarked, ChevronLeft, ChevronRight } from "lucide-react";
+import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export const revalidate = 60; // 60 seconds ISR revalidation
 
@@ -36,13 +38,16 @@ export async function generateMetadata({
   const params = parseCatalogParams(resolved);
 
   const title = params.q
-    ? `Search: "${params.q}" — Urdu Novels Catalog`
+    ? `Search: "${params.q}" — Urdu Novels`
     : params.genre
     ? `Browse ${params.genre} Urdu Novels`
-    : "Browse Urdu Fiction & Novels Catalog";
+    : "All Urdu Novels & Fiction — تمام ناولز";
 
   const description =
-    "Explore independent Pakistani Urdu novels. Direct reader-to-writer payments via JazzCash, EasyPaisa, and Bank Transfer with instant chapter access.";
+    "Browse digital Pakistani Urdu novels and series. Read free preview chapters and pay authors directly via JazzCash, EasyPaisa, or bank transfer.";
+
+  const canonicalUrl = `${siteConfig.url}/novels`;
+  const ogImageUrl = `${siteConfig.url}/brand/og-image.png`;
 
   return {
     title,
@@ -59,6 +64,26 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
+      url: canonicalUrl,
+      locale: "en_PK",
+      alternateLocale: ["ur_PK"],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: "UNB Premium — Urdu Novels Catalog",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
+    alternates: {
+      canonical: canonicalUrl,
     },
   };
 }
@@ -75,8 +100,42 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
   const totalPages = Math.ceil(totalCount / params.limit) || 1;
   const currentPage = params.page;
 
+  const jsonLdGraph: Record<string, unknown>[] = [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: siteConfig.url,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Novels",
+          item: `${siteConfig.url}/novels`,
+        },
+      ],
+    },
+  ];
+
+  if (currentPage === 1 && novels.length > 0) {
+    jsonLdGraph.push({
+      "@type": "ItemList",
+      numberOfItems: novels.length,
+      itemListElement: novels.map((n, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        name: n.title_urdu || n.title_english,
+        url: `${siteConfig.url}/novels/${n.slug}`,
+      })),
+    });
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-w-0 py-6 sm:py-10 space-y-6 sm:space-y-8">
+      <JsonLd data={{ "@context": "https://schema.org", "@graph": jsonLdGraph }} />
       {/* Page Header */}
       <div className="space-y-3 border-b border-border pb-6 w-full min-w-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 min-w-0">

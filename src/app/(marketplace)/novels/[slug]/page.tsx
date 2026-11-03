@@ -16,6 +16,7 @@ import {
 } from "@/lib/supabase/public";
 import { resolveCoverUrl } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 import {
   BookOpen,
   Feather,
@@ -49,6 +50,13 @@ export async function generateMetadata({
     novel.synopsis_urdu ||
     `Read ${novel.title_urdu} by ${novel.writer_pen_name_english}. Support Pakistani authors directly via JazzCash, EasyPaisa, or Bank Transfer.`;
 
+  const rawCover = resolveCoverUrl(novel.cover_url);
+  const ogImageUrl = rawCover
+    ? rawCover.startsWith("http")
+      ? rawCover
+      : `${siteConfig.url}${rawCover.startsWith("/") ? "" : "/"}${rawCover}`
+    : `${siteConfig.url}/brand/og-image.png`;
+
   return {
     title,
     description,
@@ -57,15 +65,22 @@ export async function generateMetadata({
       description,
       type: "book",
       url: `${siteConfig.url}/novels/${novel.slug}`,
-      images: novel.cover_url
-        ? [{ url: novel.cover_url, width: 600, height: 900, alt: novel.title_urdu }]
-        : [],
+      locale: "en_PK",
+      alternateLocale: ["ur_PK"],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 600,
+          height: 900,
+          alt: novel.title_urdu || novel.title_english,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: novel.cover_url ? [novel.cover_url] : [],
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${siteConfig.url}/novels/${novel.slug}`,
@@ -160,10 +175,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-10 pb-12">
         <NovelAccessProvider novelId={novel.id}>
