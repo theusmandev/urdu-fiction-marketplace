@@ -9,6 +9,7 @@ import {
   searchPublicNovels,
 } from "@/lib/supabase/public";
 import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { BookMarked, ChevronRight, Home, ArrowLeft } from "lucide-react";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
@@ -30,8 +31,10 @@ export async function generateMetadata({
   }
 
   const title = `${genre.name_english} (${genre.name_urdu}) — Urdu Novels`;
-  const description = `Read and support independent Pakistani authors writing in ${genre.name_english} (${genre.name_urdu}). Direct reader-to-writer payment verification.`;
+  const description = `Read Urdu fiction in ${genre.name_english} (${genre.name_urdu}). Direct reader-to-writer payments via JazzCash, EasyPaisa, or bank transfer.`;
   const isEmpty = !genre.published_novels_count || genre.published_novels_count <= 0;
+  const canonicalUrl = `${siteConfig.url}/genres/${genre.slug}`;
+  const ogImageUrl = `${siteConfig.url}/brand/og-image.png`;
 
   return {
     title,
@@ -48,10 +51,26 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      url: `${siteConfig.url}/genres/${genre.slug}`,
+      url: canonicalUrl,
+      locale: "en_PK",
+      alternateLocale: ["ur_PK"],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${genre.name_english} Urdu Novels`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${siteConfig.url}/genres/${genre.slug}`,
+      canonical: canonicalUrl,
     },
   };
 }
@@ -70,38 +89,49 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
     limit: 24,
   });
 
-  // JSON-LD Structured Data
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
+  // JSON-LD Structured Data: BreadcrumbList and ItemList
+  const jsonLdGraph: Record<string, unknown>[] = [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: siteConfig.url,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Genres",
+          item: `${siteConfig.url}/genres`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: genre.name_english,
+          item: `${siteConfig.url}/genres/${genre.slug}`,
+        },
+      ],
+    },
+  ];
+
+  if (novels.length > 0) {
+    jsonLdGraph.push({
+      "@type": "ItemList",
+      numberOfItems: novels.length,
+      itemListElement: novels.map((n, idx) => ({
         "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: siteConfig.url,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Genres",
-        item: `${siteConfig.url}/genres`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: genre.name_english,
-        item: `${siteConfig.url}/genres/${genre.slug}`,
-      },
-    ],
-  };
+        position: idx + 1,
+        name: n.title_urdu || n.title_english,
+        url: `${siteConfig.url}/novels/${n.slug}`,
+      })),
+    });
+  }
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={{ "@context": "https://schema.org", "@graph": jsonLdGraph }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         {/* Breadcrumb Navigation */}

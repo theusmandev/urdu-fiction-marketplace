@@ -4,20 +4,52 @@ import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { getPublicGenres } from "@/lib/supabase/public";
 import { BookOpen } from "lucide-react";
+import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 
 export const revalidate = 300; // 5 minutes ISR revalidation
 
 export const metadata: Metadata = {
   title: "Literary Genres — اصنافِ ادب",
   description:
-    "Explore Urdu fiction genres: Romantic & Social, Mystery & Thriller, Historical & Classical, Fantasy & Tales, and Literary Fiction.",
+    "Explore digital Urdu fiction categories including romance, social, suspense, mystery, historical, and classical literature.",
+  alternates: {
+    canonical: "/genres",
+  },
+  openGraph: {
+    title: "Literary Genres — اصنافِ ادب | UNB Premium",
+    description:
+      "Explore digital Urdu fiction categories including romance, social, suspense, mystery, historical, and classical literature.",
+    type: "website",
+    url: "/genres",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Literary Genres — اصنافِ ادب",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Literary Genres — اصنافِ ادب | UNB Premium",
+    description:
+      "Explore digital Urdu fiction categories including romance, social, suspense, mystery, historical, and classical literature.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 export default async function GenresIndexPage() {
   const genres = await getPublicGenres();
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([{ name: "Genres", path: "/genres" }]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <JsonLd data={breadcrumbJsonLd} />
       {/* Page Title */}
       <div className="space-y-3 border-b border-border pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
