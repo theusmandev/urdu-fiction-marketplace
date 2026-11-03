@@ -7,6 +7,7 @@ import { NovelCard } from "@/components/catalog/NovelCard";
 import { WriterProfileTipButton } from "@/components/tips/WriterProfileTipButton";
 import {
   getPublicWriterByUsername,
+  getPublicWriters,
   getNovelsByWriter,
 } from "@/lib/supabase/public";
 import { siteConfig } from "@/config/site";
@@ -19,6 +20,15 @@ import {
 } from "lucide-react";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
+
+export async function generateStaticParams() {
+  const writers = await getPublicWriters(50);
+  return writers
+    .filter((w) => Boolean(w.username))
+    .map((w) => ({
+      username: w.username!,
+    }));
+}
 
 interface WriterProfilePageProps {
   params: Promise<{ username: string }>;
@@ -169,6 +179,8 @@ export default async function WriterProfilePage({
             <img
               src={writer.avatar_url}
               alt={writer.pen_name_english}
+              width={112}
+              height={112}
               className="w-24 h-24 sm:w-28 sm:rotate-0 sm:h-28 rounded-2xl object-cover border-2 border-border shrink-0 shadow-md"
             />
           ) : (

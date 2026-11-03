@@ -6,6 +6,7 @@ import { UrduText } from "@/components/urdu/UrduText";
 import { NovelCard } from "@/components/catalog/NovelCard";
 import {
   getPublicGenreBySlug,
+  getPublicGenres,
   searchPublicNovels,
 } from "@/lib/supabase/public";
 import { siteConfig } from "@/config/site";
@@ -13,6 +14,13 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { BookMarked, ChevronRight, Home, ArrowLeft } from "lucide-react";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
+
+export async function generateStaticParams() {
+  const genres = await getPublicGenres();
+  return genres.map((genre) => ({
+    slug: genre.slug,
+  }));
+}
 
 interface GenrePageProps {
   params: Promise<{ slug: string }>;
