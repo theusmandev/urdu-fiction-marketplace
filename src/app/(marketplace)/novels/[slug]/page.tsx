@@ -13,7 +13,9 @@ import { ExpandableSynopsis } from "@/components/catalog/ExpandableSynopsis";
 import {
   getPublicNovelBySlug,
   getPublicNovelChapters,
+  searchPublicNovels,
 } from "@/lib/supabase/public";
+import { parseCatalogParams } from "@/lib/catalog/params";
 import { resolveCoverUrl } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -28,6 +30,13 @@ import {
 } from "lucide-react";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
+
+export async function generateStaticParams() {
+  const { novels } = await searchPublicNovels(parseCatalogParams({ limit: "50" }));
+  return novels.map((novel) => ({
+    slug: novel.slug,
+  }));
+}
 
 interface NovelPageProps {
   params: Promise<{ slug: string }>;

@@ -6,12 +6,19 @@ import {
   getPublicNovelBySlug,
   getFreePreviewChapter,
   getPublicNovelChapters,
+  searchPublicNovels,
 } from "@/lib/supabase/public";
+import { parseCatalogParams } from "@/lib/catalog/params";
 import { siteConfig } from "@/config/site";
 import { resolveCoverUrl } from "@/lib/utils";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
+
+export async function generateStaticParams() {
+  const { novels } = await searchPublicNovels(parseCatalogParams({ limit: "20" }));
+  return novels.map((n) => ({ slug: n.slug, number: "1" }));
+}
 
 interface ReaderPageProps {
   params: Promise<{ slug: string; number: string }>;
