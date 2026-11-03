@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { ProfileRow, WriterProfileRow } from '@/types/database';
 import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
-import { removeSessionHintCookie } from '@/lib/auth/session-hint';
+import { removeSessionHintCookie, SESSION_HINT_COOKIE_NAME } from '@/lib/auth/session-hint';
 
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -64,7 +64,11 @@ export async function updateSession(request: NextRequest) {
     headers.set('Cache-Control', 'private, no-store');
     headers.set('Vary', 'Cookie');
     headers.set('X-Robots-Tag', 'noindex, nofollow');
-    return NextResponse.json({ user: null }, { headers });
+    const response = NextResponse.json({ user: null }, { headers });
+    if (request.cookies.has(SESSION_HINT_COOKIE_NAME)) {
+      removeSessionHintCookie(response);
+    }
+    return response;
   }
 
   // CRITICAL SECURITY RULE: Clean incoming internal headers to prevent spoofing

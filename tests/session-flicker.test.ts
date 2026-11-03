@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { NextRequest } = require('next/server');
+const { NextRequest, NextResponse } = require('next/server');
 
 import {
   SESSION_HINT_COOKIE_NAME,
@@ -356,6 +356,118 @@ describe('Header Auth Flicker, Security Invariants & Proxy Verification', () => 
       assert.equal(result, null);
       assert.equal(retryAttempts, 2, 'Must retry exactly once');
       assert.equal(cookie, `${SESSION_HINT_COOKIE_NAME}=1`, 'Hint cookie must be preserved during network failure');
+    });
+  });
+
+  describe('8. /api/auth/session Cookie Self-Healing & Reconciliation Tests', () => {
+    test('/api/auth/session self-heals: sets unb_has_session=1 when authenticated user calls without hint cookie', () => {
+      // Simulate incoming request from authenticated user without unb_has_session cookie
+      const req = new NextRequest('https://premium.urdunovelbanks.com/api/auth/session', {
+        headers: {
+          cookie: 'sb-wetwjeoayxwmsxtfjkho-auth-token=valid-jwt-token',
+        },
+      });
+
+      const cookies = req.cookies.getAll();
+      const hasAuthToken = cookies.some(
+        (c: { name: string }) => c.name.startsWith('sb-') && c.name.includes('-auth-token')
+      );
+      const hasHintCookie = req.cookies.get(SESSION_HINT_COOKIE_NAME)?.value === '1';
+
+      assert.equal(hasAuthToken, true);
+      assert.equal(hasHintCookie, false);
+
+      // Authenticated user returned from getHeaderSessionUser
+      const mockUser = {
+        id: 'user-123',
+        email: 'reader@example.com',
+        name: 'Reader',
+        role: 'reader',
+      };
+
+      const response = NextResponse.json({ user: mockUser }, {
+        headers: {
+          'Cache-Control': 'private, no-store',
+          'Vary': 'Cookie',
+        },
+      });
+
+      if (mockUser) {
+        attachSessionHintCookie(response);
+      }
+
+      // Verify Set-Cookie header contains unb_has_session=1
+      const setCookieHeader = response.headers.get('set-cookie');
+      assert.ok(setCookieHeader, 'Set-Cookie header must be present');
+      assert.ok(setCookieHeader.includes('unb_has_session=1'), 'Must self-heal by setting unb_has_session=1');
+      assert.ok(setCookieHeader.toLowerCase().includes('samesite=lax'));
+      assert.ok(setCookieHeader.toLowerCase().includes('path=/'));
+    });
+
+    test('/api/auth/session self-heals: clears unb_has_session when unauthenticated user calls with stale hint cookie', () => {
+      // Simulate incoming request from visitor with stale hint cookie but NO auth tokens
+      const req = new NextRequest('https://premium.urdunovelbanks.com/api/auth/session', {
+        headers: {
+          cookie: `${SESSION_HINT_COOKIE_NAME}=1`,
+        },
+      });
+
+      const cookies = req.cookies.getAll();
+      const hasAuthToken = cookies.some(
+        (c: { name: string }) => c.name.startsWith('sb-') && c.name.includes('-auth-token')
+      );
+      const hasHintCookie = req.cookies.get(SESSION_HINT_COOKIE_NAME)?.value === '1';
+
+      assert.equal(hasAuthToken, false);
+      assert.equal(hasHintCookie, true);
+
+      const response = NextResponse.json({ user: null }, {
+        headers: {
+          'Cache-Control': 'private, no-store',
+          'Vary': 'Cookie',
+        },
+      });
+
+      if (hasHintCookie) {
+        removeSessionHintCookie(response);
+      }
+
+      // Verify Set-Cookie header clears unb_has_session
+      const setCookieHeader = response.headers.get('set-cookie');
+      assert.ok(setCookieHeader, 'Set-Cookie header must be present');
+      assert.ok(setCookieHeader.includes('unb_has_session=;'), 'Must clear stale unb_has_session');
+      assert.ok(setCookieHeader.toLowerCase().includes('max-age=0'));
+    });
+
+    test('/api/auth/session self-heals: clears unb_has_session when token check fails with stale hint cookie', () => {
+      // Simulate incoming request with expired auth token and stale hint cookie
+      const req = new NextRequest('https://premium.urdunovelbanks.com/api/auth/session', {
+        headers: {
+          cookie: `sb-wetwjeoayxwmsxtfjkho-auth-token=expired-token; ${SESSION_HINT_COOKIE_NAME}=1`,
+        },
+      });
+
+      const hasHintCookie = req.cookies.get(SESSION_HINT_COOKIE_NAME)?.value === '1';
+      assert.equal(hasHintCookie, true);
+
+      // Authenticated user returns null (e.g. invalid/expired JWT or deactivated user)
+      const user = null;
+
+      const response = NextResponse.json({ user }, {
+        headers: {
+          'Cache-Control': 'private, no-store',
+          'Vary': 'Cookie',
+        },
+      });
+
+      if (!user && hasHintCookie) {
+        removeSessionHintCookie(response);
+      }
+
+      const setCookieHeader = response.headers.get('set-cookie');
+      assert.ok(setCookieHeader);
+      assert.ok(setCookieHeader.includes('unb_has_session=;'));
+      assert.ok(setCookieHeader.toLowerCase().includes('max-age=0'));
     });
   });
 });

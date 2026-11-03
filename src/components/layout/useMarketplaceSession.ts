@@ -14,11 +14,25 @@ export type MarketplaceSessionStatus = "unknown" | "anonymous" | "authenticated"
 export interface MarketplaceSessionState {
   user: HeaderSessionUser | null;
   status: MarketplaceSessionStatus;
+  hasHint: boolean;
+}
+
+export function checkHasSessionHint(): boolean {
+  if (typeof document === "undefined") return false;
+  try {
+    return (
+      document.documentElement.getAttribute("data-session-hint") === "1" ||
+      document.cookie.indexOf("unb_has_session=1") !== -1
+    );
+  } catch {
+    return false;
+  }
 }
 
 let cachedState: MarketplaceSessionState = {
   user: null,
   status: "unknown",
+  hasHint: false,
 };
 
 let hasInitiatedFetch = false;
@@ -30,10 +44,10 @@ function syncSessionHintCookie(isAuthenticated: boolean) {
     if (isAuthenticated) {
       const isSecure = window.location.protocol === "https:";
       const secureFlag = isSecure ? "; Secure" : "";
-      document.cookie = `unb_has_session=1; path=/; max-age=2592000; SameSite=Lax${secureFlag}`;
+      document.cookie = `unb_has_session=1; Path=/; Max-Age=2592000; SameSite=Lax${secureFlag}`;
       document.documentElement.setAttribute("data-session-hint", "1");
     } else {
-      document.cookie = "unb_has_session=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "unb_has_session=; Path=/; Max-Age=0; SameSite=Lax";
       document.documentElement.removeAttribute("data-session-hint");
     }
   } catch {
@@ -49,8 +63,13 @@ export function setMarketplaceSessionState(
   user: HeaderSessionUser | null,
   status: MarketplaceSessionStatus
 ) {
-  cachedState = { user, status };
-  if (status === "authenticated" && user) {
+  const isAuth = status === "authenticated" && !!user;
+  cachedState = {
+    user,
+    status,
+    hasHint: isAuth,
+  };
+  if (isAuth) {
     syncSessionHintCookie(true);
   } else if (status === "anonymous") {
     syncSessionHintCookie(false);
@@ -112,21 +131,29 @@ export function useMarketplaceSession(
     subscribe,
     () => {
       if (initialUser !== undefined && initialUser !== null) {
-        return { user: initialUser, status: "authenticated" as const };
+        return { user: initialUser, status: "authenticated" as const, hasHint: true };
       }
-      return cachedState;
+      return {
+        ...cachedState,
+        hasHint:
+          cachedState.status === "authenticated"
+            ? true
+            : cachedState.status === "anonymous"
+            ? false
+            : checkHasSessionHint(),
+      };
     },
     () => {
       if (initialUser !== undefined && initialUser !== null) {
-        return { user: initialUser, status: "authenticated" as const };
+        return { user: initialUser, status: "authenticated" as const, hasHint: true };
       }
-      return { user: null, status: "unknown" as const };
+      return { user: null, status: "unknown" as const, hasHint: false };
     }
   );
 
   useEffect(() => {
     if (initialUser !== undefined && initialUser !== null) {
-      cachedState = { user: initialUser, status: "authenticated" };
+      cachedState = { user: initialUser, status: "authenticated", hasHint: true };
       syncSessionHintCookie(true);
       return;
     }
@@ -144,7 +171,7 @@ export function useMarketplaceSession(
     fetchSessionWithRetry().then((data) => {
       if (data === null) {
         // Network error retry failed: fall back to anonymous UI but DO NOT clear hint cookie
-        cachedState = { user: null, status: "anonymous" };
+        cachedState = { user: null, status: "anonymous", hasHint: checkHasSessionHint() };
         listeners.forEach((l) => l());
       } else if (data.user) {
         setMarketplaceSessionState(data.user, "authenticated");
