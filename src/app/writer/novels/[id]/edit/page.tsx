@@ -91,6 +91,7 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
         maxPrice={maxPrice}
         initialData={{
           id: novel.id,
+          slug: novel.slug,
           title_urdu: novel.title_urdu,
           title_english: novel.title_english,
           synopsis_urdu: novel.synopsis_urdu,

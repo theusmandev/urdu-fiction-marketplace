@@ -145,8 +145,12 @@ export function createNovelFormSchema(bounds?: { minPrice?: number; maxPrice?: n
     title_english: z
       .string()
       .trim()
-      .min(2, 'English title is required (at least 2 characters).')
-      .max(200, 'English title cannot exceed 200 characters.'),
+      .min(2, 'English / Roman title is required (at least 2 characters).')
+      .max(200, 'English / Roman title cannot exceed 200 characters.')
+      .regex(
+        /[a-zA-Z0-9]/,
+        'English / Roman title must contain Latin letters or numbers (e.g. "Peer-e-Kamil" or "Namal") for clean web link generation.'
+      ),
     synopsis_urdu: z
       .string()
       .trim()

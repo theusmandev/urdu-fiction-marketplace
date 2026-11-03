@@ -16,7 +16,10 @@ import {
   Loader2,
   ShieldCheck,
   Check,
+  Globe,
+  Lock,
 } from 'lucide-react';
+import { generateNovelSlug } from '@/lib/text/slug-generator';
 
 interface NovelFormProps {
   userId: string;
@@ -26,6 +29,7 @@ interface NovelFormProps {
   maxPrice?: number;
   initialData?: {
     id: string;
+    slug?: string;
     title_urdu: string;
     title_english: string;
     synopsis_urdu: string;
@@ -273,7 +277,7 @@ export function NovelForm({
               )}
             </div>
 
-            {/* English Title */}
+            {/* English Title & Romanized URL Slug */}
             <div className="space-y-1.5" dir="ltr">
               <label className="block text-xs font-semibold text-main">
                 English / Roman Title <span className="text-danger-text">*</span>
@@ -289,9 +293,31 @@ export function NovelForm({
               {fieldErrors.title_english && (
                 <p className="text-xs text-danger-text">{fieldErrors.title_english[0]}</p>
               )}
-              <p className="text-[11px] text-secondary">
-                This title generates the novel&apos;s URL address and search indexing.
-              </p>
+              
+              {/* Live Slug Preview & Guidance */}
+              <div className="rounded-lg bg-surface-muted/60 border border-border p-3 space-y-1.5 text-xs">
+                <div className="flex items-center gap-1.5 text-secondary font-mono text-[11px]">
+                  <Globe className="w-3.5 h-3.5 text-accent-strong shrink-0" />
+                  <span className="font-semibold text-main">Web Link:</span>
+                  <span className="text-accent-strong break-all">
+                    /novels/{initialData?.status === 'published' && initialData.slug
+                      ? initialData.slug
+                      : (generateNovelSlug(formData.title_english) || 'your-novel-slug')}
+                  </span>
+                  {initialData?.status === 'published' && (
+                    <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-accent/10 text-accent-strong border border-border">
+                      <Lock className="w-2.5 h-2.5" />
+                      Locked
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-secondary leading-relaxed">
+                  Enter English or Romanized title. This creates the permanent novel link and Google search snippet.
+                </p>
+                <p className="text-[11px] text-secondary leading-relaxed font-urdu text-right" dir="rtl">
+                  اردو ناول کے عنوان کا رومن یا انگریزی تلفظ درج کریں (مثلاً &apos;Peer-e-Kamil&apos;)۔ یہی نام سرچ انجن اور ویب لنک کے لیے استعمال ہوگا۔
+                </p>
+              </div>
             </div>
 
             {/* Language */}
