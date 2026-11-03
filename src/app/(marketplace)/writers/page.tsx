@@ -1,7 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import { getPublicWriters } from "@/lib/supabase/public";
 import {
   Feather,
@@ -15,16 +18,47 @@ import {
 export const revalidate = 300; // 5 minutes ISR revalidation
 
 export const metadata: Metadata = {
-  title: "Featured Authors & Publish Your Novels — اردو ناول نگار",
+  title: "Urdu Novelists & Authors — مصنفین",
   description:
     "Discover independent Pakistani Urdu novelists and learn how to publish your fiction with direct reader-to-writer payments via JazzCash and EasyPaisa.",
+  alternates: {
+    canonical: "/writers",
+  },
+  openGraph: {
+    title: "Urdu Novelists & Authors — مصنفین | UNB Premium",
+    description:
+      "Discover independent Pakistani Urdu novelists and learn how to publish your fiction with direct reader-to-writer payments via JazzCash and EasyPaisa.",
+    url: "/writers",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "UNB Premium Authors Directory",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Urdu Novelists & Authors — مصنفین | UNB Premium",
+    description:
+      "Discover independent Pakistani Urdu novelists and learn how to publish your fiction with direct reader-to-writer payments via JazzCash and EasyPaisa.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 export default async function WritersDirectoryPage() {
   const writers = await getPublicWriters(24);
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "Authors", path: "/writers" },
+  ]);
 
   return (
     <div className="space-y-16 py-12">
+      <JsonLd data={breadcrumbs} />
       {/* Hero: Writer Recruitment & Mission */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-r from-navy via-navy to-[#18263E] text-white rounded-3xl p-8 md:p-14 border border-white/10 shadow-2xl space-y-6">

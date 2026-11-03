@@ -1,16 +1,56 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { siteConfig } from '@/config/site';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { BecomeWriterForm } from './become-writer-form';
 import { Feather, Clock, CheckCircle2, ArrowRight } from 'lucide-react';
 import { UrduText } from '@/components/urdu/UrduText';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { buildBreadcrumbJsonLd } from '@/lib/seo/breadcrumbs';
 
+export const metadata: Metadata = {
+  title: 'Publish Your Urdu Novel — مصنف بنیں',
+  description:
+    'Apply to publish original Urdu serials and novels on UNB Premium with direct reader bank deposits and full copyright ownership.',
+  alternates: {
+    canonical: '/become-a-writer',
+  },
+  openGraph: {
+    title: 'Publish Your Urdu Novel — مصنف بنیں | UNB Premium',
+    description:
+      'Apply to publish original Urdu serials and novels on UNB Premium with direct reader bank deposits and full copyright ownership.',
+    url: '/become-a-writer',
+    type: 'website',
+    locale: 'en_PK',
+    alternateLocale: ['ur_PK'],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Publish on UNB Premium',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Publish Your Urdu Novel — مصنف بنیں | UNB Premium',
+    description:
+      'Apply to publish original Urdu serials and novels on UNB Premium with direct reader bank deposits and full copyright ownership.',
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
+};
 
 export default async function BecomeWriterPage() {
   const { writerProfile } = await requireAuth('/become-a-writer');
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: 'Become a Writer', path: '/become-a-writer' },
+  ]);
 
   return (
     <div className="min-h-screen bg-ivory text-main py-12 px-4 sm:px-6 lg:px-8">
+      <JsonLd data={breadcrumbs} />
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-3">
           <div className="inline-flex p-3 rounded-2xl bg-warning-soft border border-warning-border text-accent mb-2 shadow-sm">

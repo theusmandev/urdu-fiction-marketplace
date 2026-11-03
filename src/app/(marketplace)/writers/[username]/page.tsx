@@ -10,6 +10,7 @@ import {
   getNovelsByWriter,
 } from "@/lib/supabase/public";
 import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 import {
   BookOpen,
   ChevronRight,
@@ -40,6 +41,13 @@ export async function generateMetadata({
     writer.bio_urdu ||
     `Read digital Urdu novels by author ${writer.pen_name_english} (${writer.pen_name_urdu}). Support directly via JazzCash and EasyPaisa.`;
 
+  const rawAvatar = writer.avatar_url?.trim();
+  const ogImageUrl = rawAvatar
+    ? rawAvatar.startsWith("http")
+      ? rawAvatar
+      : `${siteConfig.url}${rawAvatar.startsWith("/") ? "" : "/"}${rawAvatar}`
+    : `${siteConfig.url}/brand/og-image.png`;
+
   return {
     title,
     description,
@@ -48,7 +56,22 @@ export async function generateMetadata({
       description,
       type: "profile",
       url: `${siteConfig.url}/writers/${writer.username}`,
-      images: writer.avatar_url ? [{ url: writer.avatar_url }] : [],
+      locale: "en_PK",
+      alternateLocale: ["ur_PK"],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 400,
+          height: 400,
+          alt: writer.pen_name_english || writer.pen_name_urdu,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${siteConfig.url}/writers/${writer.username}`,
@@ -117,10 +140,7 @@ export default async function WriterProfilePage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Breadcrumbs */}
