@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
@@ -15,6 +16,14 @@ import {
   Sparkles,
   CheckCircle2,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'My Library',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export const dynamic = 'force-dynamic';
 

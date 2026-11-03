@@ -1,8 +1,17 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { User, BookOpen, ShoppingBag, Feather, ShieldAlert, LogOut, Mail } from 'lucide-react';
 import { logoutUser } from '@/app/actions/auth';
+
+export const metadata: Metadata = {
+  title: 'Account Settings',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 
 export default async function AccountLayout({
