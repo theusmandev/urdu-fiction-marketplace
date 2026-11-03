@@ -31,10 +31,19 @@ export async function generateMetadata({
 
   const title = `${genre.name_english} (${genre.name_urdu}) — Urdu Novels`;
   const description = `Read and support independent Pakistani authors writing in ${genre.name_english} (${genre.name_urdu}). Direct reader-to-writer payment verification.`;
+  const isEmpty = !genre.published_novels_count || genre.published_novels_count <= 0;
 
   return {
     title,
     description,
+    ...(isEmpty
+      ? {
+          robots: {
+            index: false,
+            follow: true,
+          },
+        }
+      : {}),
     openGraph: {
       title,
       description,

@@ -24,6 +24,15 @@ export async function generateMetadata({
   searchParams,
 }: NovelsPageProps): Promise<Metadata> {
   const resolved = await searchParams;
+  const hasFilterParams = Boolean(
+    resolved.q ||
+    resolved.genre ||
+    resolved.sort ||
+    resolved.page ||
+    resolved.minPrice ||
+    resolved.maxPrice ||
+    resolved.freeOnly
+  );
   const params = parseCatalogParams(resolved);
 
   const title = params.q
@@ -38,6 +47,14 @@ export async function generateMetadata({
   return {
     title,
     description,
+    ...(hasFilterParams
+      ? {
+          robots: {
+            index: false,
+            follow: true,
+          },
+        }
+      : {}),
     openGraph: {
       title,
       description,
