@@ -9,15 +9,9 @@
 import { unstable_cache } from 'next/cache';
 import { getPublicSupabase } from '@/lib/supabase/public';
 import type { SocialLinks } from '@/types/database';
+import { DEFAULT_SOCIAL_LINKS } from './social-constants';
 
-export const DEFAULT_SOCIAL_LINKS: SocialLinks = {
-  facebook: 'https://www.facebook.com/people/Urdu-novel-Bank/100090906471153/',
-  whatsapp: 'https://whatsapp.com/channel/0029VaurdEY0wajrnyeAl50Y',
-  pinterest: 'https://www.pinterest.com/urdunovelbanks/',
-  instagram: 'https://www.instagram.com/urdunovelbank/',
-  youtube: 'https://youtube.com/@urdunovelbank',
-  telegram: 'https://t.me/urdunovelbank',
-};
+export { DEFAULT_SOCIAL_LINKS };
 
 async function fetchSocialLinksFromDb(): Promise<SocialLinks> {
   try {
