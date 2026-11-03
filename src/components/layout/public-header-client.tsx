@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback, useSyncExternalStore } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
@@ -70,7 +70,7 @@ export function PublicHeaderClient({
       try {
         const localDismissed = localStorage.getItem("unb_promo_dismissed_v1") === "true";
         if (localDismissed) {
-          setPromoDismissed(true);
+          queueMicrotask(() => setPromoDismissed(true));
           document.cookie = "unb_banner_dismissed=true; path=/; max-age=31536000; SameSite=Lax";
         }
       } catch {}
