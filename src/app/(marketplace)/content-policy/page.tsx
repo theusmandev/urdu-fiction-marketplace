@@ -1,19 +1,54 @@
 import React from "react";
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import { AlertTriangle } from "lucide-react";
 
 export const revalidate = 86400; // 24 hours ISR
 
 export const metadata: Metadata = {
-  title: "Content & Copyright Policy — ادارتی و کاپی رائٹ پالیسی",
+  title: "Content & Copyright Policy — کاپی رائٹ",
   description:
     "Editorial and community guidelines governing original Urdu manuscripts, copyright compliance, and prohibited content.",
+  alternates: {
+    canonical: "/content-policy",
+  },
+  openGraph: {
+    title: "Content & Copyright Policy — کاپی رائٹ | UNB Premium",
+    description:
+      "Editorial and community guidelines governing original Urdu manuscripts, copyright compliance, and prohibited content.",
+    url: "/content-policy",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "UNB Premium Content & Copyright Policy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Content & Copyright Policy — کاپی رائٹ | UNB Premium",
+    description:
+      "Editorial and community guidelines governing original Urdu manuscripts, copyright compliance, and prohibited content.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 export default function ContentPolicyPage() {
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "Content Policy", path: "/content-policy" },
+  ]);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <JsonLd data={breadcrumbs} />
       {/* Legal Status Notice */}
       <div className="p-4 rounded-xl bg-warning/10 border border-warning-border/20 text-warning-text text-xs flex items-center gap-2.5">
         <AlertTriangle className="w-4 h-4 text-accent-strong shrink-0" />

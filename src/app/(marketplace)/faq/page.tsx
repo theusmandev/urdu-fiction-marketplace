@@ -1,7 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import { HelpCircle, Mail } from "lucide-react";
 
 export const revalidate = 86400; // 24 hours ISR
@@ -10,6 +13,33 @@ export const metadata: Metadata = {
   title: "Frequently Asked Questions — سوال و جواب",
   description:
     "Find answers about direct reader-to-writer payments, JazzCash/EasyPaisa verification, reading controls, and writer publishing.",
+  alternates: {
+    canonical: "/faq",
+  },
+  openGraph: {
+    title: "Frequently Asked Questions — سوال و جواب | UNB Premium",
+    description:
+      "Find answers about direct reader-to-writer payments, JazzCash/EasyPaisa verification, reading controls, and writer publishing.",
+    url: "/faq",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Frequently Asked Questions — UNB Premium",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Frequently Asked Questions — سوال و جواب | UNB Premium",
+    description:
+      "Find answers about direct reader-to-writer payments, JazzCash/EasyPaisa verification, reading controls, and writer publishing.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 interface FaqItem {
@@ -57,8 +87,13 @@ const FAQS: FaqItem[] = [
 ];
 
 export default function FaqPage() {
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "FAQ", path: "/faq" },
+  ]);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <JsonLd data={breadcrumbs} />
       {/* Draft Legal Notice */}
       <div className="p-3 rounded-xl bg-warning/10 border border-warning-border/20 text-warning-text text-xs text-center font-medium">
         Draft — pending legal review

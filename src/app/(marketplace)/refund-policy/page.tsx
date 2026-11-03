@@ -1,20 +1,55 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 
 export const revalidate = 86400; // 24 hours ISR
 
 export const metadata: Metadata = {
-  title: "Refund & Dispute Policy — ریفنڈ اور تنازعات کی پالیسی",
+  title: "Refund & Dispute Policy — ریفنڈ پالیسی",
   description:
     "Plain explanation of refund and dispute mechanisms on UNB Premium's direct reader-to-writer payment architecture.",
+  alternates: {
+    canonical: "/refund-policy",
+  },
+  openGraph: {
+    title: "Refund & Dispute Policy — ریفنڈ پالیسی | UNB Premium",
+    description:
+      "Plain explanation of refund and dispute mechanisms on UNB Premium's direct reader-to-writer payment architecture.",
+    url: "/refund-policy",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "UNB Premium Refund Policy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Refund & Dispute Policy — ریفنڈ پالیسی | UNB Premium",
+    description:
+      "Plain explanation of refund and dispute mechanisms on UNB Premium's direct reader-to-writer payment architecture.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 export default function RefundPolicyPage() {
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "Refund Policy", path: "/refund-policy" },
+  ]);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <JsonLd data={breadcrumbs} />
       {/* Legal Status Notice */}
       <div className="p-4 rounded-xl bg-warning/10 border border-warning-border/20 text-warning-text text-xs flex items-center gap-2.5">
         <AlertTriangle className="w-4 h-4 text-accent-strong shrink-0" />

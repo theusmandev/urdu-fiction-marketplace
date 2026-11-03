@@ -1,7 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import {
   CreditCard,
   ShieldCheck,
@@ -17,9 +20,36 @@ import {
 export const revalidate = 86400; // 24 hours ISR
 
 export const metadata: Metadata = {
-  title: "How to Pay the Writer & Submit TID — ادائیگی اور رسید کا طریقہ",
+  title: "Payment & TID Guide — ادائیگی کا طریقہ",
   description:
     "Step-by-step reader guide for direct payments to Pakistani authors via JazzCash, EasyPaisa, Raast, or Bank IBAN on UNB Premium.",
+  alternates: {
+    canonical: "/how-to-pay",
+  },
+  openGraph: {
+    title: "Payment & TID Guide — ادائیگی کا طریقہ | UNB Premium",
+    description:
+      "Step-by-step reader guide for direct payments to Pakistani authors via JazzCash, EasyPaisa, Raast, or Bank IBAN on UNB Premium.",
+    url: "/how-to-pay",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "How Direct Payment & TID Submission Works",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Payment & TID Guide — ادائیگی کا طریقہ | UNB Premium",
+    description:
+      "Step-by-step reader guide for direct payments to Pakistani authors via JazzCash, EasyPaisa, Raast, or Bank IBAN on UNB Premium.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 const PAYMENT_STEPS = [
@@ -129,8 +159,13 @@ const FAQS = [
 ];
 
 export default function HowToPayPage() {
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "Payment Guide", path: "/how-to-pay" },
+  ]);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+      <JsonLd data={breadcrumbs} />
       {/* Header */}
       <header className="space-y-4 text-center border-b border-border pb-8">
         <span className="text-xs font-semibold text-accent uppercase tracking-wider">

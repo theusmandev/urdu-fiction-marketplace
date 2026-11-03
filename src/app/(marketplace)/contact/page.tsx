@@ -1,23 +1,57 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import { getPlatformSupportEmail } from "@/lib/supabase/public";
 import { Mail, Clock, ShieldCheck, HelpCircle } from "lucide-react";
 
 export const revalidate = 300; // 5 minutes ISR
 
 export const metadata: Metadata = {
-  title: "Contact & Platform Support — رابطہ",
+  title: "Contact & Support — رابطہ اور مدد",
   description:
     "Contact UNB Premium customer support for payment verification assistance, author onboarding inquiries, or content issues.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact & Support — رابطہ اور مدد | UNB Premium",
+    description:
+      "Contact UNB Premium customer support for payment verification assistance, author onboarding inquiries, or content issues.",
+    url: "/contact",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Contact UNB Premium Support",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact & Support — رابطہ اور مدد | UNB Premium",
+    description:
+      "Contact UNB Premium customer support for payment verification assistance, author onboarding inquiries, or content issues.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 export default async function ContactPage() {
   const supportEmail = await getPlatformSupportEmail();
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "Contact Support", path: "/contact" },
+  ]);
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <JsonLd data={breadcrumbs} />
       {/* Header */}
       <div className="space-y-4 text-center border-b border-border pb-8">
         <span className="text-xs font-semibold text-accent uppercase tracking-wider">

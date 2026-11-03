@@ -4,19 +4,53 @@ import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { siteConfig } from "@/config/site";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
 import { Feather, Heart, Smartphone } from "lucide-react";
 
 export const revalidate = 86400; // 24 hours ISR
 
 export const metadata: Metadata = {
-  title: "About UNB Premium — Dedicated to Modern Urdu Literature",
+  title: "About Us — ہمارا تعارف",
   description:
     "Learn about UNB Premium: Pakistan's independent digital fiction marketplace connecting readers directly with Urdu authors.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Us — ہمارا تعارف | UNB Premium",
+    description:
+      "Learn about UNB Premium: Pakistan's independent digital fiction marketplace connecting readers directly with Urdu authors.",
+    url: "/about",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "About UNB Premium",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us — ہمارا تعارف | UNB Premium",
+    description:
+      "Learn about UNB Premium: Pakistan's independent digital fiction marketplace connecting readers directly with Urdu authors.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
 };
 
 export default function AboutPage() {
+  const breadcrumbs = buildBreadcrumbJsonLd([
+    { name: "About Us", path: "/about" },
+  ]);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <JsonLd data={breadcrumbs} />
       {/* Page Header */}
       <div className="space-y-4 text-center border-b border-border pb-8">
         <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="inline-block hover:opacity-95 transition-opacity">
