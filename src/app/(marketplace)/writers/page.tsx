@@ -176,6 +176,9 @@ export default async function WritersDirectoryPage() {
                     <img
                       src={writer.avatar_url}
                       alt={writer.pen_name_english}
+                      width={56}
+                      height={56}
+                      loading="lazy"
                       className="w-14 h-14 rounded-full object-cover border border-border group-hover:border-accent shrink-0"
                     />
                   ) : (

@@ -38,6 +38,7 @@ const arabicFont = Amiri({
   variable: "--font-arabic",
   display: "swap",
   weight: ["400", "700"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
