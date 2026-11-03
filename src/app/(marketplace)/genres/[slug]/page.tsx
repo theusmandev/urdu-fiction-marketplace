@@ -174,13 +174,19 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
               </p>
             </div>
 
-            <div className="text-right">
+            <div className="text-right space-y-1">
               <UrduText
                 as="h2"
                 size="4xl"
                 className="text-accent drop-shadow-md py-0 leading-[2.2]"
               >
                 {genre.name_urdu}
+              </UrduText>
+              <UrduText
+                size="sm"
+                className="text-white/80 py-0"
+              >
+                اردو ادب میں {genre.name_urdu} کے منتخب اور معیاری ناولز
               </UrduText>
             </div>
           </div>

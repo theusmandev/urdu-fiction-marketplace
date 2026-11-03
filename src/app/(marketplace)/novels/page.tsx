@@ -146,14 +146,25 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-navy truncate">
               Explore All Urdu Novels
             </h1>
+            <p className="text-xs text-secondary mt-1 max-w-xl leading-relaxed">
+              Browse original serialized fiction and complete Urdu novels. Enjoy free sample chapters and support authors directly via Pakistani mobile wallets or bank transfer.
+            </p>
           </div>
-          <UrduText
-            as="p"
-            size="xl"
-            className="text-secondary font-normal leading-[2.2] py-0 shrink-0 text-left md:text-right"
-          >
-            معیاری اردو ناولز اور افسانوں کی مکمل فہرست
-          </UrduText>
+          <div className="text-left md:text-right shrink-0 space-y-0.5">
+            <UrduText
+              as="p"
+              size="xl"
+              className="text-navy font-normal leading-[2.2] py-0"
+            >
+              معیاری اردو ناولز اور فکشن کی مکمل فہرست
+            </UrduText>
+            <UrduText
+              size="sm"
+              className="text-secondary font-normal py-0"
+            >
+              مفت نمونہ ابواب پڑھیں اور مصنفین کی براہِ راست حوصلہ افزائی کریں۔
+            </UrduText>
+          </div>
         </div>
       </div>
 

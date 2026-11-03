@@ -86,6 +86,9 @@ export default function HowItWorksPage() {
             <h3 className="font-serif text-base font-bold text-navy">
               Select Payment Method
             </h3>
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
+              ادائیگی کا طریقہ منتخب کریں
+            </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               Choose the author&apos;s verified JazzCash, EasyPaisa, Raast, or Bank IBAN
               at checkout. The exact account details and title are displayed.
@@ -99,6 +102,9 @@ export default function HowItWorksPage() {
             <h3 className="font-serif text-base font-bold text-navy">
               Transfer Funds & Submit TID
             </h3>
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
+              رقم منتقل کریں اور رسید جمع کریں
+            </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               Send the exact PKR amount from your banking or wallet app. Submit your
               Transaction Reference (TID) and payment receipt screenshot. (See our{' '}
@@ -116,6 +122,9 @@ export default function HowItWorksPage() {
             <h3 className="font-serif text-base font-bold text-navy">
               Author Verifies & Delivers
             </h3>
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
+              تصدیق اور مطالعہ کا آغاز
+            </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               The writer verifies the bank or wallet credit and approves your order.
               All novel chapters are instantly unlocked in your library.
@@ -143,6 +152,9 @@ export default function HowItWorksPage() {
             <h3 className="font-serif text-base font-bold text-navy">
               Configure Payment Accounts
             </h3>
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
+              بینک یا والٹ اکاؤنٹ کا اندراج
+            </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               Add your verified Pakistani payment methods (JazzCash, EasyPaisa, Raast,
               or Bank IBAN) in the Writer Studio.
@@ -156,6 +168,9 @@ export default function HowItWorksPage() {
             <h3 className="font-serif text-base font-bold text-navy">
               Publish Your Novel
             </h3>
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
+              ناول کی اشاعت اور پیش نظارہ
+            </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               Upload manuscripts, define free preview chapters, set your price, and submit
               for rapid quality review.
@@ -169,6 +184,9 @@ export default function HowItWorksPage() {
             <h3 className="font-serif text-base font-bold text-navy">
               Direct Money in Your Pocket
             </h3>
+            <UrduText size="sm" className="text-secondary py-0 font-normal">
+              براہِ راست آمدنی آپ کے اکاؤنٹ میں
+            </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               100% of reader payments land directly in your account. You verify receipts
               in one click, and platform fee (20%) is tracked transparently.

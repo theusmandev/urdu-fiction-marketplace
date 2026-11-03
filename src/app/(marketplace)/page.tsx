@@ -89,6 +89,12 @@ export default async function HomePage() {
             <p className="font-serif text-base sm:text-lg md:text-xl text-text-muted max-w-xl mx-auto font-normal leading-relaxed">
               Connecting readers directly with Pakistan&apos;s finest storytellers.
             </p>
+            <UrduText
+              size="base"
+              className="text-text-muted max-w-xl mx-auto font-normal py-0 leading-[2.2]"
+            >
+              مفت نمونہ ابواب پڑھیں، مصنفین سے براہِ راست جڑیں اور آسان پاکستانی ذرائع سے مکمل ناول حاصل کریں۔
+            </UrduText>
           </div>
 
           {/* Action CTAs: Primary button + search shortcut with minimum 44px touch targets */}
