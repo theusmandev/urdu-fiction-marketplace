@@ -1,5 +1,7 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
 import { NovelCard } from "@/components/catalog/NovelCard";
 import {
@@ -20,6 +22,41 @@ import {
 } from "lucide-react";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "UNB Premium — Urdu Novels & Fiction Marketplace",
+  },
+  description:
+    "Buy and read original Urdu novels directly from Pakistani authors. Pay securely via JazzCash, EasyPaisa, or Raast with instant digital access.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "UNB Premium — Urdu Novels & Fiction Marketplace",
+    description:
+      "Buy and read original Urdu novels directly from Pakistani authors. Pay securely via JazzCash, EasyPaisa, or Raast with instant digital access.",
+    url: "/",
+    type: "website",
+    locale: "en_PK",
+    alternateLocale: ["ur_PK"],
+    images: [
+      {
+        url: `${siteConfig.url}/brand/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "UNB Premium — Urdu Novels & Fiction Marketplace",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "UNB Premium — Urdu Novels & Fiction Marketplace",
+    description:
+      "Buy and read original Urdu novels directly from Pakistani authors. Pay securely via JazzCash, EasyPaisa, or Raast with instant digital access.",
+    images: [`${siteConfig.url}/brand/og-image.png`],
+  },
+};
 
 export default async function HomePage() {
   const [featuredNovels, newestNovels, genres] = await Promise.all([
