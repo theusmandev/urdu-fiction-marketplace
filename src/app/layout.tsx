@@ -40,6 +40,9 @@ const arabicFont = Amiri({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  alternates: {
+    canonical: "./",
+  },
   title: {
     default: `${siteConfig.brandName} — ${siteConfig.tagline}`,
     template: `%s | ${siteConfig.brandName}`,
