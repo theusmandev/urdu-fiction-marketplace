@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { UrduText } from "@/components/urdu/UrduText";
+import { NovelCard } from "@/components/catalog/NovelCard";
 import { NovelAccessProvider } from "@/components/catalog/NovelAccessContext";
 import { NovelAccessPanel } from "@/components/catalog/NovelAccessPanel";
 import { NovelPaymentGuarantee } from "@/components/catalog/NovelPaymentGuarantee";
@@ -13,6 +14,7 @@ import { ExpandableSynopsis } from "@/components/catalog/ExpandableSynopsis";
 import {
   getPublicNovelBySlug,
   getPublicNovelChapters,
+  getNovelsByWriter,
   searchPublicNovels,
 } from "@/lib/supabase/public";
 import { parseCatalogParams } from "@/lib/catalog/params";
@@ -27,6 +29,7 @@ import {
   Calendar,
   Globe,
   FileText,
+  ArrowRight,
 } from "lucide-react";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
@@ -55,9 +58,13 @@ export async function generateMetadata({
   }
 
   const title = `${novel.title_urdu} (${novel.title_english || "Urdu Novel"}) — ${novel.writer_pen_name_english || novel.writer_pen_name_urdu}`;
-  const description =
+  const rawDescription =
     novel.synopsis_urdu ||
     `Read ${novel.title_urdu} by ${novel.writer_pen_name_english}. Support Pakistani authors directly via JazzCash, EasyPaisa, or Bank Transfer.`;
+  const description =
+    rawDescription.length > 155
+      ? `${rawDescription.slice(0, 152).trim()}...`
+      : rawDescription;
 
   const rawCover = resolveCoverUrl(novel.cover_url);
   const ogImageUrl = rawCover
@@ -105,8 +112,19 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
     notFound();
   }
 
-  const chapters = await getPublicNovelChapters(novel.slug);
+  const primaryGenre = novel.genres && novel.genres.length > 0 ? novel.genres[0] : null;
+
+  const [chapters, authorNovels, genreResult] = await Promise.all([
+    getPublicNovelChapters(novel.slug),
+    getNovelsByWriter(novel.writer_id),
+    primaryGenre
+      ? searchPublicNovels(parseCatalogParams({ genre: primaryGenre.slug, limit: "5" }))
+      : Promise.resolve({ novels: [] }),
+  ]);
+
   const freeChapters = chapters.filter((c) => c.is_free_preview);
+  const moreByWriter = authorNovels.filter((n) => n.id !== novel.id).slice(0, 4);
+  const moreInGenre = genreResult.novels.filter((n) => n.id !== novel.id).slice(0, 4);
 
   const formattedDate = novel.published_at
     ? new Date(novel.published_at).toLocaleDateString("en-PK", {
@@ -427,6 +445,76 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
             </div>
           </div>
         </div>
+
+        {/* Cross-Link Block 1: More by this Author */}
+        {moreByWriter.length > 0 && (
+          <section className="pt-12 border-t border-border space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+              <div>
+                <span className="text-xs font-semibold text-accent uppercase tracking-wider block">
+                  Author Collection
+                </span>
+                <h2 className="font-serif text-2xl font-bold text-navy">
+                  More by {novel.writer_pen_name_english || novel.writer_pen_name_urdu}
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <UrduText size="base" className="text-secondary py-0">
+                  {novel.writer_pen_name_urdu} کے دیگر ناولز
+                </UrduText>
+                {novel.writer_username && (
+                  <Link
+                    href={`/writers/${novel.writer_username}`}
+                    className="text-xs font-semibold text-accent hover:text-accent-dark inline-flex items-center gap-1 transition-colors"
+                  >
+                    <span>View Author Profile</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {moreByWriter.map((item) => (
+                <NovelCard key={item.id} novel={item} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Cross-Link Block 2: More in this Genre */}
+        {primaryGenre && moreInGenre.length > 0 && (
+          <section className="pt-10 border-t border-border space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+              <div>
+                <span className="text-xs font-semibold text-accent uppercase tracking-wider block">
+                  Genre Discovery
+                </span>
+                <h2 className="font-serif text-2xl font-bold text-navy">
+                  More in {primaryGenre.name_english}
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <UrduText size="base" className="text-secondary py-0">
+                  {primaryGenre.name_urdu} کے مزید ناولز
+                </UrduText>
+                <Link
+                  href={`/genres/${primaryGenre.slug}`}
+                  className="text-xs font-semibold text-accent hover:text-accent-dark inline-flex items-center gap-1 transition-colors"
+                >
+                  <span>Explore Genre</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {moreInGenre.map((item) => (
+                <NovelCard key={item.id} novel={item} />
+              ))}
+            </div>
+          </section>
+        )}
       </NovelAccessProvider>
     </div>
   </>
