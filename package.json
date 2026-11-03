@@ -18,6 +18,7 @@
     "check:terms": "node scripts/check-terminology.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:colors": "node scripts/check-colors.mjs",
+    "check:seo": "node scripts/check-seo-regression.mjs",
     "build:brand": "node scripts/build-brand-assets.mjs"
   },
   "dependencies": {
