@@ -17,7 +17,10 @@ import {
   updateRetentionSettingsAction,
   runRetentionCleanupAction,
 } from '@/app/actions/admin';
+import { formatBytes } from '@/lib/retention/format';
 import type { RetentionSettings, RetentionCleanupSummary } from '@/types/database';
+
+export { formatBytes };
 
 interface Props {
   initialSettings: RetentionSettings;
@@ -399,7 +402,11 @@ export function DataRetentionSettingsCard({
                   <span className="font-bold">
                     {cleanupStatus.filesDeleted ?? 0}
                   </span>{' '}
-                  expired storage receipt files.
+                  expired storage receipt files (freed approx.{' '}
+                  <span className="font-bold text-success-text">
+                    {formatBytes(cleanupStatus.summary?.total_bytes_freed ?? cleanupStatus.summary?.db_bytes_freed)}
+                  </span>
+                  ).
                 </p>
               )}
               {cleanupStatus.error && <p>{cleanupStatus.error}</p>}
@@ -423,13 +430,21 @@ export function DataRetentionSettingsCard({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
             <div className="p-2.5 rounded-lg bg-surface border border-border text-center">
               <span className="block text-[10px] text-muted uppercase tracking-wider">
                 Total Rows Pruned
               </span>
               <span className="text-base font-bold text-main font-mono">
                 {activeSummary.total_rows_deleted ?? 0}
+              </span>
+            </div>
+            <div className="p-2.5 rounded-lg bg-surface border border-accent-admin-border bg-accent-admin-soft/40 text-center">
+              <span className="block text-[10px] text-accent-admin font-bold uppercase tracking-wider">
+                Storage Freed
+              </span>
+              <span className="text-base font-bold text-accent-admin font-mono">
+                {formatBytes(activeSummary.total_bytes_freed ?? activeSummary.db_bytes_freed)}
               </span>
             </div>
             <div className="p-2.5 rounded-lg bg-surface border border-border text-center">
@@ -449,7 +464,7 @@ export function DataRetentionSettingsCard({
                   (activeSummary.notifications_deleted ?? 0)}
               </span>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface border border-border text-center">
+            <div className="p-2.5 rounded-lg bg-surface border border-border text-center col-span-2 sm:col-span-1">
               <span className="block text-[10px] text-muted uppercase tracking-wider">
                 Read Telemetry
               </span>

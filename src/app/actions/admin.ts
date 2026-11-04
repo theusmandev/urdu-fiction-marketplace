@@ -656,6 +656,8 @@ export async function runRetentionCleanupAction(): Promise<
     dbSummary: unknown;
     filesDeleted: number;
     prunedRows?: number;
+    storageBytesFreed?: number;
+    totalBytesFreed?: number;
   }>
 > {
   await requireRole('admin', '/admin');
@@ -671,6 +673,30 @@ export async function runRetentionCleanupAction(): Promise<
   // 2. Storage screenshots cleanup based on retention_payment_proofs_days
   const storageResult = await cleanupOldPaymentProofFiles({ client: supabase });
 
+  const rawDb = (dbSummary as Record<string, unknown>) || {};
+  const dbBytesFreed = typeof rawDb.db_bytes_freed === 'number' ? rawDb.db_bytes_freed : 0;
+  const storageBytesFreed = storageResult.storage_bytes_freed ?? 0;
+  const totalBytesFreed = dbBytesFreed + storageBytesFreed;
+
+  const combinedSummary = {
+    ...rawDb,
+    storage_proofs_deleted: storageResult.deletedFiles,
+    storage_bytes_freed: storageBytesFreed,
+    total_bytes_freed: totalBytesFreed,
+  };
+
+  // Persist combined summary into platform_settings so page reloads reflect storage freed
+  try {
+    await supabase
+      .from('platform_settings')
+      .update({
+        last_retention_cleanup_summary: combinedSummary,
+      })
+      .eq('id', 1);
+  } catch (updateErr) {
+    console.warn('[runRetentionCleanupAction] Failed to update combined summary:', updateErr);
+  }
+
   try {
     revalidatePath('/admin');
     revalidatePath('/admin/settings');
@@ -682,9 +708,11 @@ export async function runRetentionCleanupAction(): Promise<
   return {
     success: true,
     data: {
-      dbSummary,
+      dbSummary: combinedSummary,
       filesDeleted: storageResult.deletedFiles,
       prunedRows: storageResult.prunedRows,
+      storageBytesFreed,
+      totalBytesFreed,
     },
   };
 }
