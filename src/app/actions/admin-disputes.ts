@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import type {
   DisputeListItem,
   RefundRequestItem,
@@ -83,6 +84,10 @@ export async function resolveDisputeVerifyAction(
   revalidatePath('/orders');
   revalidatePath('/disputes');
 
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
+
   return {
     success: true,
     data: { dispute_id: data.dispute_id, order_id: data.order_id },
@@ -124,6 +129,10 @@ export async function resolveDisputeRefundAction(
   revalidatePath('/orders');
   revalidatePath('/disputes');
 
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
+
   return {
     success: true,
     data: { dispute_id: data.dispute_id, order_id: data.order_id },
@@ -162,6 +171,10 @@ export async function resolveDisputeForWriterAction(
   revalidatePath('/admin/disputes');
   revalidatePath(`/admin/disputes/${disputeId}`);
   revalidatePath('/disputes');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
 
   return {
     success: true,
@@ -268,6 +281,10 @@ export async function approveRefundRequestAction(
   revalidatePath('/writer/orders');
   revalidatePath('/orders');
 
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
+
   return {
     success: true,
     data: { request_id: data.request_id, order_id: data.order_id },
@@ -302,6 +319,10 @@ export async function rejectRefundRequestAction(
   }
 
   revalidatePath('/admin/refunds');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
 
   return {
     success: true,
@@ -371,6 +392,10 @@ export async function adminReplySupportRequestAction(
   revalidatePath(`/admin/support/${requestId}`);
   revalidatePath(`/support/${requestId}`);
 
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
+
   return {
     success: true,
     data: { message_id: data.message_id },
@@ -423,5 +448,41 @@ export async function retryFailedEmailsAction(): Promise<AdminActionResult<{ ret
     success: true,
     data: { retried_count: data.retried_count },
     message: `Reset ${data.retried_count} failed email(s) to pending.`,
+  };
+}
+
+/**
+ * Manually flushes and dispatches pending emails from the outbox.
+ */
+export async function dispatchOutboxAction(): Promise<
+  AdminActionResult<{ processed: number; sent: number; failed: number }>
+> {
+  await requireRole('admin', '/admin');
+  const result = await dispatchPendingEmails(50);
+
+  revalidatePath('/admin');
+
+  if (result.unconfigured) {
+    return {
+      success: false,
+      error:
+        'Email service is unconfigured. Please configure RESEND_API_KEY in Cloudflare Workers settings or .env.local to enable email sending.',
+    };
+  }
+
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error || 'Failed to dispatch pending emails.',
+    };
+  }
+
+  return {
+    success: true,
+    data: { processed: result.processed, sent: result.sent, failed: result.failed },
+    message:
+      result.processed === 0
+        ? 'No pending emails in outbox.'
+        : `Successfully dispatched ${result.sent} email(s) (${result.failed} failed).`,
   };
 }

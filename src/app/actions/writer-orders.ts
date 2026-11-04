@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireWriter } from '@/lib/auth/requireRole';
 import { createClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import { z } from 'zod';
 import type { ActionResponse } from './checkout';
 
@@ -56,6 +57,10 @@ export async function verifyOrderPaymentAction(
     const res = data as { order_id: string };
     revalidatePath('/writer/orders');
 
+    try {
+      await dispatchPendingEmails(5);
+    } catch {}
+
     return {
       success: true,
       data: {
@@ -100,6 +105,10 @@ export async function rejectOrderPaymentAction(
 
     const res = data as { order_id: string };
     revalidatePath('/writer/orders');
+
+    try {
+      await dispatchPendingEmails(5);
+    } catch {}
 
     return {
       success: true,

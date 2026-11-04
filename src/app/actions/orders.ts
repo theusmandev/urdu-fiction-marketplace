@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAuth, requireWriter } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 
 export interface OrderActionResult {
   success: boolean;
@@ -62,6 +63,11 @@ export async function verifyOrderPaymentAction(
 
   revalidatePath('/writer/orders');
   revalidatePath('/writer');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
+
   return {
     success: true,
     message: 'Payment verified successfully. Novel access has been unlocked for the reader.',
@@ -101,6 +107,11 @@ export async function rejectOrderPaymentAction(
 
   revalidatePath('/writer/orders');
   revalidatePath('/writer');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch {}
+
   return {
     success: true,
     message: 'Payment submission has been rejected. The reader has been notified.',

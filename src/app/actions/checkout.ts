@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { createClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import {
   createOrderFormSchema,
   paymentSubmissionFormSchema,
@@ -139,6 +140,10 @@ export async function submitPaymentAction(
 
     const result = data as { submission_id: string; is_retry: boolean };
     revalidatePath('/orders');
+
+    try {
+      await dispatchPendingEmails(5);
+    } catch {}
 
     return {
       success: true,

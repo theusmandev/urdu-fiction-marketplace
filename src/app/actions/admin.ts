@@ -3,6 +3,7 @@
 import { requireRole } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import { isSitePalette, ALLOWED_SITE_PALETTES, type SitePalette } from '@/lib/settings/palette';
 import {
   suspendNovelSchema,
@@ -43,6 +44,13 @@ export async function adminApproveWriterAction(writerId: string): Promise<Action
   revalidatePath('/admin');
   revalidatePath('/admin/writers');
   revalidatePath(`/admin/writers/${writerId}`);
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after writer approval encountered an error:', dispatchErr);
+  }
+
   return { success: true };
 }
 
@@ -69,6 +77,13 @@ export async function adminRejectWriterAction(
   revalidatePath('/admin');
   revalidatePath('/admin/writers');
   revalidatePath(`/admin/writers/${writerId}`);
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after writer rejection encountered an error:', dispatchErr);
+  }
+
   return { success: true };
 }
 
@@ -157,6 +172,13 @@ export async function adminApproveNovelAction(
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after novel approval encountered an error:', dispatchErr);
+  }
+
   return { success: true };
 }
 
@@ -183,6 +205,13 @@ export async function adminRejectNovelAction(
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after novel rejection encountered an error:', dispatchErr);
+  }
+
   return { success: true };
 }
 

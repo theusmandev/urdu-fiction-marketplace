@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import type { SupportRequestListItem, SupportRequestDetailPayload } from '@/types/database';
 
 export interface SupportActionResult<T = unknown> {
@@ -54,6 +55,13 @@ export async function createSupportRequestAction(
   revalidatePath('/support');
   revalidatePath('/admin/support');
 
+  // Trigger non-blocking email dispatch if credentials are configured
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after support ticket creation encountered an error:', dispatchErr);
+  }
+
   return {
     success: true,
     data: { request_id: data.request_id },
@@ -92,6 +100,13 @@ export async function addSupportMessageAction(
 
   revalidatePath(`/support/${requestId}`);
   revalidatePath(`/admin/support/${requestId}`);
+
+  // Trigger non-blocking email dispatch if credentials are configured
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after support message encountered an error:', dispatchErr);
+  }
 
   return {
     success: true,

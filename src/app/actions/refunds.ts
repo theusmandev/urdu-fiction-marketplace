@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 
 export interface RefundActionResult<T = unknown> {
   success: boolean;
@@ -47,6 +48,12 @@ export async function requestRefundAction(
   revalidatePath(`/orders/${orderId}`);
   revalidatePath('/writer/orders');
   revalidatePath('/admin/refunds');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after refund request encountered an error:', dispatchErr);
+  }
 
   return {
     success: true,

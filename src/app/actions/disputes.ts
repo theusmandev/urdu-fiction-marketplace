@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth/requireRole';
 import { createServerClient } from '@/lib/supabase/server';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import type { DisputeListItem, DisputeDetailPayload } from '@/types/database';
 
 export interface DisputeActionResult<T = unknown> {
@@ -44,6 +45,12 @@ export async function openDisputeAction(
   revalidatePath('/disputes');
   revalidatePath('/writer/disputes');
   revalidatePath('/admin/disputes');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after open dispute encountered an error:', dispatchErr);
+  }
 
   return {
     success: true,
@@ -88,6 +95,12 @@ export async function addDisputeMessageAction(
   revalidatePath(`/disputes/${disputeId}`);
   revalidatePath(`/writer/disputes/${disputeId}`);
   revalidatePath(`/admin/disputes/${disputeId}`);
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after dispute message encountered an error:', dispatchErr);
+  }
 
   return {
     success: true,

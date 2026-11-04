@@ -16,6 +16,7 @@ import {
 } from '@/lib/commission/schemas';
 import { revalidatePath } from 'next/cache';
 import { unwrapQuery } from '@/lib/supabase/query';
+import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 
 export async function previewCommissionInvoiceAction(
   writerId: string,
@@ -60,6 +61,12 @@ export async function generateCommissionInvoiceAction(
   revalidatePath(`/admin/commission/writers/${writerId}`);
   revalidatePath('/admin/commission');
   revalidatePath('/admin');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after platform fee invoice generation encountered an error:', dispatchErr);
+  }
 
   return { success: true, invoice: data };
 }
@@ -117,6 +124,12 @@ export async function confirmCommissionSettlementAction(rawInput: ConfirmCommiss
   revalidatePath('/admin/commission/reports');
   revalidatePath('/admin');
 
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after settlement confirmation encountered an error:', dispatchErr);
+  }
+
   return { success: true, result: data };
 }
 
@@ -142,6 +155,12 @@ export async function rejectCommissionReportAction(rawInput: RejectCommissionRep
   revalidatePath('/admin/commission/reports');
   revalidatePath('/admin/invoices');
   revalidatePath('/admin');
+
+  try {
+    await dispatchPendingEmails(5);
+  } catch (dispatchErr) {
+    console.error('Non-blocking outbox dispatch after report rejection encountered an error:', dispatchErr);
+  }
 
   return { success: true, result: data };
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { retryFailedEmailsAction } from '@/app/actions/admin-disputes';
+import { retryFailedEmailsAction, dispatchOutboxAction } from '@/app/actions/admin-disputes';
 import type { EmailOutboxStats } from '@/types/database';
 import {
   Mail,
@@ -13,6 +13,7 @@ import {
   Loader2,
   AlertCircle,
   ShieldCheck,
+  Send,
 } from 'lucide-react';
 
 interface EmailOutboxCardProps {
@@ -36,6 +37,22 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
         setFeedback({
           type: 'success',
           message: res.message || `Reset failed emails to pending.`,
+        });
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDispatch = () => {
+    setFeedback(null);
+    startTransition(async () => {
+      const res = await dispatchOutboxAction();
+      if (!res.success) {
+        setFeedback({ type: 'error', message: res.error || 'Failed to dispatch emails.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: res.message || 'Dispatched pending emails.',
         });
         router.refresh();
       }
@@ -70,19 +87,36 @@ export function EmailOutboxCard({ stats }: EmailOutboxCardProps) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleRetry}
-          disabled={isPending || stats.failed_count === 0}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-main bg-surface hover:bg-ivory border border-border transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
-        >
-          {isPending ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <RefreshCw className="w-3.5 h-3.5 text-accent-admin" />
-          )}
-          <span>Retry Failed Emails</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDispatch}
+            disabled={isPending || (stats.pending_count || 0) === 0}
+            className="btn-primary text-xs !py-1.5 !px-3 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            title="Dispatch pending outbox emails immediately"
+          >
+            {isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Send className="w-3.5 h-3.5" />
+            )}
+            <span>Dispatch Pending ({stats.pending_count || 0})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRetry}
+            disabled={isPending || stats.failed_count === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-main bg-surface hover:bg-ivory border border-border transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
+          >
+            {isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="w-3.5 h-3.5 text-accent-admin" />
+            )}
+            <span>Retry Failed</span>
+          </button>
+        </div>
       </div>
 
       {feedback && (
