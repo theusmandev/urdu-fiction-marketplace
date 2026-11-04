@@ -435,10 +435,10 @@ BEGIN
 
     -- 2. Settled platform fee payment reports
     RETURN QUERY
-    SELECT cpr.proof_url, 'fee_settlement'::text
+    SELECT cpr.screenshot_path, 'fee_settlement'::text
     FROM public.commission_payment_reports cpr
-    WHERE cpr.proof_url IS NOT NULL
-      AND cpr.proof_url NOT LIKE '[PRUNED%'
+    WHERE cpr.screenshot_path IS NOT NULL
+      AND cpr.screenshot_path NOT LIKE '[PRUNED%'
       AND cpr.status IN ('confirmed', 'rejected')
       AND cpr.reviewed_at < pg_catalog.now() - (p_days || ' days')::interval
     LIMIT 100;
@@ -481,8 +481,8 @@ BEGIN
     WHERE screenshot_url = ANY(p_paths);
 
     UPDATE public.commission_payment_reports
-    SET proof_url = '[PRUNED_BY_RETENTION_POLICY]'
-    WHERE proof_url = ANY(p_paths);
+    SET screenshot_path = '[PRUNED_BY_RETENTION_POLICY]'
+    WHERE screenshot_path = ANY(p_paths);
 
     UPDATE public.tips
     SET screenshot_path = '[PRUNED_BY_RETENTION_POLICY]'
