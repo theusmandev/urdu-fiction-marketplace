@@ -150,7 +150,7 @@ BEGIN
       AND created_at < v_end_time;
 
     -- Current unpaid platform fee exposure across all writers
-    SELECT coalesce(pg_catalog.sum(total_unpaid_commission), 0.00)
+    SELECT coalesce(pg_catalog.sum(current_unpaid_commission), 0.00)
     INTO v_unpaid_fee_exposure_pkr
     FROM public.writer_profiles;
 
@@ -446,10 +446,10 @@ BEGIN
     -- Active vs pruned binary payment proofs
     SELECT
         (SELECT coalesce(pg_catalog.count(*), 0) FROM public.payment_submissions WHERE screenshot_url IS NOT NULL AND screenshot_url NOT LIKE '[PRUNED%') +
-        (SELECT coalesce(pg_catalog.count(*), 0) FROM public.commission_payment_reports WHERE proof_url IS NOT NULL AND proof_url NOT LIKE '[PRUNED%') +
+        (SELECT coalesce(pg_catalog.count(*), 0) FROM public.commission_payment_reports WHERE screenshot_path IS NOT NULL AND screenshot_path NOT LIKE '[PRUNED%') +
         (SELECT coalesce(pg_catalog.count(*), 0) FROM public.tips WHERE screenshot_path IS NOT NULL AND screenshot_path NOT LIKE '[PRUNED%'),
         (SELECT coalesce(pg_catalog.count(*), 0) FROM public.payment_submissions WHERE screenshot_url LIKE '[PRUNED%') +
-        (SELECT coalesce(pg_catalog.count(*), 0) FROM public.commission_payment_reports WHERE proof_url LIKE '[PRUNED%') +
+        (SELECT coalesce(pg_catalog.count(*), 0) FROM public.commission_payment_reports WHERE screenshot_path LIKE '[PRUNED%') +
         (SELECT coalesce(pg_catalog.count(*), 0) FROM public.tips WHERE screenshot_path LIKE '[PRUNED%')
     INTO
         v_count_active_proofs,
