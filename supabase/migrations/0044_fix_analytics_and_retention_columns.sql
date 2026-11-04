@@ -634,3 +634,4 @@ $$;
 -- Privileges: Restrict execution strictly to authenticated platform admins
 REVOKE EXECUTE ON FUNCTION public.get_admin_dashboard_analytics(integer) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.get_admin_dashboard_analytics(integer) TO authenticated;
+
