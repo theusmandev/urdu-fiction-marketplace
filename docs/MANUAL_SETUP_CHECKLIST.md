@@ -561,6 +561,22 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0041_data_retention_and_maintenance.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Run `SELECT retention_audit_logs_days, retention_chapter_reads_days, retention_payment_proofs_days FROM public.platform_settings WHERE id = 1;` and verify columns exist with default values (30, 7, 90).
 
+### 42. `supabase/migrations/0042_writer_studio_announcement.sql` [ADMIN-CONTROLLED BILINGUAL WRITER STUDIO ANNOUNCEMENT BANNER]
+- **Purpose**: Provisions an admin-controlled bilingual announcement banner displayed exclusively to authors inside Writer Studio:
+  - **Schema Expansion**: Extends `public.platform_settings` with 10 announcement columns (`writer_announcement_enabled`, `writer_announcement_variant` (`info`, `feature`, `warning`, `success`), `writer_announcement_title_en`, `writer_announcement_title_ur`, `writer_announcement_body_en`, `writer_announcement_body_ur`, `writer_announcement_link_url`, `writer_announcement_link_label`, `writer_announcement_dismissible`, `writer_announcement_updated_at`).
+  - **Atomic RPC `update_writer_announcement`**:
+    - Restricts modification to platform administrators (`public.is_admin()`).
+    - Validates variant constraint and link URL safety (rejecting `javascript:`, `data:`, `vbscript:`, and allowing `/` or `https?://`).
+    - Stamped with `SET search_path = ''` adhering to PostgreSQL security guidelines.
+    - Updates announcement settings, refreshes `writer_announcement_updated_at = pg_catalog.now()`, and records an entry in `public.audit_logs`.
+  - **Security & Privileges**: Revokes direct execution from `PUBLIC` and `anon`; grants to `authenticated`.
+- **Action**: Paste contents of `supabase/migrations/0042_writer_studio_announcement.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT writer_announcement_enabled, writer_announcement_variant, writer_announcement_title_en, writer_announcement_dismissible FROM public.platform_settings WHERE id = 1;
+  ```
+  Confirm columns exist.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
