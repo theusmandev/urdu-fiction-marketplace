@@ -20,9 +20,10 @@ import {
   type RetentionSettingsInput,
   writerAnnouncementSchema,
   type WriterAnnouncementInput,
+  dashboardTimeframeSchema,
 } from '@/lib/admin/schemas';
 import { cleanupOldPaymentProofFiles } from '@/lib/retention/storage-cleanup';
-import type { UserRole } from '@/types/database';
+import type { UserRole, AdminDashboardAnalytics } from '@/types/database';
 
 export interface ActionResult<T = unknown> {
   success: boolean;
@@ -764,4 +765,139 @@ export async function updateWriterAnnouncementAction(
   }
 
   return { success: true, data };
+}
+
+// -----------------------------------------------------------------------------
+// 14. ADMIN DASHBOARD EXECUTIVE ANALYTICS ACTIONS
+// -----------------------------------------------------------------------------
+
+export async function getAdminDashboardAnalyticsAction(days: number = 30): Promise<{
+  success: boolean;
+  data?: AdminDashboardAnalytics;
+  error?: string;
+}> {
+  await requireRole('admin', '/admin');
+
+  const parsed = dashboardTimeframeSchema.safeParse(days);
+  const normalizedDays = parsed.success ? parsed.data : 30;
+
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc('get_admin_dashboard_analytics', {
+    p_days: normalizedDays,
+  });
+
+  if (error) {
+    console.error('[getAdminDashboardAnalyticsAction] Supabase RPC error:', error.code, error.message);
+    return {
+      success: false,
+      error: error.message || 'Failed to load executive dashboard analytics.',
+    };
+  }
+
+  const raw = data as unknown as Partial<AdminDashboardAnalytics> | null;
+
+  const fallbackData: AdminDashboardAnalytics = {
+    timeframe: {
+      days: normalizedDays,
+      is_all_time: normalizedDays <= 0,
+      start_date: raw?.timeframe?.start_date || new Date().toISOString(),
+      end_date: raw?.timeframe?.end_date || new Date().toISOString(),
+      prev_start_date: raw?.timeframe?.prev_start_date || new Date().toISOString(),
+      prev_end_date: raw?.timeframe?.prev_end_date || new Date().toISOString(),
+    },
+    kpis: {
+      gmv_pkr: Number(raw?.kpis?.gmv_pkr ?? 0),
+      prev_gmv_pkr: Number(raw?.kpis?.prev_gmv_pkr ?? 0),
+      verified_orders_count: Number(raw?.kpis?.verified_orders_count ?? 0),
+      prev_verified_orders_count: Number(raw?.kpis?.prev_verified_orders_count ?? 0),
+      platform_fee_accrued_pkr: Number(raw?.kpis?.platform_fee_accrued_pkr ?? 0),
+      platform_fee_settled_pkr: Number(raw?.kpis?.platform_fee_settled_pkr ?? 0),
+      unpaid_fee_exposure_pkr: Number(raw?.kpis?.unpaid_fee_exposure_pkr ?? 0),
+      writer_net_earnings_pkr: Number(raw?.kpis?.writer_net_earnings_pkr ?? 0),
+      avg_order_value_pkr: Number(raw?.kpis?.avg_order_value_pkr ?? 0),
+      verified_tips_pkr: Number(raw?.kpis?.verified_tips_pkr ?? 0),
+      verified_tips_count: Number(raw?.kpis?.verified_tips_count ?? 0),
+      conversion_rate_pct: Number(raw?.kpis?.conversion_rate_pct ?? 0),
+    },
+    order_funnel: {
+      verified: Number(raw?.order_funnel?.verified ?? 0),
+      pending_verification: Number(raw?.order_funnel?.pending_verification ?? 0),
+      pending_payment: Number(raw?.order_funnel?.pending_payment ?? 0),
+      rejected: Number(raw?.order_funnel?.rejected ?? 0),
+      cancelled: Number(raw?.order_funnel?.cancelled ?? 0),
+      disputed: Number(raw?.order_funnel?.disputed ?? 0),
+      refunded_adjusted: Number(raw?.order_funnel?.refunded_adjusted ?? 0),
+      total_orders: Number(raw?.order_funnel?.total_orders ?? 0),
+    },
+    daily_series: Array.isArray(raw?.daily_series)
+      ? raw.daily_series.map((item) => ({
+          date: String(item.date || ''),
+          gmv_pkr: Number(item.gmv_pkr ?? 0),
+          platform_fee_pkr: Number(item.platform_fee_pkr ?? 0),
+          orders_count: Number(item.orders_count ?? 0),
+        }))
+      : [],
+    genre_breakdown: Array.isArray(raw?.genre_breakdown)
+      ? raw.genre_breakdown.map((item) => ({
+          genre_id: String(item.genre_id || ''),
+          name_en: String(item.name_en || ''),
+          name_ur: String(item.name_ur || ''),
+          slug: String(item.slug || ''),
+          gmv_pkr: Number(item.gmv_pkr ?? 0),
+          orders_count: Number(item.orders_count ?? 0),
+          novels_count: Number(item.novels_count ?? 0),
+        }))
+      : [],
+    decision_radar: {
+      stale_pending_orders_24h: Number(raw?.decision_radar?.stale_pending_orders_24h ?? 0),
+      open_disputes_count: Number(raw?.decision_radar?.open_disputes_count ?? 0),
+      pending_refund_requests_count: Number(raw?.decision_radar?.pending_refund_requests_count ?? 0),
+      pending_writer_applications_count: Number(raw?.decision_radar?.pending_writer_applications_count ?? 0),
+      pending_novel_moderation_count: Number(raw?.decision_radar?.pending_novel_moderation_count ?? 0),
+      overdue_invoices_count: Number(raw?.decision_radar?.overdue_invoices_count ?? 0),
+      failed_emails_count: Number(raw?.decision_radar?.failed_emails_count ?? 0),
+    },
+    top_novels: Array.isArray(raw?.top_novels)
+      ? raw.top_novels.map((item) => ({
+          novel_id: String(item.novel_id || ''),
+          title_en: String(item.title_en || ''),
+          title_ur: String(item.title_ur || ''),
+          slug: String(item.slug || ''),
+          writer_name: String(item.writer_name || ''),
+          writer_name_ur: item.writer_name_ur ? String(item.writer_name_ur) : undefined,
+          copies_sold: Number(item.copies_sold ?? 0),
+          gmv_pkr: Number(item.gmv_pkr ?? 0),
+        }))
+      : [],
+    top_writers: Array.isArray(raw?.top_writers)
+      ? raw.top_writers.map((item) => ({
+          writer_id: String(item.writer_id || ''),
+          pen_name_en: String(item.pen_name_en || ''),
+          pen_name_ur: String(item.pen_name_ur || ''),
+          published_novels_count: Number(item.published_novels_count ?? 0),
+          copies_sold: Number(item.copies_sold ?? 0),
+          gmv_pkr: Number(item.gmv_pkr ?? 0),
+          writer_net_pkr: Number(item.writer_net_pkr ?? 0),
+        }))
+      : [],
+    infrastructure: {
+      db_size_bytes: Number(raw?.infrastructure?.db_size_bytes ?? 0),
+      db_quota_limit_bytes: Number(raw?.infrastructure?.db_quota_limit_bytes ?? 524288000),
+      table_counts: {
+        orders: Number(raw?.infrastructure?.table_counts?.orders ?? 0),
+        chapters: Number(raw?.infrastructure?.table_counts?.chapters ?? 0),
+        audit_logs: Number(raw?.infrastructure?.table_counts?.audit_logs ?? 0),
+        chapter_reads: Number(raw?.infrastructure?.table_counts?.chapter_reads ?? 0),
+        email_outbox: Number(raw?.infrastructure?.table_counts?.email_outbox ?? 0),
+        notifications: Number(raw?.infrastructure?.table_counts?.notifications ?? 0),
+      },
+      active_payment_proofs_count: Number(raw?.infrastructure?.active_payment_proofs_count ?? 0),
+      pruned_payment_proofs_count: Number(raw?.infrastructure?.pruned_payment_proofs_count ?? 0),
+    },
+  };
+
+  return {
+    success: true,
+    data: fallbackData,
+  };
 }
