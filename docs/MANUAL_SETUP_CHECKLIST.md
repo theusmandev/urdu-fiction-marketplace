@@ -556,6 +556,11 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0040_email_outbox_wiring_and_support_events.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Confirm `public.enqueue_email_for_notification` and updated RPC functions exist and accept calls without error.
 
+### 41. `supabase/migrations/0041_data_retention_and_maintenance.sql` [DYNAMIC DATA & STORAGE RETENTION POLICY SYSTEM]
+- **Purpose**: Expands `public.platform_settings` with 8 configurable retention duration columns (`retention_audit_logs_days`, `retention_chapter_reads_days`, `retention_chapter_revisions_days`, `retention_email_outbox_days`, `retention_notifications_days`, `retention_rate_limits_days`, `retention_chapter_drafts_days`, `retention_payment_proofs_days`) and check constraints (-1 to 3650 days). Provides `update_retention_settings(...)` RPC with admin authorization and audit logging, `run_retention_cleanup()` RPC for dynamic maintenance pruning with sentinel bypass (<= 0 means unlimited / never delete), and storage helpers `get_expired_payment_proof_paths(...)` and `mark_payment_proofs_pruned(...)`.
+- **Action**: Paste contents of `supabase/migrations/0041_data_retention_and_maintenance.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `SELECT retention_audit_logs_days, retention_chapter_reads_days, retention_payment_proofs_days FROM public.platform_settings WHERE id = 1;` and verify columns exist with default values (30, 7, 90).
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
