@@ -7,6 +7,7 @@ import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymen
 import { AdminAppearanceCard } from '@/components/admin/AdminAppearanceCard';
 import { SocialLinksCard } from '@/components/admin/SocialLinksCard';
 import { DataRetentionSettingsCard } from '@/components/admin/DataRetentionSettingsCard';
+import { WriterAnnouncementSettingsCard } from '@/components/admin/WriterAnnouncementSettingsCard';
 import { isSitePalette, type SitePalette } from '@/lib/settings/palette';
 import { Settings, AlertCircle } from 'lucide-react';
 import type {
@@ -14,6 +15,8 @@ import type {
   SocialLinks,
   RetentionSettings,
   RetentionCleanupSummary,
+  WriterAnnouncement,
+  WriterAnnouncementVariant,
 } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
@@ -62,6 +65,16 @@ export default async function AdminSettingsPage() {
         retention_payment_proofs_days,
         last_retention_cleanup_at,
         last_retention_cleanup_summary,
+        writer_announcement_enabled,
+        writer_announcement_variant,
+        writer_announcement_title_en,
+        writer_announcement_title_ur,
+        writer_announcement_body_en,
+        writer_announcement_body_ur,
+        writer_announcement_link_url,
+        writer_announcement_link_label,
+        writer_announcement_dismissible,
+        writer_announcement_updated_at,
         updated_at
       `)
       .eq('id', 1)
@@ -106,6 +119,16 @@ export default async function AdminSettingsPage() {
     retention_payment_proofs_days?: number;
     last_retention_cleanup_at?: string | null;
     last_retention_cleanup_summary?: RetentionCleanupSummary | null;
+    writer_announcement_enabled?: boolean;
+    writer_announcement_variant?: WriterAnnouncementVariant;
+    writer_announcement_title_en?: string | null;
+    writer_announcement_title_ur?: string | null;
+    writer_announcement_body_en?: string | null;
+    writer_announcement_body_ur?: string | null;
+    writer_announcement_link_url?: string | null;
+    writer_announcement_link_label?: string | null;
+    writer_announcement_dismissible?: boolean;
+    writer_announcement_updated_at?: string | null;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
@@ -228,6 +251,19 @@ export default async function AdminSettingsPage() {
 
   const initialSocialLinks: SocialLinks = (rawSettings?.social_links as SocialLinks) ?? {};
 
+  const initialAnnouncement: WriterAnnouncement = {
+    enabled: Boolean(rawSettings?.writer_announcement_enabled),
+    variant: (rawSettings?.writer_announcement_variant || 'info') as WriterAnnouncementVariant,
+    title_en: rawSettings?.writer_announcement_title_en || '',
+    title_ur: rawSettings?.writer_announcement_title_ur || '',
+    body_en: rawSettings?.writer_announcement_body_en || '',
+    body_ur: rawSettings?.writer_announcement_body_ur || '',
+    link_url: rawSettings?.writer_announcement_link_url || '',
+    link_label: rawSettings?.writer_announcement_link_label || '',
+    dismissible: rawSettings?.writer_announcement_dismissible ?? true,
+    updated_at: rawSettings?.writer_announcement_updated_at || null,
+  };
+
   const retentionSettings: RetentionSettings = {
     retention_audit_logs_days: rawSettings?.retention_audit_logs_days ?? 30,
     retention_chapter_reads_days: rawSettings?.retention_chapter_reads_days ?? 7,
@@ -297,6 +333,8 @@ export default async function AdminSettingsPage() {
       <PlatformPaymentMethodsManager initialMethods={paymentMethods} />
 
       <SocialLinksCard initialLinks={initialSocialLinks} />
+
+      <WriterAnnouncementSettingsCard initialAnnouncement={initialAnnouncement} />
 
       <DataRetentionSettingsCard
         initialSettings={retentionSettings}
