@@ -18,6 +18,8 @@ import {
   writerActionReasonSchema,
   retentionSettingsSchema,
   type RetentionSettingsInput,
+  writerAnnouncementSchema,
+  type WriterAnnouncementInput,
 } from '@/lib/admin/schemas';
 import { cleanupOldPaymentProofFiles } from '@/lib/retention/storage-cleanup';
 import type { UserRole } from '@/types/database';
@@ -715,4 +717,51 @@ export async function runRetentionCleanupAction(): Promise<
       totalBytesFreed,
     },
   };
+}
+
+// -----------------------------------------------------------------------------
+// 13. WRITER STUDIO ANNOUNCEMENT ACTIONS
+// -----------------------------------------------------------------------------
+
+export async function updateWriterAnnouncementAction(
+  input: WriterAnnouncementInput
+): Promise<ActionResult> {
+  await requireRole('admin', '/admin');
+
+  const parsed = writerAnnouncementSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message || 'Invalid writer announcement input',
+    };
+  }
+
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc('update_writer_announcement', {
+    p_enabled: parsed.data.enabled,
+    p_variant: parsed.data.variant,
+    p_title_en: parsed.data.title_en,
+    p_title_ur: parsed.data.title_ur,
+    p_body_en: parsed.data.body_en,
+    p_body_ur: parsed.data.body_ur,
+    p_link_url: parsed.data.link_url,
+    p_link_label: parsed.data.link_label,
+    p_dismissible: parsed.data.dismissible,
+  });
+
+  if (error) {
+    console.error('[updateWriterAnnouncementAction] Supabase RPC error:', error.code, error.message);
+    return { success: false, error: error.message };
+  }
+
+  try {
+    revalidatePath('/writer', 'layout');
+    revalidatePath('/writer', 'page');
+    revalidatePath('/admin', 'layout');
+    revalidatePath('/admin/settings', 'page');
+  } catch (revalErr) {
+    console.warn('[updateWriterAnnouncementAction] revalidatePath warning:', revalErr);
+  }
+
+  return { success: true, data };
 }
