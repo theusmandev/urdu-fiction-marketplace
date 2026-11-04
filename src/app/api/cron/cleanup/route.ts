@@ -48,10 +48,35 @@ async function handleCleanup(req: NextRequest) {
     // 2. Execute storage proofs cleanup
     const storageResult = await cleanupOldPaymentProofFiles({ client: supabase });
 
+    const rawDb = (dbSummary as Record<string, unknown>) || {};
+    const dbBytesFreed = typeof rawDb.db_bytes_freed === 'number' ? rawDb.db_bytes_freed : 0;
+    const storageBytesFreed = storageResult.storage_bytes_freed ?? 0;
+    const totalBytesFreed = dbBytesFreed + storageBytesFreed;
+
+    const combinedSummary = {
+      ...rawDb,
+      storage_proofs_deleted: storageResult.deletedFiles,
+      storage_bytes_freed: storageBytesFreed,
+      total_bytes_freed: totalBytesFreed,
+    };
+
+    try {
+      await supabase
+        .from('platform_settings')
+        .update({
+          last_retention_cleanup_summary: combinedSummary,
+        })
+        .eq('id', 1);
+    } catch {
+      // Non-fatal if platform_settings update fails in background worker
+    }
+
     return NextResponse.json({
       success: true,
       database: dbSummary,
       storage: storageResult,
+      summary: combinedSummary,
+      total_bytes_freed: totalBytesFreed,
       timestamp: new Date().toISOString(),
     });
   } catch (err: unknown) {

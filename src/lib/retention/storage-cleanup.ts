@@ -11,6 +11,8 @@ async function getDefaultSupabaseClient() {
   return createServerClient();
 }
 
+export { formatBytes } from './format.ts';
+
 /**
  * Normalizes a raw screenshot URL or relative storage path into
  * the exact object key within the 'payment-proofs' bucket.
@@ -50,6 +52,7 @@ export interface StorageCleanupResult {
   success: boolean;
   deletedFiles: number;
   prunedRows?: number;
+  storage_bytes_freed?: number;
   message?: string;
   error?: string;
 }
@@ -68,6 +71,7 @@ export async function cleanupOldPaymentProofFiles(options?: {
       return {
         success: true,
         deletedFiles: 0,
+        storage_bytes_freed: 0,
         message: 'Payment proof retention is set to unlimited (never delete). Skipped.',
       };
     }
@@ -106,6 +110,7 @@ export async function cleanupOldPaymentProofFiles(options?: {
       return {
         success: true,
         deletedFiles: 0,
+        storage_bytes_freed: 0,
         message: 'Payment proof retention is set to unlimited (never delete). Skipped.',
       };
     }
@@ -121,6 +126,7 @@ export async function cleanupOldPaymentProofFiles(options?: {
       return {
         success: false,
         deletedFiles: 0,
+        storage_bytes_freed: 0,
         error: fetchErr.message,
       };
     }
@@ -129,6 +135,7 @@ export async function cleanupOldPaymentProofFiles(options?: {
       return {
         success: true,
         deletedFiles: 0,
+        storage_bytes_freed: 0,
         message: 'No expired payment proofs found.',
       };
     }
@@ -176,10 +183,15 @@ export async function cleanupOldPaymentProofFiles(options?: {
       }
     }
 
+    const totalDeletedFiles = deletedCount || storageKeys.length;
+    // Conservative average: ~350 KB (350,000 bytes) per receipt screenshot
+    const storageBytesFreed = totalDeletedFiles * 350000;
+
     return {
       success: true,
-      deletedFiles: deletedCount || storageKeys.length,
+      deletedFiles: totalDeletedFiles,
       prunedRows,
+      storage_bytes_freed: storageBytesFreed,
     };
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
