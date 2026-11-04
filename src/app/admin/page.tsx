@@ -21,6 +21,8 @@ import {
   RotateCcw,
   LifeBuoy,
   Sparkles,
+  BarChart3,
+  TrendingUp,
 } from 'lucide-react';
 
 function getTwentyFourHoursAgoIso(): string {
@@ -214,23 +216,59 @@ export default async function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
-            href="/admin/novels"
+            href="/admin/dashboard"
             className="px-3.5 py-2 rounded-xl bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
           >
-            <BookOpen className="w-3.5 h-3.5" />
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Executive Analytics</span>
+          </Link>
+          <Link
+            href="/admin/novels"
+            className="px-3.5 py-2 rounded-xl bg-surface border border-border hover:bg-surface-elevated text-main text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-accent-admin" />
             <span>Moderate Novels ({underReviewNovelsCount ?? 0})</span>
           </Link>
           <Link
             href="/admin/writers"
-            className="px-3.5 py-2 rounded-xl bg-surface border border-border hover:bg-ivory text-main text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-surface border border-border hover:bg-surface-elevated text-main text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
           >
             <Feather className="w-3.5 h-3.5 text-accent-admin" />
             <span>Review Writers ({pendingWritersCount ?? 0})</span>
           </Link>
         </div>
       </div>
+
+      {/* Executive Analytics Dashboard Feature Card */}
+      <Link
+        href="/admin/dashboard"
+        className="block group p-5 bg-surface border border-accent-admin/30 hover:border-accent-admin rounded-2xl shadow-card hover:shadow-md transition-all relative overflow-hidden"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin shrink-0 group-hover:scale-105 transition-transform">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-main">Executive Analytics & Decision Center</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-accent-admin/15 text-accent-admin border border-accent-admin/25">
+                  Live Engine
+                </span>
+              </div>
+              <p className="text-xs text-muted mt-0.5">
+                Real-time financial GMV, author net distributions, platform fee accruals, order funnel health, and operational bottleneck radar.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-accent-admin group-hover:translate-x-0.5 transition-transform shrink-0">
+            <span>Open Executive Dashboard</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </div>
+      </Link>
 
       {/* Top Queues Metrics Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-3">
