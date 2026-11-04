@@ -1,4 +1,5 @@
 import { renderEmailTemplate, type EmailRenderInput } from "./templates.ts";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export interface SendEmailResult {
   success: boolean;
@@ -8,16 +9,63 @@ export interface SendEmailResult {
 }
 
 /**
+ * Safely resolves an environment variable or secret from both Node.js (process.env)
+ * and Cloudflare Workers runtime context (getCloudflareContext().env).
+ *
+ * 1. Checks process.env[key] first (trimmed, non-empty).
+ * 2. If not found, safely calls getCloudflareContext() inside a try/catch block
+ *    and reads (ctx?.env as Record<string, string | undefined>)?.[key].
+ */
+export function resolveEmailEnv(key: string): string | undefined {
+  const fromProcess = process.env[key];
+  if (fromProcess && fromProcess.trim().length > 0) {
+    return fromProcess.trim();
+  }
+
+  try {
+    const ctx = getCloudflareContext();
+    if (ctx?.env) {
+      const val = (ctx.env as Record<string, string | undefined>)?.[key];
+      if (typeof val === "string" && val.trim().length > 0) {
+        return val.trim();
+      }
+    }
+  } catch {
+    // getCloudflareContext throws in Node.js test runners or build stages where no CF context is mounted
+  }
+
+  try {
+    const sym = Symbol.for("__cloudflare-context__");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const globalCtx = (globalThis as any)[sym];
+    if (globalCtx?.env) {
+      const val = globalCtx.env[key];
+      if (typeof val === "string" && val.trim().length > 0) {
+        return val.trim();
+      }
+    }
+  } catch {
+    // Ignore fallback inspection errors
+  }
+
+  return undefined;
+}
+
+export const getEmailEnv = resolveEmailEnv;
+
+/**
  * Checks whether the email dispatch service has valid credentials configured.
  * Returns true if EMAIL_PROVIDER has a corresponding non-empty API key.
  */
 export function isEmailServiceConfigured(): boolean {
-  const provider = (process.env.EMAIL_PROVIDER || "").toLowerCase().trim();
+  const provider = (resolveEmailEnv("EMAIL_PROVIDER") || "").toLowerCase().trim();
   if (provider === "resend") {
-    return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY.trim().length > 0);
+    const key = resolveEmailEnv("RESEND_API_KEY");
+    return Boolean(key && key.trim().length > 0);
   }
   if (provider === "brevo") {
-    return Boolean(process.env.BREVO_API_KEY && process.env.BREVO_API_KEY.trim().length > 0);
+    const key = resolveEmailEnv("BREVO_API_KEY");
+    return Boolean(key && key.trim().length > 0);
   }
   return false;
 }
@@ -54,14 +102,16 @@ export async function sendEmail(
   input: EmailRenderInput,
   options?: { allowMockInDevelopment?: boolean }
 ): Promise<SendEmailResult> {
-  const provider = (process.env.EMAIL_PROVIDER || "").toLowerCase().trim();
-  const fromAddress = process.env.EMAIL_FROM || "UNB Premium <notifications@premium.urdunovelbanks.com>";
+  const provider = (resolveEmailEnv("EMAIL_PROVIDER") || "").toLowerCase().trim();
+  const fromAddress =
+    resolveEmailEnv("EMAIL_FROM") ||
+    "Urdu Novel Bank Premium <noreply@urdunovelbanks.com>";
   const sender = parseFromAddress(fromAddress);
   const rendered = renderEmailTemplate({ ...input, recipientEmail });
 
   // 1. Resend REST API
   if (provider === "resend") {
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = resolveEmailEnv("RESEND_API_KEY");
     if (!apiKey) {
       if (process.env.NODE_ENV !== "production" || options?.allowMockInDevelopment) {
         return { success: true, isMocked: true, messageId: `mock-resend-${Date.now()}` };
@@ -108,7 +158,7 @@ export async function sendEmail(
 
   // 2. Brevo (Sendinblue) REST API
   if (provider === "brevo") {
-    const apiKey = process.env.BREVO_API_KEY;
+    const apiKey = resolveEmailEnv("BREVO_API_KEY");
     if (!apiKey) {
       if (process.env.NODE_ENV !== "production" || options?.allowMockInDevelopment) {
         return { success: true, isMocked: true, messageId: `mock-brevo-${Date.now()}` };

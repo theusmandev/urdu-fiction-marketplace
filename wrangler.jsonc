@@ -8,6 +8,11 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "keep_vars": true,
+  "vars": {
+    "EMAIL_PROVIDER": "resend",
+    "EMAIL_FROM": "Urdu Novel Bank Premium <noreply@urdunovelbanks.com>"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

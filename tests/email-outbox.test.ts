@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   isEmailServiceConfigured,
   sendEmail,
+  getEmailEnv,
+  resolveEmailEnv,
 } from '../src/lib/email/mailer.ts';
 import { dispatchPendingEmails } from '../src/lib/email/dispatch-outbox.ts';
 import {
@@ -51,6 +53,16 @@ describe('Email Outbox & Service Configuration Helper', () => {
 
     process.env.BREVO_API_KEY = 'xkeysib-test_key_12345';
     assert.strictEqual(isEmailServiceConfigured(), true);
+  });
+
+  it('resolveEmailEnv and getEmailEnv read from process.env and safely return undefined without error in Node', () => {
+    process.env.TEST_EMAIL_VAR = '  test_value_123  ';
+    assert.strictEqual(resolveEmailEnv('TEST_EMAIL_VAR'), 'test_value_123');
+    assert.strictEqual(getEmailEnv('TEST_EMAIL_VAR'), 'test_value_123');
+
+    delete process.env.NON_EXISTENT_VAR_123;
+    assert.strictEqual(resolveEmailEnv('NON_EXISTENT_VAR_123'), undefined);
+    assert.strictEqual(getEmailEnv('NON_EXISTENT_VAR_123'), undefined);
   });
 
   it('safely short-circuits dispatchPendingEmails when email service is unconfigured', async () => {
