@@ -8,6 +8,21 @@ export interface SendEmailResult {
 }
 
 /**
+ * Checks whether the email dispatch service has valid credentials configured.
+ * Returns true if EMAIL_PROVIDER has a corresponding non-empty API key.
+ */
+export function isEmailServiceConfigured(): boolean {
+  const provider = (process.env.EMAIL_PROVIDER || "").toLowerCase().trim();
+  if (provider === "resend") {
+    return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY.trim().length > 0);
+  }
+  if (provider === "brevo") {
+    return Boolean(process.env.BREVO_API_KEY && process.env.BREVO_API_KEY.trim().length > 0);
+  }
+  return false;
+}
+
+/**
  * Parses sender details from EMAIL_FROM string (e.g. "UNB Premium <notifications@unbpremium.pk>" or "notifications@unbpremium.pk").
  */
 function parseFromAddress(fromHeader: string): { name: string; email: string; raw: string } {
@@ -29,14 +44,18 @@ function parseFromAddress(fromHeader: string): { name: string; email: string; ra
 /**
  * Sends a single email using the configured HTTP REST email provider (Resend or Brevo).
  * Zero Node.js socket dependencies — fully compatible with Cloudflare Workers (workerd).
- * If no provider or keys are configured, it safely dry-runs and logs to the console.
+ *
+ * Strict Production Safety Invariant:
+ * If no provider or keys are configured, it will NOT falsely mark production database
+ * outbox rows as sent unless explicitly running in a test suite or mock flag.
  */
 export async function sendEmail(
   recipientEmail: string,
-  input: EmailRenderInput
+  input: EmailRenderInput,
+  options?: { allowMockInDevelopment?: boolean }
 ): Promise<SendEmailResult> {
   const provider = (process.env.EMAIL_PROVIDER || "").toLowerCase().trim();
-  const fromAddress = process.env.EMAIL_FROM || "UNB Premium <notifications@unbpremium.pk>";
+  const fromAddress = process.env.EMAIL_FROM || "UNB Premium <notifications@premium.urdunovelbanks.com>";
   const sender = parseFromAddress(fromAddress);
   const rendered = renderEmailTemplate({ ...input, recipientEmail });
 
@@ -44,10 +63,12 @@ export async function sendEmail(
   if (provider === "resend") {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      console.warn(
-        `[Email Dry-Run] EMAIL_PROVIDER is "resend" but RESEND_API_KEY is missing. Skipped sending to ${recipientEmail}. Subject: "${rendered.subject}"`
-      );
-      return { success: true, isMocked: true, messageId: `mock-resend-${Date.now()}` };
+      if (process.env.NODE_ENV !== "production" || options?.allowMockInDevelopment) {
+        return { success: true, isMocked: true, messageId: `mock-resend-${Date.now()}` };
+      }
+      const errorMsg = `EMAIL_PROVIDER is "resend" but RESEND_API_KEY is not configured in server environment.`;
+      console.warn(`[Email Warning] ${errorMsg} Skipped sending to ${recipientEmail}.`);
+      return { success: false, error: errorMsg };
     }
 
     try {
@@ -89,10 +110,12 @@ export async function sendEmail(
   if (provider === "brevo") {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {
-      console.warn(
-        `[Email Dry-Run] EMAIL_PROVIDER is "brevo" but BREVO_API_KEY is missing. Skipped sending to ${recipientEmail}. Subject: "${rendered.subject}"`
-      );
-      return { success: true, isMocked: true, messageId: `mock-brevo-${Date.now()}` };
+      if (process.env.NODE_ENV !== "production" || options?.allowMockInDevelopment) {
+        return { success: true, isMocked: true, messageId: `mock-brevo-${Date.now()}` };
+      }
+      const errorMsg = `EMAIL_PROVIDER is "brevo" but BREVO_API_KEY is not configured in server environment.`;
+      console.warn(`[Email Warning] ${errorMsg} Skipped sending to ${recipientEmail}.`);
+      return { success: false, error: errorMsg };
     }
 
     try {
@@ -131,13 +154,19 @@ export async function sendEmail(
     }
   }
 
-  // 3. Fallback: Safe Dry-Run when no provider configured
-  console.warn(
-    `[Email Dry-Run] EMAIL_PROVIDER not set or unsupported ("${provider}"). Email skipped sending to ${recipientEmail}. Subject: "${rendered.subject}"`
-  );
+  // 3. Fallback: Mocked in test/development; unconfigured failure in production
+  if (process.env.NODE_ENV !== "production" || options?.allowMockInDevelopment) {
+    return {
+      success: true,
+      isMocked: true,
+      messageId: `mock-${Date.now()}`,
+    };
+  }
+
+  const errorMsg = `EMAIL_PROVIDER is not configured or unsupported ("${provider}"). Configure RESEND_API_KEY to send emails.`;
+  console.warn(`[Email Warning] ${errorMsg} Skipped sending to ${recipientEmail}.`);
   return {
-    success: true,
-    isMocked: true,
-    messageId: `mock-${Date.now()}`,
+    success: false,
+    error: errorMsg,
   };
 }
