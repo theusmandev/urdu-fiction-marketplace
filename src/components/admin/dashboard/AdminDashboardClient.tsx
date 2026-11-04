@@ -30,6 +30,10 @@ import {
 } from 'lucide-react';
 import type { AdminDashboardAnalytics } from '@/types/database';
 import { getAdminDashboardAnalyticsAction } from '@/app/actions/admin';
+import { RevenueVelocityChart } from './RevenueVelocityChart';
+import { OrderFunnelGenreCard } from './OrderFunnelGenreCard';
+import { DashboardLeaderboards } from './DashboardLeaderboards';
+import { InfrastructureQuotaCard } from './InfrastructureQuotaCard';
 
 interface Props {
   initialAnalytics: AdminDashboardAnalytics;
@@ -682,6 +686,26 @@ export function AdminDashboardClient({ initialAnalytics, initialDays }: Props) {
           </div>
         )}
       </div>
+
+      {/* SECTION D: CUSTOM SVG REVENUE VELOCITY & LIFECYCLE FUNNEL CHARTS */}
+      <RevenueVelocityChart
+        data={analytics.daily_series}
+        isAllTime={analytics.timeframe.is_all_time}
+      />
+
+      <OrderFunnelGenreCard
+        funnel={analytics.order_funnel}
+        genres={analytics.genre_breakdown}
+      />
+
+      {/* SECTION E: LEADERBOARDS (TOP NOVELS & TOP WRITERS) */}
+      <DashboardLeaderboards
+        novels={analytics.top_novels}
+        writers={analytics.top_writers}
+      />
+
+      {/* SECTION F: INFRASTRUCTURE & 500MB DB QUOTA HEALTH */}
+      <InfrastructureQuotaCard infrastructure={analytics.infrastructure} />
     </div>
   );
 }
