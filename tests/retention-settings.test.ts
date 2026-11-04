@@ -5,6 +5,7 @@ import {
   extractProofStorageKey,
   cleanupOldPaymentProofFiles,
 } from '../src/lib/retention/storage-cleanup.ts';
+import { formatBytes } from '../src/lib/retention/format.ts';
 
 describe('Data Retention Settings & Storage Cleanup', () => {
   describe('retentionSettingsSchema validation', () => {
@@ -158,11 +159,36 @@ describe('Data Retention Settings & Storage Cleanup', () => {
       const result = await cleanupOldPaymentProofFiles({ retentionDays: -1 });
       assert.equal(result.success, true);
       assert.equal(result.deletedFiles, 0);
+      assert.equal(result.storage_bytes_freed, 0);
       assert.match(result.message || '', /unlimited/i);
 
       const resultZero = await cleanupOldPaymentProofFiles({ retentionDays: 0 });
       assert.equal(resultZero.success, true);
       assert.equal(resultZero.deletedFiles, 0);
+      assert.equal(resultZero.storage_bytes_freed, 0);
+    });
+  });
+
+  describe('formatBytes helper', () => {
+    it('returns "0 KB" for 0, negative, or undefined values', () => {
+      assert.equal(formatBytes(0), '0 KB');
+      assert.equal(formatBytes(-100), '0 KB');
+      assert.equal(formatBytes(null), '0 KB');
+      assert.equal(formatBytes(undefined), '0 KB');
+    });
+
+    it('formats values under 1 MB in KB', () => {
+      assert.equal(formatBytes(512), '0.5 KB');
+      assert.equal(formatBytes(850 * 1024), '850 KB');
+    });
+
+    it('formats values 1 MB and above in MB', () => {
+      assert.equal(formatBytes(1.2 * 1024 * 1024), '1.2 MB');
+      assert.equal(formatBytes(15 * 1024 * 1024), '15 MB');
+    });
+
+    it('formats values 1 GB and above in GB', () => {
+      assert.equal(formatBytes(2.5 * 1024 * 1024 * 1024), '2.5 GB');
     });
   });
 });
