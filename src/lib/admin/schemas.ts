@@ -245,3 +245,50 @@ export const retentionSettingsSchema = z.object({
 
 export type RetentionSettingsInput = z.infer<typeof retentionSettingsSchema>;
 
+export const writerAnnouncementSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    variant: z.enum(['info', 'feature', 'warning', 'success'], {
+      message: 'Invalid announcement tone variant',
+    }),
+    title_en: z.string().trim().max(160, 'English title cannot exceed 160 characters').default(''),
+    title_ur: z.string().trim().max(160, 'Urdu title cannot exceed 160 characters').default(''),
+    body_en: z.string().trim().max(600, 'English body cannot exceed 600 characters').default(''),
+    body_ur: z.string().trim().max(600, 'Urdu body cannot exceed 600 characters').default(''),
+    link_url: z
+      .string()
+      .trim()
+      .default('')
+      .refine(
+        (url) => {
+          if (!url) return true;
+          if (/^(javascript|data|vbscript):/i.test(url)) return false;
+          return /^(\/|https?:\/\/)/i.test(url);
+        },
+        {
+          message:
+            'Link URL must start with "/" (internal route) or "http://" / "https://"',
+        }
+      ),
+    link_label: z.string().trim().max(60, 'Link label cannot exceed 60 characters').default(''),
+    dismissible: z.boolean().default(true),
+  })
+  .refine(
+    (data) => {
+      if (!data.enabled) return true;
+      return (
+        data.title_en.length > 0 ||
+        data.title_ur.length > 0 ||
+        data.body_en.length > 0 ||
+        data.body_ur.length > 0
+      );
+    },
+    {
+      message: 'Active announcements must have at least one non-empty title or message (English or Urdu).',
+      path: ['title_en'],
+    }
+  );
+
+export type WriterAnnouncementInput = z.infer<typeof writerAnnouncementSchema>;
+
+

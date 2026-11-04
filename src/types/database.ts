@@ -109,7 +109,32 @@ export interface PlatformSettingsRow {
   retention_payment_proofs_days: number;
   last_retention_cleanup_at?: string | null;
   last_retention_cleanup_summary?: RetentionCleanupSummary | null;
+  writer_announcement_enabled?: boolean;
+  writer_announcement_variant?: WriterAnnouncementVariant;
+  writer_announcement_title_en?: string;
+  writer_announcement_title_ur?: string;
+  writer_announcement_body_en?: string;
+  writer_announcement_body_ur?: string;
+  writer_announcement_link_url?: string;
+  writer_announcement_link_label?: string;
+  writer_announcement_dismissible?: boolean;
+  writer_announcement_updated_at?: string | null;
   updated_at: string;
+}
+
+export type WriterAnnouncementVariant = 'info' | 'feature' | 'warning' | 'success';
+
+export interface WriterAnnouncement {
+  enabled: boolean;
+  variant: WriterAnnouncementVariant;
+  title_en: string;
+  title_ur: string;
+  body_en: string;
+  body_ur: string;
+  link_url: string;
+  link_label: string;
+  dismissible: boolean;
+  updated_at?: string | null;
 }
 
 export interface RetentionCleanupSummary {
@@ -2894,6 +2919,20 @@ export interface Database {
           p_paths: string[];
         };
         Returns: number;
+      };
+      update_writer_announcement: {
+        Args: {
+          p_enabled: boolean;
+          p_variant: string;
+          p_title_en: string;
+          p_title_ur: string;
+          p_body_en: string;
+          p_body_ur: string;
+          p_link_url: string;
+          p_link_label: string;
+          p_dismissible: boolean;
+        };
+        Returns: Json;
       };
     };
     Enums: {
