@@ -252,6 +252,7 @@ DECLARE
     v_cnt_notifications integer := 0;
     v_cnt_revisions integer := 0;
     v_cnt_drafts integer := 0;
+    v_db_bytes_freed bigint := 0;
 
     v_summary jsonb;
 BEGIN
@@ -362,6 +363,17 @@ BEGIN
         GET DIAGNOSTICS v_cnt_drafts = ROW_COUNT;
     END IF;
 
+    -- Estimate DB storage space freed using audit-based average row weights
+    v_db_bytes_freed := (
+        (v_cnt_reads::bigint * 120) +
+        (v_cnt_rate_limits::bigint * 80) +
+        (v_cnt_audit::bigint * 2500) +
+        (v_cnt_email::bigint * 1300) +
+        (v_cnt_notifications::bigint * 500) +
+        (v_cnt_revisions::bigint * 35000) +
+        (v_cnt_drafts::bigint * 25000)
+    );
+
     v_summary := pg_catalog.jsonb_build_object(
         'success', true,
         'cleaned_at', pg_catalog.now(),
@@ -372,7 +384,9 @@ BEGIN
         'notifications_deleted', v_cnt_notifications,
         'chapter_revisions_deleted', v_cnt_revisions,
         'chapter_drafts_deleted', v_cnt_drafts,
-        'total_rows_deleted', (v_cnt_reads + v_cnt_rate_limits + v_cnt_audit + v_cnt_email + v_cnt_notifications + v_cnt_revisions + v_cnt_drafts)
+        'total_rows_deleted', (v_cnt_reads + v_cnt_rate_limits + v_cnt_audit + v_cnt_email + v_cnt_notifications + v_cnt_revisions + v_cnt_drafts),
+        'db_bytes_freed', v_db_bytes_freed,
+        'total_bytes_freed', v_db_bytes_freed
     );
 
     UPDATE public.platform_settings

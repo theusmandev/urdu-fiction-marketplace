@@ -123,7 +123,10 @@ export interface RetentionCleanupSummary {
   chapter_revisions_deleted: number;
   chapter_drafts_deleted: number;
   total_rows_deleted: number;
+  db_bytes_freed?: number;
   storage_proofs_deleted?: number;
+  storage_bytes_freed?: number;
+  total_bytes_freed?: number;
 }
 
 export interface RetentionSettings {
