@@ -551,6 +551,11 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0039_add_social_links_to_platform_settings.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Run `SELECT social_links FROM public.platform_settings WHERE id = 1;` and verify JSON contains the official seeded social channels.
 
+### 40. `supabase/migrations/0040_email_outbox_wiring_and_support_events.sql` [TRANSACTIONAL EMAIL OUTBOX & SUPPORT DESK WIRING]
+- **Purpose**: Wires all missing platform lifecycle events into `public.email_outbox`: payment submission, payment verification, payment rejection, tip deposit issues, platform fee invoices and settlements, writer and novel moderation approvals/rejections, and support desk ticket opening and replies.
+- **Action**: Paste contents of `supabase/migrations/0040_email_outbox_wiring_and_support_events.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Confirm `public.enqueue_email_for_notification` and updated RPC functions exist and accept calls without error.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -607,13 +612,24 @@ Configure the authentication provider, redirect URLs, and security controls in *
 - **Confirm Email**: Recommended `ON` in staging/production. (If testing locally without SMTP, you can toggle `OFF` temporarily or inspect confirmation links in Supabase Dashboard -> Inbucket / Auth Users).
 - **Secure Email Change**: `ON`.
 
-### 3. Custom SMTP Setup (**Authentication -> SMTP Settings**)
+### 3. Custom SMTP / HTTP Email Provider Setup
 - The default Supabase shared SMTP provider has strict rate limits (approx. 3-4 emails/hour).
-- For production email delivery (confirmation emails, password resets, dispute alerts), configure a dedicated SMTP provider (e.g., Resend, Brevo, SendGrid, or AWS SES):
-  - Sender email: `noreply@unbpremium.pk`
+- For production email delivery (confirmation emails, password resets, dispute alerts), configure a dedicated provider (e.g., Resend via REST API, Brevo, SendGrid, or AWS SES):
+  - Sender email: `notifications@premium.urdunovelbanks.com`
   - Sender name: `UNB Premium (یو این بی پریمیم)`
 
-### 4. Abuse Protection & Rate Limiting (TODO)
+### 4. Branded Auth Email Templates (**Authentication -> Email Templates**)
+UNB Premium provides luxury bilingual (English + Urdu Nastaliq RTL) email templates matching the official Warm Ivory, Deep Navy, and Antique Gold aesthetic. Copy and paste each template into the Supabase Dashboard:
+- **Confirm signup**: Paste contents from `docs/email-templates/confirm_signup.html`
+  - Subject: `Confirm Your UNB Premium Account | اکاؤنٹ کی تصدیق`
+- **Reset password**: Paste contents from `docs/email-templates/reset_password.html`
+  - Subject: `Reset Your UNB Premium Password | پاس ورڈ ری سیٹ`
+- **Magic Link**: Paste contents from `docs/email-templates/magic_link.html`
+  - Subject: `Your UNB Premium Sign-In Link | ون کلک لاگ ان`
+- **Change Email Address**: Paste contents from `docs/email-templates/change_email.html`
+  - Subject: `Confirm Your New Email Address | نئے ای میل کی تصدیق`
+
+### 5. Abuse Protection & Rate Limiting (TODO)
 - **Built-in Rate Limits**: Supabase automatically rate-limits auth requests per IP address.
 - **Client Double-Submit Prevention**: The application's auth forms (`/login`, `/register`, `/forgot-password`, `/reset-password`) automatically disable submit buttons with animated loaders upon first submission to prevent duplicate requests.
 - **Bot Detection & Captcha [TODO]**:
@@ -634,8 +650,9 @@ Configure the authentication provider, redirect URLs, and security controls in *
    - `SUPABASE_SERVICE_ROLE_KEY`: Server-only administrative key. **Strictly used ONLY by the background cron worker (`src/lib/supabase/cron-client.ts`)** to claim pending outbox emails and record delivery results. Never bundled or exposed in browser JavaScript.
    - `NEXT_PUBLIC_APP_URL`: Application URL (defaults to `http://localhost:3000`).
    - `CRON_SECRET`: Secret 32+ character bearer token for constant-time authentication of scheduled cron endpoints (`/api/cron/send-emails` and `/api/cron/reminders`).
-   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`: SMTP server connection details for transactional outbox dispatch. (If omitted in local development, Nodemailer runs in safe dry-run mode without failing).
-   - `EMAIL_FROM`: Default sender address (e.g., `UNB Premium <noreply@unbpremium.pk>`).
+   - `EMAIL_PROVIDER`: HTTP REST email provider (`resend` or `brevo`). Zero TCP socket dependencies — native to Edge & Cloudflare Workers (workerd).
+   - `RESEND_API_KEY`: API key from Resend dashboard (`re_...`).
+   - `EMAIL_FROM`: Default sender address (e.g., `UNB Premium <notifications@premium.urdunovelbanks.com>`).
 
 ---
 
