@@ -291,4 +291,20 @@ export const writerAnnouncementSchema = z
 
 export type WriterAnnouncementInput = z.infer<typeof writerAnnouncementSchema>;
 
+export const dashboardTimeframeSchema = z.preprocess(
+  (val) => {
+    if (val === null || val === undefined || typeof val === 'object') return NaN;
+    if (typeof val === 'string' && val.trim() === '') return NaN;
+    return Number(val);
+  },
+  z
+    .number()
+    .int('Timeframe days must be an integer')
+    .refine((days) => [-1, 0, 7, 30, 90, 365].includes(days), {
+      message: 'Timeframe must be 7, 30, 90, 365 days, or -1 / 0 for All Time',
+    })
+);
+
+export type DashboardTimeframeInput = z.infer<typeof dashboardTimeframeSchema>;
+
 

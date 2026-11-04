@@ -165,6 +165,120 @@ export interface RetentionSettings {
   retention_payment_proofs_days: number;
 }
 
+// ----------------------------------------------------------------------
+// EXECUTIVE ADMIN DASHBOARD ANALYTICS TYPES
+// ----------------------------------------------------------------------
+
+export interface DashboardTimeframe {
+  days: number;
+  is_all_time: boolean;
+  start_date: string;
+  end_date: string;
+  prev_start_date: string;
+  prev_end_date: string;
+}
+
+export interface DashboardKpis {
+  gmv_pkr: number;
+  prev_gmv_pkr: number;
+  verified_orders_count: number;
+  prev_verified_orders_count: number;
+  platform_fee_accrued_pkr: number;
+  platform_fee_settled_pkr: number;
+  unpaid_fee_exposure_pkr: number;
+  writer_net_earnings_pkr: number;
+  avg_order_value_pkr: number;
+  verified_tips_pkr: number;
+  verified_tips_count: number;
+  conversion_rate_pct: number;
+}
+
+export interface DashboardOrderFunnel {
+  verified: number;
+  pending_verification: number;
+  pending_payment: number;
+  rejected: number;
+  cancelled: number;
+  disputed: number;
+  refunded_adjusted: number;
+  total_orders: number;
+}
+
+export interface DashboardDailyPoint {
+  date: string;
+  gmv_pkr: number;
+  platform_fee_pkr: number;
+  orders_count: number;
+}
+
+export interface DashboardGenreBreakdown {
+  genre_id: string;
+  name_en: string;
+  name_ur: string;
+  slug: string;
+  gmv_pkr: number;
+  orders_count: number;
+  novels_count: number;
+}
+
+export interface DashboardDecisionRadar {
+  stale_pending_orders_24h: number;
+  open_disputes_count: number;
+  pending_refund_requests_count: number;
+  pending_writer_applications_count: number;
+  pending_novel_moderation_count: number;
+  overdue_invoices_count: number;
+  failed_emails_count: number;
+}
+
+export interface DashboardLeaderboardNovel {
+  novel_id: string;
+  title_en: string;
+  title_ur: string;
+  slug: string;
+  writer_name: string;
+  writer_name_ur?: string;
+  copies_sold: number;
+  gmv_pkr: number;
+}
+
+export interface DashboardLeaderboardWriter {
+  writer_id: string;
+  pen_name_en: string;
+  pen_name_ur: string;
+  published_novels_count: number;
+  copies_sold: number;
+  gmv_pkr: number;
+  writer_net_pkr: number;
+}
+
+export interface DashboardInfrastructureHealth {
+  db_size_bytes: number;
+  db_quota_limit_bytes: number;
+  table_counts: {
+    orders: number;
+    chapters: number;
+    audit_logs: number;
+    chapter_reads: number;
+    email_outbox: number;
+    notifications: number;
+  };
+  active_payment_proofs_count: number;
+  pruned_payment_proofs_count: number;
+}
+
+export interface AdminDashboardAnalytics {
+  timeframe: DashboardTimeframe;
+  kpis: DashboardKpis;
+  order_funnel: DashboardOrderFunnel;
+  daily_series: DashboardDailyPoint[];
+  genre_breakdown: DashboardGenreBreakdown[];
+  decision_radar: DashboardDecisionRadar;
+  top_novels: DashboardLeaderboardNovel[];
+  top_writers: DashboardLeaderboardWriter[];
+  infrastructure: DashboardInfrastructureHealth;
+}
+
 export interface SocialLinks {
   facebook?: string;
   whatsapp?: string;
@@ -2931,6 +3045,12 @@ export interface Database {
           p_link_url: string;
           p_link_label: string;
           p_dismissible: boolean;
+        };
+        Returns: Json;
+      };
+      get_admin_dashboard_analytics: {
+        Args: {
+          p_days?: number;
         };
         Returns: Json;
       };
