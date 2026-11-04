@@ -577,6 +577,26 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm columns exist.
 
+### 43. `supabase/migrations/0043_admin_dashboard_analytics.sql` [ENTERPRISE ADMIN DASHBOARD ANALYTICS ENGINE]
+- **Purpose**: High-performance consolidated executive analytics RPC powering `/admin/dashboard`:
+  - **Atomic RPC `get_admin_dashboard_analytics(p_days integer DEFAULT 30)`**:
+    - Strictly protected by `public.is_admin()`.
+    - Normalizes timeframe input (`p_days` clamped 1-3650 days, or `<= 0` for All Time), computing period-over-period comparison windows.
+    - Computes financial KPIs (`gmv_pkr`, `prev_gmv_pkr`, `verified_orders_count`, `platform_fee_accrued_pkr`, `platform_fee_settled_pkr`, `unpaid_fee_exposure_pkr`, `writer_net_earnings_pkr`, `avg_order_value_pkr`, `verified_tips_pkr`, `conversion_rate_pct`).
+    - Produces full order funnel breakdown (`verified`, `pending_verification`, `pending_payment`, `rejected`, `cancelled`, `disputed`, `refunded_adjusted`, `total_orders`).
+    - Delivers adaptive time-series points (daily for <= 90 days, weekly for <= 365 days, monthly for > 365 days).
+    - Top genres breakdown ranked by gross sales.
+    - Decision radar bottlenecks (stale pending orders > 24h, open disputes, pending refunds, author applications, novel moderation queue, overdue platform fee invoices, failed emails).
+    - Leaderboards for Top 5 novels and Top 5 writers.
+    - Infrastructure & quota telemetry (live DB size via `pg_database_size()`, table row counts, active vs pruned binary payment proofs).
+  - **Security & Privileges**: Revokes direct execution from `PUBLIC` and `anon`; grants to `authenticated`.
+- **Action**: Paste contents of `supabase/migrations/0043_admin_dashboard_analytics.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname = 'get_admin_dashboard_analytics';
+  ```
+  Confirm function exists with `prosecdef = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
