@@ -16,7 +16,10 @@ import {
   adminUpdateUserRoleStatusSchema,
   rejectNovelSchema,
   writerActionReasonSchema,
+  retentionSettingsSchema,
+  type RetentionSettingsInput,
 } from '@/lib/admin/schemas';
+import { cleanupOldPaymentProofFiles } from '@/lib/retention/storage-cleanup';
 import type { UserRole } from '@/types/database';
 
 export interface ActionResult<T = unknown> {
@@ -604,4 +607,84 @@ export async function updateSocialLinksAction(
   }
 
   return { success: true };
+}
+
+// -----------------------------------------------------------------------------
+// 12. DATA & STORAGE RETENTION ACTIONS
+// -----------------------------------------------------------------------------
+
+export async function updateRetentionSettingsAction(
+  input: RetentionSettingsInput
+): Promise<ActionResult> {
+  await requireRole('admin', '/admin');
+
+  const parsed = retentionSettingsSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || 'Invalid retention settings' };
+  }
+
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc('update_retention_settings', {
+    p_audit_logs_days: parsed.data.retention_audit_logs_days,
+    p_chapter_reads_days: parsed.data.retention_chapter_reads_days,
+    p_chapter_revisions_days: parsed.data.retention_chapter_revisions_days,
+    p_email_outbox_days: parsed.data.retention_email_outbox_days,
+    p_notifications_days: parsed.data.retention_notifications_days,
+    p_rate_limits_days: parsed.data.retention_rate_limits_days,
+    p_chapter_drafts_days: parsed.data.retention_chapter_drafts_days,
+    p_payment_proofs_days: parsed.data.retention_payment_proofs_days,
+  });
+
+  if (error) {
+    console.error('[updateRetentionSettingsAction] Supabase error:', error.code, error.message);
+    return { success: false, error: error.message };
+  }
+
+  try {
+    revalidatePath('/admin');
+    revalidatePath('/admin/settings');
+    revalidatePath('/admin/audit');
+  } catch (revalErr) {
+    console.warn('[updateRetentionSettingsAction] revalidatePath warning:', revalErr);
+  }
+
+  return { success: true, data };
+}
+
+export async function runRetentionCleanupAction(): Promise<
+  ActionResult<{
+    dbSummary: unknown;
+    filesDeleted: number;
+    prunedRows?: number;
+  }>
+> {
+  await requireRole('admin', '/admin');
+  const supabase = await createServerClient();
+
+  // 1. Dynamic database retention cleanup via SECURITY DEFINER RPC
+  const { data: dbSummary, error: dbError } = await supabase.rpc('run_retention_cleanup');
+  if (dbError) {
+    console.error('[runRetentionCleanupAction] DB cleanup error:', dbError.code, dbError.message);
+    return { success: false, error: dbError.message };
+  }
+
+  // 2. Storage screenshots cleanup based on retention_payment_proofs_days
+  const storageResult = await cleanupOldPaymentProofFiles({ client: supabase });
+
+  try {
+    revalidatePath('/admin');
+    revalidatePath('/admin/settings');
+    revalidatePath('/admin/audit');
+  } catch (revalErr) {
+    console.warn('[runRetentionCleanupAction] revalidatePath warning:', revalErr);
+  }
+
+  return {
+    success: true,
+    data: {
+      dbSummary,
+      filesDeleted: storageResult.deletedFiles,
+      prunedRows: storageResult.prunedRows,
+    },
+  };
 }

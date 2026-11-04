@@ -6,9 +6,15 @@ import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
 import { AdminAppearanceCard } from '@/components/admin/AdminAppearanceCard';
 import { SocialLinksCard } from '@/components/admin/SocialLinksCard';
+import { DataRetentionSettingsCard } from '@/components/admin/DataRetentionSettingsCard';
 import { isSitePalette, type SitePalette } from '@/lib/settings/palette';
 import { Settings, AlertCircle } from 'lucide-react';
-import type { PlatformPaymentMethodRow, SocialLinks } from '@/types/database';
+import type {
+  PlatformPaymentMethodRow,
+  SocialLinks,
+  RetentionSettings,
+  RetentionCleanupSummary,
+} from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,6 +52,16 @@ export default async function AdminSettingsPage() {
         site_palette_updated_at,
         site_palette_updated_by,
         social_links,
+        retention_audit_logs_days,
+        retention_chapter_reads_days,
+        retention_chapter_revisions_days,
+        retention_email_outbox_days,
+        retention_notifications_days,
+        retention_rate_limits_days,
+        retention_chapter_drafts_days,
+        retention_payment_proofs_days,
+        last_retention_cleanup_at,
+        last_retention_cleanup_summary,
         updated_at
       `)
       .eq('id', 1)
@@ -80,6 +96,16 @@ export default async function AdminSettingsPage() {
     site_palette_updated_at?: string | null;
     site_palette_updated_by?: string | null;
     social_links?: SocialLinks;
+    retention_audit_logs_days?: number;
+    retention_chapter_reads_days?: number;
+    retention_chapter_revisions_days?: number;
+    retention_email_outbox_days?: number;
+    retention_notifications_days?: number;
+    retention_rate_limits_days?: number;
+    retention_chapter_drafts_days?: number;
+    retention_payment_proofs_days?: number;
+    last_retention_cleanup_at?: string | null;
+    last_retention_cleanup_summary?: RetentionCleanupSummary | null;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
@@ -202,6 +228,17 @@ export default async function AdminSettingsPage() {
 
   const initialSocialLinks: SocialLinks = (rawSettings?.social_links as SocialLinks) ?? {};
 
+  const retentionSettings: RetentionSettings = {
+    retention_audit_logs_days: rawSettings?.retention_audit_logs_days ?? 30,
+    retention_chapter_reads_days: rawSettings?.retention_chapter_reads_days ?? 7,
+    retention_chapter_revisions_days: rawSettings?.retention_chapter_revisions_days ?? 30,
+    retention_email_outbox_days: rawSettings?.retention_email_outbox_days ?? 30,
+    retention_notifications_days: rawSettings?.retention_notifications_days ?? 30,
+    retention_rate_limits_days: rawSettings?.retention_rate_limits_days ?? 2,
+    retention_chapter_drafts_days: rawSettings?.retention_chapter_drafts_days ?? 90,
+    retention_payment_proofs_days: rawSettings?.retention_payment_proofs_days ?? 90,
+  };
+
   const isEdgePurgeConfigured = Boolean(
     process.env.CACHE_PURGE_ZONE_ID && process.env.CACHE_PURGE_API_TOKEN
   );
@@ -260,6 +297,12 @@ export default async function AdminSettingsPage() {
       <PlatformPaymentMethodsManager initialMethods={paymentMethods} />
 
       <SocialLinksCard initialLinks={initialSocialLinks} />
+
+      <DataRetentionSettingsCard
+        initialSettings={retentionSettings}
+        lastCleanupAt={rawSettings?.last_retention_cleanup_at}
+        lastCleanupSummary={rawSettings?.last_retention_cleanup_summary}
+      />
     </div>
   );
 }
