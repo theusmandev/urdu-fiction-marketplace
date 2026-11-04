@@ -199,3 +199,49 @@ export const writerActionReasonSchema = z.object({
     .trim()
     .min(3, 'A reason of at least 3 characters is required'),
 });
+
+export const retentionSettingsSchema = z.object({
+  retention_audit_logs_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_chapter_reads_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_chapter_revisions_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_email_outbox_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_notifications_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_rate_limits_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_chapter_drafts_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+  retention_payment_proofs_days: z.coerce
+    .number()
+    .int('Days must be an integer')
+    .min(-1, 'Must be at least -1 (-1 or 0 means unlimited)')
+    .max(3650, 'Retention cannot exceed 3,650 days (10 years)'),
+});
+
+export type RetentionSettingsInput = z.infer<typeof retentionSettingsSchema>;
+

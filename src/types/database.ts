@@ -99,7 +99,42 @@ export interface PlatformSettingsRow {
   site_palette_updated_at?: string | null;
   site_palette_updated_by?: string | null;
   social_links?: SocialLinks;
+  retention_audit_logs_days: number;
+  retention_chapter_reads_days: number;
+  retention_chapter_revisions_days: number;
+  retention_email_outbox_days: number;
+  retention_notifications_days: number;
+  retention_rate_limits_days: number;
+  retention_chapter_drafts_days: number;
+  retention_payment_proofs_days: number;
+  last_retention_cleanup_at?: string | null;
+  last_retention_cleanup_summary?: RetentionCleanupSummary | null;
   updated_at: string;
+}
+
+export interface RetentionCleanupSummary {
+  success: boolean;
+  cleaned_at: string;
+  chapter_reads_deleted: number;
+  rate_limits_deleted: number;
+  audit_logs_deleted: number;
+  email_outbox_deleted: number;
+  notifications_deleted: number;
+  chapter_revisions_deleted: number;
+  chapter_drafts_deleted: number;
+  total_rows_deleted: number;
+  storage_proofs_deleted?: number;
+}
+
+export interface RetentionSettings {
+  retention_audit_logs_days: number;
+  retention_chapter_reads_days: number;
+  retention_chapter_revisions_days: number;
+  retention_email_outbox_days: number;
+  retention_notifications_days: number;
+  retention_rate_limits_days: number;
+  retention_chapter_drafts_days: number;
+  retention_payment_proofs_days: number;
 }
 
 export interface SocialLinks {
@@ -2824,6 +2859,38 @@ export interface Database {
           p_action: string;
         };
         Returns: boolean;
+      };
+      update_retention_settings: {
+        Args: {
+          p_audit_logs_days: number;
+          p_chapter_reads_days: number;
+          p_chapter_revisions_days: number;
+          p_email_outbox_days: number;
+          p_notifications_days: number;
+          p_rate_limits_days: number;
+          p_chapter_drafts_days: number;
+          p_payment_proofs_days: number;
+        };
+        Returns: Json;
+      };
+      run_retention_cleanup: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      get_expired_payment_proof_paths: {
+        Args: {
+          p_days: number;
+        };
+        Returns: Array<{
+          proof_path: string;
+          source_type: string;
+        }>;
+      };
+      mark_payment_proofs_pruned: {
+        Args: {
+          p_paths: string[];
+        };
+        Returns: number;
       };
     };
     Enums: {
