@@ -302,8 +302,18 @@ export function AdminDashboardClient({ initialAnalytics, initialDays }: Props) {
             <div className="text-2xl sm:text-3xl font-extrabold text-main font-mono">
               {formatPkr(analytics.kpis.gmv_pkr)}
             </div>
-            <p className="text-xs text-muted mt-0.5">
-              Verified sales volume ({analytics.kpis.verified_orders_count.toLocaleString()} orders)
+            <p
+              className="text-xs text-muted mt-0.5"
+              title={`${analytics.kpis.verified_orders_count} ledger sales recorded (${analytics.order_funnel.verified} currently verified + ${analytics.order_funnel.refunded_adjusted} post-verification refunded/adjusted)`}
+            >
+              {analytics.kpis.verified_orders_count.toLocaleString()} verified sales
+              {analytics.order_funnel.refunded_adjusted > 0 ? (
+                <span className="text-[11px] text-muted font-normal">
+                  {' '}(incl. {analytics.order_funnel.refunded_adjusted} adjusted)
+                </span>
+              ) : (
+                <span> orders</span>
+              )}
             </p>
           </div>
           <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
