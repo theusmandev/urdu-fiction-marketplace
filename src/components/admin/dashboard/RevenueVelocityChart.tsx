@@ -108,33 +108,60 @@ export function RevenueVelocityChart({ data, isAllTime }: Props) {
   const hoveredPoint = hoveredIdx !== null ? data[hoveredIdx] : null;
   const hoveredX = hoveredIdx !== null ? getX(hoveredIdx) : null;
 
+  // Velocity summary metrics
+  const peakGmv = Math.max(...data.map((d) => d.gmv_pkr), 0);
+  const peakPoint = data.find((d) => d.gmv_pkr === peakGmv);
+  const activeDaysCount = data.filter((d) => d.gmv_pkr > 0).length;
+
   return (
     <div className="bg-surface border border-border shadow-xs rounded-2xl p-5 sm:p-6 space-y-4">
       {/* Chart Header & Legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin">
-            <TrendingUp className="w-3.5 h-3.5" />
+      <div className="flex flex-col gap-3 border-b border-border pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-accent-admin/10 border border-accent-admin/20 flex items-center justify-center text-accent-admin">
+              <TrendingUp className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-main">Revenue Velocity & Platform Fee Trends</h3>
+              <p className="text-xs text-muted">
+                {isAllTime
+                  ? 'Historical growth trajectory'
+                  : `Sales velocity over the last ${data.length} intervals`}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-sm text-main">Revenue Velocity & Platform Fee Trends</h3>
-            <p className="text-xs text-muted">
-              {isAllTime
-                ? 'Historical growth trajectory'
-                : `Sales velocity over the last ${data.length} intervals`}
-            </p>
+
+          {/* Legend */}
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-accent-admin" />
+              <span className="font-semibold text-main">Gross GMV</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-info-text" />
+              <span className="font-semibold text-info-text">Platform Fee</span>
+            </div>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-accent-admin" />
-            <span className="font-semibold text-main">Gross GMV</span>
+        {/* Compact Velocity Summary Strip */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-elevated border border-border text-xs">
+            <span className="text-muted">Peak Day GMV:</span>
+            <span className="font-bold text-main font-mono">{formatPkr(peakGmv)}</span>
+            {peakPoint && peakGmv > 0 && (
+              <span className="text-[11px] text-muted font-mono">({formatDateLabel(peakPoint.date)})</span>
+            )}
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-info-soft border border-info-border" />
-            <span className="font-semibold text-info-text">Platform Fee</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-elevated border border-border text-xs">
+            <span className="text-muted">Active Sales Days:</span>
+            <span className="font-bold text-accent-admin font-mono">
+              {activeDaysCount} of {data.length}
+            </span>
+            <span className="text-[11px] text-muted font-mono">
+              ({data.length > 0 ? Math.round((activeDaysCount / data.length) * 100) : 0}%)
+            </span>
           </div>
         </div>
       </div>
@@ -205,6 +232,34 @@ export function RevenueVelocityChart({ data, isAllTime }: Props) {
             strokeLinecap="round"
             strokeLinejoin="round"
           />
+
+          {/* Data Point Markers on Active / Non-Zero Days */}
+          {data.map((d, i) => {
+            if (d.gmv_pkr <= 0 && d.platform_fee_pkr <= 0) return null;
+            const x = getX(i);
+            return (
+              <g key={`marker-${i}`}>
+                {d.platform_fee_pkr > 0 && (
+                  <circle
+                    cx={x}
+                    cy={getY(d.platform_fee_pkr)}
+                    r="2.5"
+                    className="fill-surface stroke-info-text"
+                    strokeWidth="1.5"
+                  />
+                )}
+                {d.gmv_pkr > 0 && (
+                  <circle
+                    cx={x}
+                    cy={getY(d.gmv_pkr)}
+                    r="3.5"
+                    className="fill-surface stroke-accent-admin"
+                    strokeWidth="2"
+                  />
+                )}
+              </g>
+            );
+          })}
 
           {/* X-Axis Dates */}
           {data.map((d, i) => {
