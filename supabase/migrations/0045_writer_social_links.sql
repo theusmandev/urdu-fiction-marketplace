@@ -27,7 +27,9 @@ BEGIN
 END $$;
 
 -- 3. Update public.public_writers view to include social media fields
-CREATE OR REPLACE VIEW public.public_writers
+DROP VIEW IF EXISTS public.public_writers CASCADE;
+
+CREATE VIEW public.public_writers
 WITH (security_invoker = false) AS
 SELECT
     p.id,
@@ -37,16 +39,16 @@ SELECT
     wp.bio_urdu,
     wp.bio_english,
     p.avatar_url,
-    wp.social_facebook,
-    wp.social_instagram,
-    wp.social_pinterest,
-    wp.social_tiktok,
-    wp.social_linkedin,
     (
         SELECT count(*)::int
         FROM public.novels n
         WHERE n.writer_id = p.id AND n.status = 'published'
-    ) AS published_novels_count
+    ) AS published_novels_count,
+    wp.social_facebook,
+    wp.social_instagram,
+    wp.social_pinterest,
+    wp.social_tiktok,
+    wp.social_linkedin
 FROM public.profiles p
 JOIN public.writer_profiles wp ON wp.id = p.id
 WHERE wp.status = 'approved'
