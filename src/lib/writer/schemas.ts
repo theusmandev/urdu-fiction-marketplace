@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { PaymentMethodType } from '@/types/database';
+import { createSocialUrlSchema } from '../validations/social-links.ts';
 
 // Pakistani mobile numbers: 03XXXXXXXXX (11 digits) or +923XXXXXXXXX (13 chars)
 export const PAKISTANI_MOBILE_REGEX = /^(?:\+92|0)3[0-9]{9}$/;
@@ -58,6 +59,11 @@ export const writerProfileSchema = z.object({
   bio_urdu: z.string().trim().max(2000, 'Urdu bio cannot exceed 2,000 characters.').optional().or(z.literal('')),
   bio_english: z.string().trim().max(2000, 'English bio cannot exceed 2,000 characters.').optional().or(z.literal('')),
   avatar_url: z.string().url('Invalid avatar URL.').nullable().optional().or(z.literal('')),
+  social_facebook: createSocialUrlSchema('facebook'),
+  social_instagram: createSocialUrlSchema('instagram'),
+  social_pinterest: createSocialUrlSchema('pinterest'),
+  social_tiktok: createSocialUrlSchema('tiktok'),
+  social_linkedin: createSocialUrlSchema('linkedin'),
 });
 
 export type WriterProfileInput = z.infer<typeof writerProfileSchema>;

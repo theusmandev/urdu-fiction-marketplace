@@ -13,7 +13,15 @@ import {
   Loader2,
   Save,
   Sparkles,
+  Share2,
 } from 'lucide-react';
+import {
+  FacebookIcon,
+  InstagramIcon,
+  PinterestIcon,
+  TikTokIcon,
+  LinkedInIcon,
+} from '@/components/icons/social';
 
 interface WriterProfileFormProps {
   userId: string;
@@ -24,6 +32,11 @@ interface WriterProfileFormProps {
   initialAvatarUrl: string | null;
   username: string | null;
   status: string;
+  initialSocialFacebook?: string | null;
+  initialSocialInstagram?: string | null;
+  initialSocialPinterest?: string | null;
+  initialSocialTikTok?: string | null;
+  initialSocialLinkedIn?: string | null;
 }
 
 export function WriterProfileForm({
@@ -35,6 +48,11 @@ export function WriterProfileForm({
   initialAvatarUrl,
   username,
   status,
+  initialSocialFacebook,
+  initialSocialInstagram,
+  initialSocialPinterest,
+  initialSocialTikTok,
+  initialSocialLinkedIn,
 }: WriterProfileFormProps) {
   const router = useRouter();
 
@@ -44,6 +62,11 @@ export function WriterProfileForm({
     bio_urdu: initialBioUrdu || '',
     bio_english: initialBioEnglish || '',
     avatar_url: initialAvatarUrl || null,
+    social_facebook: initialSocialFacebook || '',
+    social_instagram: initialSocialInstagram || '',
+    social_pinterest: initialSocialPinterest || '',
+    social_tiktok: initialSocialTikTok || '',
+    social_linkedin: initialSocialLinkedIn || '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -243,6 +266,126 @@ export function WriterProfileForm({
             )}
             <p className="text-[11px] text-secondary">
               Maximum 2,000 characters.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Media & Public Links Card */}
+      <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-6">
+        <div className="border-b border-border pb-4">
+          <h2 className="text-lg font-serif font-bold text-navy flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-accent" />
+            Social Media & Public Links
+          </h2>
+          <p className="text-xs text-secondary mt-0.5">
+            Share your official social channels with your readers. Enter your full profile URL or username/handle. Only populated links will appear on your public author profile.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Facebook */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-main flex items-center gap-2">
+              <FacebookIcon className="w-4 h-4 text-accent" />
+              <span>Facebook</span>
+            </label>
+            <input
+              type="text"
+              value={formData.social_facebook || ''}
+              onChange={(e) => handleChange('social_facebook', e.target.value)}
+              placeholder="https://facebook.com/username or @username"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            {fieldErrors.social_facebook && (
+              <p className="text-xs text-danger-text">{fieldErrors.social_facebook[0]}</p>
+            )}
+            <p className="text-[11px] text-secondary">
+              Author page or profile on Facebook.
+            </p>
+          </div>
+
+          {/* Instagram */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-main flex items-center gap-2">
+              <InstagramIcon className="w-4 h-4 text-accent" />
+              <span>Instagram</span>
+            </label>
+            <input
+              type="text"
+              value={formData.social_instagram || ''}
+              onChange={(e) => handleChange('social_instagram', e.target.value)}
+              placeholder="https://instagram.com/username or @username"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            {fieldErrors.social_instagram && (
+              <p className="text-xs text-danger-text">{fieldErrors.social_instagram[0]}</p>
+            )}
+            <p className="text-[11px] text-secondary">
+              Instagram handle or profile link.
+            </p>
+          </div>
+
+          {/* Pinterest */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-main flex items-center gap-2">
+              <PinterestIcon className="w-4 h-4 text-accent" />
+              <span>Pinterest</span>
+            </label>
+            <input
+              type="text"
+              value={formData.social_pinterest || ''}
+              onChange={(e) => handleChange('social_pinterest', e.target.value)}
+              placeholder="https://pinterest.com/username or @username"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            {fieldErrors.social_pinterest && (
+              <p className="text-xs text-danger-text">{fieldErrors.social_pinterest[0]}</p>
+            )}
+            <p className="text-[11px] text-secondary">
+              Pinterest boards or mood boards for your novels.
+            </p>
+          </div>
+
+          {/* TikTok */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-main flex items-center gap-2">
+              <TikTokIcon className="w-4 h-4 text-accent" />
+              <span>TikTok</span>
+            </label>
+            <input
+              type="text"
+              value={formData.social_tiktok || ''}
+              onChange={(e) => handleChange('social_tiktok', e.target.value)}
+              placeholder="https://tiktok.com/@username or @username"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            {fieldErrors.social_tiktok && (
+              <p className="text-xs text-danger-text">{fieldErrors.social_tiktok[0]}</p>
+            )}
+            <p className="text-[11px] text-secondary">
+              TikTok account for BookTok videos and updates.
+            </p>
+          </div>
+
+          {/* LinkedIn */}
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="block text-xs font-semibold text-main flex items-center gap-2">
+              <LinkedInIcon className="w-4 h-4 text-accent" />
+              <span>LinkedIn</span>
+            </label>
+            <input
+              type="text"
+              value={formData.social_linkedin || ''}
+              onChange={(e) => handleChange('social_linkedin', e.target.value)}
+              placeholder="https://linkedin.com/in/username or username"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-ivory text-main text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            {fieldErrors.social_linkedin && (
+              <p className="text-xs text-danger-text">{fieldErrors.social_linkedin[0]}</p>
+            )}
+            <p className="text-[11px] text-secondary">
+              Professional author profile on LinkedIn.
             </p>
           </div>
         </div>

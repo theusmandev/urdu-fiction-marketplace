@@ -18,6 +18,13 @@ import {
   Home,
   CheckCircle2,
 } from "lucide-react";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  PinterestIcon,
+  TikTokIcon,
+  LinkedInIcon,
+} from "@/components/icons/social";
 
 export const revalidate = 120; // 2 minutes ISR revalidation
 
@@ -109,6 +116,40 @@ export default async function WriterProfilePage({
 
   const novels = await getNovelsByWriter(writer.id);
 
+  // Filter populated social media links (only platforms with a valid non-empty URL)
+  const socialLinks = [
+    {
+      platform: "facebook" as const,
+      label: "Facebook",
+      url: writer.social_facebook,
+      Icon: FacebookIcon,
+    },
+    {
+      platform: "instagram" as const,
+      label: "Instagram",
+      url: writer.social_instagram,
+      Icon: InstagramIcon,
+    },
+    {
+      platform: "pinterest" as const,
+      label: "Pinterest",
+      url: writer.social_pinterest,
+      Icon: PinterestIcon,
+    },
+    {
+      platform: "tiktok" as const,
+      label: "TikTok",
+      url: writer.social_tiktok,
+      Icon: TikTokIcon,
+    },
+    {
+      platform: "linkedin" as const,
+      label: "LinkedIn",
+      url: writer.social_linkedin,
+      Icon: LinkedInIcon,
+    },
+  ].filter((item): item is typeof item & { url: string } => Boolean(item.url && item.url.trim() !== ""));
+
   // JSON-LD Structured Data: Person & Breadcrumbs
   const jsonLd = {
     "@context": "https://schema.org",
@@ -121,6 +162,7 @@ export default async function WriterProfilePage({
         description: writer.bio_urdu || writer.bio_english || undefined,
         image: writer.avatar_url || undefined,
         url: `${siteConfig.url}/writers/${writer.username}`,
+        sameAs: socialLinks.length > 0 ? socialLinks.map((s) => s.url) : undefined,
       },
       {
         "@type": "BreadcrumbList",
@@ -279,6 +321,34 @@ export default async function WriterProfilePage({
                     {bioEnglish}
                   </p>
                 ) : null}
+              </div>
+            )}
+
+            {/* Author Social Media Links (Rendered ONLY if 1 or more links are populated) */}
+            {socialLinks.length > 0 && (
+              <div
+                className="flex flex-wrap items-center gap-2 pt-1 min-w-0"
+                aria-label="Author social media links"
+              >
+                <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider shrink-0 mr-0.5">
+                  Connect:
+                </span>
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  {socialLinks.map(({ platform, label, url, Icon }) => (
+                    <a
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${writer.pen_name_english || 'Author'} on ${label}`}
+                      title={`${label}: ${url}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-border hover:border-accent hover:text-accent-strong text-secondary text-xs font-medium transition-all shadow-2xs hover:shadow-xs active:scale-95 touch-manipulation group"
+                    >
+                      <Icon className="w-3.5 h-3.5 text-accent-strong group-hover:text-accent shrink-0" />
+                      <span className="truncate max-w-[120px]">{label}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
 

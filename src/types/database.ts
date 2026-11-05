@@ -578,6 +578,11 @@ export interface WriterProfileRow {
   is_orders_paused_for_commission: boolean;
   agreement_accepted_at: string | null;
   approved_by: string | null;
+  social_facebook?: string | null;
+  social_instagram?: string | null;
+  social_pinterest?: string | null;
+  social_tiktok?: string | null;
+  social_linkedin?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -1236,6 +1241,11 @@ export interface PublicWriter {
   bio_urdu: string | null;
   bio_english: string | null;
   avatar_url: string | null;
+  social_facebook?: string | null;
+  social_instagram?: string | null;
+  social_pinterest?: string | null;
+  social_tiktok?: string | null;
+  social_linkedin?: string | null;
   published_novels_count: number;
 }
 
@@ -1316,6 +1326,11 @@ export interface Database {
           is_orders_paused_for_commission?: boolean;
           agreement_accepted_at?: string | null;
           approved_by?: string | null;
+          social_facebook?: string | null;
+          social_instagram?: string | null;
+          social_pinterest?: string | null;
+          social_tiktok?: string | null;
+          social_linkedin?: string | null;
           created_at?: string;
           updated_at?: string;
         };

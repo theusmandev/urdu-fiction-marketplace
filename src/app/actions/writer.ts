@@ -40,18 +40,37 @@ export async function updateWriterProfileAction(
       };
     }
 
-    const { pen_name_urdu, pen_name_english, bio_urdu, bio_english, avatar_url } = parsed.data;
+    const {
+      pen_name_urdu,
+      pen_name_english,
+      bio_urdu,
+      bio_english,
+      avatar_url,
+      social_facebook,
+      social_instagram,
+      social_pinterest,
+      social_tiktok,
+      social_linkedin,
+    } = parsed.data;
     const supabase = await createClient();
 
     // 1. Update writer_profiles table
+    const updatePayload: Record<string, unknown> = {
+      pen_name_urdu: cleanUrduText(pen_name_urdu),
+      pen_name_english: pen_name_english.trim(),
+      bio_urdu: bio_urdu ? cleanUrduText(bio_urdu) : null,
+      bio_english: bio_english ? bio_english.trim() : null,
+    };
+
+    if (social_facebook !== undefined) updatePayload.social_facebook = social_facebook || null;
+    if (social_instagram !== undefined) updatePayload.social_instagram = social_instagram || null;
+    if (social_pinterest !== undefined) updatePayload.social_pinterest = social_pinterest || null;
+    if (social_tiktok !== undefined) updatePayload.social_tiktok = social_tiktok || null;
+    if (social_linkedin !== undefined) updatePayload.social_linkedin = social_linkedin || null;
+
     const { error: wpError } = await supabase
       .from('writer_profiles')
-      .update({
-        pen_name_urdu: cleanUrduText(pen_name_urdu),
-        pen_name_english: pen_name_english.trim(),
-        bio_urdu: bio_urdu ? cleanUrduText(bio_urdu) : null,
-        bio_english: bio_english ? bio_english.trim() : null,
-      })
+      .update(updatePayload)
       .eq('id', user.id);
 
     if (wpError) {
@@ -68,8 +87,23 @@ export async function updateWriterProfileAction(
         .eq('id', user.id);
     }
 
+    // 3. Revalidate affected paths
     revalidatePath('/writer/profile');
     revalidatePath('/writer');
+    revalidatePath('/writers');
+
+    const { data: profileRow, error: profError } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (profError) {
+      console.error('[updateWriterProfileAction] failed to fetch username for revalidation:', profError);
+    } else if (profileRow?.username) {
+      revalidatePath(`/writers/${profileRow.username}`);
+    }
+
     return { success: true };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'An unexpected error occurred.';

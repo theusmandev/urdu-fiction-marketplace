@@ -34,6 +34,11 @@ export default async function WriterProfilePage() {
         initialAvatarUrl={profile.avatar_url}
         username={profile.username}
         status={writerProfile.status}
+        initialSocialFacebook={writerProfile.social_facebook}
+        initialSocialInstagram={writerProfile.social_instagram}
+        initialSocialPinterest={writerProfile.social_pinterest}
+        initialSocialTikTok={writerProfile.social_tiktok}
+        initialSocialLinkedIn={writerProfile.social_linkedin}
       />
     </div>
   );
