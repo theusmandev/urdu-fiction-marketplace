@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Filter, Bookmark, CheckCircle2, Clock, AlertTriangle, XCircle, RotateCcw, ChevronRight } from 'lucide-react';
+import { Filter, Bookmark, CheckCircle2, Clock, AlertTriangle, XCircle, RotateCcw, Ban, ChevronRight } from 'lucide-react';
 import type { DashboardOrderFunnel, DashboardGenreBreakdown } from '@/types/database';
 
 interface Props {
@@ -32,6 +32,7 @@ export function OrderFunnelGenreCard({ funnel, genres }: Props) {
   const rejectedPct = getPct(funnel.rejected);
   const disputedPct = getPct(funnel.disputed);
   const refundedPct = getPct(funnel.refunded_adjusted);
+  const cancelledPct = getPct(funnel.cancelled);
 
   const maxGenreGmv = Math.max(...genres.map((g) => g.gmv_pkr), 1);
 
@@ -66,54 +67,61 @@ export function OrderFunnelGenreCard({ funnel, genres }: Props) {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Visual Stacked Progress Bar */}
+            {/* Visual Stacked Progress Bar (100% Filled) */}
             <div className="w-full h-4 rounded-full overflow-hidden flex bg-surface-elevated border border-border p-0.5 gap-0.5">
               {funnel.verified > 0 && (
                 <div
-                  style={{ width: `${Math.max(verifiedPct, 3)}%` }}
+                  style={{ width: `${(funnel.verified / total) * 100}%` }}
                   className="h-full rounded-sm bg-success-soft border border-success-border transition-all"
                   title={`Verified: ${funnel.verified} (${verifiedPct}%)`}
                 />
               )}
               {funnel.pending_verification > 0 && (
                 <div
-                  style={{ width: `${Math.max(pendingVerifPct, 3)}%` }}
+                  style={{ width: `${(funnel.pending_verification / total) * 100}%` }}
                   className="h-full rounded-sm bg-warning-soft border border-warning-border transition-all"
                   title={`Awaiting Verification: ${funnel.pending_verification} (${pendingVerifPct}%)`}
                 />
               )}
               {funnel.pending_payment > 0 && (
                 <div
-                  style={{ width: `${Math.max(pendingPayPct, 3)}%` }}
+                  style={{ width: `${(funnel.pending_payment / total) * 100}%` }}
                   className="h-full rounded-sm bg-surface-elevated border border-border transition-all"
                   title={`Pending Payment: ${funnel.pending_payment} (${pendingPayPct}%)`}
                 />
               )}
               {funnel.rejected > 0 && (
                 <div
-                  style={{ width: `${Math.max(rejectedPct, 3)}%` }}
+                  style={{ width: `${(funnel.rejected / total) * 100}%` }}
                   className="h-full rounded-sm bg-danger-soft border border-danger-border transition-all"
                   title={`Rejected: ${funnel.rejected} (${rejectedPct}%)`}
                 />
               )}
               {funnel.disputed > 0 && (
                 <div
-                  style={{ width: `${Math.max(disputedPct, 3)}%` }}
+                  style={{ width: `${(funnel.disputed / total) * 100}%` }}
                   className="h-full rounded-sm bg-info-soft border border-info-border transition-all"
                   title={`Disputed: ${funnel.disputed} (${disputedPct}%)`}
                 />
               )}
               {funnel.refunded_adjusted > 0 && (
                 <div
-                  style={{ width: `${Math.max(refundedPct, 3)}%` }}
+                  style={{ width: `${(funnel.refunded_adjusted / total) * 100}%` }}
                   className="h-full rounded-sm bg-surface border border-border transition-all"
                   title={`Refunded: ${funnel.refunded_adjusted} (${refundedPct}%)`}
                 />
               )}
+              {funnel.cancelled > 0 && (
+                <div
+                  style={{ width: `${(funnel.cancelled / total) * 100}%` }}
+                  className="h-full rounded-sm bg-surface-elevated border border-border opacity-70 transition-all"
+                  title={`Cancelled / Expired: ${funnel.cancelled} (${cancelledPct}%)`}
+                />
+              )}
             </div>
 
-            {/* Segment Breakdown Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+            {/* Segment Breakdown Grid (All 7 Statuses Accounting for 100% of Orders) */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 pt-1">
               {/* Verified */}
               <div className="p-2.5 rounded-xl border border-success-border bg-success-soft text-success-text space-y-0.5">
                 <div className="flex items-center justify-between text-[11px] font-semibold">
@@ -192,6 +200,20 @@ export function OrderFunnelGenreCard({ funnel, genres }: Props) {
                 </div>
                 <div className="text-base font-bold font-mono">
                   {funnel.refunded_adjusted.toLocaleString()}
+                </div>
+              </div>
+
+              {/* Cancelled / Expired */}
+              <div className="p-2.5 rounded-xl border border-border bg-surface-elevated text-muted space-y-0.5">
+                <div className="flex items-center justify-between text-[11px] font-semibold">
+                  <span className="flex items-center gap-1">
+                    <Ban className="w-3 h-3 text-muted" />
+                    Cancelled
+                  </span>
+                  <span>{cancelledPct}%</span>
+                </div>
+                <div className="text-base font-bold font-mono text-muted">
+                  {funnel.cancelled.toLocaleString()}
                 </div>
               </div>
             </div>
