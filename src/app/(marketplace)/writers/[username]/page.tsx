@@ -152,11 +152,11 @@ export default async function WriterProfilePage({
     <>
       <JsonLd data={jsonLd} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8 sm:space-y-10 min-w-0">
         {/* Breadcrumbs */}
         <nav
           aria-label="Breadcrumbs"
-          className="flex items-center gap-2 text-xs text-secondary overflow-x-auto pb-1"
+          className="w-full flex items-center gap-2 text-xs text-secondary overflow-x-auto pb-1"
         >
           <Link href="/" className="hover:text-navy flex items-center gap-1 shrink-0">
             <Home className="w-3.5 h-3.5" />
@@ -173,7 +173,7 @@ export default async function WriterProfilePage({
         </nav>
 
         {/* Author Bio & Identity Header */}
-        <div className="bg-surface p-6 sm:p-10 rounded-3xl border border-border shadow-sm flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8">
+        <div className="w-full bg-surface p-6 sm:p-10 rounded-3xl border border-border shadow-sm flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8 min-w-0 overflow-hidden">
           {writer.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -189,35 +189,35 @@ export default async function WriterProfilePage({
             </div>
           )}
 
-          <div className="space-y-3 min-w-0 flex-1">
-            <div className="space-y-0.5">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-accent/20 text-accent-dark px-2.5 py-0.5 rounded-full border border-accent/30">
+          <div className="space-y-3 min-w-0 flex-1 w-full overflow-hidden">
+            <div className="space-y-0.5 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 min-w-0">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-accent/20 text-accent-dark px-2.5 py-0.5 rounded-full border border-accent/30 shrink-0">
                   <CheckCircle2 className="w-3 h-3 text-accent" />
                   <span>Approved author</span>
                 </span>
-                <span className="text-xs text-secondary">
+                <span className="text-xs text-secondary break-words [overflow-wrap:anywhere] min-w-0">
                   @{writer.username}
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0 pt-0.5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0 pt-0.5 min-w-0">
                 <UrduText
                   as="h1"
                   size="2xl"
-                  className="text-navy font-normal leading-[1.8] py-0"
+                  className="text-navy font-normal leading-[1.8] py-0 break-words [overflow-wrap:anywhere]"
                 >
                   {writer.pen_name_urdu}
                 </UrduText>
 
-                <h2 className="font-serif text-base font-semibold text-secondary">
+                <h2 className="font-serif text-base font-semibold text-secondary break-words [overflow-wrap:anywhere]">
                   ({writer.pen_name_english})
                 </h2>
               </div>
             </div>
 
             {hasAnyBio && (
-              <div className="p-4 sm:p-5 rounded-2xl bg-ivory/60 border border-border/70 space-y-3">
+              <div className="w-full p-4 sm:p-5 rounded-2xl bg-ivory/60 border border-border/70 space-y-3 min-w-0 overflow-hidden">
                 <div className="flex items-center justify-between border-b border-border/50 pb-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-accent-dark">
                     About the author
@@ -232,7 +232,7 @@ export default async function WriterProfilePage({
                     <p
                       dir="rtl"
                       lang="ur"
-                      className="font-urdu text-sm text-main leading-[2.2] text-right"
+                      className="font-urdu text-sm text-main leading-[2.2] text-right break-words [overflow-wrap:anywhere]"
                     >
                       {bioUrdu}
                     </p>
@@ -240,24 +240,24 @@ export default async function WriterProfilePage({
                     <p
                       dir="ltr"
                       lang="en"
-                      className="text-xs text-secondary leading-relaxed text-left"
+                      className="text-xs text-secondary leading-relaxed text-left break-words [overflow-wrap:anywhere]"
                     >
                       {bioEnglish}
                     </p>
                   )
                 ) : hasBioEnglish && hasBioUrdu ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
                     <p
                       dir="ltr"
                       lang="en"
-                      className="text-xs text-secondary leading-relaxed text-left"
+                      className="text-xs text-secondary leading-relaxed text-left break-words [overflow-wrap:anywhere]"
                     >
                       {bioEnglish}
                     </p>
                     <p
                       dir="rtl"
                       lang="ur"
-                      className="font-urdu text-sm text-main leading-[2.2] text-right md:border-l md:border-border/50 md:pl-4"
+                      className="font-urdu text-sm text-main leading-[2.2] text-right md:border-l md:border-border/50 md:pl-4 break-words [overflow-wrap:anywhere]"
                     >
                       {bioUrdu}
                     </p>
@@ -266,7 +266,7 @@ export default async function WriterProfilePage({
                   <p
                     dir="rtl"
                     lang="ur"
-                    className="font-urdu text-sm text-main leading-[2.2] text-right"
+                    className="font-urdu text-sm text-main leading-[2.2] text-right break-words [overflow-wrap:anywhere]"
                   >
                     {bioUrdu}
                   </p>
@@ -274,7 +274,7 @@ export default async function WriterProfilePage({
                   <p
                     dir="ltr"
                     lang="en"
-                    className="text-xs text-secondary leading-relaxed text-left"
+                    className="text-xs text-secondary leading-relaxed text-left break-words [overflow-wrap:anywhere]"
                   >
                     {bioEnglish}
                   </p>
@@ -282,29 +282,29 @@ export default async function WriterProfilePage({
               </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-secondary pt-1">
-              <div className="flex items-center gap-1.5 font-medium text-navy">
-                <BookOpen className="w-3.5 h-3.5 text-accent" />
+            {/* Profile Footer Row: Published Novels & Say Thanks Button */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-border/40 w-full min-w-0">
+              <div className="flex items-center gap-1.5 font-medium text-navy text-xs shrink-0">
+                <BookOpen className="w-3.5 h-3.5 text-accent shrink-0" />
                 <span>
                   {novels.length} {novels.length === 1 ? "Published Novel" : "Published Novels"}
                 </span>
               </div>
-            </div>
 
-            {/* Writer Appreciation (Tip Jar) Button */}
-            <div className="pt-2">
-              <WriterProfileTipButton writerId={writer.id} />
+              <div className="w-full sm:w-auto min-w-0">
+                <WriterProfileTipButton writerId={writer.id} className="w-full sm:w-auto" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Novels Showcase by this Author */}
-        <div className="space-y-6">
-          <div className="border-b border-border pb-4 flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-bold text-navy">
+        <div className="space-y-6 w-full min-w-0">
+          <div className="border-b border-border pb-4 flex flex-wrap items-center justify-between gap-2 w-full min-w-0">
+            <h2 className="font-serif text-xl sm:text-2xl font-bold text-navy break-words [overflow-wrap:anywhere]">
               Published Novels by {writer.pen_name_english}
             </h2>
-            <UrduText as="span" size="sm" className="text-secondary py-0">
+            <UrduText as="span" size="sm" className="text-secondary py-0 shrink-0">
               مصنف کے شائع شدہ ناولز
             </UrduText>
           </div>

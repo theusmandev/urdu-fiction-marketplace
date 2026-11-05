@@ -137,15 +137,20 @@ export function WriterProfileTipButton({
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className="inline-flex items-baseline gap-2 px-4 py-2 rounded-xl border border-warning-border/80 bg-warning-soft/60 text-warning-text font-medium hover:bg-warning-soft/60 transition-all min-h-[44px] shadow-xs active:scale-[0.99] touch-manipulation cursor-pointer"
+        aria-label="Say thanks to author / مصنف کا شکریہ ادا کریں"
+        className="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-primary hover:bg-primary-hover text-primary-contrast font-medium transition-all min-h-[44px] shadow-sm hover:shadow-md hover:opacity-95 active:scale-[0.99] touch-manipulation cursor-pointer w-full sm:w-auto"
       >
-        <Heart className="w-4 h-4 fill-accent-strong/20 text-warning-text dark:text-accent-strong self-center shrink-0" />
-        <span className="text-sm font-medium">{TIP_CARD_COPY.title}</span>
-        <span className="text-accent-strong/60 dark:text-accent-strong/60 font-light text-xs self-center">/</span>
+        <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+          <Heart className="w-3.5 h-3.5 fill-accent text-accent shrink-0" />
+        </span>
+        <span className="font-semibold text-sm tracking-wide shrink-0">
+          Say Thanks
+        </span>
+        <span className="h-4 w-px bg-current/25 mx-1 shrink-0" aria-hidden="true" />
         <span
           dir="rtl"
           lang="ur"
-          className="font-urdu text-[1.1rem] leading-none text-warning-text"
+          className="font-urdu text-base leading-none pb-0.5 shrink-0"
         >
           {TIP_CARD_COPY.titleUrdu}
         </span>
