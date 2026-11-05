@@ -141,32 +141,32 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
     <>
       <JsonLd data={{ "@context": "https://schema.org", "@graph": jsonLdGraph }} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
         {/* Breadcrumb Navigation */}
         <nav
           aria-label="Breadcrumbs"
-          className="flex items-center gap-2 text-xs text-secondary"
+          className="w-full flex items-center gap-2 text-xs text-secondary overflow-x-auto py-1"
         >
-          <Link href="/" className="hover:text-navy flex items-center gap-1">
+          <Link href="/" className="hover:text-navy flex items-center gap-1 shrink-0">
             <Home className="w-3.5 h-3.5" />
             <span>Home</span>
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-secondary/40" />
-          <Link href="/genres" className="hover:text-navy">
+          <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
+          <Link href="/genres" className="hover:text-navy shrink-0">
             Genres
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-secondary/40" />
-          <span className="text-navy font-semibold">{genre.name_english}</span>
+          <ChevronRight className="w-3.5 h-3.5 text-secondary/40 shrink-0" />
+          <span className="text-navy font-semibold truncate">{genre.name_english}</span>
         </nav>
 
-        {/* Genre Header Banner */}
-        <div className="bg-gradient-to-r from-navy via-navy to-[#18263E] text-white p-8 md:p-12 rounded-3xl border border-white/10 shadow-xl space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
+        {/* Genre Header Banner — Consistent 100% Width & Height Across All Genres */}
+        <div className="w-full bg-gradient-to-r from-navy via-navy to-navy-dark text-white p-6 sm:p-8 md:p-12 rounded-3xl border border-white/10 shadow-xl min-h-[180px] sm:min-h-[200px] flex flex-col justify-center">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 w-full">
+            <div className="space-y-2 min-w-0">
               <span className="text-xs font-semibold text-accent uppercase tracking-wider">
                 Literary Category
               </span>
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-white break-words">
                 {genre.name_english}
               </h1>
               <p className="text-xs text-white/80">
@@ -174,7 +174,7 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
               </p>
             </div>
 
-            <div className="text-right space-y-1">
+            <div className="text-left md:text-right space-y-1 shrink-0" dir="rtl">
               <UrduText
                 as="h2"
                 size="4xl"
@@ -193,8 +193,8 @@ export default async function GenreDetailsPage({ params }: GenrePageProps) {
         </div>
 
         {/* Novels Grid */}
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+        <div className="space-y-6 w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 w-full">
             <h2 className="font-serif text-xl font-bold text-navy">
               Novels in {genre.name_english}
             </h2>
