@@ -121,99 +121,116 @@ export function OrderFunnelGenreCard({ funnel, genres }: Props) {
             </div>
 
             {/* Segment Breakdown Grid (All 7 Statuses Accounting for 100% of Orders) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 pt-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
               {/* Verified */}
-              <div className="p-2.5 rounded-xl border border-success-border bg-success-soft text-success-text space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Verified
-                  </span>
-                  <span>{verifiedPct}%</span>
+              <div className="p-3 rounded-xl border border-success-border bg-success-soft text-success-text overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate text-xs font-medium">Verified</span>
                 </div>
-                <div className="text-base font-bold font-mono">
-                  {funnel.verified.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono">
+                    {funnel.verified.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold opacity-80 shrink-0">
+                    {verifiedPct}%
+                  </span>
                 </div>
               </div>
 
               {/* Awaiting Verification */}
-              <div className="p-2.5 rounded-xl border border-warning-border bg-warning-soft text-warning-text space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    Verifying
-                  </span>
-                  <span>{pendingVerifPct}%</span>
+              <div className="p-3 rounded-xl border border-warning-border bg-warning-soft text-warning-text overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate text-xs font-medium">Verifying</span>
                 </div>
-                <div className="text-base font-bold font-mono">
-                  {funnel.pending_verification.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono">
+                    {funnel.pending_verification.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold opacity-80 shrink-0">
+                    {pendingVerifPct}%
+                  </span>
                 </div>
               </div>
 
               {/* Pending Payment */}
-              <div className="p-2.5 rounded-xl border border-border bg-surface-elevated text-main space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-muted">
-                  <span>Checkout</span>
-                  <span>{pendingPayPct}%</span>
+              <div className="p-3 rounded-xl border border-border bg-surface-elevated text-main overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0 text-muted">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate text-xs font-medium">Checkout</span>
                 </div>
-                <div className="text-base font-bold font-mono">
-                  {funnel.pending_payment.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono">
+                    {funnel.pending_payment.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold text-muted shrink-0">
+                    {pendingPayPct}%
+                  </span>
                 </div>
               </div>
 
               {/* Rejected */}
-              <div className="p-2.5 rounded-xl border border-danger-border bg-danger-soft text-danger-text space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className="flex items-center gap-1">
-                    <XCircle className="w-3 h-3" />
-                    Rejected
-                  </span>
-                  <span>{rejectedPct}%</span>
+              <div className="p-3 rounded-xl border border-danger-border bg-danger-soft text-danger-text overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <XCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate text-xs font-medium">Rejected</span>
                 </div>
-                <div className="text-base font-bold font-mono">
-                  {funnel.rejected.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono">
+                    {funnel.rejected.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold opacity-80 shrink-0">
+                    {rejectedPct}%
+                  </span>
                 </div>
               </div>
 
               {/* Disputed */}
-              <div className="p-2.5 rounded-xl border border-info-border bg-info-soft text-info-text space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className="flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" />
-                    Disputed
-                  </span>
-                  <span>{disputedPct}%</span>
+              <div className="p-3 rounded-xl border border-info-border bg-info-soft text-info-text overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate text-xs font-medium">Disputed</span>
                 </div>
-                <div className="text-base font-bold font-mono">
-                  {funnel.disputed.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono">
+                    {funnel.disputed.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold opacity-80 shrink-0">
+                    {disputedPct}%
+                  </span>
                 </div>
               </div>
 
               {/* Refunded */}
-              <div className="p-2.5 rounded-xl border border-border bg-surface text-main space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-muted">
-                  <span className="flex items-center gap-1">
-                    <RotateCcw className="w-3 h-3" />
-                    Refunded
-                  </span>
-                  <span>{refundedPct}%</span>
+              <div className="p-3 rounded-xl border border-border bg-surface text-main overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0 text-muted">
+                  <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate text-xs font-medium">Refunded</span>
                 </div>
-                <div className="text-base font-bold font-mono">
-                  {funnel.refunded_adjusted.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono">
+                    {funnel.refunded_adjusted.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold text-muted shrink-0">
+                    {refundedPct}%
+                  </span>
                 </div>
               </div>
 
               {/* Cancelled / Expired */}
-              <div className="p-2.5 rounded-xl border border-border bg-surface-elevated text-muted space-y-0.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className="flex items-center gap-1">
-                    <Ban className="w-3 h-3 text-muted" />
-                    Cancelled
-                  </span>
-                  <span>{cancelledPct}%</span>
+              <div className="p-3 rounded-xl border border-border bg-surface-elevated text-muted overflow-hidden min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Ban className="w-3.5 h-3.5 shrink-0 text-muted" />
+                  <span className="truncate text-xs font-medium">Cancelled</span>
                 </div>
-                <div className="text-base font-bold font-mono text-muted">
-                  {funnel.cancelled.toLocaleString()}
+                <div className="flex items-baseline justify-between gap-2 mt-1.5">
+                  <span className="text-lg font-bold font-mono text-main">
+                    {funnel.cancelled.toLocaleString()}
+                  </span>
+                  <span className="text-xs font-semibold opacity-80 shrink-0">
+                    {cancelledPct}%
+                  </span>
                 </div>
               </div>
             </div>
