@@ -77,7 +77,7 @@ export async function registerUser(formData: FormData): Promise<AuthActionResult
         full_name: fullName,
         username,
       },
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${origin}/auth/callback?email=${encodeURIComponent(email)}`,
     },
   });
 

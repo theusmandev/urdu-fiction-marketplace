@@ -220,4 +220,27 @@ describe('Auth Validation Schemas (Zod)', () => {
       assert.equal(result.success, false);
     });
   });
+
+  describe('Login Email Prefill Validation', () => {
+    const isValidEmail = (val: string | null | undefined): boolean => {
+      if (!val) return false;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+    };
+
+    test('accepts valid email addresses for prefill', () => {
+      assert.equal(isValidEmail('reader@example.com'), true);
+      assert.equal(isValidEmail('user.name+tag@domain.co.uk'), true);
+      assert.equal(isValidEmail('  ahmed@gmail.com  '), true);
+    });
+
+    test('strictly rejects usernames or non-email strings from prefill', () => {
+      assert.equal(isValidEmail('666'), false);
+      assert.equal(isValidEmail('ahmed_khan'), false);
+      assert.equal(isValidEmail(''), false);
+      assert.equal(isValidEmail(null), false);
+      assert.equal(isValidEmail(undefined), false);
+      assert.equal(isValidEmail('user@'), false);
+      assert.equal(isValidEmail('@domain.com'), false);
+    });
+  });
 });

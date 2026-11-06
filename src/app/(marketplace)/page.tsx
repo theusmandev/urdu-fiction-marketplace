@@ -93,7 +93,7 @@ export default async function HomePage() {
               size="base"
               className="text-text-muted max-w-xl mx-auto font-normal py-0 leading-[2.2]"
             >
-              مفت نمونہ ابواب پڑھیں، مصنفین سے براہِ راست جڑیں اور آسان پاکستانی ذرائع سے مکمل ناول حاصل کریں۔
+              پسندیدہ ناولز کے مفت ابواب پڑھیں، مصنفین کو سپورٹ کریں، اور آسان ادائیگی سے مکمل کہانی کا لطف اٹھائیں۔
             </UrduText>
           </div>
 

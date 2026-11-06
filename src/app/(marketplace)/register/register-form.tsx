@@ -3,10 +3,11 @@
 import React, { useState, useTransition, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, User, AtSign, AlertCircle, CheckCircle2, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, User, AtSign, AlertCircle, CheckCircle2, ArrowRight, Loader2, Eye, EyeOff, Info } from 'lucide-react';
 import { registerUser, checkUsernameAvailability } from '@/app/actions/auth';
 import { usernameRegex } from '@/lib/auth/schemas';
 import { BrandLogo } from '@/components/brand/BrandLogo';
+import { UrduText } from '@/components/urdu/UrduText';
 
 export interface RegisterFormProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -74,6 +75,7 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
     formData.append('password', password);
 
     startTransition(async () => {
+      const trimmedEmail = email.trim();
       const result = await registerUser(formData);
 
       if (!result.success) {
@@ -82,8 +84,18 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
           setFieldErrors(result.fieldErrors);
         }
       } else if (result.message) {
+        try {
+          if (trimmedEmail) {
+            localStorage.setItem('unb_last_auth_email', trimmedEmail);
+          }
+        } catch {}
         setSuccessMessage(result.message);
       } else if (result.redirectTo) {
+        try {
+          if (trimmedEmail) {
+            localStorage.setItem('unb_last_auth_email', trimmedEmail);
+          }
+        } catch {}
         router.push(result.redirectTo);
         router.refresh();
       }
@@ -112,18 +124,67 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
         </div>
 
         {successMessage ? (
-          <div className="rounded-2xl border border-success-border bg-success-soft p-6 text-center space-y-4 shadow-sm">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
-            <h2 className="text-lg font-bold font-serif text-success-text">Verification Email Sent</h2>
-            <p className="text-sm text-success-text leading-relaxed">
-              {successMessage}
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 rounded-xl bg-success px-4 py-2 text-sm font-semibold text-white hover:bg-success-hover transition-colors shadow-sm"
+          <div className="rounded-2xl border border-success-border bg-success-soft p-6 sm:p-7 text-center space-y-5 shadow-sm">
+            <div className="w-14 h-14 rounded-full bg-success/15 border border-success-border/60 text-success flex items-center justify-center mx-auto shadow-2xs">
+              <CheckCircle2 className="h-7 w-7" />
+            </div>
+
+            {/* English Confirmation Header */}
+            <div className="space-y-1.5">
+              <h2 className="text-lg font-bold font-serif text-success-text">
+                Verification Email Sent
+              </h2>
+              <p className="text-sm text-success-text leading-relaxed max-w-md mx-auto">
+                {successMessage}
+              </p>
+            </div>
+
+            {/* Prominent Urdu Guidance Box */}
+            <div className="rounded-xl bg-surface/90 border border-success-border/60 p-4 sm:p-5 text-center space-y-3.5 shadow-2xs">
+              <UrduText
+                as="h3"
+                size="lg"
+                className="font-bold text-success-text py-0 leading-[2.2]"
               >
-                <span>Proceed to Sign in</span>
+                تصدیقی ای میل بھیج دی گئی ہے!
+              </UrduText>
+
+              <UrduText
+                as="p"
+                size="sm"
+                className="text-text font-normal leading-[2.2] py-0 max-w-md mx-auto"
+              >
+                آپ کا اکاؤنٹ بن گیا ہے! لاگ اِن کرنے سے پہلے براہِ کرم اپنی ای میل (Gmail / Inbox) کھولیں اور ہماری بھیجی گئی ای میل میں موجود تصدیقی لنک پر کلک کر کے اپنا اکاؤنٹ ایکٹیویٹ کریں۔
+              </UrduText>
+
+              <div
+                dir="rtl"
+                className="rounded-lg bg-success-soft/80 border border-success-border/60 px-3.5 py-2.5 text-right flex items-start gap-2.5"
+              >
+                <Info className="w-4 h-4 text-success shrink-0 mt-1" />
+                <UrduText
+                  as="p"
+                  size="xs"
+                  className="text-success-text font-medium leading-[2.0] py-0 flex-1"
+                >
+                  نوٹ: اگر ای میل سامنے نظر نہ آئے تو اپنا Spam یا Promotions فولڈر ضرور چیک کریں۔
+                </UrduText>
+              </div>
+            </div>
+
+            {/* Action CTA Button */}
+            <div className="pt-1">
+              <Link
+                href={
+                  email.trim()
+                    ? `/login?email=${encodeURIComponent(email.trim())}${nextParam ? `&next=${encodeURIComponent(nextParam)}` : ''}`
+                    : nextParam
+                    ? `/login?next=${encodeURIComponent(nextParam)}`
+                    : '/login'
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-success px-5 py-2.5 text-sm font-semibold text-white hover:bg-success-hover transition-colors shadow-sm min-h-[44px]"
+              >
+                <span>Proceed to Sign in / <span className="font-urdu">لاگ اِن کریں</span></span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -151,6 +212,7 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     id="fullName"
                     name="fullName"
                     type="text"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -197,6 +259,7 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     id="username"
                     name="username"
                     type="text"
+                    autoComplete="nickname"
                     required
                     value={username}
                     onChange={(e) => {
@@ -227,7 +290,7 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
                     id="email"
                     name="email"
                     type="email"
-                    autoComplete="email"
+                    autoComplete="username email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

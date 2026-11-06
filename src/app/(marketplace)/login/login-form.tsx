@@ -6,6 +6,12 @@ import { useRouter } from 'next/navigation';
 import { Lock, Mail, AlertCircle, ArrowRight, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { loginUser } from '@/app/actions/auth';
 import { BrandLogo } from '@/components/brand/BrandLogo';
+import { UrduText } from '@/components/urdu/UrduText';
+
+function isValidEmail(val: string | null | undefined): boolean {
+  if (!val) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+}
 
 export interface LoginFormProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -18,8 +24,15 @@ export function LoginForm({ searchParams }: LoginFormProps) {
   const nextParam = typeof resolvedParams.next === 'string' ? resolvedParams.next : null;
   const errorCode = typeof resolvedParams.error === 'string' ? resolvedParams.error : null;
   const messageCode = typeof resolvedParams.message === 'string' ? resolvedParams.message : null;
+  const verifiedParam = resolvedParams.verified === 'true' || resolvedParams.verified === '1';
+  const urlEmail = typeof resolvedParams.email === 'string' ? resolvedParams.email.trim() : null;
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => {
+    if (urlEmail && isValidEmail(urlEmail)) {
+      return urlEmail;
+    }
+    return '';
+  });
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,9 +44,25 @@ export function LoginForm({ searchParams }: LoginFormProps) {
       localStorage.removeItem('unb_user_display');
       localStorage.removeItem('unb_has_session');
     } catch {}
-  }, []);
+
+    // Pre-populate email: 1. URL search param (if valid), OR 2. localStorage (if valid)
+    if (urlEmail && isValidEmail(urlEmail)) {
+      setEmail(urlEmail);
+      try {
+        localStorage.setItem('unb_last_auth_email', urlEmail);
+      } catch {}
+    } else {
+      try {
+        const savedEmail = localStorage.getItem('unb_last_auth_email');
+        if (savedEmail && isValidEmail(savedEmail)) {
+          setEmail((prev) => (isValidEmail(prev) ? prev : savedEmail.trim()));
+        }
+      } catch {}
+    }
+  }, [urlEmail]);
 
   const getSystemError = () => {
+    if (verifiedParam) return null;
     if (errorCode === 'account_deactivated') {
       return 'Your account has been deactivated. Please contact support at support@unbpremium.pk.';
     }
@@ -64,6 +93,9 @@ export function LoginForm({ searchParams }: LoginFormProps) {
       } else if (result.redirectTo) {
         try {
           localStorage.setItem('unb_has_session', '1');
+          if (isValidEmail(email)) {
+            localStorage.setItem('unb_last_auth_email', email.trim());
+          }
         } catch {}
         router.push(result.redirectTo);
         router.refresh();
@@ -91,6 +123,23 @@ export function LoginForm({ searchParams }: LoginFormProps) {
             </Link>
           </p>
         </div>
+
+        {/* Email Verification Success Banner */}
+        {verifiedParam && (
+          <div className="rounded-2xl bg-success-soft border border-success-border p-4 sm:p-5 space-y-2 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-2 text-success font-semibold text-sm">
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <span>Email confirmed! Please sign in with your password below.</span>
+            </div>
+            <UrduText
+              as="p"
+              size="sm"
+              className="text-success-text font-medium leading-[2.1] py-0"
+            >
+              آپ کی ای میل کی تصدیق ہو چکی ہے! براہِ کرم نیچے اپنا پاس ورڈ درج کر کے لاگ اِن کریں۔
+            </UrduText>
+          </div>
+        )}
 
         {/* System Message Notifications */}
         {systemError && (
@@ -128,7 +177,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
                   id="email"
                   name="email"
                   type="email"
-                  autoComplete="email"
+                  autoComplete="username email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
