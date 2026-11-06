@@ -327,7 +327,7 @@ export function FreePreviewReaderClient({
             <UrduText
               as="h2"
               size="xs"
-              className="font-bold py-0 leading-tight truncate"
+              className="font-bold py-0 leading-tight truncate text-inherit"
             >
               {chapter.title_urdu}
             </UrduText>
@@ -454,7 +454,7 @@ export function FreePreviewReaderClient({
               <h3 className="text-sm font-bold uppercase tracking-wider">
                 Protected Chapter Content
               </h3>
-              <UrduText size="base" className="py-0 font-bold leading-relaxed">
+              <UrduText size="base" className="py-0 font-bold leading-relaxed text-inherit">
                 مطالعہ جاری رکھنے کے لیے اسکرین پر کہیں بھی کلک کریں
               </UrduText>
             </div>
@@ -481,7 +481,7 @@ export function FreePreviewReaderClient({
           <UrduText
             as="h1"
             size="3xl"
-            className="font-bold leading-[2.4] py-1"
+            className="font-bold leading-[2.4] py-1 text-inherit"
           >
             {chapter.title_urdu}
           </UrduText>

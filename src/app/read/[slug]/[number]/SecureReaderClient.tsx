@@ -619,7 +619,7 @@ export function SecureReaderClient({
               <h3 className="text-sm font-bold uppercase tracking-wider">
                 Protected Chapter Content
               </h3>
-              <UrduText size="base" className="py-0 font-bold leading-relaxed">
+              <UrduText size="base" className="py-0 font-bold leading-relaxed text-inherit">
                 مطالعہ جاری رکھنے کے لیے اسکرین پر کہیں بھی کلک کریں
               </UrduText>
             </div>
@@ -797,7 +797,7 @@ export function SecureReaderClient({
                         <span className="font-mono text-[11px] font-bold">
                           Ch {item.chapter_number}:
                         </span>
-                        <UrduText size="sm" className="truncate py-0">
+                        <UrduText size="sm" className="truncate py-0 text-inherit">
                           {item.title_urdu}
                         </UrduText>
                       </div>
@@ -826,7 +826,7 @@ export function SecureReaderClient({
                       <span className="font-mono text-[11px] font-semibold opacity-70">
                         {item.chapter_number}.
                       </span>
-                      <UrduText size="sm" className="truncate py-0">
+                      <UrduText size="sm" className="truncate py-0 text-inherit">
                         {item.title_urdu}
                       </UrduText>
                     </div>
