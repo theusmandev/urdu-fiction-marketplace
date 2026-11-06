@@ -6,6 +6,6 @@
  */
 
 export const PROXY_MATCHER = [
-  '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2)$).*)',
+  '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2|webmanifest)$).*)',
 ];
 

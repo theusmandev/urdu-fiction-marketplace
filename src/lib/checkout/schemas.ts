@@ -24,31 +24,48 @@ export const paymentSubmissionFormSchema = z.object({
   tid: z
     .string()
     .trim()
-    .min(6, 'Transaction reference (TID) must be at least 6 characters')
-    .max(40, 'Transaction reference (TID) cannot exceed 40 characters')
+    .min(
+      6,
+      'Transaction Reference (TID) must be 6 to 40 valid characters (letters, numbers, hyphens). / ٹرانزیکشن آئی ڈی (TID) کم از کم 6 سے 40 حروف یا نمبرز پر مشتمل ہونی چاہیے۔'
+    )
+    .max(
+      40,
+      'Transaction Reference (TID) must be 6 to 40 valid characters (letters, numbers, hyphens). / ٹرانزیکشن آئی ڈی (TID) کم از کم 6 سے 40 حروف یا نمبرز پر مشتمل ہونی چاہیے۔'
+    )
     .regex(
       tidRegex,
-      'Transaction reference (TID) can only contain letters, numbers, hyphens, and underscores'
+      'Transaction Reference (TID) must be 6 to 40 valid characters (letters, numbers, hyphens). / ٹرانزیکشن آئی ڈی (TID) کم از کم 6 سے 40 حروف یا نمبرز پر مشتمل ہونی چاہیے۔'
     ),
   claimedAmount: z.coerce
     .number()
-    .positive('Payment amount must be greater than 0 PKR'),
+    .positive(
+      'Please enter the exact order amount transferred. / براہِ کرم بھیجی گئی درست رقم درج کریں۔'
+    ),
   senderAccountName: z
     .string()
     .trim()
-    .max(100, 'Sender account name cannot exceed 100 characters')
+    .max(
+      100,
+      'Sender account name cannot exceed 100 characters. / بھیجنے والے کا اکاؤنٹ نام 100 حروف سے زیادہ نہیں ہو سکتا۔'
+    )
     .optional()
     .or(z.literal('')),
   readerNote: z
     .string()
     .trim()
-    .max(500, 'Reader note cannot exceed 500 characters')
+    .max(
+      500,
+      'Reader note cannot exceed 500 characters. / نوٹ 500 حروف سے زیادہ نہیں ہو سکتا۔'
+    )
     .optional()
     .or(z.literal('')),
   screenshotPath: z
     .string()
     .trim()
-    .min(1, 'Payment screenshot proof is required')
+    .min(
+      1,
+      'Please upload your payment receipt screenshot. / براہِ کرم ادائیگی کی رسید (اسکرین شاٹ) اپلوڈ کریں۔'
+    )
     .refine((val) => !val.includes('..'), {
       message: 'Invalid path format: path traversal is prohibited',
     })

@@ -114,10 +114,16 @@ export async function submitPaymentAction(
     await requireAuth('/orders');
     const parsed = paymentSubmissionFormSchema.safeParse(input);
     if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      const firstErrorList = Object.values(fieldErrors)[0];
+      const specificError =
+        firstErrorList?.[0] ||
+        'Please fix the submission errors below. / براہِ کرم نیچے دی گئی غلطیاں درست کریں۔';
+
       return {
         success: false,
-        error: 'Please fix the submission errors below.',
-        fieldErrors: parsed.error.flatten().fieldErrors,
+        error: specificError,
+        fieldErrors,
       };
     }
 
@@ -132,9 +138,25 @@ export async function submitPaymentAction(
     });
 
     if (error) {
+      const msg = error.message || '';
+      let userFriendlyError = msg;
+      const fieldErrors: Record<string, string[]> = {};
+
+      if (msg.toLowerCase().includes('transaction reference') || msg.toLowerCase().includes('tid')) {
+        if (msg.includes('already been submitted')) {
+          userFriendlyError =
+            'This Transaction Reference (TID) has already been submitted for another active order. / یہ ٹرانزیکشن آئی ڈی پہلے ہی کسی دوسرے آرڈر کے لیے استعمال ہو چکی ہے۔';
+        } else {
+          userFriendlyError =
+            'Transaction Reference (TID) must be 6 to 40 valid characters (letters, numbers, hyphens). / ٹرانزیکشن آئی ڈی (TID) کم از کم 6 سے 40 حروف یا نمبرز پر مشتمل ہونی چاہیے۔';
+        }
+        fieldErrors.tid = [userFriendlyError];
+      }
+
       return {
         success: false,
-        error: error.message || 'Failed to submit payment details.',
+        error: userFriendlyError || 'Failed to submit payment details.',
+        fieldErrors: Object.keys(fieldErrors).length > 0 ? fieldErrors : undefined,
       };
     }
 

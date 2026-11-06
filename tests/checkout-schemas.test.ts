@@ -111,6 +111,26 @@ describe('Checkout & Payment Submission Schemas', () => {
       });
       assert.equal(invalid.success, false);
     });
+
+    it('returns specific bilingual error messages for invalid TID, amount, and missing screenshot', () => {
+      const orderId = '11111111-2222-3333-4444-555555555555';
+      const invalid = paymentSubmissionFormSchema.safeParse({
+        orderId,
+        tid: '555', // Under 6 characters
+        claimedAmount: 0,
+        screenshotPath: '',
+      });
+      assert.equal(invalid.success, false);
+      if (!invalid.success) {
+        const errors = invalid.error.flatten().fieldErrors;
+        assert.ok(errors.tid?.[0].includes('Transaction Reference (TID) must be 6 to 40'));
+        assert.ok(errors.tid?.[0].includes('ٹرانزیکشن آئی ڈی'));
+        assert.ok(errors.claimedAmount?.[0].includes('Please enter the exact order amount'));
+        assert.ok(errors.claimedAmount?.[0].includes('درست رقم'));
+        assert.ok(errors.screenshotPath?.[0].includes('Please upload your payment receipt screenshot'));
+        assert.ok(errors.screenshotPath?.[0].includes('ادائیگی کی رسید'));
+      }
+    });
   });
 
   describe('createOrderFormSchema', () => {

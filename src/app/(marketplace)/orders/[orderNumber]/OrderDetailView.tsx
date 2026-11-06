@@ -221,6 +221,7 @@ export function OrderDetailView({
   const [readerNote, setReaderNote] = useState('');
   const [screenshotPath, setScreenshotPath] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   // Modal states
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -252,32 +253,64 @@ export function OrderDetailView({
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setFieldErrors({});
 
-    if (!tid.trim()) {
-      setFormError('Please enter the transaction reference (TID) from your bank/wallet receipt.');
-      return;
+    const clientErrors: Record<string, string[]> = {};
+    const trimmedTid = tid.trim();
+
+    if (!trimmedTid) {
+      clientErrors.tid = [
+        'Transaction Reference (TID) is required. / ٹرانزیکشن آئی ڈی (TID) درج کرنا لازمی ہے۔',
+      ];
+    } else if (trimmedTid.length < 6 || trimmedTid.length > 40 || !/^[a-zA-Z0-9_-]+$/.test(trimmedTid)) {
+      clientErrors.tid = [
+        'Transaction Reference (TID) must be 6 to 40 valid characters (letters, numbers, hyphens). / ٹرانزیکشن آئی ڈی (TID) کم از کم 6 سے 40 حروف یا نمبرز پر مشتمل ہونی چاہیے۔',
+      ];
     }
 
-    if (!screenshotPath) {
-      setFormError('Please upload a screenshot of your payment transfer confirmation.');
+    const currentScreenshot = screenshotPath;
+    if (!currentScreenshot) {
+      clientErrors.screenshotPath = [
+        'Please upload your payment receipt screenshot. / براہِ کرم ادائیگی کی رسید (اسکرین شاٹ) اپلوڈ کریں۔',
+      ];
+    }
+
+    if (!claimedAmount || Number(claimedAmount) <= 0) {
+      clientErrors.claimedAmount = [
+        'Please enter the exact order amount transferred. / براہِ کرم بھیجی گئی درست رقم درج کریں۔',
+      ];
+    }
+
+    if (Object.keys(clientErrors).length > 0 || !currentScreenshot) {
+      setFieldErrors(clientErrors);
+      const firstError = Object.values(clientErrors)[0]?.[0];
+      setFormError(
+        firstError ||
+          'Please fix the submission errors below. / براہِ کرم نیچے دی گئی غلطیاں درست کریں۔'
+      );
       return;
     }
 
     startTransition(async () => {
       const res = await submitPaymentAction({
         orderId: order.id,
-        tid: tid.trim(),
-        screenshotPath,
+        tid: trimmedTid,
+        screenshotPath: currentScreenshot,
         claimedAmount: Number(claimedAmount) || order.amountPkr,
         senderAccountName: senderName.trim() || undefined,
         readerNote: readerNote.trim() || undefined,
       });
 
       if (!res.success) {
+        if (res.fieldErrors && Object.keys(res.fieldErrors).length > 0) {
+          setFieldErrors(res.fieldErrors);
+        }
         setFormError(res.error || 'Failed to submit payment proof.');
         return;
       }
 
+      setFieldErrors({});
+      setFormError(null);
       router.refresh();
     });
   };
@@ -400,11 +433,30 @@ export function OrderDetailView({
           </div>
         </div>
 
-        {/* Inline General Errors */}
+        {/* Top Error Alert Banner */}
         {formError && (
-          <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-xs text-danger-text">
-            <AlertCircle className="w-4 h-4 text-danger-text shrink-0 mt-0.5" />
-            <span>{formError}</span>
+          <div className="rounded-2xl bg-danger-soft border border-danger-border p-4 sm:p-5 flex items-start gap-3.5 text-xs text-danger-text shadow-xs">
+            <AlertCircle className="w-5 h-5 text-danger-text shrink-0 mt-0.5" />
+            <div className="space-y-1.5 flex-1 min-w-0">
+              {formError.includes(' / ') ? (
+                <>
+                  <p className="font-semibold text-danger-text leading-snug">
+                    {formError.split(' / ')[0]}
+                  </p>
+                  <UrduText
+                    as="p"
+                    size="xs"
+                    className="text-danger-text font-medium leading-[2.0] py-0"
+                  >
+                    {formError.split(' / ')[1]}
+                  </UrduText>
+                </>
+              ) : (
+                <p className="font-semibold text-danger-text leading-relaxed">
+                  {formError}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -544,13 +596,45 @@ export function OrderDetailView({
                     type="text"
                     required
                     value={tid}
-                    onChange={(e) => setTid(e.target.value)}
+                    onChange={(e) => {
+                      setTid(e.target.value);
+                      if (fieldErrors.tid) {
+                        setFieldErrors((prev) => {
+                          const updated = { ...prev };
+                          delete updated.tid;
+                          return updated;
+                        });
+                      }
+                    }}
                     placeholder="e.g. 12345678901 or TID-JC-987"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-border text-base sm:text-xs text-navy placeholder:text-muted focus:outline-none focus:border-accent focus:bg-white transition-colors min-h-[44px]"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-base sm:text-xs text-navy placeholder:text-muted focus:outline-none transition-colors min-h-[44px] ${
+                      fieldErrors.tid
+                        ? 'border-2 border-danger-border bg-danger-soft/10 focus:border-danger-border focus:ring-1 focus:ring-danger-border'
+                        : 'border border-border bg-surface-muted focus:border-accent focus:bg-white'
+                    }`}
                   />
-                  <p className="text-[10px] text-secondary">
-                    6 to 40 characters (letters, numbers, hyphens, underscores).
-                  </p>
+                  {fieldErrors.tid ? (
+                    <div className="space-y-0.5 pt-0.5">
+                      <p className="text-xs font-medium text-danger-text">
+                        {fieldErrors.tid[0].includes(' / ')
+                          ? fieldErrors.tid[0].split(' / ')[0]
+                          : fieldErrors.tid[0]}
+                      </p>
+                      {fieldErrors.tid[0].includes(' / ') && (
+                        <UrduText
+                          as="p"
+                          size="xs"
+                          className="text-danger-text font-medium leading-[2.0] py-0"
+                        >
+                          {fieldErrors.tid[0].split(' / ')[1]}
+                        </UrduText>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-[10px] text-secondary">
+                      6 to 40 characters (letters, numbers, hyphens, underscores).
+                    </p>
+                  )}
                 </div>
 
                 {/* Amount Paid Claimed */}
@@ -564,14 +648,44 @@ export function OrderDetailView({
                     min="1"
                     required
                     value={claimedAmount}
-                    onChange={(e) => setClaimedAmount(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-border text-base sm:text-xs text-navy focus:outline-none focus:border-accent focus:bg-white transition-colors font-mono min-h-[44px]"
+                    onChange={(e) => {
+                      setClaimedAmount(Number(e.target.value));
+                      if (fieldErrors.claimedAmount) {
+                        setFieldErrors((prev) => {
+                          const updated = { ...prev };
+                          delete updated.claimedAmount;
+                          return updated;
+                        });
+                      }
+                    }}
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-base sm:text-xs text-navy focus:outline-none transition-colors font-mono min-h-[44px] ${
+                      fieldErrors.claimedAmount
+                        ? 'border-2 border-danger-border bg-danger-soft/10 focus:border-danger-border focus:ring-1 focus:ring-danger-border'
+                        : 'border border-border bg-surface-muted focus:border-accent focus:bg-white'
+                    }`}
                   />
-                  {claimedAmount !== order.amountPkr && (
+                  {fieldErrors.claimedAmount ? (
+                    <div className="space-y-0.5 pt-0.5">
+                      <p className="text-xs font-medium text-danger-text">
+                        {fieldErrors.claimedAmount[0].includes(' / ')
+                          ? fieldErrors.claimedAmount[0].split(' / ')[0]
+                          : fieldErrors.claimedAmount[0]}
+                      </p>
+                      {fieldErrors.claimedAmount[0].includes(' / ') && (
+                        <UrduText
+                          as="p"
+                          size="xs"
+                          className="text-danger-text font-medium leading-[2.0] py-0"
+                        >
+                          {fieldErrors.claimedAmount[0].split(' / ')[1]}
+                        </UrduText>
+                      )}
+                    </div>
+                  ) : claimedAmount !== order.amountPkr ? (
                     <p className="text-[10px] text-warning-text font-medium">
                       Amount differs from invoice total ({formatPKR(order.amountPkr)}).
                     </p>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Sender Account Name */}
@@ -583,13 +697,45 @@ export function OrderDetailView({
                     type="text"
                     maxLength={100}
                     value={senderName}
-                    onChange={(e) => setSenderName(e.target.value)}
+                    onChange={(e) => {
+                      setSenderName(e.target.value);
+                      if (fieldErrors.senderAccountName) {
+                        setFieldErrors((prev) => {
+                          const updated = { ...prev };
+                          delete updated.senderAccountName;
+                          return updated;
+                        });
+                      }
+                    }}
                     placeholder="e.g. Muhammad Usman"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-border text-base sm:text-xs text-navy placeholder:text-muted focus:outline-none focus:border-accent focus:bg-white transition-colors min-h-[44px]"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-base sm:text-xs text-navy placeholder:text-muted focus:outline-none transition-colors min-h-[44px] ${
+                      fieldErrors.senderAccountName
+                        ? 'border-2 border-danger-border bg-danger-soft/10 focus:border-danger-border focus:ring-1 focus:ring-danger-border'
+                        : 'border border-border bg-surface-muted focus:border-accent focus:bg-white'
+                    }`}
                   />
-                  <p className="text-[10px] text-secondary">
-                    Name on the account you sent the money from.
-                  </p>
+                  {fieldErrors.senderAccountName ? (
+                    <div className="space-y-0.5 pt-0.5">
+                      <p className="text-xs font-medium text-danger-text">
+                        {fieldErrors.senderAccountName[0].includes(' / ')
+                          ? fieldErrors.senderAccountName[0].split(' / ')[0]
+                          : fieldErrors.senderAccountName[0]}
+                      </p>
+                      {fieldErrors.senderAccountName[0].includes(' / ') && (
+                        <UrduText
+                          as="p"
+                          size="xs"
+                          className="text-danger-text font-medium leading-[2.0] py-0"
+                        >
+                          {fieldErrors.senderAccountName[0].split(' / ')[1]}
+                        </UrduText>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-[10px] text-secondary">
+                      Name on the account you sent the money from.
+                    </p>
+                  )}
                 </div>
 
                 {/* Note */}
@@ -601,10 +747,41 @@ export function OrderDetailView({
                     type="text"
                     maxLength={500}
                     value={readerNote}
-                    onChange={(e) => setReaderNote(e.target.value)}
+                    onChange={(e) => {
+                      setReaderNote(e.target.value);
+                      if (fieldErrors.readerNote) {
+                        setFieldErrors((prev) => {
+                          const updated = { ...prev };
+                          delete updated.readerNote;
+                          return updated;
+                        });
+                      }
+                    }}
                     placeholder="e.g. Paid via JazzCash app at 2:30 PM"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-border text-base sm:text-xs text-navy placeholder:text-muted focus:outline-none focus:border-accent focus:bg-white transition-colors min-h-[44px]"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-base sm:text-xs text-navy placeholder:text-muted focus:outline-none transition-colors min-h-[44px] ${
+                      fieldErrors.readerNote
+                        ? 'border-2 border-danger-border bg-danger-soft/10 focus:border-danger-border focus:ring-1 focus:ring-danger-border'
+                        : 'border border-border bg-surface-muted focus:border-accent focus:bg-white'
+                    }`}
                   />
+                  {fieldErrors.readerNote && (
+                    <div className="space-y-0.5 pt-0.5">
+                      <p className="text-xs font-medium text-danger-text">
+                        {fieldErrors.readerNote[0].includes(' / ')
+                          ? fieldErrors.readerNote[0].split(' / ')[0]
+                          : fieldErrors.readerNote[0]}
+                      </p>
+                      {fieldErrors.readerNote[0].includes(' / ') && (
+                        <UrduText
+                          as="p"
+                          size="xs"
+                          className="text-danger-text font-medium leading-[2.0] py-0"
+                        >
+                          {fieldErrors.readerNote[0].split(' / ')[1]}
+                        </UrduText>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -613,15 +790,50 @@ export function OrderDetailView({
                 <label className="text-xs font-semibold text-secondary block">
                   Payment Screenshot Proof <span className="text-danger-text">*</span>
                 </label>
-                <ImageUploader
-                  bucket="payment-proofs"
-                  preset="payment-screenshot"
-                  folder={order.id}
-                  value={screenshotPath}
-                  onChange={(path) => setScreenshotPath(path)}
-                  disabled={isPending}
-                  helperText="Upload your bank/wallet transfer receipt screenshot (auto-compressed to <= 150 KB webp)"
-                />
+                <div
+                  className={
+                    fieldErrors.screenshotPath
+                      ? 'rounded-2xl ring-2 ring-danger-border bg-danger-soft/10 p-1'
+                      : ''
+                  }
+                >
+                  <ImageUploader
+                    bucket="payment-proofs"
+                    preset="payment-screenshot"
+                    folder={order.id}
+                    value={screenshotPath}
+                    onChange={(path) => {
+                      setScreenshotPath(path);
+                      if (fieldErrors.screenshotPath) {
+                        setFieldErrors((prev) => {
+                          const updated = { ...prev };
+                          delete updated.screenshotPath;
+                          return updated;
+                        });
+                      }
+                    }}
+                    disabled={isPending}
+                    helperText="Upload your bank/wallet transfer receipt screenshot (auto-compressed to <= 150 KB webp)"
+                  />
+                </div>
+                {fieldErrors.screenshotPath && (
+                  <div className="space-y-0.5 pt-1">
+                    <p className="text-xs font-medium text-danger-text">
+                      {fieldErrors.screenshotPath[0].includes(' / ')
+                        ? fieldErrors.screenshotPath[0].split(' / ')[0]
+                        : fieldErrors.screenshotPath[0]}
+                    </p>
+                    {fieldErrors.screenshotPath[0].includes(' / ') && (
+                      <UrduText
+                        as="p"
+                        size="xs"
+                        className="text-danger-text font-medium leading-[2.0] py-0"
+                      >
+                        {fieldErrors.screenshotPath[0].split(' / ')[1]}
+                      </UrduText>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}
