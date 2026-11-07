@@ -522,7 +522,14 @@ export function TipCard({
                         : 'border-border/60 bg-surface/70 hover:bg-warning-soft/50  text-main'
                     }`}
                   >
-                    <span className="text-xs font-medium">{meta?.name || 'Tip'}</span>
+                    <span className="text-xs font-medium inline-flex items-center justify-center gap-1.5">
+                      {meta?.emoji && (
+                        <span aria-hidden="true" className="text-sm select-none">
+                          {meta.emoji}
+                        </span>
+                      )}
+                      <span>{meta?.name || 'Tip'}</span>
+                    </span>
                     <span className="text-sm font-semibold">PKR {preset}</span>
                     {meta?.nameUrdu && (
                       <UrduText as="span" size="xs" className="text-[10px] text-secondary py-0">
@@ -543,7 +550,12 @@ export function TipCard({
                     : 'border-border/60 bg-surface/70 hover:bg-warning-soft/50  text-main'
                 }`}
               >
-                <span className="text-xs font-medium">{TIP_CARD_COPY.customLabel}</span>
+                <span className="text-xs font-medium inline-flex items-center justify-center gap-1.5">
+                  <span aria-hidden="true" className="text-sm select-none">
+                    {TIP_CARD_COPY.customEmoji || '✨'}
+                  </span>
+                  <span>{TIP_CARD_COPY.customLabel}</span>
+                </span>
                 <span className="text-xs text-secondary font-mono">Other</span>
                 <UrduText as="span" size="xs" className="text-[10px] text-secondary py-0">
                   {TIP_CARD_COPY.customLabelUrdu}

@@ -15,6 +15,7 @@ export interface TipPresetOption {
   labelUrdu: string;
   descriptionEnglish: string;
   descriptionUrdu: string;
+  emoji?: string;
 }
 
 export const TIP_PRESETS: TipPresetOption[] = [
@@ -25,22 +26,25 @@ export const TIP_PRESETS: TipPresetOption[] = [
     labelUrdu: 'چائے',
     descriptionEnglish: 'A small warm gesture',
     descriptionUrdu: 'ایک گرما گرم کپ چائے کے ساتھ داد',
+    emoji: '☕',
   },
   {
-    id: 'mithai',
+    id: 'coffee',
     amount: 250,
-    labelEnglish: 'Mithai',
-    labelUrdu: 'مٹھائی',
-    descriptionEnglish: 'A sweet appreciation',
-    descriptionUrdu: 'کہانی کی مٹھاس کا میٹھا سا شکریہ',
+    labelEnglish: 'Coffee',
+    labelUrdu: 'کافی',
+    descriptionEnglish: 'A warm cup of inspiration',
+    descriptionUrdu: 'گرم کافی کا کپ اور دل سے حوصلہ افزائی',
+    emoji: '☕︎ྀི',
   },
   {
-    id: 'eidi',
+    id: 'tohfa',
     amount: 500,
-    labelEnglish: 'Eidi',
-    labelUrdu: 'عیدی',
+    labelEnglish: 'Tohfa',
+    labelUrdu: 'تحفہ',
     descriptionEnglish: 'Generous encouragement',
-    descriptionUrdu: 'خاص موقع پر دل کھول کر حوصلہ افزائی',
+    descriptionUrdu: 'محبت اور تحفے کے ساتھ خصوصی داد',
+    emoji: '🎁',
   },
 ];
 
@@ -213,10 +217,17 @@ export const tipsCopy = {
   },
 } as const;
 
-export const PRESET_LABELS: Record<number, { name: string; nameUrdu: string }> = {
-  100: { name: 'Chai', nameUrdu: 'چائے' },
-  250: { name: 'Mithai', nameUrdu: 'مٹھائی' },
-  500: { name: 'Eidi', nameUrdu: 'عیدی' },
+export const PRESET_LABELS: Record<number, { name: string; nameUrdu: string; emoji: string }> = {
+  100: { name: 'Chai', nameUrdu: 'چائے', emoji: '☕' },
+  250: { name: 'Coffee', nameUrdu: 'کافی', emoji: '☕︎ྀི' },
+  500: { name: 'Tohfa', nameUrdu: 'تحفہ', emoji: '🎁' },
+};
+
+export const CUSTOM_PRESET_LABEL = {
+  name: 'Custom',
+  nameUrdu: 'دیگر رقم',
+  sublabel: 'Other',
+  emoji: '✨',
 };
 
 export const TIP_CARD_COPY = {
@@ -228,6 +239,7 @@ export const TIP_CARD_COPY = {
   honestLineUrdu: 'پوری رقم براہِ راست مصنف کو جاتی ہے؛ کوئی پلیٹ فارم فیس نہیں ہے۔',
   customLabel: 'Custom',
   customLabelUrdu: 'دیگر رقم',
+  customEmoji: '✨',
   messagePlaceholder: 'Write a warm note to encourage the author...',
   anonymousLabel: 'Send anonymously',
   anonymousOption: 'Send anonymously',

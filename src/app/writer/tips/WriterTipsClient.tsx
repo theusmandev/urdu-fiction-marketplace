@@ -979,7 +979,10 @@ export function WriterTipsClient({
                         key={amt}
                         className="py-2 px-1 text-center rounded-lg border border-border/60 bg-surface/80 text-xs"
                       >
-                        <div className="font-medium text-[11px] text-secondary">{meta?.name || 'Tip'}</div>
+                        <div className="font-medium text-[11px] text-secondary inline-flex items-center justify-center gap-1">
+                          {meta?.emoji && <span aria-hidden="true" className="text-xs select-none">{meta.emoji}</span>}
+                          <span>{meta?.name || 'Tip'}</span>
+                        </div>
                         <div className="font-bold text-main">PKR {amt}</div>
                       </div>
                     );
@@ -1214,7 +1217,7 @@ export function WriterTipsClient({
                   <span>Step 1: Reader Selects Amount &amp; Message</span>
                 </div>
                 <p className="leading-relaxed">
-                  The reader picks an appreciation preset (e.g. PKR 250 Mithai) or custom amount, selects your payment channel (JazzCash, EasyPaisa, or Bank), and optionally writes a warm encouragement note.
+                  The reader picks an appreciation preset (e.g. PKR 250 Coffee) or custom amount, selects your payment channel (JazzCash, EasyPaisa, or Bank), and optionally writes a warm encouragement note.
                 </p>
               </div>
 
