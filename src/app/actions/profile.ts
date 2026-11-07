@@ -82,6 +82,8 @@ export async function updateProfile(formData: FormData): Promise<ProfileActionRe
   }
 
   revalidatePath('/account');
+  revalidatePath('/account', 'layout');
+  revalidatePath('/', 'layout');
   return {
     success: true,
     message: 'Profile updated successfully!',

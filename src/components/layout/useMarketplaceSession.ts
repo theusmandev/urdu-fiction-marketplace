@@ -18,6 +18,7 @@ export interface MarketplaceSessionState {
 
 export const STORAGE_USER_KEY = "unb_user_display";
 export const STORAGE_HINT_KEY = "unb_has_session";
+export const SESSION_REFRESH_EVENT = "unb_session_refresh";
 
 let cachedState: MarketplaceSessionState = {
   user: null,
@@ -25,6 +26,7 @@ let cachedState: MarketplaceSessionState = {
 };
 
 let hasInitiatedFetch = false;
+let isFetchingPromise: Promise<{ user: HeaderSessionUser | null } | null> | null = null;
 const listeners = new Set<() => void>();
 
 function syncSessionHintCookie(isAuthenticated: boolean) {
@@ -53,6 +55,7 @@ function syncSessionHintCookie(isAuthenticated: boolean) {
 
 export function clearMarketplaceSessionCache(): void {
   hasInitiatedFetch = false;
+  isFetchingPromise = null;
   cachedState = { user: null, status: "anonymous" };
   syncSessionHintCookie(false);
   listeners.forEach((l) => l());
@@ -60,6 +63,15 @@ export function clearMarketplaceSessionCache(): void {
 
 export function setMarketplaceSessionUser(user: HeaderSessionUser | null) {
   setMarketplaceSessionState(user, user ? "authenticated" : "anonymous");
+}
+
+export function updateMarketplaceSessionUser(
+  partial: Partial<HeaderSessionUser>
+): HeaderSessionUser | null {
+  if (!cachedState.user) return null;
+  const updated: HeaderSessionUser = { ...cachedState.user, ...partial };
+  setMarketplaceSessionState(updated, "authenticated");
+  return updated;
 }
 
 export function setMarketplaceSessionState(
@@ -125,6 +137,62 @@ async function fetchSessionWithRetry(): Promise<{ user: HeaderSessionUser | null
   }
 }
 
+/**
+ * Authoritatively re-fetches the session from /api/auth/session, updates the
+ * store, syncs localStorage/cookies, and notifies all UI subscribers immediately.
+ */
+export async function refreshMarketplaceSession(): Promise<HeaderSessionUser | null> {
+  hasInitiatedFetch = true;
+  if (!isFetchingPromise) {
+    isFetchingPromise = fetchSessionWithRetry().finally(() => {
+      isFetchingPromise = null;
+    });
+  }
+
+  const data = await isFetchingPromise;
+  if (data?.user) {
+    setMarketplaceSessionState(data.user, "authenticated");
+    return data.user;
+  } else {
+    setMarketplaceSessionState(null, "anonymous");
+    return null;
+  }
+}
+
+// Global browser event listener registration (registered once per window lifetime)
+let isEventListenerAttached = false;
+function ensureEventListeners() {
+  if (typeof window === "undefined" || isEventListenerAttached) return;
+  isEventListenerAttached = true;
+
+  window.addEventListener(SESSION_REFRESH_EVENT, () => {
+    void refreshMarketplaceSession();
+  });
+
+  window.addEventListener("storage", (e: StorageEvent) => {
+    if (e.key === STORAGE_HINT_KEY) {
+      if (e.newValue === "1") {
+        void refreshMarketplaceSession();
+      } else if (!e.newValue) {
+        clearMarketplaceSessionCache();
+      }
+    } else if (e.key === STORAGE_USER_KEY) {
+      if (e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed && typeof parsed === "object" && parsed.id) {
+            setMarketplaceSessionState(parsed as HeaderSessionUser, "authenticated");
+          }
+        } catch {}
+      } else {
+        clearMarketplaceSessionCache();
+      }
+    }
+  });
+}
+
+ensureEventListeners();
+
 export function useMarketplaceSession(
   initialUser?: HeaderSessionUser | null
 ): MarketplaceSessionState {
@@ -145,6 +213,8 @@ export function useMarketplaceSession(
   );
 
   useEffect(() => {
+    ensureEventListeners();
+
     if (initialUser !== undefined && initialUser !== null) {
       cachedState = { user: initialUser, status: "authenticated" };
       syncSessionHintCookie(true);
@@ -171,23 +241,7 @@ export function useMarketplaceSession(
       return;
     }
 
-    // Always fetch when unsure: never assume anonymous on client JS based on document.cookie,
-    // as Supabase auth cookies may be httpOnly or partitioned across tabs.
-    // If the hint cookie exists, fetchSessionWithRetry() consumes window.__UNB_SESSION (already started in <head>).
-    // If no session exists, /api/auth/session fast anonymous path returns null in <1ms from the edge.
-    hasInitiatedFetch = true;
-
-    fetchSessionWithRetry().then((data) => {
-      if (data === null) {
-        // Network error retry failed: fall back to anonymous UI but DO NOT clear hint cookie
-        cachedState = { user: null, status: "anonymous" };
-        listeners.forEach((l) => l());
-      } else if (data.user) {
-        setMarketplaceSessionState(data.user, "authenticated");
-      } else {
-        setMarketplaceSessionState(null, "anonymous");
-      }
-    });
+    void refreshMarketplaceSession();
   }, [initialUser]);
 
   return state;

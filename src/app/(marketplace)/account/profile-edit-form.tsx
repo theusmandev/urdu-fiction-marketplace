@@ -1,10 +1,15 @@
 'use client';
 
 import React, { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import type { ProfileRow } from '@/types/database';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { updateProfile } from '@/app/actions/profile';
+import {
+  refreshMarketplaceSession,
+  updateMarketplaceSessionUser,
+} from '@/components/layout/useMarketplaceSession';
 import { Loader2, CheckCircle2, AlertCircle, Save } from 'lucide-react';
 
 interface ProfileEditFormProps {
@@ -13,6 +18,7 @@ interface ProfileEditFormProps {
 }
 
 export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
+  const router = useRouter();
   const [fullName, setFullName] = useState(profile.full_name || '');
   const [username, setUsername] = useState(profile.username || '');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url);
@@ -45,6 +51,15 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
         }
       } else {
         setSuccessMessage(result.message || 'Profile updated successfully!');
+        if (avatarUrl) {
+          updateMarketplaceSessionUser({
+            avatarUrl,
+            name: fullName.trim() || undefined,
+            username: username.trim() || undefined,
+          });
+        }
+        await refreshMarketplaceSession();
+        router.refresh();
       }
     });
   };

@@ -90,7 +90,9 @@ export async function updateWriterProfileAction(
     // 3. Revalidate affected paths
     revalidatePath('/writer/profile');
     revalidatePath('/writer');
+    revalidatePath('/writer', 'layout');
     revalidatePath('/writers');
+    revalidatePath('/', 'layout');
 
     const { data: profileRow, error: profError } = await supabase
       .from('profiles')

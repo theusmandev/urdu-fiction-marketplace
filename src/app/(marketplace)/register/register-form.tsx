@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, AtSign, AlertCircle, CheckCircle2, ArrowRight, Loader2, Eye, EyeOff, Info } from 'lucide-react';
 import { registerUser, checkUsernameAvailability } from '@/app/actions/auth';
+import { refreshMarketplaceSession } from '@/components/layout/useMarketplaceSession';
 import { usernameRegex } from '@/lib/auth/schemas';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { UrduText } from '@/components/urdu/UrduText';
@@ -96,6 +97,7 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
             localStorage.setItem('unb_last_auth_email', trimmedEmail);
           }
         } catch {}
+        await refreshMarketplaceSession();
         router.push(result.redirectTo);
         router.refresh();
       }

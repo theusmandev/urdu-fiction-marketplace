@@ -4,6 +4,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { updateWriterProfileAction } from '@/app/actions/writer';
+import {
+  refreshMarketplaceSession,
+  updateMarketplaceSessionUser,
+} from '@/components/layout/useMarketplaceSession';
 import type { WriterProfileInput } from '@/lib/writer/schemas';
 import {
   User,
@@ -108,6 +112,13 @@ export function WriterProfileForm({
     } else {
       setSuccessMessage('Author profile successfully updated.');
       setIsDirty(false);
+      if (formData.avatar_url) {
+        updateMarketplaceSessionUser({
+          avatarUrl: formData.avatar_url,
+          name: formData.pen_name_english.trim() || undefined,
+        });
+      }
+      await refreshMarketplaceSession();
       router.refresh();
     }
   };

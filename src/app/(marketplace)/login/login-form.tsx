@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, AlertCircle, ArrowRight, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { loginUser } from '@/app/actions/auth';
+import { refreshMarketplaceSession } from '@/components/layout/useMarketplaceSession';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { UrduText } from '@/components/urdu/UrduText';
 
@@ -97,6 +98,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
             localStorage.setItem('unb_last_auth_email', email.trim());
           }
         } catch {}
+        await refreshMarketplaceSession();
         router.push(result.redirectTo);
         router.refresh();
       }
