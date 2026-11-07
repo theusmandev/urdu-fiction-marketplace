@@ -17,7 +17,7 @@ import {
 import { createClient } from '@/lib/supabase/browser';
 import { UrduText } from '@/components/urdu/UrduText';
 import { HowTipsWorkModal } from './HowTipsWorkModal';
-import { TIP_CARD_COPY, PRESET_LABELS, HOW_TIPS_WORK } from '@/lib/copy/tips';
+import { TIP_CARD_COPY, PRESET_LABELS, HOW_TIPS_WORK, APPRECIATION_TIERS } from '@/lib/copy/tips';
 import { validateTipAmount, validateTipMessage } from '@/lib/tips/validation';
 import { resolveTipCardState, type TipCardState } from '@/lib/tips/state';
 import type { TipOptionsPayload } from '@/types/database';
@@ -452,7 +452,7 @@ export function TipCard({
   return (
     <>
       <div
-        className={`w-full max-w-xl mx-auto rounded-2xl border border-warning-border/70 bg-surface ${paddingClasses} shadow-xs text-main transition-all ${className}`}
+        className={`w-full max-w-xl mx-auto min-w-0 rounded-2xl border border-warning-border/70 bg-surface ${paddingClasses} shadow-xs text-main transition-all ${className}`}
         id="tip-card"
       >
         {/* Header */}
@@ -602,34 +602,34 @@ export function TipCard({
                 return (
                   <label
                     key={pm.id}
-                    className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer select-none transition-all ${
+                    className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all w-full min-w-0 ${
                       isSelected
                         ? 'border-warning-border bg-warning-soft/60  text-main'
                         : 'border-border/60 bg-surface/70 hover:bg-warning-soft/30 text-secondary'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment_method"
-                        value={pm.id}
-                        checked={isSelected}
-                        onChange={() => setSelectedMethodId(pm.id)}
-                        className="text-accent-strong focus:ring-ring/30"
-                      />
-                      <div>
-                        <span className="text-xs font-semibold capitalize text-main">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value={pm.id}
+                      checked={isSelected}
+                      onChange={() => setSelectedMethodId(pm.id)}
+                      className="text-accent-strong focus:ring-ring/30 mt-0.5 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1 break-words [overflow-wrap:anywhere]">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
+                        <span className="text-xs font-semibold capitalize text-main break-words [overflow-wrap:anywhere]">
                           {pm.bank_name || pm.method_type.replace('_', ' ')}
                         </span>
-                        <span className="text-xs text-secondary ml-2 font-mono">
+                        <span className="text-xs text-secondary font-mono break-words [overflow-wrap:anywhere]">
                           {pm.masked_label}
                         </span>
-                        {pm.instructions_note && (
-                          <span className="block text-[11px] text-secondary mt-0.5">
-                            {pm.instructions_note}
-                          </span>
-                        )}
                       </div>
+                      {pm.instructions_note && (
+                        <span className="block text-[11px] text-secondary mt-1 break-words [overflow-wrap:anywhere]">
+                          {pm.instructions_note}
+                        </span>
+                      )}
                     </div>
                   </label>
                 );

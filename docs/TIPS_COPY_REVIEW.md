@@ -36,9 +36,9 @@ This document catalogs all reader- and writer-facing microcopy in the Tip Jar / 
 - **Disabled notice**: `Appreciation is currently paused for this author. / مصنف نے فی الوقت قارئین کے تحائف وصول کرنے کا اختیار بند کر رکھا ہے۔`
 - **Maintenance / Kill switch**: `Reader appreciation is temporarily paused platform-wide. / پلیٹ فارم پر شکریہ کی سروس عارضی طور پر معطل ہے۔`
 - **Preset badges**:
-  - Chai (PKR 100): `چائے` — `ایک گرما گرم کپ چائے کے ساتھ داد`
-  - Mithai (PKR 250): `مٹھائی` — `کہانی کی مٹھاس کا میٹھا سا شکریہ`
-  - Eidi (PKR 500): `عیدی` — `خاص موقع پر دل کھول کر حوصلہ افزائی`
+  - Chai (PKR 100): `☕` `چائے` — `ایک گرما گرم کپ چائے کے ساتھ داد`
+  - Coffee (PKR 250): `☕︎ྀི` `کافی` — `گرم کافی کا کپ اور دل سے حوصلہ افزائی`
+  - Tohfa (PKR 500): `🎁` `تحفہ` — `محبت اور تحفے کے ساتھ خصوصی داد`
 - **Honest line**: `The whole amount goes directly to the author; UNB Premium takes no share.` / `پوری رقم براہِ راست مصنف کو جاتی ہے؛ یو این بی پریمیم کوئی حصہ نہیں لیتا۔`
 
 ### B. Reader Management (`/tips` & `/tips/[tipNumber]`)

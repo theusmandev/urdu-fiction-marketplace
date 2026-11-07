@@ -170,7 +170,7 @@ export function WriterProfileTipButton({
               role="dialog"
               aria-modal="true"
               aria-label="Say thanks to author"
-              className="w-full max-h-[92vh] sm:max-h-[88vh] sm:max-w-xl overflow-y-auto overscroll-contain focus:outline-hidden"
+              className="w-full max-h-[92vh] sm:max-h-[88vh] sm:max-w-xl min-w-0 overflow-y-auto overscroll-contain focus:outline-hidden"
               tabIndex={-1}
             >
               <TipCard

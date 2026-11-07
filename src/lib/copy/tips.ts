@@ -18,6 +18,57 @@ export interface TipPresetOption {
   emoji?: string;
 }
 
+export interface AppreciationTier {
+  id: string;
+  amount: number | null;
+  emoji: string;
+  labelEnglish: string;
+  labelUrdu: string;
+  sublabel?: string;
+  descriptionEnglish?: string;
+  descriptionUrdu?: string;
+  isCustom?: boolean;
+}
+
+export const APPRECIATION_TIERS: AppreciationTier[] = [
+  {
+    id: 'chai',
+    amount: 100,
+    emoji: '☕',
+    labelEnglish: 'Chai',
+    labelUrdu: 'چائے',
+    descriptionEnglish: 'A small warm gesture',
+    descriptionUrdu: 'ایک گرما گرم کپ چائے کے ساتھ داد',
+  },
+  {
+    id: 'coffee',
+    amount: 250,
+    emoji: '☕︎ྀི',
+    labelEnglish: 'Coffee',
+    labelUrdu: 'کافی',
+    descriptionEnglish: 'A warm cup of inspiration',
+    descriptionUrdu: 'گرم کافی کا کپ اور دل سے حوصلہ افزائی',
+  },
+  {
+    id: 'tohfa',
+    amount: 500,
+    emoji: '🎁',
+    labelEnglish: 'Tohfa',
+    labelUrdu: 'تحفہ',
+    descriptionEnglish: 'Generous encouragement',
+    descriptionUrdu: 'محبت اور تحفے کے ساتھ خصوصی داد',
+  },
+  {
+    id: 'custom',
+    amount: null,
+    emoji: '✨',
+    labelEnglish: 'Custom',
+    labelUrdu: 'دیگر رقم',
+    sublabel: 'Other',
+    isCustom: true,
+  },
+];
+
 export const TIP_PRESETS: TipPresetOption[] = [
   {
     id: 'chai',

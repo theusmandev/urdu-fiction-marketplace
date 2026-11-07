@@ -52,9 +52,10 @@ test('Tip Jar Copy Lint — Prohibits Begging and Donation Terminology', async (
     );
   });
 
-  await t.test('Includes Chai, Coffee, Tohfa preset names', () => {
+  await t.test('Includes Chai, Coffee, Tohfa preset names and exports APPRECIATION_TIERS', () => {
     assert.match(copyContent, /Chai/);
     assert.match(copyContent, /Coffee/);
     assert.match(copyContent, /Tohfa/);
+    assert.match(copyContent, /export const APPRECIATION_TIERS/);
   });
 });

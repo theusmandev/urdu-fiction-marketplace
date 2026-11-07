@@ -502,7 +502,7 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 
 ### 34. `supabase/migrations/0034_tips.sql` [TIP JAR / READER APPRECIATION (PHASE 1)]
 - **Purpose**: Implements isolated direct-payment reader-to-author appreciation tips with 0% platform commission:
-  - **Table `public.writer_tip_settings`**: Per-author opt-in, custom presets (Chai/Mithai/Eidi), thank-you message, and optional custom bounds.
+  - **Table `public.writer_tip_settings`**: Per-author opt-in, custom presets (Chai/Coffee/Tohfa), thank-you message, and optional custom bounds.
   - **Table `public.tips`**: Isolated direct payment tip record (`TIP-YYYYMMDD-XXXXXXXX`) with TID verification, duplicate TID flagging, review flags, and a partial unique index allowing at most 3 open tips per (reader_id, writer_id).
   - **Platform Settings & Rules**: Adds `tips_enabled` (kill switch), `tip_min_pkr` (20), `tip_max_pkr` (5000), `max_tips_per_hour` (5), `tip_daily_cap_pkr_per_reader` (10000), `tip_confirm_reminder_hours` (48), and `use_for_tips` flag on `writer_payment_methods`.
   - **Atomic RPCs**:
