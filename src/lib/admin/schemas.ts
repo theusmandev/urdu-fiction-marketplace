@@ -144,6 +144,7 @@ export const platformSettingsSchema = z
       .min(1, 'Tip reminder hours must be between 1 and 168')
       .max(168, 'Tip reminder hours cannot exceed 168 hours')
       .default(48),
+    watermarkEnabled: z.boolean().default(true),
   })
   .refine((data) => data.minNovelPricePkr <= data.maxNovelPricePkr, {
     message: 'Minimum novel price cannot exceed maximum novel price',

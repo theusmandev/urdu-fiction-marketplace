@@ -5,6 +5,7 @@ import { unwrapSingleQuery } from '@/lib/supabase/query';
 import { PlatformSettingsForm } from '@/components/admin/PlatformSettingsForm';
 import { PlatformPaymentMethodsManager } from '@/components/admin/PlatformPaymentMethodsManager';
 import { AdminAppearanceCard } from '@/components/admin/AdminAppearanceCard';
+import { ReaderSecurityCard } from '@/components/admin/ReaderSecurityCard';
 import { SocialLinksCard } from '@/components/admin/SocialLinksCard';
 import { DataRetentionSettingsCard } from '@/components/admin/DataRetentionSettingsCard';
 import { WriterAnnouncementSettingsCard } from '@/components/admin/WriterAnnouncementSettingsCard';
@@ -75,6 +76,7 @@ export default async function AdminSettingsPage() {
         writer_announcement_link_label,
         writer_announcement_dismissible,
         writer_announcement_updated_at,
+        watermark_enabled,
         updated_at
       `)
       .eq('id', 1)
@@ -129,6 +131,7 @@ export default async function AdminSettingsPage() {
     writer_announcement_link_label?: string | null;
     writer_announcement_dismissible?: boolean;
     writer_announcement_updated_at?: string | null;
+    watermark_enabled?: boolean;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
@@ -196,6 +199,7 @@ export default async function AdminSettingsPage() {
     min_dispute_wait_hours: 24,
     verification_reminder_hours: 12,
     support_email: 'support@unbpremium.pk',
+    watermark_enabled: true,
     updated_at: '2026-01-01T00:00:00.000Z',
   };
 
@@ -214,6 +218,7 @@ export default async function AdminSettingsPage() {
         min_dispute_wait_hours: Number(rawSettings.min_dispute_wait_hours ?? 24),
         verification_reminder_hours: Number(rawSettings.verification_reminder_hours ?? 12),
         support_email: String(rawSettings.support_email ?? 'support@unbpremium.pk'),
+        watermark_enabled: Boolean(rawSettings.watermark_enabled ?? true),
         updated_at: String(rawSettings.updated_at ?? '2026-01-01T00:00:00.000Z'),
       }
     : fallbackSettings;
@@ -327,6 +332,9 @@ export default async function AdminSettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Anti-Piracy Reader Watermark Instant Control */}
+      <ReaderSecurityCard initialEnabled={Boolean(rawSettings?.watermark_enabled ?? true)} />
 
       <PlatformSettingsForm initialSettings={currentSettings} />
 

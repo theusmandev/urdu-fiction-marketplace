@@ -416,6 +416,7 @@ export async function adminUpdatePlatformSettingsAction(formData: {
   maxTipsPerHour?: number;
   tipDailyCapPkrPerReader?: number;
   tipConfirmReminderHours?: number;
+  watermarkEnabled?: boolean;
 }): Promise<ActionResult> {
   await requireRole('admin', '/admin');
   const parsed = platformSettingsSchema.safeParse(formData);
@@ -444,6 +445,7 @@ export async function adminUpdatePlatformSettingsAction(formData: {
     p_max_tips_per_hour: parsed.data.maxTipsPerHour,
     p_tip_daily_cap_pkr_per_reader: parsed.data.tipDailyCapPkrPerReader,
     p_tip_confirm_reminder_hours: parsed.data.tipConfirmReminderHours,
+    p_watermark_enabled: parsed.data.watermarkEnabled,
   });
 
   if (error) {
@@ -455,7 +457,25 @@ export async function adminUpdatePlatformSettingsAction(formData: {
   revalidatePath('/writer');
   revalidatePath('/writer/commission');
   revalidatePath('/writer/earnings');
+  revalidatePath('/read');
   revalidatePath('/', 'layout');
+  return { success: true, data };
+}
+
+export async function toggleWatermarkAction(enabled: boolean): Promise<ActionResult> {
+  await requireRole('admin', '/admin');
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc('set_watermark_enabled', {
+    p_enabled: Boolean(enabled),
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/settings');
+  revalidatePath('/read');
   return { success: true, data };
 }
 

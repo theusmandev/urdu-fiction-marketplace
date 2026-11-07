@@ -39,6 +39,7 @@ interface PlatformSettingsFormProps {
     max_tips_per_hour?: number;
     tip_daily_cap_pkr_per_reader?: number;
     tip_confirm_reminder_hours?: number;
+    watermark_enabled?: boolean;
     updated_at: string;
   };
 }
@@ -97,6 +98,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
   const [maxTipsPerHour, setMaxTipsPerHour] = useState((initialSettings.max_tips_per_hour ?? 5).toString());
   const [tipDailyCap, setTipDailyCap] = useState((initialSettings.tip_daily_cap_pkr_per_reader ?? 10000).toString());
   const [tipConfirmReminderHours, setTipConfirmReminderHours] = useState((initialSettings.tip_confirm_reminder_hours ?? 48).toString());
+  const [watermarkEnabled, setWatermarkEnabled] = useState(initialSettings.watermark_enabled ?? true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,6 +248,7 @@ export function PlatformSettingsForm({ initialSettings }: PlatformSettingsFormPr
         maxTipsPerHour: parsedMaxTipsPerHour,
         tipDailyCapPkrPerReader: parsedTipDailyCap,
         tipConfirmReminderHours: parsedTipConfirmReminderHours,
+        watermarkEnabled,
       });
 
       if (!res.success) {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UrduText } from '@/components/urdu/UrduText';
@@ -356,6 +356,8 @@ export function SecureReaderClient({
 
 
   // Watermark pattern
+  const rawId = useId();
+  const watermarkPatternId = `wm-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const watermarkText = buildWatermarkPattern(chapter.watermark_code, readerId);
 
   return (
@@ -572,24 +574,6 @@ export function SecureReaderClient({
       </header>
 
       {/* ------------------------------------------------------------------ */}
-      {/* 2. PROTECTIVE WATERMARK OVERLAY                                    */}
-      {/* ------------------------------------------------------------------ */}
-      {watermarkText && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-20 overflow-hidden select-none opacity-[0.06] dark:opacity-[0.04] print:hidden"
-        >
-          <div className="w-[180%] h-[180%] -ml-[40%] -mt-[40%] rotate-[-25deg] flex flex-wrap content-start gap-16 font-mono text-xs tracking-wider text-current">
-            {Array.from({ length: 60 }).map((_, i) => (
-              <span key={i} className="inline-block whitespace-nowrap">
-                {watermarkText}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ------------------------------------------------------------------ */}
       {/* 2b. PRIVACY SHIELD OVERLAY (BLUR / VISIBILITY / SCREENSHOT ATTEMPT) */}
       {/* ------------------------------------------------------------------ */}
       {isPrivacyShieldActive && (
@@ -658,7 +642,35 @@ export function SecureReaderClient({
         </div>
 
         {/* Chapter Body Content (RTL Urdu Nastaliq) */}
-        <article className="relative">
+        <article className="relative overflow-hidden">
+          {/* PROTECTIVE WATERMARK OVERLAY — Strictly isolated to manuscript text */}
+          {watermarkText && (
+            <svg
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 w-full h-full z-10 select-none overflow-hidden opacity-[0.06] dark:opacity-[0.04] print:hidden"
+            >
+              <defs>
+                <pattern
+                  id={watermarkPatternId}
+                  width="320"
+                  height="160"
+                  patternUnits="userSpaceOnUse"
+                  patternTransform="rotate(-25)"
+                >
+                  <text
+                    x="20"
+                    y="80"
+                    fill="currentColor"
+                    className="font-mono text-xs tracking-wider"
+                  >
+                    {watermarkText}
+                  </text>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill={`url(#${watermarkPatternId})`} />
+            </svg>
+          )}
+
           <ChapterBody
             text={chapter.content_urdu}
             fontSize={fontSize}
@@ -668,8 +680,8 @@ export function SecureReaderClient({
           />
         </article>
 
-        {/* Reader Appreciation (Tip Jar) */}
-        <div className="mt-12 mb-6">
+        {/* Reader Appreciation (Tip Jar) — Guaranteed isolation from watermark */}
+        <div className="mt-12 mb-6 relative z-20">
           <TipCard novelId={chapter.novel_id} />
         </div>
 

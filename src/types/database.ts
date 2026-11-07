@@ -119,6 +119,7 @@ export interface PlatformSettingsRow {
   writer_announcement_link_label?: string;
   writer_announcement_dismissible?: boolean;
   writer_announcement_updated_at?: string | null;
+  watermark_enabled?: boolean;
   updated_at: string;
 }
 
@@ -393,6 +394,7 @@ export interface ChapterReaderPayload {
   next_chapter_number: number | null;
   access_reason: 'free_preview' | 'entitled' | 'owner' | 'admin';
   watermark_code: string | null;
+  watermark_enabled?: boolean;
   reader_progress: number | null;
 }
 
@@ -2127,12 +2129,19 @@ export interface Database {
           p_max_tips_per_hour?: number;
           p_tip_daily_cap_pkr_per_reader?: number;
           p_tip_confirm_reminder_hours?: number;
+          p_watermark_enabled?: boolean;
         };
         Returns: {
           success: boolean;
           message?: string;
           settings?: Json;
         };
+      };
+      set_watermark_enabled: {
+        Args: {
+          p_enabled: boolean;
+        };
+        Returns: Json;
       };
       set_writer_commission_terms: {
         Args: {

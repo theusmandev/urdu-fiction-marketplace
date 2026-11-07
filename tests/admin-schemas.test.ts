@@ -141,6 +141,35 @@ describe('Admin Validation Schemas (Zod)', () => {
       });
       assert.equal(invalidHourly.success, false);
     });
+
+    it('defaults watermarkEnabled to true and parses boolean overrides accurately', () => {
+      const defaultWatermark = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 50,
+        maxNovelPricePkr: 5000,
+        supportEmail: 'admin@unbpremium.pk',
+      });
+      assert.equal(defaultWatermark.success, true);
+      if (defaultWatermark.success) {
+        assert.equal(defaultWatermark.data.watermarkEnabled, true);
+      }
+
+      const disabledWatermark = platformSettingsSchema.safeParse({
+        defaultCommissionRate: 20,
+        defaultUnpaidCommissionLimit: 5000,
+        disputeWindowDays: 7,
+        minNovelPricePkr: 50,
+        maxNovelPricePkr: 5000,
+        supportEmail: 'admin@unbpremium.pk',
+        watermarkEnabled: false,
+      });
+      assert.equal(disabledWatermark.success, true);
+      if (disabledWatermark.success) {
+        assert.equal(disabledWatermark.data.watermarkEnabled, false);
+      }
+    });
   });
 
   describe('writerCommissionTermsSchema', () => {
