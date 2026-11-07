@@ -175,7 +175,8 @@ export function WriterProfileForm({
               value={formData.avatar_url}
               onChange={(val) => handleChange('avatar_url', val)}
               disabled={isSubmitting}
-              helperText="Recommended: Square image, 400x400px. Auto-compressed."
+              helperText="Upload a JPG, PNG, or WebP image. Drag and zoom to frame your photo."
+              helperTextUrdu="اپنی تصویر اپلوڈ کریں اور دائرے کے اندر اپنی مرضی سے ایڈجسٹ کریں۔"
             />
           </div>
         </div>

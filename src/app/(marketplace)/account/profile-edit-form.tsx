@@ -74,7 +74,8 @@ export function ProfileEditForm({ user, profile }: ProfileEditFormProps) {
           value={avatarUrl}
           onChange={(url) => setAvatarUrl(url)}
           label="Profile Picture"
-          helperText="Max 400x400px. Stored in public novel-assets bucket under your user folder."
+          helperText="Upload a JPG, PNG, or WebP image. Drag and zoom to frame your photo."
+          helperTextUrdu="اپنی تصویر اپلوڈ کریں اور دائرے کے اندر اپنی مرضی سے ایڈجسٹ کریں۔"
           disabled={isPending}
         />
       </div>
