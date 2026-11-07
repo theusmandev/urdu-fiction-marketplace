@@ -56,6 +56,7 @@ export async function verifyOrderPaymentAction(
 
     const res = data as { order_id: string };
     revalidatePath('/writer/orders');
+    revalidatePath('/writer');
 
     try {
       await dispatchPendingEmails(5);
@@ -105,6 +106,7 @@ export async function rejectOrderPaymentAction(
 
     const res = data as { order_id: string };
     revalidatePath('/writer/orders');
+    revalidatePath('/writer');
 
     try {
       await dispatchPendingEmails(5);

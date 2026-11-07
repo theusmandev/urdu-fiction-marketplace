@@ -28,37 +28,15 @@ import {
   Info,
 } from 'lucide-react';
 
-export interface WriterOrderSubmission {
-  id: string;
-  tid: string;
-  screenshotPath: string;
-  claimedAmount: number;
-  senderAccountName: string | null;
-  readerNote: string | null;
-  reviewerStatus: string;
-  reviewerNote: string | null;
-  isDuplicateTidFlagged: boolean;
-  createdAt: string;
-}
+import {
+  transitionOrderToVerified,
+  transitionOrderToRejected,
+  transitionOrderToRefundPending,
+  type WriterOrderSubmission,
+  type WriterOrderCardData,
+} from '@/lib/orders/writer-orders-state';
 
-export interface WriterOrderCardData {
-  id: string;
-  orderNumber: string;
-  readerId: string;
-  readerDisplayName: string;
-  novelTitleUrdu: string;
-  novelTitleEnglish: string;
-  novelSlug: string;
-  amountPkr: number;
-  paymentMethod: string;
-  status: OrderStatus;
-  rejectedReason: string | null;
-  createdAt: string;
-  updatedAt: string;
-  submissions: WriterOrderSubmission[];
-  hasPendingRefund?: boolean;
-  pendingRefundReason?: string | null;
-}
+export type { WriterOrderSubmission, WriterOrderCardData };
 
 interface WriterOrdersClientProps {
   initialOrders: WriterOrderCardData[];
@@ -185,9 +163,14 @@ function WriterScreenshotThumbnail({ path }: { path: string }) {
 
 export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
   const router = useRouter();
-  const [orders] = useState<WriterOrderCardData[]>(initialOrders);
+  const [orders, setOrders] = useState<WriterOrderCardData[]>(initialOrders);
   const [activeTab, setActiveTab] = useState<TabType>('awaiting');
   const [isPending, startTransition] = useTransition();
+
+  // Sync server props when initialOrders changes (e.g. from router.refresh())
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
 
   // Verification dialog state
   const [verifyTarget, setVerifyTarget] = useState<{
@@ -232,19 +215,27 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
     setVerifyError(null);
 
     const requiredText = `I confirm that PKR ${verifyTarget.order.amountPkr} has been received in my account for order ${verifyTarget.order.orderNumber}`;
+    const targetOrderId = verifyTarget.order.id;
+    const targetSubmissionId = verifyTarget.submission.id;
+    const note = verifyNote.trim();
 
     startTransition(async () => {
       const res = await verifyOrderPaymentAction({
-        orderId: verifyTarget.order.id,
-        submissionId: verifyTarget.submission.id,
+        orderId: targetOrderId,
+        submissionId: targetSubmissionId,
         confirmationText: requiredText,
-        writerNote: verifyNote.trim() || undefined,
+        writerNote: note || undefined,
       });
 
       if (!res.success) {
         setVerifyError(res.error || 'Failed to verify payment.');
         return;
       }
+
+      // Immediately transition local state so the card instantly moves to 'Verified Orders'
+      setOrders((prev) =>
+        transitionOrderToVerified(prev, targetOrderId, targetSubmissionId, note)
+      );
 
       setVerifyTarget(null);
       setVerifyNote('');
@@ -257,22 +248,31 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
     if (!rejectTarget) return;
     setRejectError(null);
 
-    if (rejectReason.trim().length < 5) {
+    const trimmedReason = rejectReason.trim();
+    if (trimmedReason.length < 5) {
       setRejectError('Please provide a clear reason of at least 5 characters.');
       return;
     }
 
+    const targetOrderId = rejectTarget.order.id;
+    const targetSubmissionId = rejectTarget.submission.id;
+
     startTransition(async () => {
       const res = await rejectOrderPaymentAction({
-        orderId: rejectTarget.order.id,
-        submissionId: rejectTarget.submission.id,
-        reason: rejectReason.trim(),
+        orderId: targetOrderId,
+        submissionId: targetSubmissionId,
+        reason: trimmedReason,
       });
 
       if (!res.success) {
         setRejectError(res.error || 'Failed to reject payment.');
         return;
       }
+
+      // Immediately transition local state so the card instantly moves to 'Rejected'
+      setOrders((prev) =>
+        transitionOrderToRejected(prev, targetOrderId, targetSubmissionId, trimmedReason)
+      );
 
       setRejectTarget(null);
       setRejectReason('');
@@ -882,16 +882,21 @@ export function WriterOrdersClient({ initialOrders }: WriterOrdersClientProps) {
                     return;
                   }
                   setRefundError(null);
+                  const targetId = refundTarget.id;
+                  const reason = refundReason.trim();
                   startTransition(async () => {
                     const res = await requestRefundAction(
-                      refundTarget.id,
-                      refundReason,
+                      targetId,
+                      reason,
                       refundEvidenceNote,
                       refundEvidencePath
                     );
                     if (!res.success) {
                       setRefundError(res.error || 'Failed to submit refund request.');
                     } else {
+                      setOrders((prev) =>
+                        transitionOrderToRefundPending(prev, targetId, reason)
+                      );
                       setRefundTarget(null);
                       router.refresh();
                     }

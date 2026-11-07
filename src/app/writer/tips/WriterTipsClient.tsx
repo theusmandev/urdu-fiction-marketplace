@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Heart,
@@ -81,6 +81,13 @@ export function WriterTipsClient({
   const [tips, setTips] = useState<WriterReceivedTipItem[]>(initialTips);
   const [summary, setSummary] = useState<TipSummaryPayload>(initialSummary);
   const [paymentMethods, setPaymentMethods] = useState<WriterPaymentMethodRow[]>(initialPaymentMethods);
+
+  // Sync server props when initialTips or initialSummary updates from router.refresh()
+  useEffect(() => {
+    setTips(initialTips);
+    setSummary(initialSummary);
+    setPaymentMethods(initialPaymentMethods);
+  }, [initialTips, initialSummary, initialPaymentMethods]);
 
   // Settings form state
   const [enabled, setEnabled] = useState(initialSettings.enabled);
