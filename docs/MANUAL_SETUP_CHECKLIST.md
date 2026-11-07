@@ -597,6 +597,31 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm function exists with `prosecdef = true`.
 
+### 44. `supabase/migrations/0044_fix_analytics_and_retention_columns.sql` [ANALYTICS & RETENTION SCHEMA COLUMN HOTFIX]
+- **Purpose**: Corrects column names in `get_admin_dashboard_analytics`, `get_expired_payment_proof_paths`, and `mark_payment_proofs_pruned` (`current_unpaid_commission` and `screenshot_path`).
+- **Action**: Paste contents of `supabase/migrations/0044_fix_analytics_and_retention_columns.sql` into the Supabase SQL Editor and click **Run**.
+
+### 45. `supabase/migrations/0045_writer_social_links.sql` [AUTHOR SOCIAL MEDIA PROFILES]
+- **Purpose**: Adds dedicated social media link columns (`social_facebook`, `social_instagram`, `social_pinterest`, `social_tiktok`, `social_linkedin`) to `writer_profiles` and updates `public_writers` view.
+- **Action**: Paste contents of `supabase/migrations/0045_writer_social_links.sql` into the Supabase SQL Editor and click **Run**.
+
+### 46. `supabase/migrations/0046_fix_writer_profiles_rls_update.sql` [WRITER PROFILE COLUMN PRIVILEGES]
+- **Purpose**: Grants UPDATE privileges on author profile social link columns and refreshes RLS update policy for authors.
+- **Action**: Paste contents of `supabase/migrations/0046_fix_writer_profiles_rls_update.sql` into the Supabase SQL Editor and click **Run**.
+
+### 47. `supabase/migrations/0047_reader_watermark_toggle.sql` [ANTI-PIRACY WATERMARK GLOBAL ADMIN TOGGLE]
+- **Purpose**: Adds `watermark_enabled` to `platform_settings`, creates `set_watermark_enabled(boolean)` RPC, updates `get_chapter_for_reader()`, and updates `update_platform_settings()`.
+- **Action**: Paste contents of `supabase/migrations/0047_reader_watermark_toggle.sql` into the Supabase SQL Editor and click **Run**.
+
+### 48. `supabase/migrations/0048_fix_order_verification_commission_column.sql` [CANONICAL ORDER VERIFICATION RPC]
+- **Purpose**: Recreates `public.verify_order_payment(uuid, uuid, text)` using canonical column names on `orders` (`applied_commission_rate`, `calculated_commission_pkr`, `calculated_writer_share_pkr`) and `sales_ledger` (`commission_rate`). Aligns partial unique index predicate on `purchase_entitlements`, preserves transactional email outbox enqueue, in-app notifications, balance reconciliation, and audit logging.
+- **Action**: Paste contents of `supabase/migrations/0048_fix_order_verification_commission_column.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname = 'verify_order_payment';
+  ```
+  Confirm function exists with `prosecdef = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
