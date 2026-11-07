@@ -129,6 +129,7 @@ export const siteConfig: SiteConfig = {
       ],
       writers: [
         { title: "Sell Your Novels", href: "/become-a-writer" },
+        { title: "Writer Platform Agreement", href: "/writer-agreement" },
         { title: "Writer Guidelines & Integrity", href: "/content-policy" },
         { title: "Platform Fee & Payout Policy", href: "/terms" },
         { title: "Writer Studio", href: "/writer" },
@@ -141,6 +142,7 @@ export const siteConfig: SiteConfig = {
         { title: "Reader Library Access", href: "/library" },
       ],
       legal: [
+        { title: "Writer Platform Agreement", href: "/writer-agreement" },
         { title: "Refund & Dispute Policy", href: "/refund-policy" },
         { title: "Terms of Service", href: "/terms" },
         { title: "Privacy Policy", href: "/privacy" },

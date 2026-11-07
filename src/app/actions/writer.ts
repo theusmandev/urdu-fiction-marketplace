@@ -700,3 +700,39 @@ export async function splitChapterAction(
     return { success: false, error: msg };
   }
 }
+
+/**
+ * Accept Writer Platform Agreement (records agreement_accepted_at = now())
+ */
+export async function acceptWriterAgreementAction(): Promise<ActionResponse<{ accepted_at: string }>> {
+  try {
+    const { user } = await requireWriter('/writer/agreement');
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+
+    const { error } = await supabase
+      .from('writer_profiles')
+      .update({
+        agreement_accepted_at: now,
+        updated_at: now,
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('[acceptWriterAgreementAction] Error:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to record agreement acceptance. Please try again.',
+      };
+    }
+
+    revalidatePath('/writer/agreement');
+    revalidatePath('/writer');
+    return { success: true, data: { accepted_at: now } };
+  } catch (err: unknown) {
+    console.error('[acceptWriterAgreementAction] Unexpected error:', err);
+    const msg = err instanceof Error ? err.message : 'An unexpected error occurred.';
+    return { success: false, error: msg };
+  }
+}
+

@@ -185,8 +185,9 @@ export function BecomeWriterForm({ existingProfile }: BecomeWriterFormProps) {
           <span className="text-xs text-secondary leading-normal">
             I confirm that all published Urdu stories are my original work, and I agree to the{' '}
             <Link
-              href="/writer/agreement"
+              href="/writer-agreement"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-accent hover:text-accent-dark underline underline-offset-2 font-semibold"
             >
               Writer Platform Agreement
