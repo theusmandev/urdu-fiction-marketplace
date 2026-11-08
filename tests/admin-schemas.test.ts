@@ -12,7 +12,7 @@ describe('Admin Validation Schemas (Zod)', () => {
   describe('platformSettingsSchema', () => {
     it('accepts valid platform settings', () => {
       const valid = {
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 14,
         minNovelPricePkr: 50,
@@ -47,7 +47,7 @@ describe('Admin Validation Schemas (Zod)', () => {
 
     it('rejects invalid dispute window (< 1 or > 365)', () => {
       const zeroDays = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 0,
         minNovelPricePkr: 50,
@@ -57,7 +57,7 @@ describe('Admin Validation Schemas (Zod)', () => {
       assert.equal(zeroDays.success, false);
 
       const tooLong = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 400,
         minNovelPricePkr: 50,
@@ -69,7 +69,7 @@ describe('Admin Validation Schemas (Zod)', () => {
 
     it('validates minimum and maximum novel price bounds', () => {
       const zeroMin = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 0,
@@ -79,7 +79,7 @@ describe('Admin Validation Schemas (Zod)', () => {
       assert.equal(zeroMin.success, false);
 
       const fractionalMin = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 49.5,
@@ -89,7 +89,7 @@ describe('Admin Validation Schemas (Zod)', () => {
       assert.equal(fractionalMin.success, false);
 
       const minExceedsMax = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 60000,
@@ -101,7 +101,7 @@ describe('Admin Validation Schemas (Zod)', () => {
 
     it('rejects invalid support email', () => {
       const invalidEmail = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 50,
@@ -113,7 +113,7 @@ describe('Admin Validation Schemas (Zod)', () => {
 
     it('validates abuse controls (orders per hour and chapter read windows)', () => {
       const validAbuse = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 50,
@@ -131,7 +131,7 @@ describe('Admin Validation Schemas (Zod)', () => {
       }
 
       const invalidHourly = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 50,
@@ -144,7 +144,7 @@ describe('Admin Validation Schemas (Zod)', () => {
 
     it('defaults watermarkEnabled to true and parses boolean overrides accurately', () => {
       const defaultWatermark = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 50,
@@ -157,7 +157,7 @@ describe('Admin Validation Schemas (Zod)', () => {
       }
 
       const disabledWatermark = platformSettingsSchema.safeParse({
-        defaultCommissionRate: 20,
+        defaultCommissionRate: 30,
         defaultUnpaidCommissionLimit: 5000,
         disputeWindowDays: 7,
         minNovelPricePkr: 50,

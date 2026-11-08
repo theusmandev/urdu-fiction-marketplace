@@ -229,7 +229,7 @@ export function AdminWriterCommissionDetailClient({
             </UrduText>
           </div>
           <p className="text-xs text-muted mt-1">
-            Author ID: <span className="font-mono">{writer.id}</span> • Rate: <span className="font-mono">{writer.custom_commission_rate ?? 20}%</span>
+            Author ID: <span className="font-mono">{writer.id}</span> • Rate: <span className="font-mono">{writer.custom_commission_rate ?? 30}%</span>
           </p>
         </div>
 

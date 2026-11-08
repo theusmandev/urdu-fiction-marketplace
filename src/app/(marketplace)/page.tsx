@@ -356,7 +356,7 @@ export default async function HomePage() {
                 کیا آپ باصلاحیت افسانہ نگار یا ناول نگار ہیں؟
               </UrduText>
               <p className="text-sm text-text-muted leading-relaxed">
-                Join UNB Premium as an author. Keep up to 80% of novel sales, receive
+                Join UNB Premium as an author. Keep up to 70% of novel sales, receive
                 payments directly from readers to your Pakistani bank account or wallet,
                 and maintain 100% intellectual property rights.
               </p>

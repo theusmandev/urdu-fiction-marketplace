@@ -78,7 +78,7 @@ export default async function WritersDirectoryPage() {
 
             <p className="text-text-muted text-sm md:text-base leading-relaxed">
               Publish independently on Pakistan&apos;s dedicated digital literature
-              platform. Keep up to 80% of novel sales, receive direct payments into
+              platform. Keep up to 70% of novel sales, receive direct payments into
               your JazzCash, EasyPaisa, or Bank Account, and retain full copyright
               ownership.
             </p>

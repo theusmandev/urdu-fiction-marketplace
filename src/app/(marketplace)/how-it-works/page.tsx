@@ -189,7 +189,7 @@ export default function HowItWorksPage() {
             </UrduText>
             <p className="text-xs text-secondary leading-relaxed">
               100% of reader payments land directly in your account. You verify receipts
-              in one click, and platform fee (20%) is tracked transparently.
+              in one click, and platform fee (30%) is tracked transparently.
             </p>
           </div>
         </div>

@@ -120,7 +120,7 @@ export default function TermsPage() {
             4. Platform Fee & Financial Accrual — Draft, Pending Legal Review
           </h2>
           <p>
-            The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. The platform charges a percentage platform fee (default 20%, subject to
+            The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. The platform charges a percentage platform fee (default 30%, subject to
             contractual adjustments in the writer profile) on verified sales. The platform fee is
             tracked on an append-only sales ledger and settled periodically against the
             unpaid platform fee limit.

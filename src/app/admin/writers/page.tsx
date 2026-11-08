@@ -195,7 +195,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                               {writer.custom_commission_rate}% (Custom)
                             </span>
                           ) : (
-                            <span className="text-muted">20% (Default)</span>
+                            <span className="text-muted">30% (Default)</span>
                           )}
                         </td>
                         <td className="py-2.5 px-3 sm:px-4 font-mono whitespace-nowrap">
@@ -253,7 +253,7 @@ export default async function AdminWritersPage({ searchParams }: PageProps) {
                       Rate:{' '}
                       {writer.custom_commission_rate !== null
                         ? `${writer.custom_commission_rate}% (Custom)`
-                        : '20% (Default)'}
+                        : '30% (Default)'}
                     </div>
                   </div>
 

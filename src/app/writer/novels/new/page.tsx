@@ -32,7 +32,7 @@ export default async function NewNovelPage() {
 
   const queryError = genresError || settingsError;
   const availableGenres = genres || [];
-  const commissionRate = writerProfile.custom_commission_rate ?? 20;
+  const commissionRate = writerProfile.custom_commission_rate ?? 30;
   const minPrice = settings?.min_novel_price_pkr ?? 50;
   const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
 

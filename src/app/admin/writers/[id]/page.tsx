@@ -224,7 +224,7 @@ export default async function AdminWriterDetailPage({ params }: PageProps) {
                   {writer.custom_commission_rate !== null ? (
                     <span className="text-accent-admin font-semibold">{writer.custom_commission_rate}% (Custom)</span>
                   ) : (
-                    <span className="text-muted">20.00% (Platform Default)</span>
+                    <span className="text-muted">30.00% (Platform Default)</span>
                   )}
                 </span>
               </div>

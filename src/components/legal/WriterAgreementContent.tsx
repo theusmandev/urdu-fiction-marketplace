@@ -59,11 +59,11 @@ export function WriterAgreementContent({
             <span>2. Platform Fee &amp; Accrual Threshold</span>
           </h2>
           <p>
-            The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. The platform records an automated 20% platform fee (or agreed custom rate) on each verified sale. You agree to settle accrued platform fees with the platform once your balance reaches the unpaid limit of PKR 5,000. Orders remain active and uninterrupted while within this limit.
+            The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. The platform records an automated 30% platform fee (or agreed custom rate) on each verified sale. You agree to settle accrued platform fees with the platform once your balance reaches the unpaid limit of PKR 5,000. Orders remain active and uninterrupted while within this limit.
           </p>
           <div className="pt-1 border-t border-border/40" dir="rtl">
             <UrduText as="p" size="xs" className="text-secondary leading-[2.2]">
-              پلیٹ فارم فیس ہر تصدیق شدہ آرڈر کی ۲۰ فیصد (یا طے شدہ شرح) ہے۔ یہ فیس مصنف کی طرف واجب الادا ہوتی ہے اور قاری سے کوئی اضافی فیس نہیں لی جاتی۔ ۵۰۰۰ روپے کی حد تک پہنچنے پر آپ فیس ادا کرنے کے پابند ہیں۔
+              پلیٹ فارم فیس ہر تصدیق شدہ آرڈر کی ۳۰ فیصد (یا طے شدہ شرح) ہے۔ یہ فیس مصنف کی طرف واجب الادا ہوتی ہے اور قاری سے کوئی اضافی فیس نہیں لی جاتی۔ ۵۰۰۰ روپے کی حد تک پہنچنے پر آپ فیس ادا کرنے کے پابند ہیں۔
             </UrduText>
           </div>
         </section>

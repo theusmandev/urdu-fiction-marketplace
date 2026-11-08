@@ -77,7 +77,7 @@ export default async function EditNovelPage({ params }: EditNovelPageProps) {
 
   const linkedGenreIds = (linkedGenres || []).map((g) => g.genre_id);
   const availableGenres = genres || [];
-  const commissionRate = writerProfile.custom_commission_rate ?? 20;
+  const commissionRate = writerProfile.custom_commission_rate ?? 30;
   const minPrice = settings?.min_novel_price_pkr ?? 50;
   const maxPrice = settings?.max_novel_price_pkr ? Number(settings.max_novel_price_pkr) : 5000;
 

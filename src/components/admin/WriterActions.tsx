@@ -280,7 +280,7 @@ export function WriterActions({
                   max="100"
                   value={rateInput}
                   onChange={(e) => setRateInput(e.target.value)}
-                  placeholder="Leave blank for platform default (20%)"
+                  placeholder="Leave blank for platform default (30%)"
                   className="w-full bg-surface-muted border border-border rounded-xl px-3.5 py-2 text-xs text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-ring-admin/20 focus:border-accent-admin"
                 />
                 <span className="text-[10px] text-muted">

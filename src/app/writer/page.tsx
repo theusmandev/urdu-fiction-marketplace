@@ -94,7 +94,7 @@ export default async function WriterDashboardPage() {
   const novelsTotal = novelCount ?? 0;
   const pendingOrdersTotal = pendingVerificationCount ?? 0;
   const activePayoutsTotal = paymentMethodsCount ?? 0;
-  const commissionRate = writerProfile.custom_commission_rate ?? 20;
+  const commissionRate = writerProfile.custom_commission_rate ?? 30;
 
   // Resolve effective unpaid commission limit:
   // If individual writer has a custom unpaid_commission_limit_pkr in writer_profiles, use it.

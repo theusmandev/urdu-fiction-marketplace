@@ -186,7 +186,7 @@ export default async function AdminSettingsPage() {
   }
 
   const fallbackSettings = {
-    default_commission_rate: 20.0,
+    default_commission_rate: 30.0,
     default_unpaid_commission_limit: 5000.0,
     dispute_window_days: 3,
     min_novel_price_pkr: 50,
@@ -205,7 +205,7 @@ export default async function AdminSettingsPage() {
 
   const currentSettings = rawSettings
     ? {
-        default_commission_rate: Number(rawSettings.default_commission_rate ?? 20),
+        default_commission_rate: Number(rawSettings.default_commission_rate ?? 30),
         default_unpaid_commission_limit: Number(rawSettings.default_unpaid_commission_limit ?? 5000),
         dispute_window_days: Number(rawSettings.dispute_window_days ?? 3),
         min_novel_price_pkr: Number(rawSettings.min_novel_price_pkr ?? 50),

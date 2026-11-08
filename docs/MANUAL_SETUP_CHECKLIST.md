@@ -45,7 +45,7 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Verification**: In **Authentication -> Policies**, verify that tables have RLS enabled.
 
 ### 5. `supabase/migrations/0005_seed_genres_and_settings.sql`
-- **Purpose**: Populates the platform settings singleton (20% default commission rate, PKR 5,000 unpaid commission threshold) and seeds 8 core Urdu literature genres.
+- **Purpose**: Populates the platform settings singleton (initial 20% commission rate default, updated to 30% in migration 0049; PKR 5,000 unpaid commission threshold) and seeds 8 core Urdu literature genres.
 - **Action**: Paste contents into the SQL Editor and click **Run**.
 - **Verification**: Run `SELECT * FROM genres;` and confirm 8 rows are returned.
 
@@ -621,6 +621,15 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   SELECT proname, prosecdef FROM pg_proc WHERE proname = 'verify_order_payment';
   ```
   Confirm function exists with `prosecdef = true`.
+
+### 49. `supabase/migrations/0049_update_default_platform_fee_to_30_percent.sql` [UPDATE DEFAULT PLATFORM FEE TO 30%]
+- **Purpose**: Updates `public.platform_settings.default_commission_rate` column default and singleton row `id = 1` from `20.00` to `30.00`. Updates defensive fallbacks from `20.00` to `30.00` in active definitions of `public.create_order`, `public.verify_order_payment`, and `public.admin_force_verify`. Preserves locked snapshots on historical orders and sales ledger rows.
+- **Action**: Paste contents of `supabase/migrations/0049_update_default_platform_fee_to_30_percent.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT id, default_commission_rate FROM public.platform_settings WHERE id = 1;
+  ```
+  Confirm `default_commission_rate = 30.00`.
 
 ## Stage 2: Initial Platform Administrator Bootstrapping
 

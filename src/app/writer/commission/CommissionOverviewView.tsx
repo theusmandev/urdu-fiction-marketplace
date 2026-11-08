@@ -138,7 +138,7 @@ export function CommissionOverviewView({ summary, invoices }: CommissionOverview
             <div className="bg-surface p-3 rounded-lg border border-border space-y-1">
               <span className="font-semibold text-navy">1. Accrued Platform Fee</span>
               <p className="text-[11px] text-secondary">
-                When you verify a reader&apos;s direct payment, UNB accrues its platform fee (e.g. 20%) in your ledger.
+                When you verify a reader&apos;s direct payment, UNB accrues its platform fee (e.g. 30%) in your ledger.
               </p>
             </div>
             <div className="bg-surface p-3 rounded-lg border border-border space-y-1">

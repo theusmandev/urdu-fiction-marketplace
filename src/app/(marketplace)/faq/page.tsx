@@ -77,7 +77,7 @@ const FAQS: FaqItem[] = [
   {
     q: "How do authors receive their earnings?",
     qUrdu: "مصنفین کو ان کا معاوضہ کیسے ملتا ہے؟",
-    a: "Authors receive 100% of reader payments directly into their own bank or wallet accounts in real-time. The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. Platform fee (default 20%) is calculated automatically and tracked against the writer's sales ledger.",
+    a: "Authors receive 100% of reader payments directly into their own bank or wallet accounts in real-time. The platform fee is a percentage of each verified sale. It is owed by the author to the platform and is settled separately; readers pay no platform fee. Platform fee (default 30%) is calculated automatically and tracked against the writer's sales ledger.",
   },
   {
     q: "What if a writer does not unlock my novel after payment?",

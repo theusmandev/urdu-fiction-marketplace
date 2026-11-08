@@ -116,7 +116,7 @@ export default function AboutPage() {
             Writer Autonomy
           </h3>
           <p className="text-xs text-secondary leading-relaxed">
-            Authors keep up to 80% of novel sales, set their own pricing, retain 100% of
+            Authors keep up to 70% of novel sales, set their own pricing, retain 100% of
             their copyright, and interact transparently with their readers.
           </p>
         </div>
