@@ -3,6 +3,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { UrduText } from "@/components/urdu/UrduText";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { PoweredByWordmark } from "@/components/brand/PoweredByWordmark";
 import { ShieldCheck, Heart, ArrowUpRight } from "lucide-react";
 import {
   FacebookIcon,
@@ -164,6 +165,11 @@ export async function PublicFooter() {
             </div>
           </div>
         )}
+
+        {/* Powered by Urdu Novel Bank Calligraphy Wordmark */}
+        <div className="py-8 sm:py-10 flex justify-center border-b border-border">
+          <PoweredByWordmark />
+        </div>
 
         {/* Bottom Bar: Copyright & Direct Payment Protection Notice */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-text-muted">

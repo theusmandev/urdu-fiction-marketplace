@@ -87,7 +87,7 @@ export const siteConfig: SiteConfig = {
   defaultCurrency: "PKR",
   currencySymbol: "Rs.",
   currencySymbolUrdu: "روپے",
-  defaultCommissionPercentage: 20, // Display fallback only; DB platform_settings is authoritative
+  defaultCommissionPercentage: 30, // Display fallback only; DB platform_settings is authoritative
   defaultUnpaidCommissionThreshold: 5000, // Display fallback only; DB platform_settings is authoritative
 
   contactEmail: "support@unbpremium.pk",
