@@ -2,6 +2,7 @@ import React from 'react';
 
 export interface PoweredByWordmarkProps {
   className?: string;
+  href?: string | null;
 }
 
 /**
@@ -11,21 +12,23 @@ export interface PoweredByWordmarkProps {
  * Features an optically-centered "POWERED BY" badge flanked by left/right fading
  * horizontal accent rules, and the authentic "اردو ناول بینک" vector calligraphy
  * with multi-stop warm gold and deep ink gradients.
+ * Links to https://urdunovelbanks.com with accessible external link attributes.
  */
 export function PoweredByWordmark({
-  className = 'max-w-[220px] sm:max-w-[260px] w-full mx-auto',
+  className = '',
+  href = 'https://urdunovelbanks.com',
 }: PoweredByWordmarkProps) {
-  return (
-    <div className={`flex flex-col items-center ${className}`}>
+  const content = (
+    <>
       {/* Top Label: "POWERED BY" flanked by fading horizontal accent rules */}
-      <div className="w-full flex items-center gap-3">
+      <div className="w-full flex items-center gap-2">
         <div
           className="h-px flex-1"
           style={{ background: 'linear-gradient(to right, transparent, var(--color-accent))' }}
           aria-hidden="true"
         />
-        <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] uppercase text-accent select-none whitespace-nowrap">
-          <span className="-mr-[0.28em]">POWERED BY</span>
+        <span className="text-[8.5px] sm:text-[9.5px] font-semibold tracking-[0.24em] uppercase text-accent select-none whitespace-nowrap">
+          <span className="-mr-[0.24em]">POWERED BY</span>
         </span>
         <div
           className="h-px flex-1"
@@ -35,7 +38,7 @@ export function PoweredByWordmark({
       </div>
 
       {/* Exact SVG Calligraphy Wordmark ("اردو ناول بینک") */}
-      <div className="w-full mt-1 sm:mt-1.5">
+      <div className="w-full">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="120 615 1010 400"
@@ -81,7 +84,25 @@ export function PoweredByWordmark({
           </g>
         </svg>
       </div>
-    </div>
+    </>
   );
-}
 
+  const containerClasses =
+    `group mx-auto flex w-full max-w-[130px] sm:max-w-[155px] flex-col items-center gap-0.5 transition-opacity duration-200 hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg ${className}`.trim();
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Powered by Urdu Novel Bank — Visit urdunovelbanks.com"
+        className={containerClasses}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <div className={containerClasses}>{content}</div>;
+}

@@ -167,7 +167,7 @@ export async function PublicFooter() {
         )}
 
         {/* Powered by Urdu Novel Bank Calligraphy Wordmark */}
-        <div className="py-8 sm:py-10 flex justify-center border-b border-border">
+        <div className="py-3 sm:py-4 flex justify-center border-b border-border">
           <PoweredByWordmark />
         </div>
 
