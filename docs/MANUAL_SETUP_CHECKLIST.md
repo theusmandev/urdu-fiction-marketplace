@@ -631,6 +631,15 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm `default_commission_rate = 30.00`.
 
+### 50. `supabase/migrations/0050_enable_writer_tips_by_default.sql` [ENABLE "SAY THANKS" TIPS BY DEFAULT FOR ALL WRITERS]
+- **Purpose**: Updates `public.writer_tip_settings.enabled` column default to `true`. Backfills all existing approved authors with `enabled = true`. Auto-provisions tip settings upon author approval in `approve_writer` and applicant onboarding in `apply_as_writer`. Updates RPC fallbacks (`get_tip_options`, `create_tip`, `get_my_tip_settings`) to default `writer_enabled` to `true` while respecting explicit opt-outs when a writer turns it OFF.
+- **Action**: Paste contents of `supabase/migrations/0050_enable_writer_tips_by_default.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT column_name, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'writer_tip_settings' AND column_name = 'enabled';
+  ```
+  Confirm `column_default` is `true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

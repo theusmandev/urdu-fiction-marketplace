@@ -180,4 +180,45 @@ test('Tip Jar UI State & Visibility Helpers', async (t) => {
       assert.equal(errorState.code, 'PGRST500');
     }
   });
+
+  await t.test('Say Thanks (Tips) enabled by default for all writers and toggleable', () => {
+    const defaultPayload: TipOptionsPayload = {
+      tips_enabled: true,
+      writer_enabled: true, // 0050: default enabled = true
+      writer_id: 'writer-default',
+      can_tip: true,
+      preset_amounts: [100, 250, 500],
+      min_amount_pkr: 20,
+      max_amount_pkr: 5000,
+      payment_methods: [
+        {
+          id: 'pm-def',
+          method_type: 'jazzcash',
+          bank_name: null,
+          masked_label: 'JazzCash (•••• 9999)',
+          instructions_note: null,
+        },
+      ],
+    };
+
+    // When writer has default settings (enabled = true)
+    const activeState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-789',
+      userRole: 'reader',
+      targetWriterId: 'writer-default',
+      payload: defaultPayload,
+    });
+    assert.equal(activeState.status, 'ready');
+
+    // When writer explicitly turns OFF tips
+    const disabledState = resolveTipCardState({
+      isUserSignedIn: true,
+      currentUserId: 'reader-789',
+      userRole: 'reader',
+      targetWriterId: 'writer-default',
+      payload: { ...defaultPayload, writer_enabled: false },
+    });
+    assert.equal(disabledState.status, 'disabled_by_writer');
+  });
 });

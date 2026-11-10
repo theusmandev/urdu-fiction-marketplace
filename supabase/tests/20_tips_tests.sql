@@ -139,15 +139,15 @@ BEGIN
     -- ==========================================================================
     PERFORM pg_catalog.set_config('request.jwt.claim.sub', v_reader_1_id::text, true);
 
-    -- Before enabling tips for Writer A: get_tip_options says writer_enabled = false
+    -- Out of the box (0050): get_tip_options says writer_enabled = true and can_tip = true
     v_rpc_res := public.get_tip_options(v_writer_a_id);
-    IF (v_rpc_res->>'can_tip')::boolean IS FALSE AND (v_rpc_res->>'writer_enabled')::boolean IS FALSE THEN
-        INSERT INTO test_results VALUES (1, 'Tips disabled by default for writer', 'PASS', v_rpc_res->>'reason');
+    IF (v_rpc_res->>'can_tip')::boolean IS TRUE AND (v_rpc_res->>'writer_enabled')::boolean IS TRUE THEN
+        INSERT INTO test_results VALUES (1, 'Tips enabled by default for writer', 'PASS', 'Active by default');
     ELSE
-        INSERT INTO test_results VALUES (1, 'Tips disabled by default for writer', 'FAIL', v_rpc_res::text);
+        INSERT INTO test_results VALUES (1, 'Tips enabled by default for writer', 'FAIL', v_rpc_res::text);
     END IF;
 
-    -- Writer A enables tips via set_my_tip_settings
+    -- Writer A updates tip settings via set_my_tip_settings
     PERFORM pg_catalog.set_config('request.jwt.claim.sub', v_writer_a_id::text, true);
     v_rpc_res := public.set_my_tip_settings(
         true,
@@ -158,9 +158,9 @@ BEGIN
     );
 
     IF (v_rpc_res->>'enabled')::boolean IS TRUE THEN
-        INSERT INTO test_results VALUES (2, 'Writer can enable tips with custom thank you message', 'PASS', 'Settings updated');
+        INSERT INTO test_results VALUES (2, 'Writer can update tip settings with custom thank you message', 'PASS', 'Settings updated');
     ELSE
-        INSERT INTO test_results VALUES (2, 'Writer can enable tips with custom thank you message', 'FAIL', v_rpc_res::text);
+        INSERT INTO test_results VALUES (2, 'Writer can update tip settings with custom thank you message', 'FAIL', v_rpc_res::text);
     END IF;
 
     -- ==========================================================================

@@ -721,6 +721,11 @@ export function WriterTipsClient({
                     <p className="text-xs text-secondary mt-1">
                       {WRITER_STUDIO_COPY.enableSwitchDesc}
                     </p>
+                    {WRITER_STUDIO_COPY.enableSwitchDescUrdu && (
+                      <UrduText as="p" size="xs" className="text-secondary/90 py-0 mt-0.5">
+                        {WRITER_STUDIO_COPY.enableSwitchDescUrdu}
+                      </UrduText>
+                    )}
                   </div>
                   <button
                     type="button"

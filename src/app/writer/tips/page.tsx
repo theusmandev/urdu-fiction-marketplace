@@ -58,7 +58,7 @@ export default async function WriterTipsPage() {
 
   const settings: WriterTipSettingsRow = settingsData || {
     writer_id: user.id,
-    enabled: false,
+    enabled: true,
     thank_you_message: 'شکریہ! آپ کی پزیرائی کا بہت شکریہ۔',
     preset_amounts: [100, 250, 500],
     min_amount: null,
