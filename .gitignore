@@ -51,3 +51,7 @@ supabase/.temp/
 .open-next/
 .wrangler/
 
+# local previews
+.preview/
+
+

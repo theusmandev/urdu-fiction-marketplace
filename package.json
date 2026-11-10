@@ -19,7 +19,8 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:colors": "node scripts/check-colors.mjs",
     "check:seo": "node scripts/check-seo-regression.mjs",
-    "build:brand": "node scripts/build-brand-assets.mjs"
+    "build:brand": "node scripts/build-brand-assets.mjs",
+    "email:preview": "node scripts/preview-emails.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
