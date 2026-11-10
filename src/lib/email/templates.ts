@@ -36,7 +36,7 @@ interface TemplateMetadata {
   ctaPath: string;
 }
 
-const TEMPLATE_REGISTRY: Record<string, TemplateMetadata> = {
+export const TEMPLATE_REGISTRY: Record<string, TemplateMetadata> = {
   payment_verified: {
     badgeText: "Novel Unlocked",
     badgeUrdu: "رسائی مل گئی",
@@ -91,9 +91,45 @@ const TEMPLATE_REGISTRY: Record<string, TemplateMetadata> = {
     ctaLabel: "View Tip Details",
     ctaPath: "/tips",
   },
+  reminder_tip_confirmation: {
+    badgeText: "Tip Confirmation",
+    badgeUrdu: "ٹپ تصدیق کی یاد دہانی",
+    ctaLabel: "Confirm Tip in Studio",
+    ctaPath: "/writer/tips",
+  },
+  tip_reminder: {
+    badgeText: "Tip Confirmation",
+    badgeUrdu: "ٹپ تصدیق کی یاد دہانی",
+    ctaLabel: "Confirm Tip in Studio",
+    ctaPath: "/writer/tips",
+  },
+  reminder_order_verification: {
+    badgeText: "Order Verification",
+    badgeUrdu: "آرڈر تصدیق کی یاد دہانی",
+    ctaLabel: "Verify Order in Studio",
+    ctaPath: "/writer/orders",
+  },
+  verification_reminder: {
+    badgeText: "Order Verification",
+    badgeUrdu: "آرڈر تصدیق کی یاد دہانی",
+    ctaLabel: "Verify Order in Studio",
+    ctaPath: "/writer/orders",
+  },
   invoice_issued: {
     badgeText: "Platform Fee Notice",
     badgeUrdu: "پلیٹ فارم فیس",
+    ctaLabel: "View Platform Fee Invoice",
+    ctaPath: "/writer/commission",
+  },
+  invoice_overdue: {
+    badgeText: "Platform Fee Overdue",
+    badgeUrdu: "پلیٹ فارم فیس واجب الادا",
+    ctaLabel: "View Platform Fee Invoice",
+    ctaPath: "/writer/commission",
+  },
+  invoice_due_reminder: {
+    badgeText: "Platform Fee Reminder",
+    badgeUrdu: "پلیٹ فارم فیس کی یاد دہانی",
     ctaLabel: "View Platform Fee Invoice",
     ctaPath: "/writer/commission",
   },
@@ -204,11 +240,11 @@ export function sanitizeEmailContent(content: string): string {
  * Returns the public application base URL from environment or production default.
  */
 export function getAppBaseUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "https://premium.urdunovelbanks.com"
-  ).replace(/\/+$/, "");
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (envUrl && envUrl.trim().length > 0) {
+    return envUrl.trim().replace(/\/+$/, "");
+  }
+  return "https://premium.urdunovelbanks.com";
 }
 
 /**

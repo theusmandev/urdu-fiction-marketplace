@@ -11,6 +11,7 @@ import {
   sanitizeEmailContent,
   renderEmailTemplate,
   getAppBaseUrl,
+  TEMPLATE_REGISTRY,
 } from '../src/lib/email/templates.ts';
 
 describe('Email Outbox & Service Configuration Helper', () => {
@@ -193,6 +194,99 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
       });
       assert.ok(rendered.html.includes(item.cta), `Template ${item.template} should contain CTA path ${item.cta}`);
       assert.ok(rendered.html.includes(item.badge), `Template ${item.template} should contain badge ${item.badge}`);
+    }
+  });
+
+  it('maps correct badge, Urdu Nastaliq, and CTA for the 3 missing reminder templates', () => {
+    // 1. invoice_overdue
+    const overdue = renderEmailTemplate({
+      template: 'invoice_overdue',
+      subject: 'Platform Fee Invoice Overdue',
+      bodyText: 'Please settle your overdue platform fee invoice.',
+    });
+    assert.ok(overdue.html.includes('Platform Fee Overdue'));
+    assert.ok(overdue.html.includes('پلیٹ فارم فیس واجب الادا'));
+    assert.ok(overdue.html.includes('/writer/commission'));
+    assert.ok(!overdue.html.includes('commission invoice'));
+    assert.ok(!overdue.html.includes('کمیشن'));
+
+    // 2. reminder_order_verification
+    const orderRem = renderEmailTemplate({
+      template: 'reminder_order_verification',
+      subject: 'Reminder: Verify Order Payment',
+      bodyText: 'A reader has submitted payment. Please check your bank and verify.',
+    });
+    assert.ok(orderRem.html.includes('Order Verification'));
+    assert.ok(orderRem.html.includes('آرڈر تصدیق کی یاد دہانی'));
+    assert.ok(orderRem.html.includes('/writer/orders'));
+
+    // 3. reminder_tip_confirmation
+    const tipRem = renderEmailTemplate({
+      template: 'reminder_tip_confirmation',
+      subject: 'Reminder: Confirm Reader Appreciation Tip',
+      bodyText: 'A reader submitted a tip. Please confirm receipt in Writer Studio.',
+    });
+    assert.ok(tipRem.html.includes('Tip Confirmation'));
+    assert.ok(tipRem.html.includes('ٹپ تصدیق کی یاد دہانی'));
+    assert.ok(tipRem.html.includes('/writer/tips'));
+  });
+
+  it('asserts getAppBaseUrl fallback is strictly https://premium.urdunovelbanks.com', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+
+    assert.strictEqual(getAppBaseUrl(), 'https://premium.urdunovelbanks.com');
+
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-domain.com/';
+    assert.strictEqual(getAppBaseUrl(), 'https://custom-domain.com');
+
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+  });
+
+  it('guarantees TEMPLATE_REGISTRY completeness for every template enqueued across database & code', () => {
+    const KNOWN_ENQUEUED_TEMPLATES = [
+      'payment_verified',
+      'order_payment_submitted',
+      'payment_rejected',
+      'support_reply',
+      'support_ticket_created',
+      'support_message_received',
+      'tip_submitted',
+      'tip_confirmed',
+      'tip_not_received',
+      'reminder_tip_confirmation',
+      'tip_reminder',
+      'reminder_order_verification',
+      'verification_reminder',
+      'invoice_issued',
+      'invoice_overdue',
+      'invoice_due_reminder',
+      'invoice_settled',
+      'invoice_payment_rejected',
+      'writer_approved',
+      'writer_rejected',
+      'novel_approved',
+      'novel_rejected',
+      'dispute_opened',
+      'dispute_message',
+      'dispute_resolved',
+      'refund_requested',
+      'refund_approved',
+      'refund_rejected',
+    ];
+
+    for (const key of KNOWN_ENQUEUED_TEMPLATES) {
+      const meta = TEMPLATE_REGISTRY[key];
+      assert.ok(meta, `Template "${key}" must be registered in TEMPLATE_REGISTRY`);
+      assert.ok(meta.badgeText.length > 0, `Template "${key}" must have badgeText`);
+      assert.ok(meta.badgeUrdu.length > 0, `Template "${key}" must have badgeUrdu`);
+      assert.ok(meta.ctaLabel.length > 0, `Template "${key}" must have ctaLabel`);
+      assert.ok(meta.ctaPath.startsWith('/'), `Template "${key}" ctaPath must start with '/'`);
+
+      // Verify no forbidden terminology in registered metadata
+      assert.ok(!meta.badgeText.toLowerCase().includes('commission'), `Forbidden term in badgeText of "${key}"`);
+      assert.ok(!meta.badgeUrdu.includes('کمیشن'), `Forbidden term in badgeUrdu of "${key}"`);
+      assert.ok(!meta.ctaLabel.toLowerCase().includes('commission'), `Forbidden term in ctaLabel of "${key}"`);
     }
   });
 });

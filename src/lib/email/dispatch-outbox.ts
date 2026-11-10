@@ -5,6 +5,7 @@ export interface DispatchOutboxResult {
   processed: number;
   sent: number;
   failed: number;
+  rateLimited?: boolean;
   unconfigured?: boolean;
   error?: string;
 }
@@ -88,7 +89,21 @@ export async function dispatchPendingEmails(
     let sentCount = 0;
     let failedCount = 0;
 
-    for (const item of pendingEmails) {
+    // Rate-limit burst pacing:
+    // Resend free-tier enforces a burst cap of 2 requests/second.
+    // Brevo free-tier enforces ~10 requests/second.
+    // Adding 550ms pacing between sequential dispatches in production (~1.8 req/sec)
+    // prevents 429 burst errors without sacrificing batch reliability.
+    // In test suites (NODE_ENV === "test"), delay is 0ms for instant execution.
+    const pacingDelayMs = process.env.NODE_ENV === "test" ? 0 : 550;
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    for (let i = 0; i < pendingEmails.length; i++) {
+      const item = pendingEmails[i];
+      if (i > 0 && pacingDelayMs > 0) {
+        await sleep(pacingDelayMs);
+      }
+
       const emailResult = await sendEmail(
         item.recipient_email,
         {
@@ -99,26 +114,76 @@ export async function dispatchPendingEmails(
         { allowMockInDevelopment: options?.allowMockInDevelopment }
       );
 
-      const { error: recordError } = await supabase.rpc(
-        "record_email_delivery_result",
-        {
-          p_email_id: item.id,
-          p_success: emailResult.success,
-          p_error: emailResult.error || null,
-        }
-      );
-
-      if (recordError) {
-        console.error(
-          `[Email Dispatcher] Failed to record delivery status for ${item.id}:`,
-          recordError.message
-        );
-      }
-
       if (emailResult.success) {
+        const { error: recordError } = await supabase.rpc(
+          "record_email_delivery_result",
+          {
+            p_email_id: item.id,
+            p_success: true,
+            p_error: null,
+            p_is_rate_limited: false,
+            p_retry_after: null,
+            p_is_permanent: false,
+          }
+        );
+
+        if (recordError) {
+          console.error(
+            `[Email Dispatcher] Failed to record delivery status for ${item.id}:`,
+            recordError.message
+          );
+        }
         sentCount++;
       } else {
-        failedCount++;
+        const isRateLimited =
+          emailResult.errorCategory === "rate_limited" ||
+          emailResult.errorCategory === "daily_quota";
+        const isPermanent = emailResult.errorCategory === "permanent";
+
+        let retryAfterIso: string | null = null;
+        if (isRateLimited) {
+          const delayMs = (emailResult.retryAfterSeconds ?? 300) * 1000;
+          retryAfterIso = new Date(Date.now() + delayMs).toISOString();
+        }
+
+        const { error: recordError } = await supabase.rpc(
+          "record_email_delivery_result",
+          {
+            p_email_id: item.id,
+            p_success: false,
+            p_error: emailResult.error || "Email delivery failed",
+            p_is_rate_limited: isRateLimited,
+            p_retry_after: retryAfterIso,
+            p_is_permanent: isPermanent,
+          }
+        );
+
+        if (recordError) {
+          console.error(
+            `[Email Dispatcher] Failed to record delivery status for ${item.id}:`,
+            recordError.message
+          );
+        }
+
+        if (isPermanent) {
+          failedCount++;
+        } else if (!isRateLimited) {
+          failedCount++;
+        }
+
+        // Circuit breaker: If provider hit 429 or exhausted daily quota, stop the batch immediately
+        if (isRateLimited) {
+          console.warn(
+            `[Email Dispatcher] Email provider rate limit or quota hit (${emailResult.errorCategory}). Halting batch dispatch early to protect outbox.`
+          );
+          return {
+            success: true,
+            processed: i + 1,
+            sent: sentCount,
+            failed: failedCount,
+            rateLimited: true,
+          };
+        }
       }
     }
 

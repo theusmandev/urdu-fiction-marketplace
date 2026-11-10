@@ -1,11 +1,28 @@
 import { renderEmailTemplate, type EmailRenderInput } from "./templates.ts";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
+export type EmailErrorCategory = "rate_limited" | "daily_quota" | "temporary" | "permanent";
+
 export interface SendEmailResult {
   success: boolean;
   messageId?: string;
   error?: string;
+  errorCategory?: EmailErrorCategory;
   isMocked?: boolean;
+  retryAfterSeconds?: number;
+}
+
+/**
+ * Sanitizes external API error strings to ensure recipient email addresses,
+ * API tokens, and authorization credentials never leak into database logs or exceptions.
+ */
+export function sanitizeErrorMessage(rawError: string): string {
+  if (!rawError) return "Unknown email delivery error";
+  return rawError
+    .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[REDACTED_EMAIL]")
+    .replace(/(?:Bearer\s+)[a-zA-Z0-9_\-\.]+/gi, "[REDACTED_AUTH]")
+    .replace(/(?:xkeysib-|re_)[a-zA-Z0-9_\-\.]+/gi, "[REDACTED_KEY]")
+    .slice(0, 500);
 }
 
 /**
@@ -107,9 +124,16 @@ export async function sendEmail(
     resolveEmailEnv("EMAIL_FROM") ||
     "Urdu Novel Bank Premium <noreply@urdunovelbanks.com>";
   const sender = parseFromAddress(fromAddress);
+
+  // Optional Reply-To header support (defaults to official support desk)
+  const defaultReplyTo = "Urdu Novel Bank Support <support@urdunovelbanks.com>";
+  const replyToAddress = resolveEmailEnv("EMAIL_REPLY_TO") || defaultReplyTo;
+  const replyTo = parseFromAddress(replyToAddress);
+
   const rendered = renderEmailTemplate({ ...input, recipientEmail });
 
   // 1. Resend REST API
+  // Free tier: 100 emails/day, 2 req/sec rate limit
   if (provider === "resend") {
     const apiKey = resolveEmailEnv("RESEND_API_KEY");
     if (!apiKey) {
@@ -118,7 +142,7 @@ export async function sendEmail(
       }
       const errorMsg = `EMAIL_PROVIDER is "resend" but RESEND_API_KEY is not configured in server environment.`;
       console.warn(`[Email Warning] ${errorMsg} Skipped sending to ${recipientEmail}.`);
-      return { success: false, error: errorMsg };
+      return { success: false, error: errorMsg, errorCategory: "temporary", retryAfterSeconds: 300 };
     }
 
     try {
@@ -131,18 +155,47 @@ export async function sendEmail(
         body: JSON.stringify({
           from: sender.raw,
           to: [recipientEmail],
+          reply_to: replyTo.raw,
           subject: rendered.subject,
           text: rendered.text,
           html: rendered.html,
         }),
       });
 
-      const data = (await response.json()) as { id?: string; message?: string; name?: string };
+      const data = (await response.json()) as { id?: string; message?: string; name?: string; statusCode?: number };
 
       if (!response.ok) {
-        const errorMsg = data.message || `Resend API returned status ${response.status}`;
-        console.error(`[Resend Error] Failed sending email to ${recipientEmail}:`, errorMsg);
-        return { success: false, error: errorMsg };
+        const rawMsg = data.message || `Resend API returned status ${response.status}`;
+        const errorMsg = sanitizeErrorMessage(rawMsg);
+        const statusCode = response.status;
+
+        const isDaily = /daily|quota|plan\s*limit|limit\s*reached/i.test(rawMsg);
+        let errorCategory: EmailErrorCategory = "temporary";
+        let retryAfterSeconds = 300;
+
+        if (statusCode === 429) {
+          errorCategory = isDaily ? "daily_quota" : "rate_limited";
+          const retryHeader = response.headers.get("retry-after");
+          if (retryHeader) {
+            const parsed = parseInt(retryHeader, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+              retryAfterSeconds = Math.min(parsed, 3600);
+            }
+          } else {
+            retryAfterSeconds = isDaily ? 21600 : 60; // 6 hours for daily, 60s for burst
+          }
+        } else if (statusCode === 402 || (statusCode === 403 && isDaily)) {
+          errorCategory = "daily_quota";
+          retryAfterSeconds = 21600;
+        } else if (statusCode >= 400 && statusCode < 500) {
+          // 400 Bad Request, 422 Invalid Recipient Address, etc.
+          errorCategory = "permanent";
+        } else {
+          errorCategory = "temporary";
+        }
+
+        console.error(`[Resend Error] Failed sending email to ${recipientEmail}: [${errorCategory}] ${errorMsg}`);
+        return { success: false, error: errorMsg, errorCategory, retryAfterSeconds };
       }
 
       return {
@@ -150,13 +203,14 @@ export async function sendEmail(
         messageId: data.id || `resend-${Date.now()}`,
       };
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorMessage = sanitizeErrorMessage(err instanceof Error ? err.message : String(err));
       console.error(`[Resend Error] Network error sending to ${recipientEmail}:`, errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: errorMessage, errorCategory: "temporary", retryAfterSeconds: 300 };
     }
   }
 
   // 2. Brevo (Sendinblue) REST API
+  // Free tier: 300 emails/day, ~10 req/sec rate limit
   if (provider === "brevo") {
     const apiKey = resolveEmailEnv("BREVO_API_KEY");
     if (!apiKey) {
@@ -165,7 +219,7 @@ export async function sendEmail(
       }
       const errorMsg = `EMAIL_PROVIDER is "brevo" but BREVO_API_KEY is not configured in server environment.`;
       console.warn(`[Email Warning] ${errorMsg} Skipped sending to ${recipientEmail}.`);
-      return { success: false, error: errorMsg };
+      return { success: false, error: errorMsg, errorCategory: "temporary", retryAfterSeconds: 300 };
     }
 
     try {
@@ -179,6 +233,7 @@ export async function sendEmail(
         body: JSON.stringify({
           sender: { name: sender.name, email: sender.email },
           to: [{ email: recipientEmail }],
+          replyTo: { email: replyTo.email, name: replyTo.name },
           subject: rendered.subject,
           textContent: rendered.text,
           htmlContent: rendered.html,
@@ -188,9 +243,39 @@ export async function sendEmail(
       const data = (await response.json()) as { messageId?: string; message?: string; code?: string };
 
       if (!response.ok) {
-        const errorMsg = data.message || `Brevo API returned status ${response.status}`;
-        console.error(`[Brevo Error] Failed sending email to ${recipientEmail}:`, errorMsg);
-        return { success: false, error: errorMsg };
+        const rawMsg = data.message || data.code || `Brevo API returned status ${response.status}`;
+        const errorMsg = sanitizeErrorMessage(rawMsg);
+        const statusCode = response.status;
+
+        const isDaily =
+          /credits?|quota|daily|plan/i.test(rawMsg) ||
+          data.code === "not_enough_credits" ||
+          data.code === "quota_exceeded";
+        let errorCategory: EmailErrorCategory = "temporary";
+        let retryAfterSeconds = 300;
+
+        if (statusCode === 429) {
+          errorCategory = isDaily ? "daily_quota" : "rate_limited";
+          const retryHeader = response.headers.get("retry-after");
+          if (retryHeader) {
+            const parsed = parseInt(retryHeader, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+              retryAfterSeconds = Math.min(parsed, 3600);
+            }
+          } else {
+            retryAfterSeconds = isDaily ? 21600 : 60;
+          }
+        } else if (statusCode === 402 || (statusCode === 400 && isDaily)) {
+          errorCategory = "daily_quota";
+          retryAfterSeconds = 21600;
+        } else if (statusCode >= 400 && statusCode < 500) {
+          errorCategory = "permanent";
+        } else {
+          errorCategory = "temporary";
+        }
+
+        console.error(`[Brevo Error] Failed sending email to ${recipientEmail}: [${errorCategory}] ${errorMsg}`);
+        return { success: false, error: errorMsg, errorCategory, retryAfterSeconds };
       }
 
       return {
@@ -198,9 +283,9 @@ export async function sendEmail(
         messageId: data.messageId || `brevo-${Date.now()}`,
       };
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorMessage = sanitizeErrorMessage(err instanceof Error ? err.message : String(err));
       console.error(`[Brevo Error] Network error sending to ${recipientEmail}:`, errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: errorMessage, errorCategory: "temporary", retryAfterSeconds: 300 };
     }
   }
 
@@ -218,5 +303,7 @@ export async function sendEmail(
   return {
     success: false,
     error: errorMsg,
+    errorCategory: "temporary",
+    retryAfterSeconds: 300,
   };
 }

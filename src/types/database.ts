@@ -1047,6 +1047,8 @@ export interface EmailOutboxRow {
   dedupe_key: string | null;
   created_at: string;
   sent_at: string | null;
+  claimed_at?: string | null;
+  retry_after?: string | null;
 }
 
 export interface DisputeListItem {
@@ -1788,6 +1790,8 @@ export interface Database {
           dedupe_key?: string | null;
           created_at?: string;
           sent_at?: string | null;
+          claimed_at?: string | null;
+          retry_after?: string | null;
         };
         Update: Partial<EmailOutboxRow>;
         Relationships: [];
@@ -2770,6 +2774,9 @@ export interface Database {
           p_email_id: string;
           p_success: boolean;
           p_error?: string | null;
+          p_is_rate_limited?: boolean;
+          p_retry_after?: string | null;
+          p_is_permanent?: boolean;
         };
         Returns: {
           success: boolean;
