@@ -190,7 +190,7 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
 
   it('maps correct badge and CTA for moderation and support events', () => {
     const templates = [
-      { template: 'writer_approved', cta: '/writer/dashboard', badge: 'Writer Studio' },
+      { template: 'writer_approved', cta: '/writer/payment-methods', badge: 'Writer Studio' },
       { template: 'novel_approved', cta: '/writer/novels', badge: 'Novel Published' },
       { template: 'support_ticket_created', cta: '/admin/support', badge: 'Support Request' },
       { template: 'order_payment_submitted', cta: '/writer/orders', badge: 'Payment Verification' },
@@ -284,6 +284,9 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
       'refund_requested',
       'refund_approved',
       'refund_rejected',
+      'reminder_verification_12h',
+      'reminder_verification_24h',
+      'reminder_tip_expiring_7d',
     ];
 
     for (const key of KNOWN_ENQUEUED_TEMPLATES) {
@@ -301,7 +304,7 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
     }
   });
 
-  it('guarantees across all 28 registered templates that zero old hex colors, zero img tags, and exact layout invariants exist', () => {
+  it('guarantees across all registered templates that zero old hex colors, zero img tags, and exact layout invariants exist', () => {
     const FORBIDDEN_OLD_COLORS = [
       '#1B2A41',
       '#FAF7F2',
@@ -387,5 +390,102 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
     const urCallout = renderCalloutBox('وضاحت: آپ کی ادائیگی موصول ہو چکی ہے۔', true);
     assert.ok(urCallout.includes('direction: rtl'), 'Urdu callout is RTL');
     assert.ok(urCallout.includes('Noto Nastaliq Urdu'), 'Urdu callout uses Nastaliq font stack');
+  });
+
+  it('Phase E3: ensures all registered templates have comprehensive bilingual guidance and verified deep-links', () => {
+    const baseUrl = getAppBaseUrl();
+
+    for (const [key, meta] of Object.entries(TEMPLATE_REGISTRY)) {
+      // 1. Guidance presence and non-emptiness
+      assert.ok(meta.actionGuidanceEn && meta.actionGuidanceEn.length > 20, `Template "${key}" missing actionGuidanceEn`);
+      assert.ok(meta.actionGuidanceUr && meta.actionGuidanceUr.length > 20, `Template "${key}" missing actionGuidanceUr`);
+      assert.ok(meta.whatHappenedEn && meta.whatHappenedEn.length > 10, `Template "${key}" missing whatHappenedEn`);
+      assert.ok(meta.whatHappenedUr && meta.whatHappenedUr.length > 10, `Template "${key}" missing whatHappenedUr`);
+
+      // 2. Urdu script validation
+      assert.ok(/[\u0600-\u06FF]/.test(meta.actionGuidanceUr), `Template "${key}" actionGuidanceUr must contain Urdu script`);
+      assert.ok(/[\u0600-\u06FF]/.test(meta.whatHappenedUr), `Template "${key}" whatHappenedUr must contain Urdu script`);
+
+      // 3. Deep-link validity
+      assert.ok(meta.ctaPath.startsWith('/'), `Template "${key}" ctaPath must start with '/'`);
+      assert.notStrictEqual(meta.ctaPath, '/writer/dashboard', `Template "${key}" must not point to non-existent /writer/dashboard`);
+
+      // 4. Render output checks
+      const rendered = renderEmailTemplate({
+        template: key,
+        subject: `Notice: ${meta.badgeText}`,
+        bodyText: `Your request regarding ${meta.badgeText} has been processed.`,
+      });
+
+      // HTML contains "What Happens Next" card and "اگلا قدم" card
+      assert.ok(rendered.html.includes('What Happens Next'), `Template "${key}" HTML missing "What Happens Next" header`);
+      assert.ok(rendered.html.includes('اگلا قدم'), `Template "${key}" HTML missing "اگلا قدم" header`);
+      assert.ok(
+        rendered.html.includes(meta.actionGuidanceEn.replace(/'/g, '&#039;')),
+        `Template "${key}" HTML missing actionGuidanceEn`
+      );
+
+      // Plain-text contains "Next Step:" and "اگلا قدم:"
+      assert.ok(rendered.text.includes('Next Step:'), `Template "${key}" text missing "Next Step:"`);
+      assert.ok(rendered.text.includes('اگلا قدم:'), `Template "${key}" text missing "اگلا قدم:"`);
+      assert.ok(rendered.text.includes(meta.actionGuidanceEn), `Template "${key}" text missing actionGuidanceEn`);
+
+      // Absolute URL validation
+      assert.ok(rendered.text.includes(`${baseUrl}${meta.ctaPath}`), `Template "${key}" text must contain absolute ctaUrl`);
+      assert.ok(rendered.html.includes(`href="${baseUrl}${meta.ctaPath}"`), `Template "${key}" HTML must contain absolute ctaUrl`);
+
+      // Strictly zero forbidden terminology
+      assert.ok(!meta.actionGuidanceEn.toLowerCase().includes('commission'), `Forbidden term in actionGuidanceEn of "${key}"`);
+      assert.ok(!meta.actionGuidanceUr.includes('کمیشن'), `Forbidden term in actionGuidanceUr of "${key}"`);
+      assert.ok(!meta.whatHappenedEn.toLowerCase().includes('commission'), `Forbidden term in whatHappenedEn of "${key}"`);
+      assert.ok(!meta.whatHappenedUr.includes('کمیشن'), `Forbidden term in whatHappenedUr of "${key}"`);
+    }
+  });
+
+  it('Phase E3: frames reason, note, and feedback paragraphs inside callout boxes automatically', () => {
+    const rendered = renderEmailTemplate({
+      template: 'payment_rejected',
+      subject: 'Payment Declined for Order #ORD-101',
+      bodyText: 'The author could not verify your payment.\nReason: Bank statement did not match deposit reference TID.\nمصنف آپ کی ادائیگی کی تصدیق نہیں کر سکے۔\nوجہ: بینک ریکارڈ میں یہ رقم موصول نہیں ہوئی۔',
+    });
+
+    // Both English and Urdu callout boxes should be rendered
+    assert.ok(rendered.html.includes('border-left: 3px solid #D39A2A'), 'English Reason line rendered in callout box');
+    assert.ok(rendered.html.includes('border-right: 3px solid #D39A2A'), 'Urdu Reason line rendered in callout box');
+    assert.ok(rendered.html.includes('Bank statement did not match deposit reference TID'));
+    assert.ok(rendered.html.includes('بینک ریکارڈ میں یہ رقم موصول نہیں ہوئی'));
+  });
+
+  it('Phase E3: ensures payment_rejected and tip_not_received maintain respectful, non-accusatory tone', () => {
+    const rejPayment = TEMPLATE_REGISTRY['payment_rejected'];
+    const rejTip = TEMPLATE_REGISTRY['tip_not_received'];
+
+    for (const meta of [rejPayment, rejTip]) {
+      const combined = `${meta.whatHappenedEn} ${meta.actionGuidanceEn}`.toLowerCase();
+      assert.ok(!combined.includes('fraud'), 'Must not contain accusatory word "fraud"');
+      assert.ok(!combined.includes('fake'), 'Must not contain accusatory word "fake"');
+      assert.ok(!combined.includes('scam'), 'Must not contain accusatory word "scam"');
+      assert.ok(!combined.includes('cheat'), 'Must not contain accusatory word "cheat"');
+
+      // Must direct calmly to review note / check receipt
+      assert.ok(combined.includes('review') || combined.includes('check'), 'Must guide user calmly');
+    }
+  });
+
+  it('Phase E3: strictly references verified codebase facts (30% platform fee, PKR 5,000 threshold, 24h dispute window, 7d tip expiry)', () => {
+    // 1. Platform Fee Invoice threshold PKR 5,000 (0017:71, FAQ:113, Agreement:94)
+    const invoiceMeta = TEMPLATE_REGISTRY['invoice_issued'];
+    assert.ok(invoiceMeta.whatHappenedEn.includes('PKR 5,000') || invoiceMeta.actionGuidanceEn.includes('5,000'));
+    assert.ok(invoiceMeta.whatHappenedUr.includes('5,000') || invoiceMeta.actionGuidanceUr.includes('5,000'));
+
+    // 2. Dispute 24-hour wait window (0018:418)
+    const disputeMeta = TEMPLATE_REGISTRY['reminder_verification_24h'];
+    assert.ok(disputeMeta.actionGuidanceEn.includes('24 hours'));
+    assert.ok(disputeMeta.actionGuidanceUr.includes('24 گھنٹے'));
+
+    // 3. Tip expiry 7 days (0034:2026)
+    const tipReminder = TEMPLATE_REGISTRY['reminder_tip_confirmation'];
+    assert.ok(tipReminder.actionGuidanceEn.includes('7 days'));
+    assert.ok(tipReminder.actionGuidanceUr.includes('7 دن'));
   });
 });

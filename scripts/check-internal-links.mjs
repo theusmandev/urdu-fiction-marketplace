@@ -128,7 +128,7 @@ for (const file of allFiles) {
       // href="..." or href='...' or href={`...`}
       /(?:href|to|url)\s*=\s*["']([^"']+)["']/g,
       /(?:href|to|url)\s*=\s*\{`([^`]+)`\}/g,
-      /(?:href|to|url)\s*:\s*["']([^"']+)["']/g,
+      /(?:href|to|url|ctaPath)\s*:\s*["']([^"']+)["']/g,
       /(?:href|to|url)\s*:\s*`([^`]+)`/g,
       // router.push("..."), router.push(`...`), redirect("..."), redirect(`...`)
       /(?:router\.(?:push|replace)|redirect)\s*\(\s*["']([^"']+)["']/g,
