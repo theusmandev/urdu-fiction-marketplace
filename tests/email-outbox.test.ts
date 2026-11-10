@@ -10,6 +10,7 @@ import { dispatchPendingEmails } from '../src/lib/email/dispatch-outbox.ts';
 import {
   sanitizeEmailContent,
   renderEmailTemplate,
+  renderCalloutBox,
   getAppBaseUrl,
   TEMPLATE_REGISTRY,
 } from '../src/lib/email/templates.ts';
@@ -113,7 +114,7 @@ describe('Sensitive Token Redaction Invariant (sanitizeEmailContent)', () => {
 });
 
 describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () => {
-  it('renders official UNB Premium aesthetic tokens (Warm Ivory, Deep Navy, Antique Gold)', () => {
+  it('renders official UNB Premium aesthetic tokens (Sand Canvas, Warm Brown, Gold, Nastaliq)', () => {
     const rendered = renderEmailTemplate({
       template: 'payment_verified',
       subject: 'Novel Access Unlocked | ناول ان لاک ہو گیا',
@@ -121,17 +122,27 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
       recipientEmail: 'reader@example.com',
     });
 
-    // Aesthetic token checks
-    assert.ok(rendered.html.includes('#FAF7F2'), 'Includes Warm Ivory background (#FAF7F2)');
+    // Approved Reference Aesthetic token checks
+    assert.ok(rendered.html.includes('#F1ECDF'), 'Includes Sand Canvas background (#F1ECDF)');
     assert.ok(rendered.html.includes('#FFFFFF'), 'Includes Crisp White card (#FFFFFF)');
-    assert.ok(rendered.html.includes('#1B2A41'), 'Includes Deep Navy banner (#1B2A41)');
-    assert.ok(rendered.html.includes('#C8A96B'), 'Includes Antique Gold trim/border (#C8A96B)');
-    assert.ok(rendered.html.includes('#E6DEC8'), 'Includes Warm Cream border (#E6DEC8)');
+    assert.ok(rendered.html.includes('#813B09'), 'Includes Brand Brown header & button (#813B09)');
+    assert.ok(rendered.html.includes('#5F2F16'), 'Includes Dark Brown header badge (#5F2F16)');
+    assert.ok(rendered.html.includes('#D39A2A'), 'Includes Gold badge border & dashes (#D39A2A)');
+    assert.ok(rendered.html.includes('#E6DFD0'), 'Includes Warm Cream border & dividers (#E6DFD0)');
+    assert.ok(rendered.html.includes('#8E6410'), 'Includes High-contrast Gold links (#8E6410)');
+    assert.ok(rendered.html.includes('#22262B'), 'Includes Dark Slate body text (#22262B)');
+    assert.ok(rendered.html.includes('#5B6470'), 'Includes Muted Neutral secondary text (#5B6470)');
 
-    // Nastaliq RTL typography
-    assert.ok(rendered.html.includes('direction: rtl'));
-    assert.ok(rendered.html.includes('Gulzar'));
-    assert.ok(rendered.html.includes('Noto Nastaliq Urdu'));
+    // Typography & layout checks
+    assert.ok(rendered.html.includes('Georgia'), 'Uses Georgia editorial serif for brand title');
+    assert.ok(rendered.html.includes('dir="rtl"'), 'Urdu block has dir="rtl"');
+    assert.ok(rendered.html.includes('lang="ur"'), 'Urdu block has lang="ur"');
+    assert.ok(rendered.html.includes('Noto Nastaliq Urdu'), 'Includes Noto Nastaliq Urdu in font stack');
+    assert.ok(!rendered.html.includes('<img'), 'Contains zero <img> tags');
+
+    // Preheader & Fallback Link
+    assert.ok(rendered.html.includes('mso-hide: all'), 'Includes hidden preheader for email clients');
+    assert.ok(rendered.html.includes('Button not working?'), 'Includes plain fallback link block');
 
     // Category badge & CTA
     assert.ok(rendered.html.includes('Novel Unlocked'));
@@ -140,7 +151,7 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
     assert.ok(rendered.html.includes('Open My Library'));
 
     // Plain text representation
-    assert.ok(rendered.text.includes('UNB Premium'));
+    assert.ok(rendered.text.includes('Urdu Novel Bank Premium'));
     assert.ok(rendered.text.includes('/account/notifications'));
     assert.ok(rendered.text.includes('/library'));
   });
@@ -288,5 +299,93 @@ describe('Luxury Bilingual Email Template Rendering (renderEmailTemplate)', () =
       assert.ok(!meta.badgeUrdu.includes('کمیشن'), `Forbidden term in badgeUrdu of "${key}"`);
       assert.ok(!meta.ctaLabel.toLowerCase().includes('commission'), `Forbidden term in ctaLabel of "${key}"`);
     }
+  });
+
+  it('guarantees across all 28 registered templates that zero old hex colors, zero img tags, and exact layout invariants exist', () => {
+    const FORBIDDEN_OLD_COLORS = [
+      '#1B2A41',
+      '#FAF7F2',
+      '#C8A96B',
+      '#1F2430',
+      '#333F4D',
+      '#E6DEC8',
+      '#EFE8DA',
+      '#735118',
+      '#5F6673',
+    ];
+
+    for (const [key, meta] of Object.entries(TEMPLATE_REGISTRY)) {
+      const rendered = renderEmailTemplate({
+        template: key,
+        subject: `Operational Test: ${meta.badgeText}`,
+        bodyText: `English description for ${meta.badgeText}.\nیہ اردو متن کی آزمائش ہے۔`,
+        recipientEmail: 'test@example.com',
+      });
+
+      // 1. Zero old colors
+      for (const oldColor of FORBIDDEN_OLD_COLORS) {
+        assert.ok(
+          !rendered.html.includes(oldColor),
+          `Template "${key}" contains forbidden legacy color ${oldColor}`
+        );
+      }
+
+      // 2. Zero <img> tags
+      assert.ok(
+        !rendered.html.includes('<img'),
+        `Template "${key}" must not contain raster <img> tags`
+      );
+
+      // 3. Hidden Preheader
+      assert.ok(
+        rendered.html.includes('mso-hide: all') && rendered.html.includes('display: none'),
+        `Template "${key}" must contain hidden preheader block`
+      );
+
+      // 4. Exactly ONE Primary CTA button
+      const ctaMatches = (rendered.html.match(/class="unb-btn"/g) || []).length;
+      assert.strictEqual(
+        ctaMatches,
+        1,
+        `Template "${key}" must contain exactly 1 primary CTA button (found ${ctaMatches})`
+      );
+
+      // 5. Plain-text Fallback URL
+      assert.ok(
+        rendered.html.includes('Button not working? Copy and paste this link into your browser:'),
+        `Template "${key}" must contain plain fallback URL block`
+      );
+
+      // 6. Urdu Block
+      assert.ok(
+        rendered.html.includes('dir="rtl"') && rendered.html.includes('lang="ur"'),
+        `Template "${key}" must contain an Urdu block with dir="rtl" and lang="ur"`
+      );
+
+      // 7. Approved Palette Tokens Present
+      assert.ok(rendered.html.includes('#F1ECDF'), `Template "${key}" must have canvas #F1ECDF`);
+      assert.ok(rendered.html.includes('#FFFFFF'), `Template "${key}" must have card #FFFFFF`);
+      assert.ok(rendered.html.includes('#813B09'), `Template "${key}" must have brand brown #813B09`);
+      assert.ok(rendered.html.includes('#5F2F16'), `Template "${key}" must have badge fill #5F2F16`);
+      assert.ok(rendered.html.includes('#D39A2A'), `Template "${key}" must have gold accent #D39A2A`);
+      assert.ok(rendered.html.includes('#E6DFD0'), `Template "${key}" must have divider border #E6DFD0`);
+
+      // 8. Plain-text alternative exists and is complete
+      assert.ok(rendered.text.length > 50, `Template "${key}" plain-text alternative is too short`);
+      assert.ok(rendered.text.includes(meta.badgeText), `Template "${key}" plain-text missing badgeText`);
+      assert.ok(rendered.text.includes('premium.urdunovelbanks.com'), `Template "${key}" plain-text missing host`);
+    }
+  });
+
+  it('renders reusable callout boxes with high-contrast warm styling', () => {
+    const enCallout = renderCalloutBox('Notice: payment submitted for verification.', false);
+    assert.ok(enCallout.includes('#FAF6EE'), 'Callout uses soft cream background');
+    assert.ok(enCallout.includes('border-left: 3px solid #D39A2A'), 'Callout uses gold left accent');
+    assert.ok(enCallout.includes('#22262B'), 'Callout uses high-contrast text');
+    assert.ok(enCallout.includes('direction: ltr'), 'English callout is LTR');
+
+    const urCallout = renderCalloutBox('وضاحت: آپ کی ادائیگی موصول ہو چکی ہے۔', true);
+    assert.ok(urCallout.includes('direction: rtl'), 'Urdu callout is RTL');
+    assert.ok(urCallout.includes('Noto Nastaliq Urdu'), 'Urdu callout uses Nastaliq font stack');
   });
 });
