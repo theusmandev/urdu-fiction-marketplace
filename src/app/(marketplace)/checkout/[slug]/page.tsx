@@ -64,7 +64,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     );
   }
 
-  if (!novel || novel.status !== 'published') {
+  if (!novel || novel.status !== 'published' || !publicNovel) {
     notFound();
   }
 

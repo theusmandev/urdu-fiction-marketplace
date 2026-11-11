@@ -40,6 +40,21 @@ export async function createOrderAction(
     }
 
     const supabase = await createClient();
+
+    // Verify novel is published and writer is approved and active in public catalog
+    const { data: publicNovel, error: publicNovelError } = await supabase
+      .from('public_novels')
+      .select('id')
+      .eq('id', parsed.data.novelId)
+      .maybeSingle();
+
+    if (publicNovelError || !publicNovel) {
+      return {
+        success: false,
+        error: 'This novel is currently unavailable for purchase.',
+      };
+    }
+
     const { data, error } = await supabase.rpc('create_order', {
       p_novel_id: parsed.data.novelId,
       p_payment_method_id: parsed.data.paymentMethodId,
@@ -47,6 +62,15 @@ export async function createOrderAction(
 
     if (error) {
       const msg = error.message.toLowerCase();
+      if (
+        msg.includes('not eligible to receive orders') ||
+        msg.includes('not available for purchase')
+      ) {
+        return {
+          success: false,
+          error: 'This novel is currently unavailable for purchase.',
+        };
+      }
       if (msg.includes('rate limit exceeded')) {
         return {
           success: false,

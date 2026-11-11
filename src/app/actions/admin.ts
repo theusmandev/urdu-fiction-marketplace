@@ -31,6 +31,119 @@ export interface ActionResult<T = unknown> {
   error?: string;
 }
 
+/**
+ * Shared cache invalidation helper for public marketplace routes.
+ * Ensures ISR static pages and dynamic routes are purged when novels or writers change status.
+ */
+export async function revalidatePublicMarketplacePaths(options?: {
+  novelSlug?: string;
+  novelSlugs?: string[];
+  genreSlug?: string;
+  writerUsername?: string;
+}) {
+  try {
+    revalidatePath('/', 'layout');
+    revalidatePath('/');
+    revalidatePath('/novels');
+    revalidatePath('/writers');
+    revalidatePath('/sitemap.xml');
+
+    const slugs = new Set<string>();
+    if (options?.novelSlug) slugs.add(options.novelSlug);
+    if (options?.novelSlugs) {
+      for (const s of options.novelSlugs) {
+        if (s) slugs.add(s);
+      }
+    }
+
+    for (const slug of slugs) {
+      revalidatePath(`/novels/${slug}`);
+      revalidatePath(`/checkout/${slug}`);
+      revalidatePath(`/novels/${slug}/read`, 'layout');
+    }
+
+    if (options?.genreSlug) {
+      revalidatePath(`/genres/${options.genreSlug}`);
+    }
+
+    if (options?.writerUsername) {
+      revalidatePath(`/writers/${options.writerUsername}`);
+    }
+  } catch (err) {
+    console.error('[revalidatePublicMarketplacePaths] error during revalidation:', err);
+  }
+}
+
+async function getNovelAndWriterMetadata(
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
+  novelId: string
+): Promise<{ novelSlug?: string; writerUsername?: string }> {
+  try {
+    const { data: novelData, error: novelError } = await supabase
+      .from('novels')
+      .select('slug, writer_id')
+      .eq('id', novelId)
+      .maybeSingle();
+
+    if (novelError) {
+      console.error('[getNovelAndWriterMetadata] novel query error:', novelError.code, novelError.message);
+      return {};
+    }
+
+    if (!novelData) return {};
+
+    let writerUsername: string | undefined;
+    if (novelData.writer_id) {
+      const { data: writer, error: writerError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', novelData.writer_id)
+        .maybeSingle();
+
+      if (writerError) {
+        console.error('[getNovelAndWriterMetadata] writer query error:', writerError.code, writerError.message);
+      } else if (writer?.username) {
+        writerUsername = writer.username;
+      }
+    }
+
+    return { novelSlug: novelData.slug, writerUsername };
+  } catch (err) {
+    console.error('[getNovelAndWriterMetadata] unexpected error:', err);
+    return {};
+  }
+}
+
+async function getWriterMetadataAndNovels(
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
+  writerId: string
+): Promise<{ writerUsername?: string; novelSlugs: string[] }> {
+  try {
+    const [profileRes, novelsRes] = await Promise.all([
+      supabase.from('profiles').select('username').eq('id', writerId).maybeSingle(),
+      supabase.from('novels').select('slug').eq('writer_id', writerId),
+    ]);
+
+    const { data: writerProfile, error: profileError } = profileRes;
+    const { data: writerNovels, error: novelsError } = novelsRes;
+
+    if (profileError) {
+      console.error('[getWriterMetadataAndNovels] profile query error:', profileError.code, profileError.message);
+    }
+    if (novelsError) {
+      console.error('[getWriterMetadataAndNovels] novels query error:', novelsError.code, novelsError.message);
+    }
+
+    return {
+      writerUsername: writerProfile?.username,
+      novelSlugs: (writerNovels || []).map((n) => n.slug),
+    };
+  } catch (err) {
+    console.error('[getWriterMetadataAndNovels] unexpected error:', err);
+    return { novelSlugs: [] };
+  }
+}
+
 // -----------------------------------------------------------------------------
 // 1. WRITER APPROVAL & GOVERNANCE ACTIONS
 // -----------------------------------------------------------------------------
@@ -38,6 +151,8 @@ export interface ActionResult<T = unknown> {
 export async function adminApproveWriterAction(writerId: string): Promise<ActionResult> {
   await requireRole('admin', '/admin');
   const supabase = await createServerClient();
+
+  const { writerUsername, novelSlugs } = await getWriterMetadataAndNovels(supabase, writerId);
 
   const { error } = await supabase.rpc('approve_writer', {
     p_writer_id: writerId,
@@ -50,6 +165,11 @@ export async function adminApproveWriterAction(writerId: string): Promise<Action
   revalidatePath('/admin');
   revalidatePath('/admin/writers');
   revalidatePath(`/admin/writers/${writerId}`);
+
+  await revalidatePublicMarketplacePaths({
+    writerUsername,
+    novelSlugs,
+  });
 
   try {
     await dispatchPendingEmails(5);
@@ -71,6 +191,9 @@ export async function adminRejectWriterAction(
   }
 
   const supabase = await createServerClient();
+
+  const { writerUsername, novelSlugs } = await getWriterMetadataAndNovels(supabase, parsed.data.writerId);
+
   const { error } = await supabase.rpc('reject_writer', {
     p_writer_id: parsed.data.writerId,
     p_reason: parsed.data.reason,
@@ -83,6 +206,11 @@ export async function adminRejectWriterAction(
   revalidatePath('/admin');
   revalidatePath('/admin/writers');
   revalidatePath(`/admin/writers/${writerId}`);
+
+  await revalidatePublicMarketplacePaths({
+    writerUsername,
+    novelSlugs,
+  });
 
   try {
     await dispatchPendingEmails(5);
@@ -104,6 +232,9 @@ export async function adminSuspendWriterAction(
   }
 
   const supabase = await createServerClient();
+
+  const { writerUsername, novelSlugs } = await getWriterMetadataAndNovels(supabase, parsed.data.writerId);
+
   const { error } = await supabase.rpc('suspend_writer', {
     p_writer_id: parsed.data.writerId,
     p_reason: parsed.data.reason,
@@ -116,6 +247,12 @@ export async function adminSuspendWriterAction(
   revalidatePath('/admin');
   revalidatePath('/admin/writers');
   revalidatePath(`/admin/writers/${writerId}`);
+
+  await revalidatePublicMarketplacePaths({
+    writerUsername,
+    novelSlugs,
+  });
+
   return { success: true };
 }
 
@@ -166,6 +303,8 @@ export async function adminApproveNovelAction(
   await requireRole('admin', '/admin');
   const supabase = await createServerClient();
 
+  const { novelSlug, writerUsername } = await getNovelAndWriterMetadata(supabase, novelId);
+
   const { error } = await supabase.rpc('approve_novel', {
     p_novel_id: novelId,
     p_checklist: checklist ? (checklist as Record<string, boolean>) : null,
@@ -178,6 +317,11 @@ export async function adminApproveNovelAction(
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  await revalidatePublicMarketplacePaths({
+    novelSlug,
+    writerUsername,
+  });
 
   try {
     await dispatchPendingEmails(5);
@@ -199,6 +343,9 @@ export async function adminRejectNovelAction(
   }
 
   const supabase = await createServerClient();
+
+  const { novelSlug, writerUsername } = await getNovelAndWriterMetadata(supabase, parsed.data.novelId);
+
   const { error } = await supabase.rpc('reject_novel', {
     p_novel_id: parsed.data.novelId,
     p_reason: parsed.data.reason,
@@ -211,6 +358,11 @@ export async function adminRejectNovelAction(
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  await revalidatePublicMarketplacePaths({
+    novelSlug,
+    writerUsername,
+  });
 
   try {
     await dispatchPendingEmails(5);
@@ -232,6 +384,9 @@ export async function adminSuspendNovelAction(
   }
 
   const supabase = await createServerClient();
+
+  const { novelSlug, writerUsername } = await getNovelAndWriterMetadata(supabase, parsed.data.novelId);
+
   const { error } = await supabase.rpc('suspend_novel', {
     p_novel_id: parsed.data.novelId,
     p_reason: parsed.data.reason,
@@ -244,6 +399,12 @@ export async function adminSuspendNovelAction(
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  await revalidatePublicMarketplacePaths({
+    novelSlug,
+    writerUsername,
+  });
+
   return { success: true };
 }
 
@@ -255,6 +416,9 @@ export async function adminUnsuspendNovelAction(novelId: string): Promise<Action
   }
 
   const supabase = await createServerClient();
+
+  const { novelSlug, writerUsername } = await getNovelAndWriterMetadata(supabase, parsed.data.novelId);
+
   const { error } = await supabase.rpc('unsuspend_novel', {
     p_novel_id: parsed.data.novelId,
   });
@@ -266,6 +430,12 @@ export async function adminUnsuspendNovelAction(novelId: string): Promise<Action
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  await revalidatePublicMarketplacePaths({
+    novelSlug,
+    writerUsername,
+  });
+
   return { success: true };
 }
 
@@ -280,6 +450,9 @@ export async function adminSetNovelFeaturedAction(
   }
 
   const supabase = await createServerClient();
+
+  const { novelSlug, writerUsername } = await getNovelAndWriterMetadata(supabase, parsed.data.novelId);
+
   const { error } = await supabase.rpc('set_novel_featured', {
     p_novel_id: parsed.data.novelId,
     p_featured: parsed.data.featured,
@@ -292,6 +465,12 @@ export async function adminSetNovelFeaturedAction(
   revalidatePath('/admin');
   revalidatePath('/admin/novels');
   revalidatePath(`/admin/novels/${novelId}`);
+
+  await revalidatePublicMarketplacePaths({
+    novelSlug,
+    writerUsername,
+  });
+
   return { success: true };
 }
 
@@ -496,6 +675,9 @@ export async function adminUpdateUserRoleStatusAction(formData: {
   }
 
   const supabase = await createServerClient();
+
+  const { writerUsername, novelSlugs } = await getWriterMetadataAndNovels(supabase, parsed.data.userId);
+
   const { data, error } = await supabase.rpc('admin_update_user_role_status', {
     p_user_id: parsed.data.userId,
     p_role: parsed.data.role,
@@ -509,6 +691,12 @@ export async function adminUpdateUserRoleStatusAction(formData: {
 
   revalidatePath('/admin');
   revalidatePath('/admin/users');
+
+  await revalidatePublicMarketplacePaths({
+    writerUsername,
+    novelSlugs,
+  });
+
   return { success: true, data };
 }
 

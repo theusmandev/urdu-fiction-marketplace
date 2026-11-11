@@ -640,6 +640,24 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm `column_default` is `true`.
 
+### 51. `supabase/migrations/0051_email_outbox_lease_and_quota_retry.sql` [EMAIL OUTBOX LEASE LOCKING & QUOTA RETRY RESILIENCE]
+- **Purpose**: Eliminates duplicate email dispatch race conditions between immediate Server Action callers and background cron workers using atomic lease locking (`claimed_at`) with `FOR UPDATE OF eo SKIP LOCKED`. Adds `retry_after` column to protect against HTTP 429 rate limits and provider daily quota caps without burning failure attempts.
+- **Action**: Paste contents of `supabase/migrations/0051_email_outbox_lease_and_quota_retry.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'email_outbox' AND column_name IN ('claimed_at', 'retry_after');
+  ```
+  Confirm both columns exist.
+
+### 52. `supabase/migrations/0052_harden_suspended_writer_and_novel_visibility.sql` [HARDEN SUSPENDED WRITER & NOVEL VISIBILITY]
+- **Purpose**: Eliminates public catalog leaks where novels and preview chapters of suspended or inactive writers were readable by unauthenticated visitors. Hardens `public.novels` and `public.chapters` SELECT RLS policies, fixes `public.public_genres` view to strictly count active/approved authors' works, updates `get_chapter_for_reader` free preview access to verify author status, and hardens `create_order` and `create_tip` RPCs while strictly preserving reading access for entitled buyers.
+- **Action**: Paste contents of `supabase/migrations/0052_harden_suspended_writer_and_novel_visibility.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('get_chapter_for_reader', 'create_order', 'create_tip', 'suspend_writer');
+  ```
+  Confirm all exist with `prosecdef = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -766,6 +784,9 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/18_chapter_split_tests.sql` (Writer chapter import & split transactional security and integrity tests)
    - `supabase/tests/19_chapter_drafts_tests.sql` (Chapter drafts & autosave isolation, concurrency, rate limits, and security tests)
    - `supabase/tests/20_tips_tests.sql` (Tip jar & reader appreciation isolation, bounds, rate limits, review flags, and privacy tests)
+   - `supabase/tests/21_site_palette_tests.sql` (Admin curated site palette, settings isolation, and preview tests)
+   - `supabase/tests/22_email_outbox_lease_and_quota_tests.sql` (Email outbox lease locking, duplicate prevention, and quota retry resilience)
+   - `supabase/tests/23_suspended_visibility_tests.sql` (Suspended writer & novel visibility hardening, catalog exclusion, and entitlement preservation)
 3. Run automated Node.js unit tests:
    ```bash
    npm test
