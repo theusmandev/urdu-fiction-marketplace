@@ -285,12 +285,13 @@ export async function getFreePreviewChapter(
 /**
  * Fetches public writers directory (approved writers with >= 1 published novel).
  */
-export async function getPublicWriters(limit = 24): Promise<PublicWriter[]> {
+export async function getPublicWriters(limit = 100): Promise<PublicWriter[]> {
   try {
     const supabase = getPublicSupabase();
     const { data, error } = await supabase
       .from("public_writers")
       .select("*")
+      .gt("published_novels_count", 0)
       .order("published_novels_count", { ascending: false })
       .limit(limit);
 
@@ -302,6 +303,31 @@ export async function getPublicWriters(limit = 24): Promise<PublicWriter[]> {
     return data as PublicWriter[];
   } catch (err) {
     console.error("[getPublicWriters] unexpected error:", err);
+    return [];
+  }
+}
+
+/**
+ * Fetches featured writers with at least one published novel.
+ */
+export async function getFeaturedWriters(limit = 10): Promise<PublicWriter[]> {
+  try {
+    const supabase = getPublicSupabase();
+    const { data, error } = await supabase
+      .from("public_writers")
+      .select("*")
+      .gt("published_novels_count", 0)
+      .order("published_novels_count", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("[getFeaturedWriters] query error:", error.code, error.message);
+      return [];
+    }
+    if (!data) return [];
+    return data as PublicWriter[];
+  } catch (err) {
+    console.error("[getFeaturedWriters] unexpected error:", err);
     return [];
   }
 }

@@ -676,6 +676,15 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm it exists with `prosecdef = true`.
 
+### 55. `supabase/migrations/0055_fix_public_writers_zero_novels.sql` [PUBLIC WRITERS ZERO NOVELS VISIBILITY]
+- **Purpose**: Updates `public.public_writers` view to remove the exclusionary filter `AND (SELECT count(*) ...) > 0`. Ensures that newly approved active writers (`wp.status = 'approved'` and `p.is_active = true`) with 0 published novels have an accessible public profile at `/writers/[username]` without encountering 404 errors, while maintaining strict isolation for suspended or inactive accounts.
+- **Action**: Paste contents of `supabase/migrations/0055_fix_public_writers_zero_novels.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT count(*) FROM public.public_writers;
+  ```
+  Confirm query succeeds and view is selectable by anon/authenticated.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -806,6 +815,7 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/22_email_outbox_lease_and_quota_tests.sql` (Email outbox lease locking, duplicate prevention, and quota retry resilience)
    - `supabase/tests/23_suspended_visibility_tests.sql` (Suspended writer & novel visibility hardening, catalog exclusion, and entitlement preservation)
    - `supabase/tests/24_admin_impersonation_tests.sql` (Admin support impersonation authorization, validation, and audit trail tests)
+   - `supabase/tests/25_public_writers_zero_novels_tests.sql` (Approved writers with zero published novels visibility and suspension isolation tests)
 3. Run automated Node.js unit tests:
    ```bash
    npm test
