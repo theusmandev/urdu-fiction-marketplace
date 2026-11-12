@@ -201,6 +201,14 @@ export const writerActionReasonSchema = z.object({
     .min(3, 'A reason of at least 3 characters is required'),
 });
 
+export const impersonateWriterSchema = z.object({
+  writerId: uuidSchema,
+  reason: z
+    .string()
+    .trim()
+    .min(5, 'A support justification reason of at least 5 characters is required'),
+});
+
 export const retentionSettingsSchema = z.object({
   retention_audit_logs_days: z.coerce
     .number()

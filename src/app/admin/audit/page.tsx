@@ -89,6 +89,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps) {
     'DELETE_GENRE',
     'UPDATE_PLATFORM_SETTINGS',
     'UPDATE_USER_ROLE_STATUS',
+    'GENERATE_IMPERSONATION_LINK',
   ];
 
   const ENTITY_TYPES = ['ALL', 'novels', 'writer_profiles', 'genres', 'platform_settings', 'profiles'];

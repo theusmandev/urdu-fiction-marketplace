@@ -16,12 +16,14 @@ import {
   adminUpdateUserRoleStatusSchema,
   rejectNovelSchema,
   writerActionReasonSchema,
+  impersonateWriterSchema,
   retentionSettingsSchema,
   type RetentionSettingsInput,
   writerAnnouncementSchema,
   type WriterAnnouncementInput,
   dashboardTimeframeSchema,
 } from '@/lib/admin/schemas';
+import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { cleanupOldPaymentProofFiles } from '@/lib/retention/storage-cleanup';
 import type { UserRole, AdminDashboardAnalytics } from '@/types/database';
 
@@ -290,6 +292,109 @@ export async function adminSetWriterCommissionTermsAction(
   revalidatePath('/admin/writers');
   revalidatePath(`/admin/writers/${writerId}`);
   return { success: true, data };
+}
+
+export interface ImpersonationResult {
+  impersonationUrl: string;
+  targetEmail: string;
+}
+
+export async function adminGenerateWriterImpersonationLinkAction(
+  writerId: string,
+  reason: string
+): Promise<ActionResult<ImpersonationResult>> {
+  await requireRole('admin', '/admin');
+
+  const parsed = impersonateWriterSchema.safeParse({ writerId, reason });
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message || 'Validation failed for impersonation link',
+    };
+  }
+
+  const supabase = await createServerClient();
+
+  // 1. Authorize, validate, and record immutable audit log in PostgreSQL
+  const { data: prepareData, error: rpcError } = await supabase.rpc(
+    'admin_prepare_impersonation_link',
+    {
+      p_target_user_id: parsed.data.writerId,
+      p_reason: parsed.data.reason,
+    }
+  );
+
+  if (rpcError) {
+    return {
+      success: false,
+      error: rpcError.message || 'Failed to authorize impersonation link generation',
+    };
+  }
+
+  const targetEmail = prepareData?.email;
+  if (!targetEmail) {
+    return {
+      success: false,
+      error: 'Target account email was not returned by authorization check.',
+    };
+  }
+
+  // 2. Generate magic link using dedicated administrative client
+  let adminClient;
+  try {
+    adminClient = createAdminSupabaseClient();
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : 'Server configuration error: missing admin credentials',
+    };
+  }
+
+  const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
+    type: 'magiclink',
+    email: targetEmail,
+  });
+
+  if (linkError) {
+    return {
+      success: false,
+      error: linkError.message || 'Supabase Auth failed to generate magic link token.',
+    };
+  }
+
+  const hashedToken = linkData?.properties?.hashed_token;
+  if (!hashedToken) {
+    return {
+      success: false,
+      error: 'Failed to obtain secure authentication token from auth provider.',
+    };
+  }
+
+  // 3. Construct direct PKCE-free callback URL
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    'https://premium.urdunovelbanks.com'
+  ).replace(/\/+$/, '');
+
+  const impersonationUrl = `${baseUrl}/auth/callback?token_hash=${encodeURIComponent(
+    hashedToken
+  )}&type=magiclink&next=%2Fwriter`;
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/audit');
+  revalidatePath(`/admin/writers/${parsed.data.writerId}`);
+
+  return {
+    success: true,
+    data: {
+      impersonationUrl,
+      targetEmail,
+    },
+  };
 }
 
 // -----------------------------------------------------------------------------

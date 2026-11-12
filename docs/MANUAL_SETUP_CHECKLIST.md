@@ -667,6 +667,15 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm all three functions exist with `prosecdef = true`.
 
+### 54. `supabase/migrations/0054_admin_impersonation_audit.sql` [ADMIN IMPERSONATION AUDIT & PREPARATION]
+- **Purpose**: Provisions `public.admin_prepare_impersonation_link` RPC to authorize, validate, and audit administrative support impersonation magic links. Enforces caller is an administrator, requires a mandatory justification reason (length >= 5 chars), strictly blocks generating impersonation links for administrator accounts, and permanently records the action in `public.audit_logs`.
+- **Action**: Paste contents of `supabase/migrations/0054_admin_impersonation_audit.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname = 'admin_prepare_impersonation_link';
+  ```
+  Confirm it exists with `prosecdef = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -758,7 +767,7 @@ UNB Premium provides luxury bilingual (English + Urdu Nastaliq RTL) email templa
 2. Populate the required keys:
    - `NEXT_PUBLIC_SUPABASE_URL`: From **Supabase Dashboard -> Project Settings -> API -> Project URL**.
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: From **Supabase Dashboard -> Project Settings -> API -> Project API Keys (anon/public)**.
-   - `SUPABASE_SERVICE_ROLE_KEY`: Server-only administrative key. **Strictly used ONLY by the background cron worker (`src/lib/supabase/cron-client.ts`)** to claim pending outbox emails and record delivery results. Never bundled or exposed in browser JavaScript.
+   - `SUPABASE_SERVICE_ROLE_KEY`: Server-only administrative key. **Strictly used ONLY by the background cron worker (`src/lib/supabase/cron-client.ts`) and authorized Admin server actions (`src/lib/supabase/admin.ts`)** for outbox dispatch and secure support impersonation link generation. For Cloudflare production, configure via `wrangler secret put SUPABASE_SERVICE_ROLE_KEY`. Never bundled or exposed in browser JavaScript.
    - `NEXT_PUBLIC_APP_URL`: Application URL (defaults to `http://localhost:3000`).
    - `CRON_SECRET`: Secret 32+ character bearer token for constant-time authentication of scheduled cron endpoints (`/api/cron/send-emails` and `/api/cron/reminders`).
    - `EMAIL_PROVIDER`: HTTP REST email provider (`resend` or `brevo`). Zero TCP socket dependencies — native to Edge & Cloudflare Workers (workerd).
@@ -796,6 +805,7 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/21_site_palette_tests.sql` (Admin curated site palette, settings isolation, and preview tests)
    - `supabase/tests/22_email_outbox_lease_and_quota_tests.sql` (Email outbox lease locking, duplicate prevention, and quota retry resilience)
    - `supabase/tests/23_suspended_visibility_tests.sql` (Suspended writer & novel visibility hardening, catalog exclusion, and entitlement preservation)
+   - `supabase/tests/24_admin_impersonation_tests.sql` (Admin support impersonation authorization, validation, and audit trail tests)
 3. Run automated Node.js unit tests:
    ```bash
    npm test

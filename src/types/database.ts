@@ -1902,6 +1902,18 @@ export interface Database {
         Args: Record<string, never>;
         Returns: boolean;
       };
+      admin_prepare_impersonation_link: {
+        Args: {
+          p_target_user_id: string;
+          p_reason: string;
+        };
+        Returns: {
+          email: string;
+          role: string;
+          full_name?: string | null;
+          username?: string | null;
+        };
+      };
       is_writer_active_and_approved: {
         Args: { p_writer_id: string };
         Returns: boolean;

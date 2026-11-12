@@ -7,9 +7,20 @@ import {
   adminRejectWriterAction,
   adminSuspendWriterAction,
   adminSetWriterCommissionTermsAction,
+  adminGenerateWriterImpersonationLinkAction,
 } from '@/app/actions/admin';
 import { ReasonConfirmDialog } from './ReasonConfirmDialog';
-import { CheckCircle2, XCircle, AlertOctagon, Sliders, Loader2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  AlertOctagon,
+  Sliders,
+  Loader2,
+  LogIn,
+  Copy,
+  Check,
+  AlertTriangle,
+} from 'lucide-react';
 
 interface WriterActionsProps {
   writerId: string;
@@ -31,8 +42,13 @@ export function WriterActions({
 
   // Modal dialog states
   const [activeDialog, setActiveDialog] = useState<
-    'approve' | 'reject' | 'suspend' | 'terms' | null
+    'approve' | 'reject' | 'suspend' | 'terms' | 'impersonate' | null
   >(null);
+  const [impersonationResult, setImpersonationResult] = useState<{
+    url: string;
+    targetEmail: string;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Commission terms edit form state
   const [rateInput, setRateInput] = useState<string>(
@@ -132,6 +148,28 @@ export function WriterActions({
     }
   };
 
+  const handleGenerateImpersonation = async (reason: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminGenerateWriterImpersonationLinkAction(writerId, reason);
+      if (!res.success || !res.data) {
+        setError(res.error || 'Failed to generate impersonation link');
+      } else {
+        setImpersonationResult({
+          url: res.data.impersonationUrl,
+          targetEmail: res.data.targetEmail,
+        });
+        setCopied(false);
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
+      setActiveDialog(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {error && (
@@ -204,6 +242,19 @@ export function WriterActions({
           <Sliders className="w-4 h-4 text-muted" />
           <span>Edit Platform Fee Terms</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setError(null);
+            setActiveDialog('impersonate');
+          }}
+          disabled={loading}
+          className="px-4 py-2 rounded-xl bg-surface hover:bg-surface-muted text-main border border-border text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+        >
+          <LogIn className="w-4 h-4 text-accent-admin" />
+          <span>Login as Writer</span>
+        </button>
       </div>
 
       {/* Confirmation Dialogs */}
@@ -244,6 +295,20 @@ export function WriterActions({
         requireReason={true}
         isLoading={loading}
         onConfirm={handleSuspend}
+        onCancel={() => setActiveDialog(null)}
+      />
+
+      <ReasonConfirmDialog
+        isOpen={activeDialog === 'impersonate'}
+        title="Generate Support Impersonation Link"
+        description="Generate a secure, audited one-time login link to inspect Writer Studio as this author. Opening the link will authenticate you as the writer without requiring their password."
+        reasonLabel="Support Justification Reason (Mandatory, min 5 chars)"
+        reasonPlaceholder="e.g. Investigating payout verification or chapter editor formatting issue reported by writer..."
+        confirmText="Generate Login Link"
+        confirmVariant="primary"
+        requireReason={true}
+        isLoading={loading}
+        onConfirm={handleGenerateImpersonation}
         onCancel={() => setActiveDialog(null)}
       />
 
@@ -336,6 +401,89 @@ export function WriterActions({
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Impersonation Link Result Modal */}
+      {impersonationResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-surface border border-border rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-accent-admin-light border border-accent-admin-border flex items-center justify-center text-accent-admin shrink-0">
+                <LogIn className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-main">
+                  Support Impersonation Link Ready
+                </h3>
+                <p className="text-xs text-muted mt-0.5 truncate">
+                  Author account: <strong className="text-main font-mono">{impersonationResult.targetEmail}</strong>
+                </p>
+              </div>
+            </div>
+
+            {/* Crucial Incognito Warning Callout */}
+            <div className="p-3.5 rounded-xl bg-warning-soft border border-warning-border text-xs text-accent-strong flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-accent-strong" />
+              <div className="space-y-1">
+                <p className="font-bold">Open in Incognito / Private Window Only</p>
+                <p className="text-[11px] leading-relaxed">
+                  Opening this link in your current browser tab will overwrite your active Admin session with this writer's session. Copy and paste it into a separate Incognito window to safely view their Writer Studio.
+                </p>
+              </div>
+            </div>
+
+            {/* Readonly URL Box */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-muted uppercase tracking-wider block">
+                One-Time Login Link
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={impersonationResult.url}
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                  className="w-full bg-surface-muted border border-border rounded-xl px-3 py-2 text-xs font-mono text-main select-all focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(impersonationResult.url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 3000);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-accent-admin hover:bg-accent-admin-dark text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors shadow-sm"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      <span>Copy Link</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-muted leading-relaxed">
+              This link is single-use and will expire. This action has been permanently recorded in the system audit trail.
+            </p>
+
+            <div className="flex justify-end pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setImpersonationResult(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-main hover:bg-surface-muted border border-border transition-colors bg-surface"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
