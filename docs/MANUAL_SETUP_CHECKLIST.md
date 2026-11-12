@@ -658,6 +658,15 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm all exist with `prosecdef = true`.
 
+### 53. `supabase/migrations/0053_fix_novels_rls_recursion.sql` [FIX NOVELS & ENTITLEMENTS RLS RECURSION]
+- **Purpose**: Eliminates PostgreSQL Error 42P17 (`infinite_recursion`) caused by bidirectional cross-table subqueries between `public.novels` and `public.purchase_entitlements`. Provisions three `SECURITY DEFINER` boundary helpers (`is_writer_active_and_approved`, `is_novel_author`, `is_free_preview_accessible`) that execute with elevated privileges to check cross-table state without triggering recursive RLS re-evaluations or profile lockouts. Recreates SELECT policies on `public.novels`, `public.purchase_entitlements`, and `public.chapters` with clean security boundaries.
+- **Action**: Paste contents of `supabase/migrations/0053_fix_novels_rls_recursion.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('is_writer_active_and_approved', 'is_novel_author', 'is_free_preview_accessible');
+  ```
+  Confirm all three functions exist with `prosecdef = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

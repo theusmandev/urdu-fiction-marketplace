@@ -1902,6 +1902,18 @@ export interface Database {
         Args: Record<string, never>;
         Returns: boolean;
       };
+      is_writer_active_and_approved: {
+        Args: { p_writer_id: string };
+        Returns: boolean;
+      };
+      is_novel_author: {
+        Args: { p_novel_id: string };
+        Returns: boolean;
+      };
+      is_free_preview_accessible: {
+        Args: { p_novel_id: string };
+        Returns: boolean;
+      };
       has_novel_entitlement: {
         Args: { p_novel_id: string };
         Returns: boolean;

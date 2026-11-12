@@ -229,6 +229,66 @@ BEGIN
     ASSERT (v_res->>'access_reason') = 'entitled', 'Test 4d Failed: Paying buyer must keep access even if author profile is deactivated';
 
     -- -------------------------------------------------------------------------
+    -- TEST 5: RLS RECURSION REGRESSION CHECK (PostgreSQL Error 42P17 Prevention)
+    -- -------------------------------------------------------------------------
+    -- Re-approve writer and re-activate profile
+    PERFORM pg_catalog.set_config('role', 'postgres', true);
+    UPDATE public.profiles SET is_active = true WHERE id = v_writer_id;
+    UPDATE public.writer_profiles SET status = 'approved' WHERE id = v_writer_id;
+
+    -- Case 5a: Author querying own novels (Writer Studio -> My Novels)
+    -- This was the exact surface that failed with 42P17 infinite recursion!
+    PERFORM pg_catalog.set_config('request.jwt.claim.sub', v_writer_id::text, true);
+    PERFORM pg_catalog.set_config('role', 'authenticated', true);
+
+    SELECT count(*) INTO v_count FROM public.novels WHERE writer_id = auth.uid();
+    ASSERT v_count = 1, 'Test 5a Failed: Author must be able to query own novels without RLS recursion';
+
+    -- Case 5b: Author querying purchase entitlements for own novels (Verify Payments)
+    SELECT count(*) INTO v_count FROM public.purchase_entitlements WHERE novel_id = v_novel_id;
+    ASSERT v_count >= 1, 'Test 5b Failed: Author must be able to query purchase entitlements without RLS recursion';
+
+    -- Case 5c: Entitled buyer querying novels & purchase entitlements
+    PERFORM pg_catalog.set_config('request.jwt.claim.sub', v_buyer_id::text, true);
+    PERFORM pg_catalog.set_config('role', 'authenticated', true);
+
+    SELECT count(*) INTO v_count FROM public.novels WHERE id = v_novel_id;
+    ASSERT v_count = 1, 'Test 5c Failed: Entitled buyer must be able to query novel without RLS recursion';
+
+    SELECT count(*) INTO v_count FROM public.purchase_entitlements WHERE reader_id = auth.uid();
+    ASSERT v_count >= 1, 'Test 5d Failed: Entitled buyer must be able to query entitlements without RLS recursion';
+
+    -- Case 5d: Anonymous visitor querying published novels and preview chapters
+    PERFORM pg_catalog.set_config('request.jwt.claim.sub', '', true);
+    PERFORM pg_catalog.set_config('role', 'anon', true);
+
+    SELECT count(*) INTO v_count FROM public.novels WHERE id = v_novel_id;
+    ASSERT v_count = 1, 'Test 5e Failed: Anon visitor must view published novel of active/approved author';
+
+    SELECT count(*) INTO v_count FROM public.chapters WHERE novel_id = v_novel_id AND is_free_preview = true;
+    ASSERT v_count = 1, 'Test 5f Failed: Anon visitor must view free preview chapter of published novel';
+
+    -- Case 5e: Suspend writer and verify anon gets 0 rows
+    PERFORM pg_catalog.set_config('role', 'postgres', true);
+    UPDATE public.writer_profiles SET status = 'suspended' WHERE id = v_writer_id;
+
+    PERFORM pg_catalog.set_config('request.jwt.claim.sub', '', true);
+    PERFORM pg_catalog.set_config('role', 'anon', true);
+
+    SELECT count(*) INTO v_count FROM public.novels WHERE id = v_novel_id;
+    ASSERT v_count = 0, 'Test 5g Failed: Anon visitor must get 0 rows for novels of suspended writer';
+
+    SELECT count(*) INTO v_count FROM public.chapters WHERE novel_id = v_novel_id AND is_free_preview = true;
+    ASSERT v_count = 0, 'Test 5h Failed: Anon visitor must get 0 rows for preview chapters of suspended writer';
+
+    -- Case 5f: Entitled buyer retains read access even when author is suspended
+    PERFORM pg_catalog.set_config('request.jwt.claim.sub', v_buyer_id::text, true);
+    PERFORM pg_catalog.set_config('role', 'authenticated', true);
+
+    SELECT count(*) INTO v_count FROM public.novels WHERE id = v_novel_id;
+    ASSERT v_count = 1, 'Test 5i Failed: Entitled buyer must still see novel even when author is suspended';
+
+    -- -------------------------------------------------------------------------
     -- CLEANUP
     -- -------------------------------------------------------------------------
     PERFORM pg_catalog.set_config('role', 'postgres', true);
@@ -243,5 +303,5 @@ BEGIN
     DELETE FROM public.profiles WHERE id IN (v_admin_id, v_writer_id, v_buyer_id, v_guest_id);
     DELETE FROM auth.users WHERE id IN (v_admin_id, v_writer_id, v_buyer_id, v_guest_id);
 
-    RAISE NOTICE '=== Test Suite 23 PASSED: All 4 test sections verified successfully ===';
+    RAISE NOTICE '=== Test Suite 23 PASSED: All 5 test sections verified successfully ===';
 END $$;
