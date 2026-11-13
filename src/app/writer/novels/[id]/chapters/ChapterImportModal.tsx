@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ChapterSplitterWizard } from './ChapterSplitterWizard';
+import type { ChapterRow } from '@/types/database';
 
 interface ChapterImportModalProps {
   novelId: string;
@@ -10,6 +11,7 @@ interface ChapterImportModalProps {
   isOpen: boolean;
   onClose: () => void;
   suggestedStartNumber?: number;
+  onSuccess?: (newChapters?: ChapterRow[]) => void;
 }
 
 export function ChapterImportModal({
@@ -19,6 +21,7 @@ export function ChapterImportModal({
   isOpen,
   onClose,
   suggestedStartNumber,
+  onSuccess,
 }: ChapterImportModalProps) {
   return (
     <ChapterSplitterWizard
@@ -29,6 +32,8 @@ export function ChapterImportModal({
       onClose={onClose}
       mode="import"
       suggestedStartNumber={suggestedStartNumber}
+      onSuccess={onSuccess}
     />
   );
 }
+

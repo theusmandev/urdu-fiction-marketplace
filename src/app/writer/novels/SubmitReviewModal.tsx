@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { submitNovelForReviewAction } from '@/app/actions/writer';
 import {
@@ -45,6 +46,11 @@ export function SubmitReviewModal({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -128,36 +134,53 @@ export function SubmitReviewModal({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-surface rounded-2xl border border-border max-w-lg w-full p-6 shadow-2xl space-y-5">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+  const modalContent = (
+    <div
+      role="presentation"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="submit-review-modal-title"
+        className="bg-surface rounded-2xl border border-border w-full max-w-lg max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)] flex flex-col overflow-hidden shadow-2xl"
+      >
+        {/* Header (shrink-0) */}
+        <div className="shrink-0 px-5 py-4 border-b border-border flex items-center justify-between bg-surface">
           <div>
-            <h3 className="text-base font-serif font-bold text-navy flex items-center gap-2">
+            <h3
+              id="submit-review-modal-title"
+              className="text-base font-serif font-bold text-navy flex items-center gap-2"
+            >
               <Send className="w-4 h-4 text-accent" />
-              Submit for Editorial Review
+              <span>Submit for Editorial Review</span>
             </h3>
             <p className="text-xs text-secondary mt-0.5 font-urdu text-right" dir="rtl">
-              ناول برائے اداری جائزہ: {novel.title_urdu}
+              ناول برائے ادارتی جائزہ: {novel.title_urdu}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-secondary hover:text-navy hover:bg-ivory"
+            className="p-1.5 rounded-lg text-secondary hover:text-navy hover:bg-ivory transition-colors"
+            title="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {errorMessage && (
-          <div className="p-3.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-2 text-xs">
-            <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
+        {/* Scrollable Body (flex-1 min-h-0 overflow-y-auto) */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
+          {errorMessage && (
+            <div className="p-3.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-2 text-xs">
+              <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
-        <div className="space-y-3">
           <p className="text-xs text-secondary leading-relaxed">
             Please ensure all publishing prerequisites below are satisfied before sending this manuscript to our editorial board:
           </p>
@@ -166,43 +189,44 @@ export function SubmitReviewModal({
             {checks.map((item) => (
               <div
                 key={item.id}
-                className="p-3 flex items-center justify-between gap-3"
+                className="py-2.5 px-3.5 flex items-center justify-between gap-3 hover:bg-ivory/80 transition-colors"
               >
-                  <div className="flex items-center gap-2.5">
-                    {item.passed ? (
-                      <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-danger-text shrink-0" />
-                    )}
-                    <span
-                      className={
-                        item.passed
-                          ? 'text-main font-medium'
-                          : 'text-danger-text font-semibold'
-                      }
-                    >
-                      {item.label}
-                    </span>
-                  </div>
-
-                  {!item.passed && (
-                    <a
-                      href={item.fixPath}
-                      className="text-[11px] font-semibold text-accent hover:underline shrink-0"
-                    >
-                      Fix Now &rarr;
-                    </a>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {item.passed ? (
+                    <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
+                  ) : (
+                    <XCircle className="w-4 h-4 text-danger-text shrink-0" />
                   )}
+                  <span
+                    className={`truncate ${
+                      item.passed
+                        ? 'text-main font-medium'
+                        : 'text-danger-text font-semibold'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
                 </div>
-              ))}
+
+                {!item.passed && (
+                  <a
+                    href={item.fixPath}
+                    className="text-[11px] font-semibold text-accent hover:underline shrink-0"
+                  >
+                    Fix Now &rarr;
+                  </a>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="pt-3 border-t border-border flex items-center justify-between">
+        {/* Pinned Footer (shrink-0) */}
+        <div className="shrink-0 px-5 py-3.5 border-t border-border bg-surface flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-border text-xs font-semibold text-secondary hover:text-main"
+            className="px-4 py-2 rounded-lg border border-border text-xs font-semibold text-secondary hover:text-navy hover:bg-ivory transition-colors text-center"
           >
             Cancel
           </button>
@@ -211,7 +235,7 @@ export function SubmitReviewModal({
             type="button"
             disabled={!allPassed || isSubmitting}
             onClick={handleSubmit}
-            className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-light disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all"
+            className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-light disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-all"
           >
             {isSubmitting ? (
               <>
@@ -229,4 +253,11 @@ export function SubmitReviewModal({
       </div>
     </div>
   );
+
+  if (isMounted && typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 }
+

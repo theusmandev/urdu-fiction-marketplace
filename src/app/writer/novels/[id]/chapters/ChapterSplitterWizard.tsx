@@ -17,6 +17,7 @@ import {
 } from '@/lib/text/split-chapters';
 import { normalizeArabicLetterForms } from '@/lib/text/clean-urdu';
 import { importChaptersAction, splitChapterAction } from '@/app/actions/writer';
+import type { ChapterRow } from '@/types/database';
 import {
   Upload,
   Scissors,
@@ -44,7 +45,7 @@ export interface ChapterSplitterWizardProps {
   existingChapterNumber?: number;
   initialText?: string;
   suggestedStartNumber?: number;
-  onSuccess?: () => void;
+  onSuccess?: (newChapters?: ChapterRow[]) => void;
 }
 
 type WizardStep =
@@ -372,9 +373,16 @@ export function ChapterSplitterWizard({
           throw new Error(res.error || 'Failed to split chapter.');
         }
         setSuccessMessage(`Chapter successfully split into ${res.data?.parts_count} parts!`);
+        router.refresh();
+        setTimeout(() => {
+          onClose();
+          if (onSuccess) onSuccess();
+          router.push(`/writer/novels/${novelId}/chapters`);
+        }, 500);
       } else {
         const totalBatches = Math.ceil(fullPayload.length / IMPORT_BATCH_SIZE);
         let currentCommitted = savedOffset;
+        const allImportedChapters: Array<{ id: string; chapter_number: number; title_urdu: string }> = [];
 
         for (let b = 0; b < totalBatches; b++) {
           const startIdx = b * IMPORT_BATCH_SIZE;
@@ -408,19 +416,43 @@ export function ChapterSplitterWizard({
             throw new Error(errorMsg);
           }
 
+          if (res.data?.chapters) {
+            allImportedChapters.push(...res.data.chapters);
+          }
+
           currentCommitted += batchSlice.length;
           setSavedOffset(currentCommitted);
         }
 
         setSuccessMessage(`Successfully imported all ${allParts.length} chapters!`);
-      }
 
-      setTimeout(() => {
-        onClose();
-        if (onSuccess) onSuccess();
-        router.push(`/writer/novels/${novelId}/chapters`);
+        // Construct optimistic ChapterRow objects to update the parent list instantly
+        const createdChapterRows: ChapterRow[] = allParts.map((part, idx) => {
+          const serverChapter = allImportedChapters[idx];
+          return {
+            id: serverChapter?.id || `imported-${Date.now()}-${idx}`,
+            novel_id: novelId,
+            chapter_number: serverChapter?.chapter_number || (startChapterNumber || 1) + idx,
+            title_urdu: part.title,
+            content_urdu: part.content,
+            is_free_preview: Boolean(part.isFreePreview),
+            word_count: part.wordCount,
+            is_published: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+        });
+
+        // Trigger immediate client update & refresh
+        if (onSuccess) {
+          onSuccess(createdChapterRows);
+        }
         router.refresh();
-      }, 1500);
+
+        setTimeout(() => {
+          onClose();
+        }, 500);
+      }
     } catch (err: unknown) {
       let msg = err instanceof Error ? err.message : 'Operation failed.';
       if (
@@ -443,7 +475,7 @@ export function ChapterSplitterWizard({
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
       <div className="bg-surface rounded-2xl border border-border max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Modal Top Bar */}
         <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-ivory/60">

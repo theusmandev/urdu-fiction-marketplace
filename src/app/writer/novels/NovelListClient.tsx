@@ -391,7 +391,13 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
 
       {/* Confirmation Dialog: Withdraw Submission */}
       {withdrawNovelId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setWithdrawNovelId(null);
+          }}
+        >
           <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-full bg-warning-soft border border-warning-border text-accent-strong flex items-center justify-center mx-auto">
               <RotateCcw className="w-6 h-6" />

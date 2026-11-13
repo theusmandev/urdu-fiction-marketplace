@@ -199,4 +199,267 @@ describe('Chapter Import Batching & Error Resilience', () => {
       );
     });
   });
+
+  describe('6. Instant State Synchronization & UX Snappiness', () => {
+    it('verifies final batch in ChapterSplitterWizard sets skipRevalidate = false', () => {
+      const wizardPath = path.join(
+        rootDir,
+        'src',
+        'app',
+        'writer',
+        'novels',
+        '[id]',
+        'chapters',
+        'ChapterSplitterWizard.tsx'
+      );
+      const content = fs.readFileSync(wizardPath, 'utf8');
+
+      // Checks that isLastBatch is defined and !isLastBatch is passed as skipRevalidate
+      assert.match(
+        content,
+        /const isLastBatch = b === totalBatches - 1;/i,
+        'ChapterSplitterWizard must detect isLastBatch'
+      );
+      assert.match(
+        content,
+        /importChaptersAction\(\s*novelId,\s*batchSlice,\s*batchStartNumber,\s*!isLastBatch\s*\)/i,
+        'ChapterSplitterWizard must pass !isLastBatch as skipRevalidate'
+      );
+    });
+
+    it('verifies ChapterListManager synchronizes initialChapters prop into local state via useEffect', () => {
+      const managerPath = path.join(
+        rootDir,
+        'src',
+        'app',
+        'writer',
+        'novels',
+        '[id]',
+        'chapters',
+        'ChapterListManager.tsx'
+      );
+      const content = fs.readFileSync(managerPath, 'utf8');
+
+      assert.match(
+        content,
+        /useEffect\(\(\)\s*=>\s*\{\s*setChapters\(initialChapters\);\s*\},\s*\[initialChapters\]\);/,
+        'ChapterListManager must synchronize initialChapters into local chapters state via useEffect'
+      );
+    });
+
+    it('verifies ChapterImportModal declares and forwards onSuccess callback', () => {
+      const modalPath = path.join(
+        rootDir,
+        'src',
+        'app',
+        'writer',
+        'novels',
+        '[id]',
+        'chapters',
+        'ChapterImportModal.tsx'
+      );
+      const content = fs.readFileSync(modalPath, 'utf8');
+
+      assert.match(
+        content,
+        /onSuccess\?:\s*\(newChapters\?:\s*ChapterRow\[\]\)\s*=>\s*void;/,
+        'ChapterImportModal must declare onSuccess in ChapterImportModalProps'
+      );
+      assert.match(
+        content,
+        /<ChapterSplitterWizard[^>]*onSuccess=\{onSuccess\}/s,
+        'ChapterImportModal must forward onSuccess to ChapterSplitterWizard'
+      );
+    });
+
+    it('verifies ChapterSplitterWizard invokes onSuccess with optimistic ChapterRow items and calls router.refresh()', () => {
+      const wizardPath = path.join(
+        rootDir,
+        'src',
+        'app',
+        'writer',
+        'novels',
+        '[id]',
+        'chapters',
+        'ChapterSplitterWizard.tsx'
+      );
+      const content = fs.readFileSync(wizardPath, 'utf8');
+
+      assert.match(
+        content,
+        /if\s*\(onSuccess\)\s*\{\s*onSuccess\(createdChapterRows\);\s*\}/,
+        'ChapterSplitterWizard must call onSuccess with createdChapterRows'
+      );
+      assert.match(
+        content,
+        /router\.refresh\(\);/,
+        'ChapterSplitterWizard must call router.refresh() upon completion'
+      );
+    });
+
+    it('verifies ChapterSplitterWizard closes modal after snappy delay (<= 600ms)', () => {
+      const wizardPath = path.join(
+        rootDir,
+        'src',
+        'app',
+        'writer',
+        'novels',
+        '[id]',
+        'chapters',
+        'ChapterSplitterWizard.tsx'
+      );
+      const content = fs.readFileSync(wizardPath, 'utf8');
+
+      assert.match(
+        content,
+        /setTimeout\(\(\)\s*=>\s*\{\s*onClose\(\);\s*\},\s*500\);/,
+        'ChapterSplitterWizard must close modal within 500ms'
+      );
+    });
+
+    it('optimistically merges and deduplicates newly imported chapters without sorting breaks', () => {
+      interface MockChapter {
+        id: string;
+        chapter_number: number;
+        title_urdu: string;
+      }
+
+      const existingChapters: MockChapter[] = [
+        { id: 'ch-1', chapter_number: 1, title_urdu: 'باب ۱' },
+        { id: 'ch-2', chapter_number: 2, title_urdu: 'باب ۲' },
+      ];
+
+      const newImported: MockChapter[] = [
+        { id: 'ch-3', chapter_number: 3, title_urdu: 'باب ۳' },
+        { id: 'ch-4', chapter_number: 4, title_urdu: 'باب ۴' },
+        { id: 'ch-2', chapter_number: 2, title_urdu: 'باب ۲ duplicate' }, // Duplicate ID simulation
+      ];
+
+      const mergeChapters = (prev: MockChapter[], imported: MockChapter[]): MockChapter[] => {
+        const existingIds = new Set(prev.map((c) => c.id));
+        const newItems = imported.filter((c) => !existingIds.has(c.id));
+        const combined = [...prev, ...newItems];
+        return combined.sort((a, b) => a.chapter_number - b.chapter_number);
+      };
+
+      const merged = mergeChapters(existingChapters, newImported);
+
+      assert.equal(merged.length, 4, 'Must have exactly 4 chapters after deduplication');
+      assert.deepEqual(
+        merged.map((c) => c.chapter_number),
+        [1, 2, 3, 4],
+        'Must be sorted strictly sequentially by chapter_number'
+      );
+      assert.equal(merged[1].title_urdu, 'باب ۲', 'Must keep existing chapter when duplicate ID is received');
+      assert.equal(merged[3].id, 'ch-4', 'Must include all new unique chapters');
+    });
+  });
+
+  describe('7. Submit for Review Modal Viewport Safety & Layout Invariants', () => {
+    it('verifies SubmitReviewModal employs 3-part flex layout and viewport bounds', () => {
+      const modalPath = path.join(rootDir, 'src', 'app', 'writer', 'novels', 'SubmitReviewModal.tsx');
+      const content = fs.readFileSync(modalPath, 'utf8');
+
+      // 1. Viewport-safe backdrop with scrolling
+      assert.match(
+        content,
+        /fixed\s+inset-0\s+z-50[^"]*overflow-y-auto/i,
+        'SubmitReviewModal backdrop must have overflow-y-auto'
+      );
+
+      // 2. Uses createPortal to escape parent transform/filter contexts
+      assert.match(
+        content,
+        /createPortal\s*\(\s*modalContent,\s*document\.body\s*\)/,
+        'SubmitReviewModal must render via createPortal into document.body'
+      );
+
+      // 3. Card constrained to 100dvh minus margin with flex-col
+      assert.match(
+        content,
+        /max-h-\[calc\(100dvh-1\.5rem\)\]\s+sm:max-h-\[calc\(100dvh-3rem\)\]\s+flex\s+flex-col\s+overflow-hidden/,
+        'Modal card must use dynamic dvh bounds and flex-col overflow-hidden'
+      );
+
+      // 4. Header is shrink-0
+      assert.match(
+        content,
+        /shrink-0\s+px-5\s+py-4\s+border-b\s+border-border/i,
+        'Header must be shrink-0 so it is never clipped'
+      );
+
+      // 5. Scrollable body with min-h-0 and overflow-y-auto
+      assert.match(
+        content,
+        /flex-1\s+min-h-0\s+overflow-y-auto\s+px-5\s+py-4/i,
+        'Body must be flex-1 min-h-0 overflow-y-auto'
+      );
+
+      // 6. Pinned footer with shrink-0 and responsive flex layout
+      assert.match(
+        content,
+        /shrink-0\s+px-5\s+py-3\.5\s+border-t\s+border-border\s+bg-surface\s+flex\s+flex-col-reverse\s+sm:flex-row/i,
+        'Footer must be shrink-0 with flex-col-reverse on mobile and sm:flex-row on desktop'
+      );
+
+      // 7. Tightened checklist items
+      assert.match(
+        content,
+        /py-2\.5\s+px-3\.5\s+flex\s+items-center/i,
+        'Checklist items must use compact padding py-2.5 px-3.5'
+      );
+    });
+
+    it('validates 8 publishing checklist prerequisites logic', () => {
+      interface MockNovel {
+        title_urdu: string;
+        title_english: string;
+        synopsis_urdu: string;
+        cover_url: string | null;
+        rights_declaration_accepted: boolean;
+        price_pkr: number;
+        genres_count: number;
+        published_chapters_count: number;
+        active_payment_methods_count: number;
+      }
+
+      const evaluateChecklist = (novel: MockNovel) => [
+        Boolean(novel.title_urdu && novel.title_urdu.trim().length >= 2),
+        Boolean(novel.title_english && novel.title_english.trim().length >= 2),
+        Boolean(novel.synopsis_urdu && novel.synopsis_urdu.trim().length >= 10),
+        Boolean(novel.cover_url),
+        Boolean(novel.rights_declaration_accepted),
+        novel.genres_count > 0,
+        novel.published_chapters_count > 0,
+        novel.price_pkr === 0 || novel.active_payment_methods_count > 0,
+      ];
+
+      // Incomplete novel (0 published chapters, no payout method on paid novel)
+      const incompleteNovel: MockNovel = {
+        title_urdu: 'پیر کامل',
+        title_english: 'Peer-e-Kamil',
+        synopsis_urdu: 'ایک شاہکار روحانی ناول جو سفر اور تبدیلی کی کہانی سناتا ہے۔',
+        cover_url: 'https://example.com/cover.jpg',
+        rights_declaration_accepted: true,
+        price_pkr: 500,
+        genres_count: 2,
+        published_chapters_count: 0,
+        active_payment_methods_count: 0,
+      };
+
+      const incompleteChecks = evaluateChecklist(incompleteNovel);
+      assert.equal(incompleteChecks[6], false, 'Must fail published chapters check when count is 0');
+      assert.equal(incompleteChecks[7], false, 'Must fail payment method check for paid novel when count is 0');
+      assert.equal(incompleteChecks.every(Boolean), false, 'allPassed must be false');
+
+      // Ready novel
+      const readyNovel: MockNovel = {
+        ...incompleteNovel,
+        published_chapters_count: 1,
+        active_payment_methods_count: 1,
+      };
+      const readyChecks = evaluateChecklist(readyNovel);
+      assert.equal(readyChecks.every(Boolean), true, 'allPassed must be true when all prerequisites are met');
+    });
+  });
 });

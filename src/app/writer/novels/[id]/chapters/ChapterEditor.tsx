@@ -355,7 +355,8 @@ export function ChapterEditor({
 
       setTimeout(() => {
         router.push(`/writer/novels/${novelId}/chapters`);
-      }, 700);
+        router.refresh();
+      }, 500);
     }
   };
 

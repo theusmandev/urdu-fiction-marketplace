@@ -50,6 +50,11 @@ export function ChapterListManager({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
+  // Synchronize initialChapters prop updates (from router.refresh() / Server Component re-renders) into local state
+  useEffect(() => {
+    setChapters(initialChapters);
+  }, [initialChapters]);
+
   useEffect(() => {
     if (!userId) return;
     listLocalDraftsForNovel(userId, novel.id)
@@ -527,6 +532,19 @@ export function ChapterListManager({
         novelId={novel.id}
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
+        suggestedStartNumber={chapters.length + 1}
+        onSuccess={(importedRows) => {
+          if (importedRows && importedRows.length > 0) {
+            setChapters((prev) => {
+              const existingIds = new Set(prev.map((c) => c.id));
+              const newItems = importedRows.filter((c) => !existingIds.has(c.id));
+              const combined = [...prev, ...newItems];
+              return combined.sort((a, b) => a.chapter_number - b.chapter_number);
+            });
+          }
+          setSuccessMessage('Chapters saved successfully.');
+          router.refresh();
+        }}
       />
 
       {/* Review Submission Checklist Modal */}
@@ -538,7 +556,13 @@ export function ChapterListManager({
 
       {/* Delete Confirmation Modal */}
       {deleteTargetId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-in fade-in duration-150">
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDeleteTargetId(null);
+          }}
+        >
           <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
