@@ -58,6 +58,16 @@ type WizardStep =
 
 type SplittingStrategy = 'size' | 'headings' | 'manual';
 
+export const IMPORT_BATCH_SIZE = 5;
+
+export interface SaveProgressState {
+  savedCount: number;
+  totalCount: number;
+  currentBatch: number;
+  totalBatches: number;
+  currentBatchCount: number;
+}
+
 export function ChapterSplitterWizard({
   novelId,
   novelTitleUrdu,
@@ -111,12 +121,14 @@ export function ChapterSplitterWizard({
   const [firstPartFree, setFirstPartFree] = useState<boolean>(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
   const [startChapterNumber, setStartChapterNumber] = useState<number>(
-    existingChapterNumber ?? suggestedStartNumber
+    existingChapterNumber ?? suggestedStartNumber ?? 1
   );
 
   // Loading & Error States
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveProgress, setSaveProgress] = useState<SaveProgressState | null>(null);
+  const [savedOffset, setSavedOffset] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -258,6 +270,7 @@ export function ChapterSplitterWizard({
     if (!file) return;
 
     setErrorMessage(null);
+    setSavedOffset(0);
     setIsUploading(true);
     setFileName(file.name);
 
@@ -329,10 +342,12 @@ export function ChapterSplitterWizard({
   };
 
   const handleSave = async () => {
-    if (buildResult.parts.length === 0) return;
+    const allParts = buildResult.parts;
+    const remainingParts = allParts.slice(savedOffset);
+    if (remainingParts.length === 0) return;
 
     // Verify hard character limit
-    const overLimit = buildResult.parts.find((p) => p.charCount > HARD_MAX_CHAPTER_CHARACTERS);
+    const overLimit = remainingParts.find((p) => p.charCount > HARD_MAX_CHAPTER_CHARACTERS);
     if (overLimit) {
       setErrorMessage(
         `Chapter "${overLimit.title}" exceeds the 120,000 character limit (${overLimit.charCount.toLocaleString()} chars). Please split this part further before saving.`
@@ -343,7 +358,7 @@ export function ChapterSplitterWizard({
     setIsSaving(true);
     setErrorMessage(null);
 
-    const payload = buildResult.parts.map((p) => ({
+    const fullPayload = remainingParts.map((p) => ({
       title_urdu: p.title,
       content_urdu: p.content,
       is_free_preview: p.isFreePreview,
@@ -352,17 +367,52 @@ export function ChapterSplitterWizard({
 
     try {
       if (mode === 'split-existing' && existingChapterId) {
-        const res = await splitChapterAction(novelId, existingChapterId, payload);
+        const res = await splitChapterAction(novelId, existingChapterId, fullPayload);
         if (!res.success) {
           throw new Error(res.error || 'Failed to split chapter.');
         }
         setSuccessMessage(`Chapter successfully split into ${res.data?.parts_count} parts!`);
       } else {
-        const res = await importChaptersAction(novelId, payload, startChapterNumber);
-        if (!res.success) {
-          throw new Error(res.error || 'Failed to import chapters.');
+        const totalBatches = Math.ceil(fullPayload.length / IMPORT_BATCH_SIZE);
+        let currentCommitted = savedOffset;
+
+        for (let b = 0; b < totalBatches; b++) {
+          const startIdx = b * IMPORT_BATCH_SIZE;
+          const batchSlice = fullPayload.slice(startIdx, startIdx + IMPORT_BATCH_SIZE);
+          const isLastBatch = b === totalBatches - 1;
+          const batchStartNumber = (startChapterNumber || 1) + currentCommitted;
+
+          setSaveProgress({
+            savedCount: currentCommitted,
+            totalCount: allParts.length,
+            currentBatch: b + 1,
+            totalBatches,
+            currentBatchCount: batchSlice.length,
+          });
+
+          const res = await importChaptersAction(
+            novelId,
+            batchSlice,
+            batchStartNumber,
+            !isLastBatch
+          );
+
+          if (!res.success) {
+            const errorMsg = res.error || 'Failed to import chapters.';
+            if (currentCommitted > savedOffset) {
+              setSavedOffset(currentCommitted);
+              throw new Error(
+                `Saved ${currentCommitted} of ${allParts.length} chapters, but batch ${b + 1} failed: ${errorMsg}`
+              );
+            }
+            throw new Error(errorMsg);
+          }
+
+          currentCommitted += batchSlice.length;
+          setSavedOffset(currentCommitted);
         }
-        setSuccessMessage(`Successfully imported ${res.data?.imported_count} chapters!`);
+
+        setSuccessMessage(`Successfully imported all ${allParts.length} chapters!`);
       }
 
       setTimeout(() => {
@@ -372,10 +422,19 @@ export function ChapterSplitterWizard({
         router.refresh();
       }, 1500);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Operation failed.';
+      let msg = err instanceof Error ? err.message : 'Operation failed.';
+      if (
+        msg.includes('Minified React error') ||
+        msg.includes('Server Components render') ||
+        msg.includes('react.dev/errors')
+      ) {
+        msg =
+          'Server communication error: The chapter batch could not be processed. Please check your connection and click "Resume & Save" to continue saving remaining chapters.';
+      }
       setErrorMessage(msg);
     } finally {
       setIsSaving(false);
+      setSaveProgress(null);
     }
   };
 
@@ -526,6 +585,45 @@ export function ChapterSplitterWizard({
             <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-danger-text shrink-0 mt-0.5" />
               <p className="text-xs">{errorMessage}</p>
+            </div>
+          )}
+
+          {saveProgress && (
+            <div className="p-4 rounded-xl bg-accent/10 border border-accent/30 text-text space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-accent-strong flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-accent-strong" />
+                  <span>
+                    Saving chapters {saveProgress.savedCount + 1}–
+                    {Math.min(
+                      saveProgress.savedCount + saveProgress.currentBatchCount,
+                      saveProgress.totalCount
+                    )}{' '}
+                    of {saveProgress.totalCount} (Batch {saveProgress.currentBatch}/
+                    {saveProgress.totalBatches})...
+                  </span>
+                </span>
+                <span className="font-mono text-[11px] text-text-muted">
+                  {Math.round(
+                    ((saveProgress.savedCount + saveProgress.currentBatchCount) /
+                      saveProgress.totalCount) *
+                      100
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="w-full bg-border rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="bg-accent h-1.5 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${Math.round(
+                      ((saveProgress.savedCount + saveProgress.currentBatchCount) /
+                        saveProgress.totalCount) *
+                        100
+                    )}%`,
+                  }}
+                />
+              </div>
             </div>
           )}
 
@@ -1116,6 +1214,14 @@ export function ChapterSplitterWizard({
                 </div>
               ) : (
                 <div className="p-4 rounded-xl border border-border bg-white space-y-3">
+                  {savedOffset > 0 && (
+                    <div className="p-3.5 rounded-xl bg-success-soft border border-success-border text-success-text text-xs flex items-center justify-between">
+                      <span>
+                        ✓ Successfully saved the first <strong>{savedOffset}</strong> chapters.
+                        Click below to save the remaining <strong>{buildResult.parts.length - savedOffset}</strong> chapters starting at #{startChapterNumber + savedOffset}.
+                      </span>
+                    </div>
+                  )}
                   <label className="text-xs font-bold text-navy block">
                     Starting Chapter Number
                   </label>
@@ -1123,12 +1229,15 @@ export function ChapterSplitterWizard({
                     <input
                       type="number"
                       min="1"
+                      disabled={savedOffset > 0}
                       value={startChapterNumber}
                       onChange={(e) => setStartChapterNumber(Math.max(1, Number(e.target.value)))}
-                      className="w-28 px-3 py-2 rounded-lg border border-border bg-ivory font-mono font-bold text-sm"
+                      className="w-28 px-3 py-2 rounded-lg border border-border bg-ivory font-mono font-bold text-sm disabled:opacity-60"
                     />
                     <span className="text-xs text-secondary">
-                      Resulting chapter numbers: #{startChapterNumber} to #{startChapterNumber + buildResult.parts.length - 1}
+                      {savedOffset > 0
+                        ? `Remaining: #${startChapterNumber + savedOffset} to #${startChapterNumber + buildResult.parts.length - 1} (${buildResult.parts.length - savedOffset} chapters)`
+                        : `Resulting chapter numbers: #${startChapterNumber} to #${startChapterNumber + buildResult.parts.length - 1}`}
                     </span>
                   </div>
                 </div>
@@ -1208,19 +1317,27 @@ export function ChapterSplitterWizard({
             ) : (
               <button
                 type="button"
-                disabled={isSaving || buildResult.parts.length === 0}
+                disabled={isSaving || (buildResult.parts.length - savedOffset) === 0}
                 onClick={handleSave}
                 className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy/90 transition-colors disabled:opacity-40 shadow-sm"
               >
                 {isSaving ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Executing Atomic Transaction...</span>
+                    <span>
+                      {saveProgress
+                        ? `Saving Batch ${saveProgress.currentBatch}/${saveProgress.totalBatches}...`
+                        : 'Executing Atomic Transaction...'}
+                    </span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Confirm & Save ({buildResult.parts.length}) Chapters</span>
+                    <span>
+                      {savedOffset > 0
+                        ? `Resume & Save (${buildResult.parts.length - savedOffset}) Remaining Chapters`
+                        : `Confirm & Save (${buildResult.parts.length}) Chapters`}
+                    </span>
                   </>
                 )}
               </button>

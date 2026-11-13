@@ -49,6 +49,11 @@ const cspHeader = `
   .trim();
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '15mb',
+    },
+  },
   images: {
     unoptimized: true,
     remotePatterns: supabaseHost

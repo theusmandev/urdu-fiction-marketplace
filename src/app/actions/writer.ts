@@ -599,7 +599,8 @@ export async function importChaptersAction(
     is_free_preview?: boolean;
     is_published?: boolean;
   }>,
-  startNumber?: number | null
+  startNumber?: number | null,
+  skipRevalidate: boolean = false
 ): Promise<ActionResponse<{ imported_count: number; chapters: Array<{ id: string; chapter_number: number; title_urdu: string }> }>> {
   try {
     await requireWriter(`/writer/novels/${novelId}/chapters`);
@@ -631,8 +632,11 @@ export async function importChaptersAction(
 
     const importedChapters = (data as Array<{ id: string; chapter_number: number; title_urdu: string }>) || [];
 
-    revalidatePath(`/writer/novels/${novelId}/chapters`);
-    revalidatePath(`/writer/novels/${novelId}`);
+    if (!skipRevalidate) {
+      revalidatePath(`/writer/novels/${novelId}/chapters`);
+      revalidatePath(`/writer/novels/${novelId}`);
+    }
+
     return {
       success: true,
       data: {
