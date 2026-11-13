@@ -135,7 +135,7 @@ export default async function LibraryPage() {
                     <div className="space-y-1">
                       <UrduText
                         size="base"
-                        className="text-navy group-hover:text-accent-strong transition-colors line-clamp-1 py-0 leading-[2.0] sm:leading-[2.1] font-normal text-sm sm:text-base"
+                        className="text-navy group-hover:text-accent-strong transition-colors line-clamp-1 pt-1.5 pb-0.5 leading-[2.1] font-normal text-sm sm:text-base"
                       >
                         {item.title_urdu}
                       </UrduText>

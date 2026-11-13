@@ -36,10 +36,6 @@ export function NovelCard({ novel }: NovelCardProps) {
       
       {/* Constrained 2:3 Aspect Ratio Cover Container - locked shrink-0 */}
       <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-surface-muted">
-        {/* Editorial Book Spine Visual Styling */}
-        <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-black/10 to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 left-2.5 w-px bg-white/20 z-10 pointer-events-none" />
-
         {/* Artistic Cover Art (Gradient/Texture + Calligraphy) */}
         <div
           className={`w-full h-full p-3 sm:p-4 flex flex-col justify-between text-white relative transition-transform duration-500 ease-out group-hover:scale-105 pointer-events-none ${novel.coverGradient}`}
@@ -67,7 +63,7 @@ export function NovelCard({ novel }: NovelCardProps) {
             <UrduText
               as="h2"
               size="base"
-              className="text-white drop-shadow-md py-0.5 leading-[2.0] sm:leading-[2.1] text-base sm:text-lg line-clamp-1"
+              className="text-white drop-shadow-md pt-1.5 pb-0.5 leading-[2.1] sm:leading-[2.2] text-base sm:text-lg line-clamp-1"
             >
               {novel.titleUrdu}
             </UrduText>
@@ -79,7 +75,7 @@ export function NovelCard({ novel }: NovelCardProps) {
           {/* Bottom Cover Author Callout */}
           <div className="border-t border-white/20 pt-1.5 z-10 flex items-center justify-between text-[10px] pointer-events-none">
             <span className="font-serif text-white/80 truncate max-w-[55%]">{novel.authorNameEn}</span>
-            <UrduText as="span" size="xs" className="text-white/90 py-0 truncate max-w-[40%] font-normal">
+            <UrduText as="span" size="xs" className="text-white/90 leading-loose py-0.5 truncate max-w-[40%] font-normal">
               {novel.authorNameUrdu}
             </UrduText>
           </div>
@@ -99,7 +95,7 @@ export function NovelCard({ novel }: NovelCardProps) {
             <UrduText
               as="h3"
               size="base"
-              className="font-bold text-navy group-hover:text-accent leading-[2.0] sm:leading-[2.1] py-0 line-clamp-1 text-base sm:text-lg transition-colors"
+              className="font-bold text-navy group-hover:text-accent leading-[2.1] pt-1.5 pb-0.5 line-clamp-1 text-base sm:text-lg transition-colors"
             >
               {novel.titleUrdu}
             </UrduText>
@@ -114,7 +110,7 @@ export function NovelCard({ novel }: NovelCardProps) {
               <Feather className="w-3 h-3 text-accent shrink-0" />
               <span className="font-medium truncate">{novel.authorNameEn}</span>
             </div>
-            <UrduText as="span" size="xs" className="text-secondary py-0 shrink-0 ml-1">
+            <UrduText as="span" size="xs" className="text-secondary leading-loose py-0.5 shrink-0 ml-1">
               {novel.authorNameUrdu}
             </UrduText>
           </div>

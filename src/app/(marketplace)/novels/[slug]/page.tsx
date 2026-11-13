@@ -229,10 +229,6 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
             <div className="md:col-span-5 lg:col-span-4 space-y-6 flex flex-col items-center">
               {/* Cover Image (Rendered first on all screens) */}
               <div className="relative aspect-[2/3] w-full max-w-[180px] sm:max-w-[220px] md:max-w-[240px] mx-auto rounded-xl overflow-hidden bg-ivory-dark shadow-md border border-border/80 shrink-0">
-                {/* Book Spine Detail */}
-                <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10 pointer-events-none" />
-                <div className="absolute inset-y-0 left-3 w-px bg-white/20 z-10 pointer-events-none" />
-
                 {resolveCoverUrl(novel.cover_url) ? (
                   <Image
                     src={resolveCoverUrl(novel.cover_url)!}

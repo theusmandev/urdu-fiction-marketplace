@@ -187,18 +187,30 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
 
       {/* Novel Header Preview Card */}
       <div className="bg-surface border border-border rounded-2xl p-5 md:p-6 shadow-card">
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row items-start gap-6">
           {/* Cover Art Preview */}
-          <div className="shrink-0 w-36 sm:w-44 aspect-[2/3] rounded-xl overflow-hidden bg-surface-muted border border-border relative shadow-sm mx-auto md:mx-0">
+          <div className="w-40 sm:w-48 md:w-52 aspect-[2/3] shrink-0 self-start mx-auto md:mx-0 rounded-2xl overflow-hidden border border-border bg-surface-muted shadow-sm relative group">
             {novel.cover_url ? (
-              <Image
-                src={novel.cover_url}
-                alt={novel.title_english}
-                fill
-                sizes="(max-width: 768px) 144px, 176px"
-                className="object-cover"
-                unoptimized
-              />
+              <>
+                <Image
+                  src={novel.cover_url}
+                  alt={novel.title_english}
+                  fill
+                  sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, 208px"
+                  className="w-full h-full object-cover"
+                  unoptimized
+                />
+                <a
+                  href={novel.cover_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 bg-navy/60 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5 p-2 text-center"
+                  title="Open full resolution cover art in new tab"
+                >
+                  <Eye className="w-4 h-4 shrink-0" />
+                  <span>View Full Cover</span>
+                </a>
+              </>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-muted p-4 text-center">
                 <BookOpen className="w-8 h-8 mb-2" />
@@ -208,7 +220,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
           </div>
 
           {/* Metadata & Actions */}
-          <div className="flex-1 flex flex-col justify-between space-y-4">
+          <div className="flex-1 min-w-0 flex flex-col space-y-4">
             <div className="space-y-3">
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-main tracking-tight">

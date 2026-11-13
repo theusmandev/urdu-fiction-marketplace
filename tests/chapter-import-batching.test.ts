@@ -462,4 +462,111 @@ describe('Chapter Import Batching & Error Resilience', () => {
       assert.equal(readyChecks.every(Boolean), true, 'allPassed must be true when all prerequisites are met');
     });
   });
+
+  describe('8. Admin Novel Moderation Cover Aspect Ratio & Layout Invariants', () => {
+    it('verifies AdminNovelReviewPage applies items-start to parent flex and aspect-[2/3] self-start to cover container', () => {
+      const adminNovelPagePath = path.join(
+        rootDir,
+        'src',
+        'app',
+        'admin',
+        'novels',
+        '[id]',
+        'page.tsx'
+      );
+      const content = fs.readFileSync(adminNovelPagePath, 'utf8');
+
+      // 1. Parent flex has items-start to prevent vertical stretching
+      assert.match(
+        content,
+        /flex\s+flex-col\s+md:flex-row\s+items-start\s+gap-6/i,
+        'Parent flex container must have items-start to prevent vertical stretching'
+      );
+
+      // 2. Cover wrapper has w-40 sm:w-48 md:w-52 aspect-[2/3] shrink-0 self-start
+      assert.match(
+        content,
+        /w-40\s+sm:w-48\s+md:w-52\s+aspect-\[2\/3\]\s+shrink-0\s+self-start/i,
+        'Cover container must enforce aspect-[2/3] with self-start and responsive width'
+      );
+
+      // 3. Image uses object-cover within aspect-[2/3] frame
+      assert.match(
+        content,
+        /className="w-full\s+h-full\s+object-cover"/,
+        'Cover image must use w-full h-full object-cover within aspect-[2/3] frame'
+      );
+
+      // 4. Provides full cover view link
+      assert.match(
+        content,
+        /View Full Cover/,
+        'Must provide View Full Cover preview link on hover'
+      );
+    });
+  });
+
+  describe('9. NovelCard Clean Cover & Nastaliq Typography Invariants', () => {
+    it('verifies NovelCard removes decorative book spine overlay', () => {
+      const cardPath = path.join(rootDir, 'src', 'components', 'catalog', 'NovelCard.tsx');
+      const content = fs.readFileSync(cardPath, 'utf8');
+
+      assert.ok(
+        !content.includes('bg-gradient-to-r from-black/30'),
+        'NovelCard must not contain black/30 spine gradient'
+      );
+      assert.ok(
+        !content.includes('Book Spine Visual Styling'),
+        'NovelCard must not contain Book Spine styling'
+      );
+    });
+
+    it('verifies NovelCard prevents Urdu Nastaliq title ascender clipping with generous padding and line-height', () => {
+      const cardPath = path.join(rootDir, 'src', 'components', 'catalog', 'NovelCard.tsx');
+      const content = fs.readFileSync(cardPath, 'utf8');
+
+      // title_urdu has pt-1.5 pb-0.5 and leading-[2.1]
+      assert.match(
+        content,
+        /pt-1\.5\s+pb-0\.5\s+line-clamp-1/,
+        'title_urdu must include pt-1.5 pb-0.5 line-clamp-1 to protect ascenders and dots'
+      );
+      assert.match(
+        content,
+        /leading-\[2\.1\]/,
+        'title_urdu must use leading-[2.1] line height'
+      );
+
+      // pen_name_urdu has leading-loose py-0.5
+      assert.match(
+        content,
+        /leading-loose\s+py-0\.5/,
+        'writer_pen_name_urdu must have leading-loose py-0.5 to protect dots'
+      );
+    });
+
+    it('verifies home novel-card and novel detail hero cover do not contain decorative spine line', () => {
+      const homeCardPath = path.join(rootDir, 'src', 'components', 'home', 'novel-card.tsx');
+      const homeContent = fs.readFileSync(homeCardPath, 'utf8');
+      assert.ok(
+        !homeContent.includes('Editorial Book Spine Visual Styling'),
+        'home novel-card must not contain spine visual styling'
+      );
+
+      const detailHeroPath = path.join(
+        rootDir,
+        'src',
+        'app',
+        '(marketplace)',
+        'novels',
+        '[slug]',
+        'page.tsx'
+      );
+      const detailContent = fs.readFileSync(detailHeroPath, 'utf8');
+      assert.ok(
+        !detailContent.includes('Book Spine Detail'),
+        'novel detail hero page must not contain Book Spine Detail'
+      );
+    });
+  });
 });
