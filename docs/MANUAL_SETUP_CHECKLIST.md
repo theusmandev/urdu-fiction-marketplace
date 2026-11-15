@@ -824,3 +824,38 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    ```bash
    npm run build
    ```
+
+---
+
+## Stage 6: Supabase Free Tier Inactivity Prevention (Keep-Alive via UptimeRobot / cron-job.org)
+
+Supabase Free Tier projects automatically pause after 7 days of inactivity if no incoming PostgREST (`/rest/v1/`) or GoTrue Auth (`/auth/v1/`) API requests reach the project. To keep UNB Premium permanently active 24/7 without manual database restoration:
+
+### 1. Architectural Design of `/api/health`
+- **Stateless PostgREST Keep-Alive**: The public endpoint [`src/app/api/health/route.ts`](file:///e:/git-workstation/urdu-fiction-marketplace/src/app/api/health/route.ts) utilizes the cookie-free, anonymous client `getPublicSupabase()` from `@/lib/supabase/public` to execute `supabase.from('genres').select('id').limit(1)`.
+- **Cache-Busting Invariants**: Configured with `dynamic = 'force-dynamic'`, `revalidate = 0`, and explicit response headers (`Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0`) to guarantee Cloudflare edge caches never intercept or serve stale responses.
+- **Both GET & HEAD Support**: Fully supports both HTTP `GET` and `HEAD` requests. Uptime monitors pinging with `HEAD` still execute the genuine PostgREST query on Supabase.
+- **Zero Secret Exposure & Sanitized Output**: Returns HTTP 200 with `{ status: 'healthy', timestamp, latency_ms }` on success, or HTTP 503 with `{ status: 'degraded', timestamp, error: 'Database unreachable' }` on error. Database connection strings, SQL details, and tokens are never leaked.
+
+### 2. Configure Free Monitor on UptimeRobot (Recommended)
+1. Sign up for a free account at [UptimeRobot.com](https://uptimerobot.com).
+2. Click **+ Add New Monitor** and configure:
+   - **Monitor Type**: `HTTP(s)`
+   - **Friendly Name**: `UNB Premium Supabase Keep-Alive & Health`
+   - **URL (or IP)**: `https://premium.urdunovelbanks.com/api/health`
+   - **Monitoring Interval**: `5 minutes` (or `10 minutes`)
+   - **Monitor Timeout**: `30 seconds`
+   - **HTTP Method**: `HEAD` (or `GET`)
+   - **Alert Contacts To Notify**: Check your administrator email.
+3. Click **Create Monitor**.
+4. **Verification**: Within 5 minutes, confirm the monitor status turns green ("Up"). Review the Supabase Dashboard -> **Reports -> API Requests** to observe incoming PostgREST requests resetting the 7-day inactivity pause counter.
+
+### 3. Alternative: Configure on cron-job.org
+1. Create a free account at [cron-job.org](https://cron-job.org).
+2. Create a new cron job:
+   - **Title**: `UNB Supabase Keep-Alive`
+   - **URL**: `https://premium.urdunovelbanks.com/api/health`
+   - **Execution Schedule**: Every 10 minutes (`*/10 * * * *`)
+   - **Request Method**: `GET`
+3. Save the job and verify execution logs in the cron-job.org console.
+
