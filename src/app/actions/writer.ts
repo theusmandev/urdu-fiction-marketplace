@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { requireWriter } from '@/lib/auth/requireRole';
+import { requireWriter, requireRole } from '@/lib/auth/requireRole';
 import { createClient } from '@/lib/supabase/server';
 import { cleanUrduText } from '@/lib/text/clean-urdu';
 import {
@@ -20,6 +20,10 @@ export interface ActionResponse<T = unknown> {
   data?: T;
   error?: string;
   fieldErrors?: Record<string, string[]>;
+  existingNovelId?: string;
+  existingNovelTitle?: string;
+  existingNovelUrduTitle?: string;
+  existingNovelStatus?: string;
 }
 
 /**
@@ -192,7 +196,7 @@ export async function createNovelAction(
   data: NovelFormInput
 ): Promise<ActionResponse<{ novel_id: string; slug: string }>> {
   try {
-    await requireWriter('/writer/novels/new');
+    const { user } = await requireWriter('/writer/novels/new');
     const supabase = await createClient();
 
     // Fetch dynamic bounds from platform_settings
@@ -220,6 +224,42 @@ export async function createNovelAction(
     }
 
     const val = parsed.data;
+    const cleanEnglish = val.title_english.trim().toLowerCase();
+    const cleanUrdu = cleanUrduText(val.title_urdu).trim();
+
+    // Query existing novels authored by this writer to prevent duplicate creation
+    const { data: existingNovels, error: existingError } = await supabase
+      .from('novels')
+      .select('id, title_english, title_urdu, status, total_chapters')
+      .eq('writer_id', user.id);
+
+    if (existingError) {
+      console.error('[createNovelAction] existing novels check error:', existingError);
+    } else if (existingNovels) {
+      const duplicate = existingNovels.find((n) => {
+        const engMatch = n.title_english.trim().toLowerCase() === cleanEnglish;
+        const urduMatch = cleanUrduText(n.title_urdu).trim() === cleanUrdu;
+        return engMatch || urduMatch;
+      });
+
+      if (duplicate) {
+        const engMatch = duplicate.title_english.trim().toLowerCase() === cleanEnglish;
+        const urduMatch = cleanUrduText(duplicate.title_urdu).trim() === cleanUrdu;
+
+        return {
+          success: false,
+          error: `You already have an existing novel titled "${duplicate.title_english}" (${duplicate.status.toUpperCase()} • ${duplicate.total_chapters} Chapters). Please do not create a duplicate novel — open your existing novel to add or manage chapters.\nآپ کے اکاؤنٹ میں اس نام کا ناول پہلے سے موجود ہے۔ نیا ناول بنانے کے بجائے اپنے موجودہ ناول میں ہی مزید ابواب (Chapters) شامل کریں۔`,
+          existingNovelId: duplicate.id,
+          existingNovelTitle: duplicate.title_english,
+          existingNovelUrduTitle: duplicate.title_urdu,
+          existingNovelStatus: duplicate.status,
+          fieldErrors: {
+            ...(engMatch ? { title_english: ['You already have an existing novel with this English title.'] } : {}),
+            ...(urduMatch ? { title_urdu: ['آپ کے اکاؤنٹ میں اس نام کا اردو ناول پہلے سے موجود ہے۔'] } : {}),
+          },
+        };
+      }
+    }
 
     const { data: rpcData, error } = await supabase.rpc('create_novel', {
       p_title_urdu: cleanUrduText(val.title_urdu),
@@ -257,7 +297,7 @@ export async function updateNovelAction(
   data: NovelFormInput
 ): Promise<ActionResponse<{ novel_id: string }>> {
   try {
-    await requireWriter(`/writer/novels/${novelId}/edit`);
+    const { user } = await requireWriter(`/writer/novels/${novelId}/edit`);
     const supabase = await createClient();
 
     // Fetch dynamic bounds from platform_settings
@@ -285,6 +325,43 @@ export async function updateNovelAction(
     }
 
     const val = parsed.data;
+    const cleanEnglish = val.title_english.trim().toLowerCase();
+    const cleanUrdu = cleanUrduText(val.title_urdu).trim();
+
+    // Query existing novels authored by this writer to prevent renaming into an existing novel
+    const { data: existingNovels, error: existingError } = await supabase
+      .from('novels')
+      .select('id, title_english, title_urdu, status, total_chapters')
+      .eq('writer_id', user.id);
+
+    if (existingError) {
+      console.error('[updateNovelAction] existing novels check error:', existingError);
+    } else if (existingNovels) {
+      const duplicate = existingNovels.find((n) => {
+        if (n.id === novelId) return false;
+        const engMatch = n.title_english.trim().toLowerCase() === cleanEnglish;
+        const urduMatch = cleanUrduText(n.title_urdu).trim() === cleanUrdu;
+        return engMatch || urduMatch;
+      });
+
+      if (duplicate) {
+        const engMatch = duplicate.title_english.trim().toLowerCase() === cleanEnglish;
+        const urduMatch = cleanUrduText(duplicate.title_urdu).trim() === cleanUrdu;
+
+        return {
+          success: false,
+          error: `You already have another novel titled "${duplicate.title_english}". Novel titles must be unique across your catalog.\nآپ کے اکاؤنٹ میں اس نام کا ایک اور ناول پہلے سے موجود ہے۔`,
+          existingNovelId: duplicate.id,
+          existingNovelTitle: duplicate.title_english,
+          existingNovelUrduTitle: duplicate.title_urdu,
+          existingNovelStatus: duplicate.status,
+          fieldErrors: {
+            ...(engMatch ? { title_english: ['You already have another novel with this English title.'] } : {}),
+            ...(urduMatch ? { title_urdu: ['آپ کے اکاؤنٹ میں اس نام کا ایک اور اردو ناول پہلے سے موجود ہے۔'] } : {}),
+          },
+        };
+      }
+    }
 
     const { data: rpcData, error } = await supabase.rpc('update_novel', {
       p_novel_id: novelId,
@@ -311,6 +388,41 @@ export async function updateNovelAction(
     return { success: true, data: result };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to update novel.';
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Permanently delete an unwanted or duplicate draft novel.
+ * Strictly enforced: Only works for novels in status = 'draft' with 0 orders/entitlements.
+ */
+export async function deleteDraftNovelAction(
+  novelId: string
+): Promise<ActionResponse<{ deleted: boolean; novel_id: string }>> {
+  try {
+    await requireRole(['writer', 'admin'], '/writer/novels');
+    const supabase = await createClient();
+
+    const { data: rpcData, error } = await supabase.rpc('delete_draft_novel', {
+      p_novel_id: novelId,
+    });
+
+    if (error) {
+      console.error('[deleteDraftNovelAction] error:', error);
+      return { success: false, error: error.message };
+    }
+
+    const result = rpcData as { success: boolean; deleted: boolean; novel_id: string };
+
+    revalidatePath('/writer/novels');
+    revalidatePath('/writer');
+    revalidatePath('/admin/novels');
+    revalidatePath(`/writer/novels/${novelId}/edit`);
+    revalidatePath(`/admin/novels/${novelId}`);
+
+    return { success: true, data: result };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Failed to delete draft novel.';
     return { success: false, error: msg };
   }
 }

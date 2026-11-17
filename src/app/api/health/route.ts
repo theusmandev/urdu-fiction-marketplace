@@ -5,14 +5,12 @@ import { checkSupabaseHealth, CACHE_CONTROL_HEADERS } from '@/lib/health/health-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export { CACHE_CONTROL_HEADERS };
-
 /**
  * GET /api/health
  * Public health check and keep-alive endpoint for UptimeRobot / cron-job.org.
  * Executes a stateless, lightweight query on Supabase 'genres' to keep the Free Tier database active.
  */
-export async function GET(request?: Request): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
     const supabase = getPublicSupabase();
     const result = await checkSupabaseHealth(supabase);
@@ -44,6 +42,6 @@ export async function GET(request?: Request): Promise<NextResponse> {
  * Supported for monitoring tools (like UptimeRobot Free Tier) that ping with HEAD by default.
  * Delegates to GET to genuinely execute the Supabase PostgREST query.
  */
-export async function HEAD(request?: Request): Promise<NextResponse> {
-  return GET(request);
+export async function HEAD(): Promise<NextResponse> {
+  return GET();
 }

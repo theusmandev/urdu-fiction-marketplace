@@ -685,6 +685,17 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm query succeeds and view is selectable by anon/authenticated.
 
+### 56. `supabase/migrations/0056_delete_draft_novel.sql` [DELETE DRAFT NOVEL RPC & DUPLICATE CREATION GUARD]
+- **Purpose**: Implements atomic draft novel deletion and duplicate title prevention:
+  - **RPC `public.delete_draft_novel(p_novel_id uuid)`**: Allows authors (or administrators) to permanently delete accidental or duplicate draft novels. Enforces strict invariants: novel must be in status `'draft'`, zero orders, zero purchase entitlements, and zero sales ledger records. Foreign keys automatically cascade to `chapters`, `novel_genres`, `reader_progress`, and `chapter_drafts`. Records an immutable audit entry in `public.audit_logs`.
+  - **RPC `public.create_novel(...)` update**: Adds an author-level duplicate title guard that rejects creating a second novel with the same normalized English title (case-insensitive) or Urdu title, instructing the author to add chapters to their existing novel instead.
+- **Action**: Paste contents of `supabase/migrations/0056_delete_draft_novel.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run:
+  ```sql
+  SELECT proname, prosecdef FROM pg_proc WHERE proname IN ('delete_draft_novel', 'create_novel');
+  ```
+  Confirm both functions exist with `prosecdef = true`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
@@ -816,6 +827,7 @@ Run the SQL test suites and automated Jest/Node test runners to validate securit
    - `supabase/tests/23_suspended_visibility_tests.sql` (Suspended writer & novel visibility hardening, catalog exclusion, and entitlement preservation)
    - `supabase/tests/24_admin_impersonation_tests.sql` (Admin support impersonation authorization, validation, and audit trail tests)
    - `supabase/tests/25_public_writers_zero_novels_tests.sql` (Approved writers with zero published novels visibility and suspension isolation tests)
+   - `supabase/tests/26_delete_draft_novel_tests.sql` (Draft novel deletion authorization, status enforcement, order isolation, and duplicate creation guard tests)
 3. Run automated Node.js unit tests:
    ```bash
    npm test

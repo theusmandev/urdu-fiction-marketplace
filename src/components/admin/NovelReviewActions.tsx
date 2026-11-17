@@ -9,6 +9,7 @@ import {
   adminUnsuspendNovelAction,
   adminSetNovelFeaturedAction,
 } from '@/app/actions/admin';
+import { deleteDraftNovelAction } from '@/app/actions/writer';
 import { ReasonConfirmDialog } from './ReasonConfirmDialog';
 import {
   CheckCircle2,
@@ -19,6 +20,8 @@ import {
   CheckSquare,
   Square,
   ShieldCheck,
+  Trash2,
+  Loader2,
 } from 'lucide-react';
 
 interface NovelReviewActionsProps {
@@ -43,6 +46,10 @@ export function NovelReviewActions({
   const [activeDialog, setActiveDialog] = useState<
     'approve' | 'reject' | 'suspend' | 'unsuspend' | null
   >(null);
+
+  // Admin delete draft state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Moderation Checklist State
   const [checklist, setChecklist] = useState({
@@ -154,6 +161,25 @@ export function NovelReviewActions({
     }
   };
 
+  const handleDeleteDraft = async () => {
+    setIsDeleting(true);
+    setError(null);
+    try {
+      const res = await deleteDraftNovelAction(novelId);
+      if (!res.success) {
+        setError(res.error || 'Failed to delete draft novel');
+        setIsDeleteModalOpen(false);
+      } else {
+        router.push('/admin/novels');
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setIsDeleteModalOpen(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {error && (
@@ -257,6 +283,17 @@ export function NovelReviewActions({
               <XCircle className="w-4 h-4" />
               <span>Reject Submission</span>
             </button>
+            {status === 'draft' && (
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(true)}
+                disabled={loading || isDeleting}
+                className="px-4 py-2 rounded-xl border border-danger-border bg-danger-soft hover:bg-danger-soft/80 text-danger-text text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Delete Draft</span>
+              </button>
+            )}
           </>
         )}
 
@@ -353,6 +390,58 @@ export function NovelReviewActions({
         onConfirm={handleUnsuspend}
         onCancel={() => setActiveDialog(null)}
       />
+
+      {/* Confirmation Dialog: Admin Delete Draft Novel */}
+      {isDeleteModalOpen && (
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isDeleting) setIsDeleteModalOpen(false);
+          }}
+        >
+          <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="font-serif font-bold text-base text-navy">
+                Delete Draft Novel?
+              </h3>
+              <p className="text-xs text-secondary leading-relaxed">
+                As an administrator, you are about to permanently delete this draft novel. All unpublished chapters and metadata will be permanently removed. This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 rounded-lg border border-border text-xs font-semibold text-secondary hover:text-main disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleDeleteDraft}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger-hover disabled:opacity-50 shadow-sm"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Yes, Delete Draft</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

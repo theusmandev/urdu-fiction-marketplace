@@ -9,6 +9,7 @@ import { SubmitReviewModal, type NovelChecklistData } from './SubmitReviewModal'
 import {
   withdrawNovelSubmissionAction,
   unpublishNovelAction,
+  deleteDraftNovelAction,
 } from '@/app/actions/writer';
 import {
   BookOpen,
@@ -25,6 +26,7 @@ import {
   DollarSign,
   AlertCircle,
   CheckCircle2,
+  Trash2,
 } from 'lucide-react';
 
 export interface NovelCardItem extends NovelChecklistData {
@@ -43,6 +45,13 @@ interface NovelListClientProps {
 export function NovelListClient({ initialNovels }: NovelListClientProps) {
   const router = useRouter();
 
+  // Reactive novel list state for instant optimistic updates
+  const [novels, setNovels] = useState<NovelCardItem[]>(initialNovels);
+
+  React.useEffect(() => {
+    setNovels(initialNovels);
+  }, [initialNovels]);
+
   const [activeTab, setActiveTab] = useState<string>('all');
   const [selectedNovelForModal, setSelectedNovelForModal] = useState<NovelChecklistData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,21 +64,25 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
   const [unpublishNovelId, setUnpublishNovelId] = useState<string | null>(null);
   const [isUnpublishing, setIsUnpublishing] = useState(false);
 
+  // State for Delete Draft Confirmation
+  const [deleteNovel, setDeleteNovel] = useState<NovelCardItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const filteredNovels = initialNovels.filter((novel) => {
+  const filteredNovels = novels.filter((novel) => {
     if (activeTab === 'all') return true;
     return novel.status === activeTab;
   });
 
   const counts = {
-    all: initialNovels.length,
-    draft: initialNovels.filter((n) => n.status === 'draft').length,
-    under_review: initialNovels.filter((n) => n.status === 'under_review').length,
-    published: initialNovels.filter((n) => n.status === 'published').length,
-    rejected: initialNovels.filter((n) => n.status === 'rejected').length,
-    suspended: initialNovels.filter((n) => n.status === 'suspended').length,
+    all: novels.length,
+    draft: novels.filter((n) => n.status === 'draft').length,
+    under_review: novels.filter((n) => n.status === 'under_review').length,
+    published: novels.filter((n) => n.status === 'published').length,
+    rejected: novels.filter((n) => n.status === 'rejected').length,
+    suspended: novels.filter((n) => n.status === 'suspended').length,
   };
 
   const handleOpenReviewModal = (novel: NovelCardItem) => {
@@ -103,6 +116,23 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
       setErrorMessage(res.error || 'Failed to unpublish novel.');
     } else {
       setSuccessMessage('Novel unpublished and reverted to draft.');
+      router.refresh();
+    }
+  };
+
+  const handleDeleteDraft = async (novelId: string) => {
+    setIsDeleting(true);
+    setErrorMessage(null);
+    const res = await deleteDraftNovelAction(novelId);
+    setIsDeleting(false);
+    setDeleteNovel(null);
+
+    if (!res.success) {
+      setErrorMessage(res.error || 'Failed to delete draft novel.');
+    } else {
+      // Instant optimistic local update
+      setNovels((prev) => prev.filter((n) => n.id !== novelId));
+      setSuccessMessage('Draft novel deleted successfully.');
       router.refresh();
     }
   };
@@ -322,6 +352,19 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {/* Delete Draft CTA for Draft */}
+                    {novel.status === 'draft' && (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteNovel(novel)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-danger-border bg-surface text-danger-text hover:bg-danger-soft text-[11px] font-semibold transition-colors"
+                        title="Delete this draft novel"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Draft</span>
+                      </button>
+                    )}
+
                     {/* Submit Review CTA for Draft & Rejected */}
                     {isDraftOrRejected && (
                       <button
@@ -479,6 +522,63 @@ export function NovelListClient({ initialNovels }: NovelListClientProps) {
                   </>
                 ) : (
                   <span>Yes, Unpublish</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Confirmation Dialog: Delete Draft Novel */}
+      {deleteNovel && (
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isDeleting) setDeleteNovel(null);
+          }}
+        >
+          <div className="bg-surface rounded-2xl border border-border max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="font-serif font-bold text-base text-navy">
+                Delete Draft Novel?
+              </h3>
+              <p className="text-sm font-semibold text-main">
+                {deleteNovel.title_english} {deleteNovel.title_urdu ? `• ${deleteNovel.title_urdu}` : ''}
+              </p>
+              <p className="text-xs text-secondary leading-relaxed">
+                Are you sure you want to permanently delete this draft novel? All draft chapters and manuscript text inside it will be permanently deleted. This action cannot be undone.
+              </p>
+              <p className="text-xs font-urdu text-secondary leading-relaxed" dir="rtl">
+                کیا آپ واقعی اس ڈرافٹ ناول کو حذف کرنا چاہتے ہیں؟ اس کے تمام ابواب اور مسودہ مستقل طور پر ختم ہو جائیں گے۔
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setDeleteNovel(null)}
+                className="px-4 py-2 rounded-lg border border-border text-xs font-semibold text-secondary hover:text-main disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => handleDeleteDraft(deleteNovel.id)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-danger-text text-white text-xs font-semibold hover:bg-danger-text/90 disabled:opacity-50 shadow-sm"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Yes, Delete Draft</span>
                 )}
               </button>
             </div>

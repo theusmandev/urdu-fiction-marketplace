@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ImageUploader } from '@/components/ui/image-uploader';
-import { createNovelAction, updateNovelAction } from '@/app/actions/writer';
+import { createNovelAction, updateNovelAction, deleteDraftNovelAction } from '@/app/actions/writer';
 import type { GenreRow } from '@/types/database';
 import { type NovelFormInput, createNovelFormSchema } from '@/lib/writer/schemas';
 import {
@@ -18,6 +18,8 @@ import {
   Check,
   Globe,
   Lock,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { generateNovelSlug } from '@/lib/text/slug-generator';
 
@@ -73,6 +75,18 @@ export function NovelForm({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [isDirty, setIsDirty] = useState(false);
+
+  // Duplicate novel warning state
+  const [duplicateNovel, setDuplicateNovel] = useState<{
+    id: string;
+    titleEnglish?: string;
+    titleUrdu?: string;
+    status?: string;
+  } | null>(null);
+
+  // Delete draft modal state (for editing draft novels)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Unsaved-changes warning on page leave
   useEffect(() => {
@@ -150,7 +164,16 @@ export function NovelForm({
       if (!res.success) {
         setErrorMessage(res.error || 'Failed to update novel.');
         if (res.fieldErrors) setFieldErrors(res.fieldErrors);
+        if (res.existingNovelId) {
+          setDuplicateNovel({
+            id: res.existingNovelId,
+            titleEnglish: res.existingNovelTitle,
+            titleUrdu: res.existingNovelUrduTitle,
+            status: res.existingNovelStatus,
+          });
+        }
       } else {
+        setDuplicateNovel(null);
         setIsDirty(false);
         setSuccessMessage('Novel details saved successfully.');
         router.refresh();
@@ -162,12 +185,36 @@ export function NovelForm({
       if (!res.success) {
         setErrorMessage(res.error || 'Failed to create novel draft.');
         if (res.fieldErrors) setFieldErrors(res.fieldErrors);
+        if (res.existingNovelId) {
+          setDuplicateNovel({
+            id: res.existingNovelId,
+            titleEnglish: res.existingNovelTitle,
+            titleUrdu: res.existingNovelUrduTitle,
+            status: res.existingNovelStatus,
+          });
+        }
       } else {
+        setDuplicateNovel(null);
         setIsDirty(false);
         setSuccessMessage('Novel draft created successfully.');
         const novelId = res.data?.novel_id;
         router.push(`/writer/novels/${novelId}/chapters`);
       }
+    }
+  };
+
+  const handleDeleteDraft = async () => {
+    if (!initialData?.id) return;
+    setIsDeleting(true);
+    setErrorMessage(null);
+    const res = await deleteDraftNovelAction(initialData.id);
+    setIsDeleting(false);
+    if (!res.success) {
+      setErrorMessage(res.error || 'Failed to delete draft novel.');
+      setIsDeleteModalOpen(false);
+    } else {
+      setIsDirty(false);
+      router.push('/writer/novels');
     }
   };
 
@@ -227,6 +274,46 @@ export function NovelForm({
         <div className="p-4 rounded-xl bg-danger-soft border border-danger-border text-danger-text flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-danger-text shrink-0" />
           <p className="text-xs font-medium">{errorMessage}</p>
+        </div>
+      )}
+
+      {/* Duplicate Novel Guidance Banner */}
+      {duplicateNovel && (
+        <div className="p-5 rounded-2xl bg-warning-soft border border-warning-border text-warning-text space-y-3">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-accent-strong shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-navy">
+                You already have a novel with this title / آپ کے پاس اس نام کا ناول پہلے سے موجود ہے
+              </h3>
+              <p className="text-xs text-secondary leading-relaxed">
+                You already have an existing novel titled{' '}
+                <strong className="text-navy">{duplicateNovel.titleEnglish}</strong>
+                {duplicateNovel.titleUrdu ? ` (${duplicateNovel.titleUrdu})` : ''}
+                {duplicateNovel.status ? ` in status ${duplicateNovel.status.toUpperCase()}` : ''}.
+                Please do not create a duplicate novel entry — open your existing novel to add or manage chapters.
+              </p>
+              <p className="text-xs font-urdu text-secondary leading-relaxed pt-1" dir="rtl">
+                آپ کے اکاؤنٹ میں اس نام کا ناول پہلے سے موجود ہے۔ نیا ناول بنانے کے بجائے اپنے موجودہ ناول میں ہی مزید ابواب (Chapters) شامل کریں۔
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-1 pl-8">
+            <Link
+              href={`/writer/novels/${duplicateNovel.id}/chapters`}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy-light shadow-sm transition-colors"
+            >
+              <BookOpen className="w-4 h-4 text-accent" />
+              <span>Manage Existing Novel Chapters →</span>
+            </Link>
+            <Link
+              href={`/writer/novels/${duplicateNovel.id}/edit`}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-surface text-secondary hover:text-navy text-xs font-semibold transition-colors"
+            >
+              <span>Edit Existing Novel</span>
+            </Link>
+          </div>
         </div>
       )}
 
@@ -557,6 +644,32 @@ export function NovelForm({
         </div>
       </div>
 
+      {/* Section 6: Danger Zone (Draft Deletion) */}
+      {isEditing && initialData?.status === 'draft' && (
+        <div className="bg-surface rounded-2xl border border-danger-border/60 p-6 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-serif font-bold text-danger-text uppercase tracking-wider flex items-center gap-2">
+                <Trash2 className="w-4 h-4 text-danger-text" />
+                Delete Draft Novel
+              </h2>
+              <p className="text-xs text-secondary mt-1">
+                Permanently delete this draft novel and its unpublished chapters. This action cannot be undone.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-danger-border bg-danger-soft text-danger-text hover:bg-danger-soft/80 text-xs font-semibold shrink-0 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Draft Novel</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Footer Submit */}
       <div className="flex items-center justify-between bg-surface rounded-xl border border-border p-4 shadow-sm">
         <Link
@@ -584,6 +697,64 @@ export function NovelForm({
           )}
         </button>
       </div>
+
+      {/* Delete Draft Confirmation Modal */}
+      {isDeleteModalOpen && initialData && (
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isDeleting) setIsDeleteModalOpen(false);
+          }}
+        >
+          <div className="bg-surface rounded-2xl border border-border max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-full bg-danger-soft border border-danger-border text-danger-text flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="font-serif font-bold text-base text-navy">
+                Delete Draft Novel?
+              </h3>
+              <p className="text-sm font-semibold text-main">
+                {initialData.title_english} {initialData.title_urdu ? `• ${initialData.title_urdu}` : ''}
+              </p>
+              <p className="text-xs text-secondary leading-relaxed">
+                Are you sure you want to permanently delete this draft novel? All draft chapters and manuscript text inside it will be permanently deleted. This action cannot be undone.
+              </p>
+              <p className="text-xs font-urdu text-secondary" dir="rtl">
+                کیا آپ واقعی اس ڈرافٹ ناول کو مستقل طور پر حذف کرنا چاہتے ہیں؟ اس ناول کے تمام غیر شائع شدہ ابواب حذف ہو جائیں گے۔
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 rounded-lg border border-border text-xs font-semibold text-secondary hover:text-main disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleDeleteDraft}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-danger-text text-white text-xs font-semibold hover:bg-danger-text/90 disabled:opacity-50 shadow-sm"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Yes, Delete Draft</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
