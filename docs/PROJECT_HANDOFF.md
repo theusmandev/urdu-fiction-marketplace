@@ -1,10 +1,54 @@
 # UNB Premium (`یو این بی پریمیم`) — Comprehensive Project Handoff
 
-> **Document Version:** 1.0.0  
-> **Repository:** `urdu-fiction-marketplace`  
-> **Production URL:** `https://premium.urdunovelbanks.com`  
-> **Target Audience:** Incoming Lead Engineers, Full-Stack Developers, Database Architects, and Autonomous Coding Agents.  
-> **Verification Status:** Fully audited against repository commit history, Supabase migrations (`0001`–`0056`), OpenNext Cloudflare configuration, and automated test suites.
+> **Document Version:** 1.1.0
+> **Repository:** `urdu-fiction-marketplace`
+> **Production URL:** `https://premium.urdunovelbanks.com`
+> **Target Audience:** Incoming Lead Engineers, Full-Stack Developers, Database Architects, and Autonomous Coding Agents.
+> **Verification Status:** Fact-checked on 2026-11-18 against the actual repository. Tech stack versions read from `package.json` and `package-lock.json`. Routes rebuilt from the real `src/app` file tree. RPC migration sources verified by grepping `supabase/migrations/*.sql`. Scheduling verified from `.github/workflows/cron.yml` and `wrangler.jsonc`. Test counts taken from actual directory listings and test runner output. Claims that could not be verified against repository evidence are marked UNVERIFIED.
+
+---
+
+## Corrections in 1.1.0
+
+The following errors from v1.0.0 have been corrected:
+
+1. **Lucide-react version** was `^1.16.0` → corrected to `^1.61.0` (resolved: `1.61.0`).
+2. **Mammoth version** was `^1.11.0` → corrected to `^1.13.0` (resolved: `1.13.0`).
+3. **Tailwind CSS version** listed as `^4.0.0` → package.json says `^4`, resolved to `4.3.3`; dev package `@tailwindcss/turbopack` resolves to `4.3.3`.
+4. **Routes section completely rebuilt** from actual file tree. Major corrections:
+   - `/browse` does not exist — removed.
+   - `/novels/[slug]/read` does not exist — the catalog detail is `/novels/[slug]`; the reader is in route group `(reader)` as `/novels/[slug]/read/[number]`, plus a legacy `/read/[slug]/[number]`.
+   - `/orders/[id]/pay` does not exist — the actual route is `/orders/[orderNumber]` (single page showing order details and payment actions).
+   - `/tips/[writerId]` and `/tips/orders/[id]` do not exist — actual tip routes are `/tips` (list), `/tips/new` (create), `/tips/[tipNumber]` (detail).
+   - `/writer/payments` does not exist — actual route is `/writer/payment-methods`.
+   - `/writer/novels/[id]` does not exist as a standalone page — the novel hub is accessed through sub-routes like `/writer/novels/[id]/edit`, `/writer/novels/[id]/chapters`.
+   - `/writer/novels/[id]/split` does not exist as a route — the splitter (`ChapterSplitterWizard.tsx`) is a component embedded in the chapters page, not its own page route.
+   - `/admin/audit-logs` does not exist — actual route is `/admin/audit`.
+   - `/admin/analytics` does not exist as a named route — there is `/admin/dashboard`.
+   - `/admin/commission` has sub-routes: `/admin/commission`, `/admin/commission/reports`, `/admin/commission/writers/[id]`.
+   - `/admin/invoices` and `/admin/invoices/[id]` exist (not documented previously).
+   - `/admin/refunds` exists (not documented previously).
+   - `/admin/tips` and `/admin/tips/[id]` exist (not documented previously).
+   - `/admin/support` and `/admin/support/[id]` exist (not documented previously).
+   - API routes `/api/cron/cleanup` and `/api/cron/purge-drafts` exist (not documented previously).
+   - `/api/writer/export-sales` and `/api/writer/parse-manuscript` exist (not documented previously).
+   - `/api/proofs/signed-url` exists (not documented previously).
+   - `/api/auth/impersonate` does **not** exist — there is no such route file; impersonation is handled via a different mechanism. Removed.
+   - `/api/chapters/autosave` does **not** exist — the autosave is `/api/writer/parse-manuscript` and client-side logic. Removed.
+   - `/api/settings/palette` does **not** exist — removed.
+   - Writer routes `/writer/disputes`, `/writer/disputes/[id]`, `/writer/earnings`, `/writer/agreement`, `/writer/commission/[invoiceId]` exist (not documented previously).
+   - Public routes `/novels`, `/writers`, `/genres` listing pages exist.
+   - Informational routes `/how-it-works`, `/how-to-pay`, `/content-policy`, `/writer-agreement`, `/refund-policy` exist. `/about`, `/terms`, `/privacy` are confirmed.
+   - Dev routes `/dev/fonts` (inside `(marketplace)`) and `/dev/brand`, `/dev/theme` exist at the root dev group.
+5. **RPC `claim_email_batch`** — no function with this exact name exists. The actual function is `claim_pending_emails_for_send` (migration `0051`) plus `record_email_delivery_result` and `retry_failed_emails`. Corrected.
+6. **RPC `batch_import_chapters`** — no function with this name exists. Actual RPCs are `import_chapters` and `split_chapter` (migration `0031`). Corrected.
+7. **"48-hour dispute trigger rule"** — corrected. The 48-hour figure appears only in the reminder logic (migration `0018`): payment submissions older than 48 hours trigger an admin notification. The minimum wait before a reader *can* open a dispute is `min_dispute_wait_hours` (default `24` hours, migration `0018`), not 48 hours.
+8. **Scheduling** — v1.0.0 incorrectly said emails are not automatically sent. `.github/workflows/cron.yml` triggers `/api/cron/send-emails` every 5 minutes via GitHub Actions `schedule: cron: '*/5 * * * *'`. Corrected and documented in full.
+9. **Supabase SQL test file count** was 28 — actual count is **30** (29 `.sql` files + 1 `.md` checklist). The SQL suites are 29 files total, including `rls_hardening.test.sql` and two tests numbered `21` (`21_api_rate_limits_tests.sql` and `21_site_palette_tests.sql`).
+10. **Node.js test file count** was 46 — actual count is **46 test files** in `tests/` (excluding the `fixtures/` subdirectory). Test runner produces **618 passing tests** (confirmed by running `npm test`).
+11. **Tip daily cap** — v1.0.0 did not state the actual default values. Corrected: `tip_min_pkr DEFAULT 20`, `tip_max_pkr DEFAULT 5000`, `max_tips_per_hour DEFAULT 5`, `tip_daily_cap_pkr_per_reader DEFAULT 10000`, `tip_confirm_reminder_hours DEFAULT 48` (all from `0034_tips.sql`).
+12. **Known Issues** expanded — added marketing copy conflict ("instant digital access" metadata, "Pay securely" language) and other factual gaps in public copy.
+13. **Database client & utility versions verified** — `@supabase/supabase-js` (`2.118.0`), `@supabase/ssr` (`0.12.7`), and `browser-image-compression` (`2.0.2`) verified from `package-lock.json`.
 
 ---
 
@@ -29,7 +73,7 @@
 ## 1. Product Summary
 
 ### 1.1 Purpose & Mission
-**UNB Premium** (`یو این بی پریمیم`) is a dedicated digital publishing platform and reader-to-writer commercial marketplace engineered specifically for serialized and standalone Urdu fiction (Novels, Novelettes, Afsanay, and Episodic Series). 
+**UNB Premium** (`یو این بی پریمیم`) is a dedicated digital publishing platform and reader-to-writer commercial marketplace engineered specifically for serialized and standalone Urdu fiction (Novels, Novelettes, Afsanay, and Episodic Series).
 
 The platform solves two major problems in Pakistani digital publishing:
 1. **Lack of International Payment Gateways:** International card networks (Stripe, PayPal) do not natively serve mainstream Pakistani creators or consumers due to banking constraints. UNB Premium operates exclusively on Pakistani domestic direct-payment rails (**JazzCash**, **EasyPaisa**, **Raast**, and **Direct Bank Transfer / IBAN**).
@@ -51,7 +95,7 @@ The system implements three mutually exclusive primary user roles (governed by `
    - Applies for author status with pen name, Urdu bio, and contact information.
    - Configures domestic payout accounts (JazzCash, EasyPaisa, Raast, Bank IBAN).
    - Creates novels (English title, Urdu Nastaliq title, synopsis, cover artwork).
-   - Ingests manuscripts using the **Writer-Controlled Chapter Splitter** (batch import from `.docx` or `.txt`, automatic Urdu numbering `حصہ ۱`, `حصہ ۲`).
+   - Ingests manuscripts using the **Writer-Controlled Chapter Splitter** (batch import from `.docx` or `.txt`, automatic Urdu numbering `حصہ ۱`, `حصہ ۲`; the splitter is a component embedded in `/writer/novels/[id]/chapters`).
    - Writes and autosaves chapter drafts with revision tracking.
    - Submits novels for administrative editorial review.
    - Verifies or rejects reader payment submissions directly from the Writer Studio dashboard after checking their bank SMS/app notifications.
@@ -74,6 +118,7 @@ Unlike conventional e-commerce platforms that act as merchant-of-record, UNB Pre
 - The reader inputs the domestic Transaction ID (TID) and uploads an image receipt (stored in the private `payment-proofs` bucket).
 - The author logs into the Writer Studio, compares the TID and proof against their own banking app / SMS, and triggers the `verify_order_payment` RPC.
 - Upon author verification, the database atomically issues a `purchase_entitlement` granting the reader perpetual access to the novel's paid chapters.
+- **Important:** Access is granted only after the author manually verifies the bank transfer, not automatically or instantly.
 
 ### 1.4 Platform Fee & Monetization Model
 - **Terminology Rule:** The word "commission" (and Urdu "کمیشن") is strictly forbidden in all user-facing copy. The feature is universally labeled **"Platform fee"** (Urdu: **پلیٹ فارم فیس**). Internal database tables and RPC names retain `commission` for historical migration continuity.
@@ -82,30 +127,38 @@ Unlike conventional e-commerce platforms that act as merchant-of-record, UNB Pre
 - **Unpaid Fee Threshold:** Default **PKR 5,000.00**. When a writer's accumulated unpaid platform fees reach or exceed this threshold, the system automatically pauses new order creation for that writer's novels (`orders_paused = true`).
 - **Platform Fee Invoicing & Settlement:** Platform fee invoices are generated periodically by administrators. Writers transfer owed fees to the platform's bank account, report payment, and admins confirm settlement via `confirm_commission_settlement`.
 - **Minimum & Maximum Novel Pricing:**
-  - Minimum Price: **PKR 50.00** (`min_novel_price_pkr` in migration `0014`). Free novels are prohibited on the marketplace.
-  - Maximum Price: **PKR 5,000.00** (`max_novel_price_pkr` in migration `0011`).
-- **Reader Appreciation Tips:**
+  - Minimum Price: **PKR 50.00** (seed default in migration `0005`; enforced and stored in `platform_settings.min_novel_price_pkr`, column added in migration `0014`).
+  - Maximum Price: **PKR 5,000.00** (seed default in migration `0005`; stored in `platform_settings.max_novel_price_pkr`, column added in migration `0011`).
+- **Reader Appreciation Tips (0% platform fee):**
   - 100% of reader tips go directly to the author.
-  - Platform fee on tips is strictly **0.00%** (migration `0034_tips.sql`, enabled by default in `0050`).
+  - Defaults (from `0034_tips.sql`): `tip_min_pkr = 20`, `tip_max_pkr = 5000`, `max_tips_per_hour = 5`, `tip_daily_cap_pkr_per_reader = 10000`, `tip_confirm_reminder_hours = 48`.
 
 ---
 
 ## 2. Tech Stack & Runtime Environment
 
-| Category | Technology | Exact Version | Repository Evidence / Configuration |
+Versions read from `package.json` (semver ranges) and resolved exact versions from `package-lock.json`.
+
+| Category | Technology | Declared Range | Resolved / Installed |
 | :--- | :--- | :--- | :--- |
-| **Framework** | Next.js (App Router) | `16.4.2` | `package.json` (`next: "16.4.2"`) |
-| **UI Library** | React | `19.3.0` | `package.json` (`react: "19.3.0"`, `react-dom: "19.3.0"`) |
-| **Styling Engine** | Tailwind CSS v4 | `^4.0.0` | `@tailwindcss/turbopack`, `src/app/globals.css`, `src/styles/tokens.css` |
-| **Database & Auth** | Supabase PostgreSQL | PostgreSQL 15+ | `@supabase/supabase-js: ^2.118.0`, `@supabase/ssr: ^0.12.7` |
-| **Deployment Target**| Cloudflare Workers | Edge / workerd | `@opennextjs/cloudflare: ^1.20.14`, `wrangler: ^4.156.0` |
-| **Worker Cache** | Cloudflare R2 | Multi-Region R2 | `open-next.config.ts`, binding `NEXT_INC_CACHE_R2_BUCKET: "unb-premium-cache"` |
-| **Worker Tag Cache** | Cloudflare D1 | Serverless SQL | `open-next.config.ts`, binding `NEXT_TAG_CACHE_D1: "unb-premium-tag-cache"` (`ab3532e1-c979-43ad-999a-bb7bbaa5a34d`) |
-| **Email Service** | Resend (REST API) | HTTP v1 REST | Zero TCP dependencies. `EMAIL_PROVIDER="resend"`, `src/lib/email/` |
-| **Icons** | Lucide React | `^1.16.0` | `package.json` (`lucide-react`) |
-| **Document Parser** | Mammoth (.docx to HTML) | `^1.11.0` | `package.json` (Used in client-side chapter splitter) |
-| **Typography** | Next.js Google Fonts | Edge Hosted | `Plus_Jakarta_Sans` (Sans), `Cormorant_Garamond` (Serif), `Gulzar` (Urdu Nastaliq), `Amiri` (Arabic) |
-| **Production Domain**| Cloudflare Custom Domain | `https://premium.urdunovelbanks.com` | Verified in DNS & Cloudflare Workers routing |
+| **Framework** | Next.js (App Router) | `16.4.2` (exact) | `16.4.2` |
+| **UI Library** | React | `19.3.0` (exact) | `19.3.0` |
+| **UI Library** | React DOM | `19.3.0` (exact) | `19.3.0` |
+| **Styling Engine** | Tailwind CSS v4 | `^4` | `4.3.3` |
+| **Styling Compiler** | @tailwindcss/turbopack | `^4` (devDep) | `4.3.3` |
+| **Database & Auth** | @supabase/supabase-js | `^2.118.0` | `2.118.0` |
+| **Database SSR** | @supabase/ssr | `^0.12.7` | `0.12.7` |
+| **Deployment Adapter** | @opennextjs/cloudflare | `1.20.14` (exact, devDep) | `1.20.14` |
+| **Cloudflare CLI** | wrangler | `4.156.0` (exact, devDep) | `4.156.0` |
+| **Icons** | lucide-react | `^1.61.0` | `1.61.0` |
+| **Document Parser** | mammoth (.docx → HTML) | `^1.13.0` | `1.13.0` |
+| **Image Compression** | browser-image-compression | `^2.0.2` | `2.0.2` |
+| **Test Runner** | Node.js built-in `--test` | n/a (via `node --test`) | Native Node.js test runner (no vitest/jest) |
+| **Typography** | Google Fonts (Next.js) | Edge-hosted | `Plus_Jakarta_Sans`, `Cormorant_Garamond`, `Gulzar` (Nastaliq), `Amiri` |
+| **Production Domain** | Cloudflare Custom Domain | `https://premium.urdunovelbanks.com` | Configured in DNS & Workers routing |
+
+> [!IMPORTANT]
+> **No vitest or jest** is installed. The test runner is Node.js's native `--test` framework invoked via `"test": "node --test tests/*.test.ts"` in `package.json`.
 
 ---
 
@@ -114,66 +167,52 @@ Unlike conventional e-commerce platforms that act as merchant-of-record, UNB Pre
 ```
 urdu-fiction-marketplace/
 ├── .github/
-│   └── workflows/                # CI/CD pipelines (Cloudflare build check, cron triggers, security scans)
-├── docs/                         # In-depth architectural documentation, checklists, templates, and audits
+│   └── workflows/
+│       ├── cf-build-check.yml    # Cloudflare build verification CI
+│       ├── cron.yml              # GitHub Actions cron: sends emails every 5 min, reminders hourly
+│       └── security-scan.yml     # Dependency vulnerability scanning
+├── docs/                         # Architectural documentation, checklists, and audit reports
 │   ├── email-templates/          # Raw HTML templates for Supabase Auth and transactional emails
-│   ├── MANUAL_SETUP_CHECKLIST.md # Authoritative step-by-step Supabase & Cloudflare manual setup guide
+│   ├── MANUAL_SETUP_CHECKLIST.md # Step-by-step Supabase & Cloudflare manual setup guide
 │   ├── TERMINOLOGY.md            # "Platform fee" vs internal "commission" mapping rules
 │   ├── RLS_TEST_PLAN.md          # Multi-tenant security matrix & RLS verification scenarios
 │   ├── SECURITY_AUDIT.md         # Vulnerability assessment and mitigation logs
 │   ├── KEEP_ALIVE_AUDIT.md       # Analysis of Supabase Free Tier keep-alive architecture
 │   └── PROJECT_HANDOFF.md        # (This document) Master onboarding and architecture reference
 ├── public/                       # Static public assets (logos, manifest, favicon, brand marks)
-├── scripts/                      # Pre-commit, linting, and quality check node scripts
-│   ├── check-sql-syntax-constructs.mjs # Validates zero invalid pg_catalog qualification in migrations
-│   ├── check-terminology.mjs     # Asserts zero forbidden user-facing occurrences of "commission"
-│   ├── check-design-tokens.mjs   # Asserts zero hard-coded Tailwind palette colors in src/
-│   ├── check-contrast.mjs        # WCAG AA 4.5:1 / 3:1 contrast ratio verification for all palettes
-│   ├── check-links.mjs           # Crawls routes and source files to prevent dead hyperlinks
-│   ├── check-frontend-queries.mjs# PostgREST query validator (checks embed syntax and error handling)
-│   └── check-seo-metadata.mjs    # Validates OpenGraph, Twitter cards, and canonical tags
-├── src/                          # Next.js App Router source root
-│   ├── app/                      # Routes, layouts, error boundaries, and server actions
-│   │   ├── (auth)/               # Login, registration, password recovery routes
-│   │   ├── (marketplace)/        # Public catalog, novel showcase, writer profiles, search
-│   │   ├── account/              # Reader profile, security settings, reading history
-│   │   ├── admin/                # Platform management, moderation, financial reconciliation
-│   │   ├── api/                  # Route handlers (health, session, impersonation, cron, autosave)
-│   │   ├── checkout/             # Payment submission and TID verification checkout funnel
-│   │   ├── library/              # Reader's purchased novels and active reading shelf
-│   │   ├── orders/               # Reader order history and status tracking
-│   │   ├── read/                 # Distraction-free novel reading interface
-│   │   ├── writer/               # Writer Studio (manuscript editor, chapter splitter, sales ledger)
-│   │   ├── globals.css           # Tailwind v4 theme definitions and font setups
-│   │   └── layout.tsx            # Root layout, Google fonts, ConfirmProvider, JSON-LD schemas
+├── scripts/                      # Pre-commit, linting, and quality check scripts
+│   ├── check-sql-syntax-constructs.mjs
+│   ├── check-terminology.mjs
+│   ├── check-colors.mjs
+│   ├── check-contrast.mjs
+│   ├── check-internal-links.mjs
+│   ├── check-frontend-queries.mjs
+│   └── check-seo-regression.mjs
+├── src/
+│   ├── app/
+│   │   ├── (marketplace)/        # Route group for all public-facing marketplace routes
+│   │   ├── (reader)/             # Route group for the distraction-free reader experience
+│   │   ├── admin/                # Admin panel routes
+│   │   ├── api/                  # API route handlers
+│   │   ├── auth/                 # Auth callback handler
+│   │   ├── dev/                  # Developer-only design tool routes
+│   │   ├── read/                 # Legacy reader route (also serves /read/[slug]/[number])
+│   │   ├── writer/               # Writer Studio routes
+│   │   ├── globals.css           # Tailwind v4 theme + font setup
+│   │   └── layout.tsx            # Root layout
 │   ├── components/               # Modular UI components
-│   │   ├── admin/                # Moderation dialogs, user role editors, settlement tables
-│   │   ├── auth/                 # Sign-in forms, password inputs, session providers
-│   │   ├── checkout/             # Bank details display, TID input, screenshot uploader
-│   │   ├── novels/               # Novel cards, cover art display, review forms
-│   │   ├── reader/               # Urdu reading controls, theme picker, font-size sliders
-│   │   ├── studio/               # Chapter editor, chapter splitter wizard, draft manager
-│   │   └── ui/                   # Base primitives (buttons, badges, modals, toast alerts)
-│   ├── config/                   # Global configuration singletons (siteConfig, navigation, metadata)
-│   ├── lib/                      # Business logic, helpers, and database adapters
-│   │   ├── auth/                 # Role guards, session hint cookies, permission helpers
-│   │   ├── email/                # Resend HTTP mailer, bilingual email builders, outbox processor
-│   │   ├── rate-limiting/        # Token bucket / DB sliding-window rate limiters
-│   │   ├── security/             # Sanitization, input escaping, TID normalizers
-│   │   ├── seo/                  # JSON-LD schema generators, canonical URL builders
-│   │   ├── settings/             # Dynamic site-palette loading and theme resolution
-│   │   ├── supabase/             # Server, client, public, cron, and admin Supabase instances
-│   │   └── text/                 # Manuscript splitting, word counters, Urdu text cleaners
-│   ├── styles/                   # Design token CSS variable definitions (`tokens.css`)
-│   ├── types/                    # TypeScript interfaces (`database.ts`, `auth.ts`, `api.ts`)
-│   └── proxy.ts                  # Edge request proxy (session refresh, internal header cleaning)
+│   ├── config/                   # Global singletons (siteConfig, navigation)
+│   ├── lib/                      # Business logic, helpers, database adapters
+│   ├── styles/                   # Design token CSS variables (tokens.css)
+│   ├── types/                    # TypeScript interfaces (database.ts, etc.)
+│   └── proxy.ts                  # Edge request proxy (session refresh, header cleaning)
 ├── supabase/
-│   ├── migrations/               # Numbered sequential SQL migrations (0001 through 0056)
-│   └── tests/                    # SQL pgTAP/psql test suites (28 test scripts)
-├── tests/                        # Vitest / Jest unit and integration tests (46 test files)
+│   ├── migrations/               # SQL migrations 0001–0056
+│   └── tests/                    # SQL test suites (29 .sql files + 1 .md)
+├── tests/                        # Node.js built-in test runner test files (46 .test.ts files)
 ├── open-next.config.ts           # OpenNext Cloudflare adapter cache & binding configuration
 ├── wrangler.jsonc                # Cloudflare Worker configuration & resource bindings
-└── next.config.ts                # Next.js server configuration, security headers, CSP
+└── next.config.ts                # Next.js configuration, security headers, CSP
 ```
 
 ---
@@ -181,64 +220,135 @@ urdu-fiction-marketplace/
 ## 4. Route Architecture & Access Control
 
 Access control is enforced at two distinct boundaries:
-1. **Edge Request Proxy (`src/proxy.ts` -> `src/lib/supabase/middleware-or-proxy.ts`):** Strips untrusted user headers, refreshes Supabase auth cookies, and blocks unauthenticated requests to protected prefixes.
-2. **Server Action / Route Handler Authorization:** Every mutation independently calls `supabase.auth.getUser()`, verifies account status (`is_active = true`), and checks user roles against the database before executing any logic.
+1. **Edge Request Proxy (`src/proxy.ts` → `src/lib/supabase/middleware-or-proxy.ts`):** Strips untrusted `x-user-id` and `x-user-email` headers, refreshes Supabase auth cookies, and redirects unauthenticated requests on protected prefixes to `/login?next=...`. Protected prefixes (from `middleware-or-proxy.ts`): `/account`, `/library`, `/orders`, `/checkout`, `/writer`, `/admin`, `/read`, `/notifications`, `/disputes`, `/support`, `/tips`, `/become-a-writer`.
+2. **Server Action / Route Handler Authorization:** Every mutation independently calls `supabase.auth.getUser()`, verifies account status (`is_active = true`), and checks user roles before executing any logic.
 
-### 4.1 Route Directory & Access Levels
+### 4.1 Public Routes (No Authentication Required)
 
-| Path | Access Level | Purpose / Description |
+| Route | File | Description |
 | :--- | :--- | :--- |
-| `/` | Public | Homepage showcasing featured novels, newest releases, top genres, and authors. |
-| `/browse` | Public | Catalog browser with search, genre filters, and sort options. |
-| `/novels/[slug]` | Public | Novel details, blurb, pricing, chapter index, reviews, and author bio. |
-| `/novels/[slug]/read` | Public / Reader | Free preview chapter reader. |
-| `/genres/[slug]` | Public | Filtered catalog view for specific literary genres. |
-| `/writers/[id]` | Public | Public author profile, biography, and published catalog. |
-| `/about`, `/contact`, `/terms`, `/privacy`, `/faq` | Public | Informational, legal, and support documentation. |
-| `/login`, `/register`, `/forgot-password`, `/reset-password` | Anonymous | User authentication pages. Authenticated users are automatically redirected to their role dashboard. |
-| `/auth/callback`, `/auth/confirm` | Public | Supabase Auth PKCE code exchange and email verification handler. |
-| `/account` | Authenticated (`reader`, `writer`, `admin`) | Personal profile settings, password update, notification preferences. |
-| `/library` | Authenticated (`reader`, `writer`, `admin`) | Reader's personal library of purchased and reading-in-progress novels. |
-| `/orders` | Authenticated (`reader`, `writer`, `admin`) | Reader's order history, status tracking, and receipt access. |
-| `/orders/[id]/pay` | Authenticated (Order Owner) | Checkout payment screen with author payment details and TID upload form. |
-| `/checkout/[slug]` | Authenticated (Reader) | Initial novel purchase confirmation and order creation step. |
-| `/read/[novelId]/[chapterNumber]` | Entitled Reader / Author / Admin | Distraction-free protected chapter reading interface. |
-| `/tips/[writerId]`, `/tips/orders/[id]` | Authenticated (Reader) | Direct reader-to-author appreciation tipping interface. |
-| `/become-a-writer` | Authenticated (`reader`) | Writer application submission form. |
-| `/disputes` | Authenticated (Order Owner) | Reader dispute creation and tracking for unverified orders. |
-| `/writer` | Authenticated (`writer`, `admin`) | Writer Studio dashboard overview (sales, quick actions, announcements). |
-| `/writer/novels` | Authenticated (`writer`, `admin`) | List of author's own novels across all statuses (`draft`, `under_review`, `published`). |
-| `/writer/novels/new` | Authenticated (`writer`, `admin`) | New novel creation form with duplicate title prevention. |
-| `/writer/novels/[id]` | Authenticated (Novel Author / Admin) | Novel management hub (chapters list, pricing, cover image, status). |
-| `/writer/novels/[id]/edit` | Authenticated (Novel Author / Admin) | Edit novel metadata (title, Urdu title, blurb, genres, price). |
-| `/writer/novels/[id]/chapters` | Authenticated (Novel Author / Admin) | Chapter manager with drag-and-drop reordering. |
-| `/writer/novels/[id]/chapters/new` | Authenticated (Novel Author / Admin) | New chapter creation editor. |
-| `/writer/novels/[id]/chapters/[chapterId]/edit` | Authenticated (Novel Author / Admin) | Chapter editing interface with draft autosave. |
-| `/writer/novels/[id]/split` | Authenticated (Novel Author / Admin) | Manuscript chapter splitter wizard (`.docx` / `.txt` import). |
-| `/writer/orders` | Authenticated (`writer`, `admin`) | Order verification queue where authors approve/reject reader payments. |
-| `/writer/commission` | Authenticated (`writer`, `admin`) | Writer Platform Fee dashboard (unpaid balance, statements, invoices). |
-| `/writer/payments` | Authenticated (`writer`, `admin`) | Author payment method configuration (JazzCash, EasyPaisa, Raast, Bank IBAN). |
-| `/writer/profile` | Authenticated (`writer`, `admin`) | Writer public profile editor (pen name, bio, social links). |
-| `/admin` | Authenticated (`admin` only) | Administrator dashboard with key platform metrics and alerts. |
-| `/admin/novels` | Authenticated (`admin` only) | Platform-wide novel moderation queue and catalog management. |
-| `/admin/novels/[id]` | Authenticated (`admin` only) | Novel review panel with editorial moderation checklist and actions. |
-| `/admin/writers` | Authenticated (`admin` only) | Writer application queue and author status management. |
-| `/admin/writers/[id]` | Authenticated (`admin` only) | Author detail view with custom fee terms and audited support impersonation. |
-| `/admin/orders` | Authenticated (`admin` only) | Global orders explorer with search by TID, reader, or novel. |
-| `/admin/commission` | Authenticated (`admin` only) | Platform fee settlement management, invoice generation, and ledger view. |
-| `/admin/disputes` | Authenticated (`admin` only) | Dispute resolution desk with force-verify and refund capabilities. |
-| `/admin/users` | Authenticated (`admin` only) | User governance (role management, account activation/deactivation). |
-| `/admin/genres` | Authenticated (`admin` only) | Taxonomy management (create, edit, reorder, and deactivate genres). |
-| `/admin/settings` | Authenticated (`admin` only) | Global settings (platform fee, pricing limits, site palette, announcements). |
-| `/admin/audit-logs` | Authenticated (`admin` only) | Immutable administrative activity audit log. |
-| `/admin/analytics` | Authenticated (`admin` only) | Platform financial, order, and reader engagement analytics. |
-| `/api/health` | Public | Stateless Supabase keep-alive health endpoint (HEAD/GET). |
-| `/api/auth/session` | Public | Fast session hint and authenticated user resolver. |
-| `/api/auth/impersonate` | Authenticated (`admin` only) | Generates audited support impersonation links ("Login as Writer"). |
-| `/api/cron/send-emails`| Cron Bearer Secret | Processes pending emails from `email_outbox` via Resend REST API. |
-| `/api/cron/reminders` | Cron Bearer Secret | Sends reminders for pending order verifications and unpaid fees. |
-| `/api/chapters/autosave`| Authenticated (Author / Admin) | Autosaves chapter drafts in background during editing. |
-| `/api/settings/palette`| Public | Returns the active site-wide color palette preset. |
+| `/` | `(marketplace)/page.tsx` | Homepage: featured novels, newest releases, top genres, authors. |
+| `/novels` | `(marketplace)/novels/page.tsx` | Full public novel catalog browser with search and filters. |
+| `/novels/[slug]` | `(marketplace)/novels/[slug]/page.tsx` | Novel detail: blurb, pricing, chapter index, author bio. |
+| `/novels/[slug]/read/[number]` | `(reader)/novels/[slug]/read/[number]/page.tsx` | Reader interface (enforces entitlement via RLS on SSR). |
+| `/read/[slug]/[number]` | `read/[slug]/[number]/page.tsx` | Legacy reader route (same function). |
+| `/genres` | `(marketplace)/genres/page.tsx` | Full genre taxonomy listing page. |
+| `/genres/[slug]` | `(marketplace)/genres/[slug]/page.tsx` | Filtered catalog for a specific genre. |
+| `/writers` | `(marketplace)/writers/page.tsx` | Public approved-writers directory. |
+| `/writers/[username]` | `(marketplace)/writers/[username]/page.tsx` | Public author profile and published novel catalog. |
+| `/about` | `(marketplace)/about/page.tsx` | About UNB Premium. |
+| `/contact` | `(marketplace)/contact/page.tsx` | Contact page. |
+| `/faq` | `(marketplace)/faq/page.tsx` | Frequently asked questions. |
+| `/how-it-works` | `(marketplace)/how-it-works/page.tsx` | Explains the buy/verify/read flow. |
+| `/how-to-pay` | `(marketplace)/how-to-pay/page.tsx` | Payment guide (JazzCash, EasyPaisa, Raast, Bank). |
+| `/terms` | `(marketplace)/terms/page.tsx` | Terms of Service. |
+| `/privacy` | `(marketplace)/privacy/page.tsx` | Privacy Policy. |
+| `/refund-policy` | `(marketplace)/refund-policy/page.tsx` | Refund policy documentation. |
+| `/content-policy` | `(marketplace)/content-policy/page.tsx` | Content moderation policy. |
+| `/writer-agreement` | `(marketplace)/writer-agreement/page.tsx` | Public writer agreement terms. |
+
+### 4.2 Anonymous Routes (Redirect if Already Authenticated)
+
+| Route | File | Description |
+| :--- | :--- | :--- |
+| `/login` | `(marketplace)/login/page.tsx` | Sign-in page. |
+| `/register` | `(marketplace)/register/page.tsx` | Account registration. |
+| `/forgot-password` | `(marketplace)/forgot-password/page.tsx` | Password recovery request. |
+| `/reset-password` | `(marketplace)/reset-password/page.tsx` | New password entry after email link. |
+| `/auth/callback` | `auth/callback/route.ts` | Supabase Auth PKCE code exchange. |
+
+### 4.3 Authenticated Reader / All-Roles Routes
+
+| Route | File | Access |
+| :--- | :--- | :--- |
+| `/account` | `(marketplace)/account/page.tsx` | Profile settings. |
+| `/account/notifications` | `(marketplace)/account/notifications/page.tsx` | Notification preferences. |
+| `/notifications` | `(marketplace)/notifications/page.tsx` | In-app notification feed. |
+| `/library` | `(marketplace)/library/page.tsx` | Reader's purchased novels shelf. |
+| `/orders` | `(marketplace)/orders/page.tsx` | Reader's order history. |
+| `/orders/[orderNumber]` | `(marketplace)/orders/[orderNumber]/page.tsx` | Order detail, payment submission, TID upload. |
+| `/checkout/[slug]` | `(marketplace)/checkout/[slug]/page.tsx` | Novel purchase initiation. |
+| `/disputes` | `(marketplace)/disputes/page.tsx` | Reader dispute list. |
+| `/disputes/[id]` | `(marketplace)/disputes/[id]/page.tsx` | Individual dispute detail / tracking. |
+| `/support` | `(marketplace)/support/page.tsx` | Support ticket list. |
+| `/support/[id]` | `(marketplace)/support/[id]/page.tsx` | Individual support ticket. |
+| `/tips` | `(marketplace)/tips/page.tsx` | Reader's tip history. |
+| `/tips/new` | `(marketplace)/tips/new/page.tsx` | Create a new appreciation tip. |
+| `/tips/[tipNumber]` | `(marketplace)/tips/[tipNumber]/page.tsx` | Individual tip detail. |
+| `/become-a-writer` | `(marketplace)/become-a-writer/page.tsx` | Writer application form (reader role only). |
+
+### 4.4 Writer Studio Routes
+
+| Route | File | Access |
+| :--- | :--- | :--- |
+| `/writer` | `writer/page.tsx` | Writer Studio dashboard. |
+| `/writer/agreement` | `writer/agreement/page.tsx` | Writer platform agreement confirmation. |
+| `/writer/novels` | `writer/novels/page.tsx` | Author's novel list. |
+| `/writer/novels/new` | `writer/novels/new/page.tsx` | Create new novel (with duplicate title guard). |
+| `/writer/novels/[id]/edit` | `writer/novels/[id]/edit/page.tsx` | Edit novel metadata. |
+| `/writer/novels/[id]/chapters` | `writer/novels/[id]/chapters/page.tsx` | Chapter manager + embedded `ChapterSplitterWizard` for manuscript import. |
+| `/writer/novels/[id]/chapters/new` | `writer/novels/[id]/chapters/new/page.tsx` | Create a new chapter. |
+| `/writer/novels/[id]/chapters/[chapterId]` | `writer/novels/[id]/chapters/[chapterId]/page.tsx` | Chapter editor with autosave. |
+| `/writer/orders` | `writer/orders/page.tsx` | Payment verification queue. |
+| `/writer/disputes` | `writer/disputes/page.tsx` | Writer's dispute list. |
+| `/writer/disputes/[id]` | `writer/disputes/[id]/page.tsx` | Individual dispute detail. |
+| `/writer/commission` | `writer/commission/page.tsx` | Platform fee balance and invoices. |
+| `/writer/commission/[invoiceId]` | `writer/commission/[invoiceId]/page.tsx` | Individual invoice detail. |
+| `/writer/earnings` | `writer/earnings/page.tsx` | Earnings and sales ledger view. |
+| `/writer/payment-methods` | `writer/payment-methods/page.tsx` | Payment method configuration. |
+| `/writer/profile` | `writer/profile/page.tsx` | Public profile editor (pen name, bio, social links). |
+| `/writer/tips` | `writer/tips/page.tsx` | Incoming appreciation tips list. |
+
+### 4.5 Admin Panel Routes
+
+| Route | File | Access |
+| :--- | :--- | :--- |
+| `/admin` | `admin/page.tsx` | Admin dashboard overview. |
+| `/admin/dashboard` | `admin/dashboard/page.tsx` | Analytics dashboard. |
+| `/admin/novels` | `admin/novels/page.tsx` | Novel moderation queue. |
+| `/admin/novels/[id]` | `admin/novels/[id]/page.tsx` | Novel review panel. |
+| `/admin/writers` | `admin/writers/page.tsx` | Writer application queue. |
+| `/admin/writers/[id]` | `admin/writers/[id]/page.tsx` | Author detail, fee terms, impersonation. |
+| `/admin/orders` | `admin/orders/page.tsx` | Global orders explorer. |
+| `/admin/orders/[id]` | `admin/orders/[id]/page.tsx` | Individual order detail. |
+| `/admin/disputes` | `admin/disputes/page.tsx` | Dispute resolution desk. |
+| `/admin/disputes/[id]` | `admin/disputes/[id]/page.tsx` | Individual dispute resolution. |
+| `/admin/commission` | `admin/commission/page.tsx` | Platform fee overview. |
+| `/admin/commission/reports` | `admin/commission/reports/page.tsx` | Financial reports. |
+| `/admin/commission/writers/[id]` | `admin/commission/writers/[id]/page.tsx` | Per-writer fee details. |
+| `/admin/invoices` | `admin/invoices/page.tsx` | Invoice management list. |
+| `/admin/invoices/[id]` | `admin/invoices/[id]/page.tsx` | Individual invoice detail. |
+| `/admin/refunds` | `admin/refunds/page.tsx` | Refund adjustments desk. |
+| `/admin/tips` | `admin/tips/page.tsx` | Platform-wide tips management. |
+| `/admin/tips/[id]` | `admin/tips/[id]/page.tsx` | Individual tip detail. |
+| `/admin/support` | `admin/support/page.tsx` | Support ticket queue. |
+| `/admin/support/[id]` | `admin/support/[id]/page.tsx` | Individual support ticket. |
+| `/admin/users` | `admin/users/page.tsx` | User role and status governance. |
+| `/admin/genres` | `admin/genres/page.tsx` | Taxonomy management. |
+| `/admin/settings` | `admin/settings/page.tsx` | Global platform settings. |
+| `/admin/audit` | `admin/audit/page.tsx` | Immutable administrative activity log. |
+
+### 4.6 API Routes
+
+| Route | File | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/health` | `api/health/route.ts` | None (public) | Stateless Supabase keep-alive (GET/HEAD). |
+| `/api/auth/session` | `api/auth/session/route.ts` | Cookie or public | Fast session resolver. |
+| `/api/cron/send-emails` | `api/cron/send-emails/route.ts` | Bearer `CRON_SECRET` | Dispatches pending `email_outbox` rows via Resend. Triggered by GitHub Actions every 5 minutes. |
+| `/api/cron/reminders` | `api/cron/reminders/route.ts` | Bearer `CRON_SECRET` | Sends verification and fee reminders. Triggered hourly by GitHub Actions. |
+| `/api/cron/cleanup` | `api/cron/cleanup/route.ts` | Bearer `CRON_SECRET` | Prunes stale records per data-retention policy. |
+| `/api/cron/purge-drafts` | `api/cron/purge-drafts/route.ts` | Bearer `CRON_SECRET` | Purges inactive chapter drafts older than 90 days. |
+| `/api/proofs/signed-url` | `api/proofs/signed-url/route.ts` | Authenticated | Generates private signed URLs for payment screenshots. |
+| `/api/writer/export-sales` | `api/writer/export-sales/route.ts` | Authenticated (writer) | Exports writer sales data as CSV/JSON. |
+| `/api/writer/parse-manuscript` | `api/writer/parse-manuscript/route.ts` | Authenticated (writer) | Parses `.docx` manuscripts server-side for the chapter splitter. |
+
+### 4.7 Developer-Only Routes
+
+| Route | File | Description |
+| :--- | :--- | :--- |
+| `/dev/brand` | `dev/brand/page.tsx` | Brand asset viewer. |
+| `/dev/theme` | `dev/theme/page.tsx` | Design token theme explorer. |
+| `/dev/fonts` | `(marketplace)/dev/fonts/page.tsx` | Font rendering test. |
 
 ---
 
@@ -248,394 +358,413 @@ The database is built on **PostgreSQL 15+** managed via Supabase. All database l
 
 ### 5.1 Sequential Migration Log (0001 through 0056)
 
-| Migration File | Primary Focus | Key Schema Objects & Actions Created |
+| Migration File | Primary Focus | Key Schema Objects Created |
 | :--- | :--- | :--- |
-| `0001_enums_and_core_tables.sql` | Core Domain Schema | Enums (`user_role`, `writer_status`, `payment_method_type`, `novel_status`, `order_status`). Core tables: `profiles`, `writer_profiles`, `writer_payment_methods`, `genres`, `novels`, `novel_genres`, `chapters`, `platform_settings`. |
-| `0002_orders_and_financial_ledger.sql` | Financial Framework | Tables: `orders`, `payment_submissions` (with virtual generated `normalized_tid`), `purchase_entitlements`, `commission_invoices`, `sales_ledger`, `commission_payments`, `disputes`, `notifications`, `audit_logs`. |
-| `0003_triggers_and_rpc_functions.sql` | Automation & Logic | Triggers: `handle_new_user()`, order number generators. Initial verification and rejection RPCs. |
-| `0004_rls_policies.sql` | Baseline RLS | Row-Level Security policies establishing multi-tenant data isolation. |
-| `0005_seed_genres_and_settings.sql` | Seed Data | Initial singleton in `platform_settings` (initial 20% default fee, PKR 5,000 threshold); seeds 8 primary Urdu genres. |
-| `0006_security_and_financial_hardening.sql` | Security Lockdown | Drops client write policies on financial tables; adds append-only triggers on `sales_ledger` and `audit_logs`; creates atomic transactional RPCs (`create_order`, `submit_payment`, `verify_order_payment`, `reject_order_payment`, `record_refund_adjustment`). Configures storage buckets (`payment-proofs`, `novel-assets`). |
-| `0007_gap_fixes_and_storage_hardening.sql` | Revisions & Limits | Adds `chapter_revisions` table and tracking trigger; creates `reader_progress` table; enforces 120,000 character limit on chapters; refines storage RLS policies. |
-| `0008_revoke_default_grants.sql` | ACL Hardening | Revokes default `PUBLIC` and `anon` write privileges across `public` schema. |
-| `0009_order_flow_fixes.sql` | Order Edge Cases | Hardens `verify_order_payment` and `reject_order_payment` state assertions; implements `cancel_order` and `apply_as_writer` RPCs. |
-| `0010_dispute_and_writer_status_hardening.sql` | Disputes & Reapplication | Adds `dispute_window_days`; prevents duplicate active orders during dispute; locks writer re-application workflow. |
-| `0011_writer_content_hardening.sql` | Content Security | Adds `max_novel_price_pkr`; triggers for novel column protection; automatic chapter word counting (`trg_chapters_calculate_word_count`); blocks chapter deletion after publication; adds `submit_novel_for_review` and `unpublish_own_novel` RPCs. |
-| `0012_admin_controls.sql` | Admin Governance | Admin RPCs: `suspend_novel`, `unsuspend_novel`, `set_novel_featured`, `create_genre`, `update_platform_settings`, `set_writer_commission_terms`, `admin_update_user_role_status`. |
-| `0013_public_catalog.sql` | Catalog Views | Adds `public_novels_catalog` and `public_writers_catalog` views with security barrier protection. |
-| `0014_min_novel_price.sql` | Pricing Constraints | Adds `min_novel_price_pkr = 50.00`; blocks free novel submissions. |
-| `0015_checkout_and_payment_submission.sql` | Checkout Pipeline | Hardens checkout flow, payment screenshot association, and TID validation. |
-| `0016_reader_and_admin_orders.sql` | Order Visibility | Optimized views and helper functions for reader order history and administrative order tracking. |
-| `0017_a_commission_enum_values.sql` | Enum Isolation | Standalone commit for adding new enum values (`ALTER TYPE ... ADD VALUE`), fulfilling PostgreSQL 55P04 safety. |
-| `0017_commission_and_statements.sql` | Fee Statements | Statement calculation views and platform fee reconciliation functions. |
-| `0018_disputes_refunds_support.sql` | Dispute Resolution | Implements `open_dispute`, `resolve_dispute`, `admin_force_verify`, and support ticket tracking. |
-| `0019_database_reconciliation_and_runtime_fixes.sql` | Runtime Bug Fixes | Fixes null pointer edge cases in RPC returns and handles edge order states. |
-| `0020_database_reconciliation_and_immutability_hardening.sql` | Immutability | Enforces strict immutability on completed order records and financial ledger rows. |
-| `0021_trigger_privilege_lockdown_and_search_path_fix.sql` | Search Path Hardening | Ensures all trigger functions explicitly define `SET search_path = ''`. |
-| `0022_protection_triggers_and_search_path_lockdown.sql` | Column Protection | Locks system columns across `novels`, `profiles`, and `writer_profiles` against direct SQL modifications. |
-| `0023_fix_sql_construct_qualification_regression.sql` | Syntax Cleanup | Removes forbidden `pg_catalog.` prefixes from SQL grammar keywords (`COALESCE`, `NULLIF`, `TRIM`, `GREATEST`, `LEAST`). |
-| `0024_format_specifiers_and_privilege_lockdown.sql` | Formatting Fixes | Replaces legacy string formatting with secure `format()` specifiers in dynamic SQL. |
-| `0025_commission_settlement_and_audit_hardening.sql` | Settlement Hardening | Enforces dual-sided audit logging for platform fee settlements. |
-| `0026_revoke_trigger_privileges_and_default_acls.sql` | ACL Lockdown | Explicitly revokes trigger execution rights from non-superuser roles. |
-| `0027_admin_novel_moderation_rls.sql` | Moderation RLS | Grants administrators full access to unpublished/draft novels within the moderation queue. |
-| `0028_admin_get_invoice_rpc.sql` | Invoice RPC | Adds secure administrative RPC to fetch and compile platform fee invoice details. |
-| `0029_sensitive_column_exposure_hardening.sql` | Data Privacy | Restricts public views from exposing author phone numbers, real names, or internal financial limits. |
-| `0030_platform_payment_methods_admin_policy.sql` | Platform Accounts | Adds table and admin policies for platform receiving bank accounts. |
-| `0031_chapter_import_and_split_rpcs.sql` | Splitter RPCs | Batch chapter ingestion RPC `batch_import_chapters` for the Chapter Splitter Wizard. |
-| `0032_seed_missing_featured_genres.sql` | Taxonomy Expansion | Seeds additional contemporary Urdu literary genres (Mystery, Historical, Thriller). |
-| `0033_chapter_drafts.sql` | Chapter Autosave | Adds `chapter_drafts` table with per-chapter autosave capabilities and writer isolation. |
-| `0034_tips.sql` | Reader Tips | Provisions tipping infrastructure (`tips` table, 0% platform fee, daily caps, writer tip toggles). |
-| `0035_rename_commission_to_platform_fee.sql` | Terminology Sync | Updates database comment metadata and views to reflect "Platform fee" naming standard. |
-| `0036_site_palette_settings.sql` | Palette Presets | Adds `site_palette` column to `platform_settings` supporting Ivory & Ink, Paper & Teal, Cream & Maroon. |
-| `0037_fix_db_verification_issues.sql` | Verification Patch | Resolves minor schema inconsistencies identified during full pgTAP test run. |
-| `0038_api_rate_limits.sql` | Rate Limiting | Adds `api_rate_limits` table and sliding-window rate-limiting RPC. |
-| `0039_add_social_links_to_platform_settings.sql` | Platform Socials | Adds social media links JSONB column to `platform_settings`. |
-| `0040_email_outbox_wiring_and_support_events.sql` | Async Email Outbox | Provisions `email_outbox` table, queueing triggers, and lease-claim RPCs for background email processing. |
-| `0041_data_retention_and_maintenance.sql` | Data Retention | Automated retention cleanup procedures for audit logs, rate limits, and expired drafts. |
-| `0042_writer_studio_announcement.sql` | Studio Banners | Configures platform announcement banner settings for the Writer Studio. |
-| `0043_admin_dashboard_analytics.sql` | Analytics Views | Adds materialized analytics functions for revenue, active readers, and novel sales velocity. |
-| `0044_fix_analytics_and_retention_columns.sql` | Analytics Fixes | Adjusts column data types and grouping expressions in analytics RPCs. |
-| `0045_writer_social_links.sql` | Author Socials | Adds author social media profile links (Facebook, Instagram, YouTube, Website). |
-| `0046_fix_writer_profiles_rls_update.sql` | Profile Update Fix | Resolves RLS policy conflict preventing writers from updating their bio and pen name. |
-| `0047_reader_watermark_toggle.sql` | Anti-Piracy Watermark | Adds platform setting toggle and user configuration for the dynamic reader watermark. |
-| `0048_fix_order_verification_commission_column.sql` | Ledger Column Patch | Ensures `commission_amount` column is correctly recorded during `verify_order_payment`. |
-| `0049_update_default_platform_fee_to_30_percent.sql`| Platform Fee Update | Updates `default_commission_rate` from 20.00% to **30.00%** in `platform_settings`. |
-| `0050_enable_writer_tips_by_default.sql` | Default Tips | Sets `tips_enabled = true` by default for all registered writers. |
-| `0051_email_outbox_lease_and_quota_retry.sql` | Outbox Resilience | Adds lease expiration tracking, retry counters, and exponential backoff to `claim_email_batch`. |
-| `0052_harden_suspended_writer_and_novel_visibility.sql`| Catalog Hardening | Excludes suspended authors and novels from public views while preserving existing reader entitlements. |
-| `0053_fix_novels_rls_recursion.sql` | RLS Recursion Fix | Eliminates PostgreSQL error 42P17 (infinite RLS recursion) via `SECURITY DEFINER` helper functions. |
-| `0054_admin_impersonation_audit.sql` | Impersonation Audit | Adds `admin_impersonation_sessions` table and audit logging for "Login as Writer" actions. |
-| `0055_fix_public_writers_zero_novels.sql` | Writer Discovery Fix | Allows approved writers with zero published novels to display their profile page. |
-| `0056_delete_draft_novel.sql` | Draft Novel Deletion | Adds `delete_draft_novel` RPC (status `'draft'`, zero orders, zero entitlements) and author duplicate title guard in `create_novel`. |
+| `0001_enums_and_core_tables.sql` | Core Domain Schema | Enums, `profiles`, `writer_profiles`, `writer_payment_methods`, `genres`, `novels`, `novel_genres`, `chapters`, `platform_settings`. |
+| `0002_orders_and_financial_ledger.sql` | Financial Framework | `orders`, `payment_submissions` (with virtual `normalized_tid`), `purchase_entitlements`, `commission_invoices`, `sales_ledger`, `commission_payments`, `disputes`, `notifications`, `audit_logs`. |
+| `0003_triggers_and_rpc_functions.sql` | Automation & Logic | `handle_new_user()`, order number generators, initial `confirm_commission_settlement` (superseded). |
+| `0004_rls_policies.sql` | Baseline RLS | Initial multi-tenant Row-Level Security policies. |
+| `0005_seed_genres_and_settings.sql` | Seed Data | `platform_settings` singleton (initial 20% default fee, PKR 5,000 threshold); 8 primary Urdu genres. |
+| `0006_security_and_financial_hardening.sql` | Security Lockdown | Append-only triggers on `sales_ledger` and `audit_logs`; RPCs: `create_order`, `submit_payment`, `verify_order_payment`, `reject_order_payment`, `record_refund_adjustment`, `generate_commission_invoice`, `confirm_commission_settlement`, `open_dispute`, `resolve_dispute`, `approve_novel`, `reject_novel`. Storage buckets `payment-proofs` and `novel-assets`. |
+| `0007_gap_fixes_and_storage_hardening.sql` | Revisions & Limits | `chapter_revisions` table; `reader_progress` table; 120,000-character `CHECK` on `chapters.content_urdu`; `resolve_dispute` and `admin_force_verify` RPCs (first version). |
+| `0008_revoke_default_grants.sql` | ACL Hardening | Revokes default `PUBLIC`/`anon` write privileges. |
+| `0009_order_flow_fixes.sql` | Order Edge Cases | Hardens `verify_order_payment`/`reject_order_payment`; `cancel_order`, `apply_as_writer`, `upsert_writer_payment_method`, `deactivate_writer_payment_method` RPCs. |
+| `0010_dispute_and_writer_status_hardening.sql` | Disputes & Status | Adds `dispute_window_days`; `min_dispute_wait_hours DEFAULT 24`; updated `admin_force_verify`, `open_dispute`, `resolve_dispute`. |
+| `0011_writer_content_hardening.sql` | Content Security | `max_novel_price_pkr`; column-protection triggers on `novels`; word-count trigger; `submit_novel_for_review`, `withdraw_novel_submission`, `unpublish_own_novel`, `create_novel`, `update_novel`, `reorder_chapters`. |
+| `0012_admin_controls.sql` | Admin Governance | `suspend_novel`, `unsuspend_novel`, `set_novel_featured`, `approve_novel` (superseded), `create_genre`, `update_genre`, `reorder_genres`, `delete_genre`, `update_platform_settings`, `set_writer_commission_terms`, `admin_update_user_role_status`. |
+| `0013_public_catalog.sql` | Catalog Views | `public_novels_catalog` and `public_writers_catalog` security-barrier views. |
+| `0014_min_novel_price.sql` | Pricing Constraints | `min_novel_price_pkr` column (DEFAULT 50); PKR 50 enforcement in `create_novel`/`update_novel`. |
+| `0015_checkout_and_payment_submission.sql` | Checkout Pipeline | Checkout flow and TID validation hardening. |
+| `0016_reader_and_admin_orders.sql` | Order Visibility | Reader order history views and admin order-tracking helpers. |
+| `0017_a_commission_enum_values.sql` | Enum Isolation | Standalone commit for `ALTER TYPE ... ADD VALUE` (required by PostgreSQL Error 55P04). |
+| `0017_commission_and_statements.sql` | Fee Statements | `reconcile_writer_unpaid_commission`, `generate_commission_invoice`, `confirm_commission_settlement` (all superseded by later migrations). |
+| `0018_disputes_refunds_support.sql` | Dispute Resolution | Hardened `open_dispute` with `min_dispute_wait_hours`; `resolve_dispute_for_reader`, `resolve_dispute_refund`, `resolve_dispute_for_writer` RPCs; `verification_reminder_hours` column (DEFAULT 48, in `platform_settings`). Note: the 48-hour figure in the reminder logic (`0018`, line 2665) is for triggering *admin alerts* about stale unverified submissions, not the minimum wait to open a dispute (which defaults to 24 hours). |
+| `0019_database_reconciliation_and_runtime_fixes.sql` | Runtime Bug Fixes | Null-pointer edge cases in RPC returns; edge order-state handling; updated `reconcile_writer_unpaid_commission`. |
+| `0020_database_reconciliation_and_immutability_hardening.sql` | Immutability | Immutability on completed orders; updated `admin_force_verify`, `resolve_dispute_for_reader`. |
+| `0021_trigger_privilege_lockdown_and_search_path_fix.sql` | Search Path Hardening | All trigger functions set `SET search_path = ''`. |
+| `0022_protection_triggers_and_search_path_lockdown.sql` | Column Protection | Column lock triggers on `novels`, `profiles`, `writer_profiles`; updated `reconcile_writer_unpaid_commission`. |
+| `0023_fix_sql_construct_qualification_regression.sql` | Syntax Cleanup | Removes forbidden `pg_catalog.` from SQL keywords; updated `reconcile_writer_unpaid_commission`. |
+| `0024_format_specifiers_and_privilege_lockdown.sql` | Formatting Fixes | `format()` specifiers in dynamic SQL; updated `admin_force_verify`, `confirm_commission_settlement`, `generate_commission_invoice`, `reconcile_writer_unpaid_commission`. |
+| `0025_commission_settlement_and_audit_hardening.sql` | Settlement Hardening | Dual-sided audit logging for settlements; updated `confirm_commission_settlement`. |
+| `0026_revoke_trigger_privileges_and_default_acls.sql` | ACL Lockdown | Revokes trigger execution rights from non-superuser roles. |
+| `0027_admin_novel_moderation_rls.sql` | Moderation RLS | Admins can read draft/under-review novels in the moderation queue. |
+| `0028_admin_get_invoice_rpc.sql` | Invoice RPC | Admin RPC to fetch and compile invoice details. |
+| `0029_sensitive_column_exposure_hardening.sql` | Data Privacy | Strips phone numbers, real names, and internal limits from public views. |
+| `0030_platform_payment_methods_admin_policy.sql` | Platform Accounts | Admin-controlled platform receiving bank accounts. |
+| `0031_chapter_import_and_split_rpcs.sql` | Splitter RPCs | `import_chapters` RPC (batch chapter ingestion) and `split_chapter` RPC. |
+| `0032_seed_missing_featured_genres.sql` | Taxonomy Expansion | Additional Urdu literary genres. |
+| `0033_chapter_drafts.sql` | Chapter Autosave | `chapter_drafts` table; per-chapter autosave with writer isolation. |
+| `0034_tips.sql` | Reader Tips | `tips` table; 0% platform fee tips; `tip_min_pkr=20`, `tip_max_pkr=5000`, `max_tips_per_hour=5`, `tip_daily_cap_pkr_per_reader=10000`, `tip_confirm_reminder_hours=48`. Updated `update_platform_settings` and reminder RPC. |
+| `0035_rename_commission_to_platform_fee.sql` | Terminology Sync | Updates view comments and labels to "Platform fee"; updated `generate_commission_invoice`, `confirm_commission_settlement`, `reconcile_writer_unpaid_commission`. |
+| `0036_site_palette_settings.sql` | Palette Presets | `site_palette` column in `platform_settings` (Ivory & Ink / Paper & Teal / Cream & Maroon). |
+| `0037_fix_db_verification_issues.sql` | Verification Patch | Schema consistency fixes; updated `update_platform_settings`. |
+| `0038_api_rate_limits.sql` | Rate Limiting | `api_rate_limits` table; sliding-window RPC (`DEFAULT 10 requests per 60 seconds`). |
+| `0039_add_social_links_to_platform_settings.sql` | Platform Socials | Social media links JSONB in `platform_settings`. |
+| `0040_email_outbox_wiring_and_support_events.sql` | Async Email Outbox | `email_outbox` table; `enqueue_email_for_notif`; updated `submit_payment`, `verify_order_payment`, `reject_order_payment`, `generate_commission_invoice`, `confirm_commission_settlement`, `approve_writer`, `reject_writer`, `approve_novel`, `reject_novel`. |
+| `0041_data_retention_and_maintenance.sql` | Data Retention | Automated retention cleanup procedures; retention column defaults in `platform_settings`. |
+| `0042_writer_studio_announcement.sql` | Studio Banners | Announcement banner columns in `platform_settings`. |
+| `0043_admin_dashboard_analytics.sql` | Analytics | Materialized analytics RPCs for revenue, active readers, novel velocity. |
+| `0044_fix_analytics_and_retention_columns.sql` | Analytics Fixes | Column data types and grouping in analytics RPCs. |
+| `0045_writer_social_links.sql` | Author Socials | Social media links in `writer_profiles` (Facebook, Instagram, YouTube, Website). |
+| `0046_fix_writer_profiles_rls_update.sql` | Profile Update Fix | RLS policy fix allowing writers to update bio and pen name. |
+| `0047_reader_watermark_toggle.sql` | Anti-Piracy Watermark | `watermark_enabled` platform toggle; updated `update_platform_settings`. |
+| `0048_fix_order_verification_commission_column.sql` | Ledger Column Patch | Ensures `commission_amount` is recorded in `verify_order_payment`. |
+| `0049_update_default_platform_fee_to_30_percent.sql` | Platform Fee Update | `default_commission_rate` updated to **30.00%**; updated `admin_force_verify`. |
+| `0050_enable_writer_tips_by_default.sql` | Default Tips | Sets `tips_enabled = true` for all existing writers. |
+| `0051_email_outbox_lease_and_quota_retry.sql` | Outbox Resilience | `claim_pending_emails_for_send`, `record_email_delivery_result`, `retry_failed_emails` RPCs; lease expiry and retry backoff. |
+| `0052_harden_suspended_writer_and_novel_visibility.sql` | Catalog Hardening | Suspended authors and novels excluded from public views; entitlements preserved. |
+| `0053_fix_novels_rls_recursion.sql` | RLS Recursion Fix | `SECURITY DEFINER` helpers eliminate PostgreSQL 42P17 infinite recursion. |
+| `0054_admin_impersonation_audit.sql` | Impersonation Audit | `admin_impersonation_sessions` table; audit logging for "Login as Writer". |
+| `0055_fix_public_writers_zero_novels.sql` | Writer Discovery Fix | Approved writers with zero published novels can display profile. |
+| `0056_delete_draft_novel.sql` | Draft Novel Deletion | `delete_draft_novel` RPC; author duplicate-title guard in `create_novel`. |
 
 ### 5.2 Core Tables & Financial Immutability
-- **`profiles`:** 1-to-1 extension of `auth.users` storing `role`, `display_name`, `avatar_url`, and `is_active`. Protected against self-escalation via trigger `trg_protect_profile_columns`.
-- **`novels`:** Catalog metadata (English title, Urdu title, slug, cover image, status, price in PKR). Status transitions are strictly guarded by `trg_protect_novel_columns`.
-- **`chapters`:** Chapter body content, chapter sequence number, free preview flag (`is_free_preview`), and word count. Word counts are calculated automatically on save.
-- **`orders`:** Commercial purchase requests. Status transitions: `pending_payment` -> `payment_submitted` -> `verified` (or `rejected`, `disputed`, `cancelled`).
-- **`payment_submissions`:** Reader proof record storing raw TID, virtual `normalized_tid` (stripped of hyphens and whitespace), and receipt screenshot storage path.
-- **`purchase_entitlements`:** Grants perpetual access to a novel's paid chapters. Unique partial index ensures one active entitlement per reader per novel.
-- **`sales_ledger`:** **Append-only immutable financial ledger.** Stores gross sale amount, author net earnings, and platform fee. Protected by trigger `trg_sales_ledger_immutable` blocking `UPDATE` and `DELETE`.
-- **`audit_logs`:** Append-only security log tracking all administrative, financial, and moderation events.
+- **`profiles`:** 1-to-1 with `auth.users`. `role`, `display_name`, `avatar_url`, `is_active`. Protected by `trg_protect_profile_columns`.
+- **`novels`:** Catalog metadata, slug, status, price. Status transitions locked by `trg_protect_novel_columns`.
+- **`chapters`:** Body content in `content_urdu`, word count (auto-calculated), `is_free_preview`. Chapter content limit: **120,000 characters** (`chk_chapters_content_length`, `0007_gap_fixes_and_storage_hardening.sql:33`).
+- **`orders`:** Status flow: `pending_payment` → `payment_submitted` → `verified` (or `rejected`, `disputed`, `cancelled`).
+- **`payment_submissions`:** Raw TID + virtual `normalized_tid` + screenshot path.
+- **`purchase_entitlements`:** One active entitlement per reader per novel (partial unique index).
+- **`sales_ledger`:** **Append-only immutable** (`trg_sales_ledger_immutable` blocks UPDATE/DELETE).
+- **`audit_logs`:** Append-only security event log.
 
-### 5.3 Storage Buckets & Policies
-1. **`novel-assets` (Public):**
-   - Stores book cover artwork and author avatar images.
-   - Size limit: **5 MB**. Allowed types: `image/webp, image/jpeg, image/png`.
-   - Path convention: `{auth.uid()}/covers/{uuid}.webp`.
-   - Public read access; writes restricted to folder owner.
-2. **`payment-proofs` (Private):**
-   - Stores sensitive bank transfer receipts and payment screenshots.
-   - Size limit: **2 MB**. Allowed types: `image/webp, image/jpeg, image/png`.
-   - Path convention: `{order_id}/{uuid}.webp`.
-   - RLS Policy: Strictly readable only by the order's reader, the novel's author, or platform administrators via signed URLs.
+### 5.3 Storage Buckets
+1. **`novel-assets` (Public):** Cover art and author avatars. 5 MB max. `image/webp, image/jpeg, image/png`.
+2. **`payment-proofs` (Private):** Payment receipts. 2 MB max. Accessible only by order owner, novel author, or admin.
 
 ---
 
 ## 6. Core Business Flows & State Machines
 
-### 6.1 Novel Authoring, Splitting & Publication Lifecycle
+### 6.1 Novel Authoring & Publication Lifecycle
 
 ```
-[Draft Novel Created] ──> [Chapters Ingested/Split] ──> [Submit For Editorial Review]
-                                                                  │
-                                      ┌───────────────────────────┴───────────────────────────┐
-                                      ▼                                                       ▼
-                            [Admin Approved]                                        [Admin Rejected]
-                                      │                                                       │
-                                      ▼                                                       ▼
-                              [Status: Published]                                     [Status: Rejected]
-                         (Visible in Public Catalog)                              (Returned to Writer with Reason)
+[Draft Novel Created] ──> [Chapters Written/Imported] ──> [Submit For Editorial Review]
+                                                                        │
+                                   ┌────────────────────────────────────┴────────────────┐
+                                   ▼                                                     ▼
+                         [Admin Approved]                                       [Admin Rejected]
+                            │                                                        │
+                            ▼                                                        ▼
+                    [Status: published]                                      [Status: rejected]
+               (Visible in Public Catalog)                            (Returned to Writer with Reason)
 ```
 
-1. **Novel Creation:** Author calls `create_novel` RPC. Migration `0056` validates that the author does not already have an active novel with the same English or Urdu title. Initial status is `'draft'`.
-2. **Manuscript Import / Splitting:** The author opens the Chapter Splitter Wizard (`/writer/novels/[id]/split`), uploads a `.docx` or `.txt` manuscript. The wizard detects chapter breaks or allows custom delimiters. Titles are auto-generated using the novel's Urdu title (e.g. `آئینہ ذات - حصہ ۱`, `آئینہ ذات - حصہ ۲`). The client sends batch slices to the `batch_import_chapters` RPC.
-3. **Submission for Review:** Once all chapters are ordered and at least one chapter is marked free preview, the author clicks "Submit for Editorial Review", calling `submit_novel_for_review`. Status changes to `'under_review'`. All novel metadata and chapters are locked against further modification.
-4. **Admin Moderation:** An administrator reviews the novel at `/admin/novels/[id]`. The admin completes the editorial checklist (rights verification, formatting, blurb quality) and executes `approve_novel` (status becomes `'published'`, visible in catalog) or `reject_novel` (status becomes `'rejected'` with feedback).
+**Key RPCs & Migration Sources:**
+- `create_novel`: `0011_writer_content_hardening.sql:591`, updated in `0056_delete_draft_novel.sql:120`
+- `submit_novel_for_review`: `0011_writer_content_hardening.sql`
+- `approve_novel`: `0006_security_and_financial_hardening.sql:2011`, superseded in `0012_admin_controls.sql:282`, then `0040_email_outbox_wiring_and_support_events.sql:1550`
+- `reject_novel`: `0006_security_and_financial_hardening.sql:2084`, superseded in `0040_email_outbox_wiring_and_support_events.sql:1639`
+- `import_chapters`: `0031_chapter_import_and_split_rpcs.sql:30`
+- `split_chapter`: `0031_chapter_import_and_split_rpcs.sql:233`
 
 ### 6.2 Order Placement & Payment Verification Lifecycle
 
 ```
-[Reader Clicks Buy] ──> RPC: create_order ──> Status: pending_payment
+[Reader Clicks Buy] → create_order → pending_payment
                               │
                               ▼
-[Reader Transfers PKR] ──> RPC: submit_payment ──> Status: payment_submitted
-  (Uploads TID & Screenshot)  │
-                              ▼
-[Author Checks Bank App] ──> RPC: verify_order_payment
-                              │
-             ┌────────────────┴────────────────┐
-             ▼                                 ▼
-   [Payment Confirmed]               [Payment Rejected]
-   Status: verified                  RPC: reject_order_payment
-   - Entitlement Granted             Status: rejected
-   - Sales Ledger Appended           - Reader Can Re-submit or Cancel
-   - Fees Accrued                    - Reader Can Open Dispute
+[Reader Transfers PKR] → submit_payment → payment_submitted
+  (Uploads TID & Screenshot)       │
+                                   ▼
+[Author Checks Bank App] → verify_order_payment
+                                   │
+              ┌────────────────────┴────────────────┐
+              ▼                                     ▼
+     [Payment Confirmed]                   [Payment Rejected]
+     Status: verified                      reject_order_payment
+     - Entitlement Granted                 Status: rejected
+     - Sales Ledger Appended               - Reader Can Re-submit
+     - Fees Accrued                        - Reader Can Open Dispute
 ```
 
-1. **Order Initiation:** Reader initiates checkout on `/checkout/[slug]`. The system calls `create_order` RPC:
-   - Validates novel is published and not suspended.
-   - Asserts writer has active payment methods and has not exceeded the PKR 5,000 unpaid platform fee threshold (`orders_paused = false`).
-   - Asserts reader does not already own the novel.
-   - Generates a unique human-readable order number (`ORD-YYYYMMDD-XXXX`). Status is set to `'pending_payment'`.
-2. **Payment Submission:** Reader transfers funds via JazzCash, EasyPaisa, Raast, or Bank IBAN to the author's displayed account. Reader enters the TID and uploads the receipt screenshot at `/orders/[id]/pay`. The client calls `submit_payment` RPC:
-   - Normalizes the TID (strips spaces, dashes, case).
-   - Verifies TID uniqueness across recent orders to prevent replay fraud.
-   - Moves order status to `'payment_submitted'`.
-   - Places a notification into `email_outbox` for the author.
-3. **Author Verification:** The author inspects the receipt and confirms credit in their personal bank account. The author clicks "Verify Payment" in `/writer/orders`, triggering the atomic `verify_order_payment` RPC:
-   - Asserts order is currently `'payment_submitted'`.
-   - Changes order status to `'verified'`.
-   - Inserts row into `purchase_entitlements` (`is_revoked = false`).
-   - Appends entry into `sales_ledger` (`entry_type = 'sale_verified'`, recording gross price, platform fee amount, and net writer earnings).
-   - Recalculates author's accumulated unpaid platform fee balance.
-   - Queues order confirmation email to the reader.
+**Key RPCs & Migration Sources:**
+- `create_order`: `0006_security_and_financial_hardening.sql`
+- `submit_payment`: `0006`, superseded in `0040_email_outbox_wiring_and_support_events.sql:129`
+- `verify_order_payment`: `0006`, superseded in `0040_email_outbox_wiring_and_support_events.sql:340`
+- `reject_order_payment`: `0006`, superseded in `0040_email_outbox_wiring_and_support_events.sql:608`
+- `cancel_order`: `0009_order_flow_fixes.sql`
 
 ### 6.3 Dispute Resolution & Refunds
-If an author rejects a valid payment or fails to verify within 48 hours, the reader can open a dispute via `open_dispute` within 30 days:
-- An administrator reviews the bank receipt and author payout records at `/admin/disputes`.
-- If reader is verified: Admin calls `admin_force_verify`, granting the reader entitlement, creating ledger records, and settling the dispute.
-- If invalid/unpaid: Admin calls `resolve_dispute` with `resolved_for_writer`, closing the case and keeping the order rejected.
-- If money was returned manually: Admin calls `record_refund_adjustment`, appending a negative balance entry into `sales_ledger` to adjust platform fee totals.
 
-### 6.4 Platform Fee Threshold & Invoicing Flow
-1. As verified orders accrue, the system tracks each author's `unpaid_commission_balance`.
-2. When the balance reaches **PKR 5,000.00**, `reconcile_writer_unpaid_commission` flags `orders_paused = true`. New orders for that author's novels are blocked until settled.
-3. Administrators generate a formal invoice via `generate_commission_invoice`.
-4. The author transfers owed fees to the platform's bank account and reports payment.
-5. The administrator confirms receipt via `confirm_commission_settlement`, resetting the author's unpaid balance, marking the invoice `'settled'`, and lifting the order pause (`orders_paused = false`).
+Minimum wait before a reader can open a dispute: `min_dispute_wait_hours` (DEFAULT **24** hours, `0018_disputes_refunds_support.sql:16`).
+Dispute window: `dispute_window_days` (DEFAULT **30** days, `0010_dispute_and_writer_status_hardening.sql`).
+
+An admin notification is triggered by the reminder RPC when a payment submission is older than **48 hours** without verification (`0018_disputes_refunds_support.sql:2665`) — this is not a reader-facing deadline.
+
+**Key RPCs:**
+- `open_dispute`: `0006`, superseded `0010`, `0018:364`, superseded `0018:364`
+- `resolve_dispute_for_reader`: `0018:718`, superseded `0020:768`
+- `resolve_dispute_for_writer`: `0018:1140`
+- `resolve_dispute_refund`: `0018:949`
+- `admin_force_verify`: `0007:386`, superseded `0010:240`, `0020:463`, `0024:334`, `0049:558`
+- `record_refund_adjustment`: `0006_security_and_financial_hardening.sql:1019`
+
+### 6.4 Platform Fee Threshold & Invoicing
+
+**Key RPCs:**
+- `reconcile_writer_unpaid_commission`: `0006:341`, superseded across `0017`, `0019`, `0022`, `0023`, `0024`, `0035`
+- `generate_commission_invoice`: `0006:1195`, superseded across `0017`, `0024`, `0028`, `0035`, `0040`
+- `confirm_commission_settlement`: `0003:443`, superseded across `0006`, `0017`, `0024`, `0025`, `0035`, `0040`
+- `set_writer_commission_terms`: `0012_admin_controls.sql`
 
 ### 6.5 Transactional Email Outbox Pipeline
-To maintain sub-100ms response times and prevent email delivery failures from breaking database transactions, the system implements an **Asynchronous Database Outbox Pattern**:
-1. Business RPCs insert pending email payloads into `email_outbox` (`status = 'pending'`).
-2. An external scheduler or Uptime monitor pings `/api/cron/send-emails` (authenticated via `Authorization: Bearer CRON_SECRET`).
-3. The endpoint invokes `claim_email_batch(batch_size, lease_seconds)`, acquiring a row-level lock on pending emails.
-4. Emails are dispatched via Resend HTTP REST API.
-5. Successful dispatches update `status = 'sent'`. Failed dispatches increment `retry_count` and apply exponential backoff.
+
+Business RPCs enqueue rows into `email_outbox` via `enqueue_email_for_notif` (`0040:31`). The outbox is dispatched by:
+- **`claim_pending_emails_for_send`** RPC (`0051_email_outbox_lease_and_quota_retry.sql:32`) — acquires a lease on pending emails.
+- **`record_email_delivery_result`** RPC (`0051:91`) — marks sent or failed.
+- **`retry_failed_emails`** RPC (`0051:150`) — retries with backoff.
+
+> **Note:** There is no `claim_email_batch` function. The actual function is `claim_pending_emails_for_send`.
 
 ---
 
 ## 7. Security Model & Invariants
 
 ### 7.1 Authentication & Edge Proxy Hardening
-- Built on Supabase GoTrue Auth with server-side PKCE cookie management (`@supabase/ssr`).
-- **Cookie Security:** Auth cookies are strictly **host-only** (`delete options.domain`), preventing sub-domain cookie leakage.
-- **Edge Header Sanitization (`src/proxy.ts`):** Strips incoming `x-user-id` and `x-user-email` headers to prevent HTTP header spoofing.
-- **Zero Client Metadata Trust:** The auth trigger `handle_new_user()` unconditionally assigns `role = 'reader'`, completely ignoring any client-provided metadata.
+- Server-side PKCE cookie management via `@supabase/ssr`.
+- **Cookie Security:** Auth cookies are strictly **host-only** (`delete options.domain` in `middleware-or-proxy.ts:126`), preventing sub-domain cookie leakage.
+- **Edge Header Sanitization:** Strips incoming `x-user-id` and `x-user-email` headers (`middleware-or-proxy.ts:76-77`).
+- **Zero Client Metadata Trust:** `handle_new_user()` unconditionally assigns `role = 'reader'`.
 
 ### 7.2 Database Privileges & RLS Policies
-- Default write privileges on `public` schema are revoked from `anon` and `PUBLIC`.
-- Direct table `INSERT`, `UPDATE`, and `DELETE` on financial tables (`orders`, `payment_submissions`, `sales_ledger`, `purchase_entitlements`, `commission_invoices`) are strictly blocked for client roles. All mutations must occur via `SECURITY DEFINER` RPCs.
-- `sales_ledger` and `audit_logs` are protected by database triggers that unconditionally raise exceptions on any `UPDATE` or `DELETE` attempt.
-- Chapter content (`chapters.content`) is protected by RLS:
-  - If `is_free_preview = true`, content is visible to everyone.
-  - If `is_free_preview = false`, content is returned **only** if the requesting user is the novel's author, a platform admin, or holds a non-revoked row in `purchase_entitlements`.
+- Default write privileges on `public` schema revoked from `anon` and `PUBLIC`.
+- Direct table mutations on financial tables blocked; all mutations via `SECURITY DEFINER` RPCs.
+- `sales_ledger` and `audit_logs` are append-only via triggers.
+- Chapter content RLS: free-preview chapters are public; paid chapters require author, admin, or non-revoked `purchase_entitlement`.
 
 ### 7.3 Reader Anti-Piracy Watermarking
-The novel reading interface (`/read/[novelId]/[chapterNumber]`) features an unobtrusive, dynamic anti-piracy watermark:
-- Injects a semi-transparent repeating canvas layer containing the reader's unique identifier and timestamp across the text container.
-- Discourages screenshot sharing and unauthorized PDF re-distribution.
-- Governed by a platform settings toggle (`watermark_enabled`).
+Dynamic canvas watermark injected in the reader UI containing the reader's identifier and timestamp. Governed by `watermark_enabled` platform toggle (`0047_reader_watermark_toggle.sql`).
 
 ### 7.4 Input Sanitization & File Upload Guards
-- **TID Normalization:** Domestic transaction IDs are normalized (`UPPER(REGEXP_REPLACE(tid, '[^A-Za-z0-9]', ''))`) to prevent duplicate submission fraud using varying punctuation.
-- **Storage Path Validation:** RLS policies on `payment-proofs` strictly enforce that files can only be uploaded into `{order_id}/...` by the order owner while the order is in `pending_payment` or `rejected` status.
-- **File Type & Size Restrictions:** File uploads are limited to 2 MB for payment screenshots and 5 MB for covers, with strict MIME type enforcement (`image/webp, image/jpeg, image/png`).
+- **TID Normalization:** `UPPER(REGEXP_REPLACE(tid, '[^A-Za-z0-9]', ''))` prevents duplicate fraud via varying punctuation.
+- **Storage Path Validation:** `payment-proofs` RLS enforces upload only by order owner while in `pending_payment` or `rejected` status.
+- **File Type & Size Limits:** 2 MB for payment screenshots, 5 MB for covers; MIME: `image/webp, image/jpeg, image/png`.
 
 ---
 
 ## 8. Deployment & Cloudflare OpenNext Architecture
 
 ### 8.1 Cloudflare Worker Architecture
-UNB Premium is deployed to **Cloudflare Workers** using `@opennextjs/cloudflare` (`1.20.14`). The application runs on the V8-based `workerd` runtime, providing low-latency edge delivery across global Points of Presence (PoPs).
-
+- **Framework:** `@opennextjs/cloudflare` `1.20.14`
 - **Entry Point:** `.open-next/worker.js`
-- **Compatibility Date:** `2024-12-30` (with `nodejs_compat` enabled)
-- **Static Assets:** `.open-next/assets` bound via Cloudflare Workers Assets (`binding = "ASSETS"`)
-- **Incremental Cache (ISR/Fetch Cache):** Backed by Cloudflare R2 bucket (`unb-premium-cache`). R2 provides multi-region consistency with 1,000,000 free Class A writes per month, avoiding KV write throttling.
-- **Tag Cache (`revalidateTag` / `revalidatePath`):** Backed by Cloudflare D1 SQL database (`unb-premium-tag-cache`, ID `ab3532e1-c979-43ad-999a-bb7bbaa5a34d`).
-- **Cache Interception:** Explicitly disabled in `open-next.config.ts` (`enableCacheInterception: false`) to ensure deterministic edge streaming.
+- **Compatibility Date:** `2024-12-30` with `nodejs_compat`
+- **Static Assets:** `.open-next/assets` via Workers Assets (`binding = "ASSETS"`)
+- **Incremental Cache:** Cloudflare R2 bucket `unb-premium-cache` (`NEXT_INC_CACHE_R2_BUCKET`)
+- **Tag Cache:** Cloudflare D1 `unb-premium-tag-cache` (ID `ab3532e1-c979-43ad-999a-bb7bbaa5a34d`)
+- **Cache Interception:** `enableCacheInterception: false` (`open-next.config.ts:21`)
 
 ### 8.2 The Tailwind CSS v4 / Turbopack Compilation Invariant
-During recent repository maintenance, an emergency styling defect occurred when `"build": "next build --webpack"` was attempted:
-- **Root Cause:** Tailwind CSS v4 in this repository is configured via the `@tailwindcss/turbopack` compiler. Because no PostCSS Tailwind plugin was configured for Webpack, running Webpack bypassed the Tailwind engine, emitting raw `@layer utilities { @tailwind utilities; }` (35 KB) without compiling any utility classes. This caused `premium.urdunovelbanks.com` to render unstyled HTML with oversized SVGs.
-- **The Rule:** The production build command MUST remain `"build": "next build"` (Turbopack). Turbopack compiles the full 144.8 KB stylesheet into `.open-next/assets/_next/static/chunks/` with all utility classes (`.flex`, `.grid`, `.items-center`, `.w-*`, etc.).
+Tailwind v4 is compiled by `@tailwindcss/turbopack` (resolved `4.3.3`). **No PostCSS Tailwind plugin is configured.** Building with `--webpack` bypasses the Tailwind engine, emitting uncompiled `@tailwind utilities` (≈35 KB). The build command MUST remain `"build": "next build"` (Turbopack) which produces the full ≈144.8 KB stylesheet.
 
-### 8.3 Environment Variables & Secrets Reference
+### 8.3 Automated Scheduling (GitHub Actions)
 
-| Variable Name | Exposure | Required Environment | Description |
-| :--- | :--- | :--- | :--- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Client & Server | All | Supabase project REST URL (`https://<id>.supabase.co`). |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client & Server | All | Supabase anonymous public API key. |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Server Only (SECRET)** | Production / Staging | Supabase administrative service role key. Configured via `wrangler secret put`. Never exposed to client. |
-| `NEXT_PUBLIC_APP_URL` | Client & Server | All | Canonical application base URL (`https://premium.urdunovelbanks.com`). |
-| `CRON_SECRET` | **Server Only (SECRET)** | Production / Staging | 32+ character bearer token used to authenticate scheduled background cron routes. |
-| `EMAIL_PROVIDER` | Server Only | Production / Staging | Email dispatch provider (`resend`). |
-| `RESEND_API_KEY` | **Server Only (SECRET)** | Production / Staging | API key from Resend for transactional email delivery. |
-| `EMAIL_FROM` | Server Only | All | Default sender email header (e.g. `UNB Premium <noreply@urdunovelbanks.com>`). |
+**Emails are automatically dispatched in production via `.github/workflows/cron.yml`:**
+- **`/api/cron/send-emails`** — triggered every **5 minutes** (`schedule: cron: '*/5 * * * *'`), processes the `email_outbox` table via Resend REST API.
+- **`/api/cron/reminders`** — triggered **hourly** (via `workflow_dispatch` with `trigger_reminders: true` or `github.event.schedule == '0 * * * *'`), sends verification and fee reminders.
+- Both endpoints require `Authorization: Bearer ${{ secrets.CRON_SECRET }}`.
+- **Dependency:** `secrets.APP_URL` and `secrets.CRON_SECRET` must be set in the GitHub repository secrets for the workflow to function. If these secrets are unset, the workflow will silently fail.
+- `wrangler.jsonc` does **not** contain a Cloudflare Cron Trigger; the scheduling is fully in GitHub Actions.
+
+### 8.4 Environment Variables & Secrets Reference
+
+| Variable Name | Exposure | Description |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Client & Server | Supabase project REST URL. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client & Server | Supabase anonymous public API key. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Server Only (SECRET)** | Administrative key. Set via `wrangler secret put`. |
+| `NEXT_PUBLIC_APP_URL` | Client & Server | Canonical application base URL. |
+| `CRON_SECRET` | **Server Only (SECRET)** | 32+ character bearer token for cron endpoint auth. Also set in GitHub repository secrets as `secrets.CRON_SECRET`. |
+| `EMAIL_PROVIDER` | Server Only | `resend` (set in `wrangler.jsonc:13` as a plain var). |
+| `RESEND_API_KEY` | **Server Only (SECRET)** | Resend transactional email API key. |
+| `EMAIL_FROM` | Server Only | Default sender header (set in `wrangler.jsonc:14`). |
 
 ---
 
 ## 9. Quality Gates & Automated Test Suites
 
-All quality gates, linters, TypeScript compilers, and test runners were executed and verified on `2026-11-18`.
+Verified on **2026-11-18**:
 
 ### 9.1 NPM Scripts Execution Audit
 
-| Quality Script | Command | Result | Output Summary / Findings |
+| Script | Command | Result | Notes |
 | :--- | :--- | :--- | :--- |
-| **SQL Syntax Check** | `npm run check:sql` | **PASS (Code 0)** | Scanned 86 SQL files (migrations 0023+ and tests). 0 forbidden `pg_catalog.<keyword>` qualifications found. |
-| **Terminology Gate** | `npm run check:terms` | **PASS (Code 0)** | Scanned `src/` and new migrations. 0 forbidden user-facing occurrences of "commission" or "کمیشن". |
-| **Design Tokens** | `npm run check:colors` | **PASS (Code 0)** | Scanned all components. 0 forbidden hardcoded Tailwind palette classes; 100% semantic token compliance. |
-| **WCAG Contrast** | `npm run check:contrast`| **PASS (Code 0)** | Evaluated all color pairings across Ivory & Ink, Paper & Teal, Cream & Maroon. All meet WCAG AA (4.5:1 / 3:1). |
-| **Hyperlink Crawler** | `npm run check:links` | **PASS (Code 0)** | Scanned 92 routes across 305 files. 0 dead links, 0 invalid internal route targets. |
-| **Frontend Queries** | `npm run check:frontend`| **PASS (Code 0)** | Validated PostgREST query syntax and error-handling patterns across 305 files. Zero unhandled errors. |
-| **SEO Metadata** | `npm run check:seo` | **PASS (Code 0)** | Evaluated 126 route checks. 100% compliant OpenGraph, Twitter, and canonical metadata tags. |
-| **TypeScript Compiler**| `npx tsc --noEmit` | **PASS (Code 0)** | Zero type errors across the entire codebase. |
-| **Unit & Integration**| `npm test` | **PASS (Code 0)** | **618 passing tests** across 176 test suites in 3.46 seconds. |
-| **Next.js Production** | `npm run build` | **PASS (Code 0)** | Turbopack compiled all 66 static and dynamic routes cleanly. |
-| **Cloudflare Worker** | `npm run build:worker` | **PASS (Code 0)** | OpenNext Cloudflare bundle created in `.open-next/worker.js` with full 144.8 KB compiled CSS stylesheet. |
-| **ESLint** | `npm run lint` | **FAIL (25 errors)** | React 19 strict rule `react-hooks/set-state-in-effect` and `@typescript-eslint/no-explicit-any` in tests (See Section 11). |
+| **SQL Syntax** | `npm run check:sql` | **PASS** | 86 SQL files, 0 violations. |
+| **Terminology** | `npm run check:terms` | **PASS** | 0 forbidden "commission" or "کمیشن" in src/. |
+| **Design Tokens** | `npm run check:colors` | **PASS** | 0 hardcoded colors; 100% semantic. |
+| **WCAG Contrast** | `npm run check:contrast` | **PASS** | All 3 palettes WCAG AA compliant. |
+| **Link Crawler** | `npm run check:links` | **PASS** | 92 routes, 305 files, 0 dead links. |
+| **Frontend Queries** | `npm run check:frontend` | **PASS** | 305 files, 0 unhandled query errors. |
+| **SEO Metadata** | `npm run check:seo` | **PASS** | 126 checks, 0 failures. |
+| **TypeScript** | `npx tsc --noEmit` | **PASS** | 0 type errors. |
+| **Unit Tests** | `npm test` | **PASS** | **618 tests** across 46 test files (Node.js `--test`). |
+| **Next.js Build** | `npm run build` | **PASS** | All routes compiled by Turbopack. |
+| **Worker Build** | `npm run build:worker` | **PASS** | `.open-next/worker.js` with 144.8 KB compiled CSS. |
+| **ESLint** | `npm run lint` | **FAIL** | 25 errors, 20 warnings (React 19 hook rules, `no-explicit-any`). |
 
 ### 9.2 SQL Test Suites (`supabase/tests/`)
-The repository contains **28 comprehensive SQL test suites** executed via the Supabase SQL Editor:
-- `00_post_migration_verification.sql`: Verifies schema objects, function signatures, and search paths.
-- `01_security_and_financial_hardening_tests.sql`: Validates append-only triggers and RPC boundaries.
-- `02_order_flow_fixes_tests.sql`: Tests order state machine and payment submissions.
-- `03_dispute_and_writer_status_tests.sql`: Validates 30-day dispute windows and writer reapplication rules.
-- `04_writer_content_tests.sql`: Tests chapter word counting, publication locking, and slug generation.
-- `05_admin_controls_tests.sql`: Tests administrative novel suspensions, taxonomy rules, and fee overrides.
-- `06_public_catalog_tests.sql`: Tests security barrier views and catalog visibility.
-- `07_min_price_tests.sql`: Verifies PKR 50 minimum price enforcement.
-- `08_checkout_tests.sql`: Validates open order concurrency limits and duplicate TID prevention.
-- `09_reader_access_tests.sql`: Tests RLS chapter content unlocking.
-- `10_commission_tests.sql`: Verifies platform fee calculation math and statements.
-- `11_disputes_refunds_tests.sql`: Tests force-verification and refund adjustment ledger entries.
-- `12_runtime_smoke.sql`: 15-step end-to-end transactional runtime smoke test.
-- `13_client_attack_matrix.sql`: 46-vector client privilege escalation attack test.
-- `14_admin_read_access.sql`: Validates multi-tenant isolation of administrative views.
-- `15_rpc_signature_check.sql` & `16_frontend_columns_check.sql`: Interface synchronization checks.
-- `17_sensitive_column_exposure.sql`: Asserts zero leakage of private writer contact info.
-- `18_chapter_split_tests.sql`: Tests chapter splitting and batch ingestion security.
-- `19_chapter_drafts_tests.sql`: Tests chapter autosave concurrency and RLS isolation.
-- `20_tips_tests.sql`: Tests reader appreciation tip limits, isolation, and 0% platform fee rule.
-- `21_site_palette_tests.sql`: Tests administrative site palette updates and previews.
-- `22_email_outbox_lease_and_quota_tests.sql`: Tests outbox lease-locking and retry backoff.
-- `23_suspended_visibility_tests.sql`: Tests exclusion of suspended authors from catalog.
-- `24_admin_impersonation_tests.sql`: Tests support impersonation tokens and audit logging.
-- `25_public_writers_zero_novels_tests.sql`: Tests visibility of approved writers prior to first release.
-- `26_delete_draft_novel_tests.sql`: Tests draft novel deletion invariants and duplicate title guards.
+
+30 files total (29 `.sql` files + `00_manual_flow_checklist.md`):
+
+- `00_post_migration_verification.sql` — Schema, function signatures, search paths.
+- `01_security_and_financial_hardening_tests.sql` — Append-only triggers, RPC ACLs.
+- `02_order_flow_fixes_tests.sql` — Order state machine, payment submissions.
+- `03_dispute_and_writer_status_tests.sql` — 30-day windows, writer reapplication.
+- `04_writer_content_tests.sql` — Word counting, slug generation, publication locking.
+- `05_admin_controls_tests.sql` — Suspensions, taxonomy, fee overrides.
+- `06_public_catalog_tests.sql` — Security barrier views, catalog visibility.
+- `07_min_price_tests.sql` — PKR 50 minimum enforcement.
+- `08_checkout_tests.sql` — Order concurrency, duplicate TID prevention.
+- `09_reader_access_tests.sql` — Chapter RLS content unlocking.
+- `10_commission_tests.sql` — Platform fee math, statements.
+- `11_disputes_refunds_tests.sql` — Force-verify, refund adjustment ledger.
+- `12_runtime_smoke.sql` — 15-step end-to-end smoke test.
+- `13_client_attack_matrix.sql` — 46-vector privilege escalation matrix.
+- `14_admin_read_access.sql` — Multi-tenant admin view isolation.
+- `15_rpc_signature_check.sql` / `16_frontend_columns_check.sql` — Interface sync.
+- `17_sensitive_column_exposure.sql` — Zero private data leakage.
+- `18_chapter_split_tests.sql` — Batch ingestion security.
+- `19_chapter_drafts_tests.sql` — Autosave concurrency, RLS.
+- `20_tips_tests.sql` — 0% fee, daily caps, rate limits.
+- `21_api_rate_limits_tests.sql` / `21_site_palette_tests.sql` — Rate limits, palette settings.
+- `22_email_outbox_lease_and_quota_tests.sql` — Lease locking, retry backoff.
+- `23_suspended_visibility_tests.sql` — Suspended author/novel catalog exclusion.
+- `24_admin_impersonation_tests.sql` — Impersonation tokens, audit trail.
+- `25_public_writers_zero_novels_tests.sql` — Writer discovery.
+- `26_delete_draft_novel_tests.sql` — Deletion invariants, duplicate title guard.
+- `rls_hardening.test.sql` — Standalone RLS hardening suite.
 
 ---
 
 ## 10. Current State of Features
 
 ### 10.1 Completed & Production-Ready
-- **End-to-End Direct Payment Marketplace:** Complete order creation, domestic payment submission (JazzCash, EasyPaisa, Raast, Bank IBAN), proof screenshot uploads, and author verification.
-- **Content Protection & Reading Experience:** Distraction-free Nastaliq Urdu reader with custom fonts (Gulzar, Plus Jakarta Sans), 3 reading themes (Light, Sepia, Dark), reading progress synchronization, and dynamic anti-piracy watermarking.
-- **Writer Studio & Manuscript Ingestion:** Book creation, chapter editor with autosaving drafts, and the **Writer-Controlled Chapter Splitter** (batch import from `.docx` and `.txt` with Urdu numbering).
-- **Financial Ledger & Platform Fee Engine:** Append-only sales ledger, automatic platform fee accrual (default 30%), custom writer fee terms, PKR 5,000 credit limit enforcement with automatic order pausing, and invoice generation.
-- **Administrative Governance:** Moderation queues for novels and writer applications, dispute resolution desk, taxonomy governance, user role management, site palette presets, studio announcement banners, and audited support impersonation ("Login as Writer").
-- **Stateless Supabase Keep-Alive:** Dedicated `/api/health` endpoint optimized for free Uptime monitors (UptimeRobot / cron-job.org) to prevent Supabase Free Tier auto-pauses.
-- **Design Tokens & Typography:** Universal light aesthetic with 3 switchable palettes (Ivory & Ink, Paper & Teal, Cream & Maroon) fully compliant with WCAG AA contrast standards.
+- **End-to-End Direct Payment Marketplace:** Order creation, TID submission, proof screenshot upload, and manual author verification flow.
+- **Content Protection & Reading Experience:** Gulzar Nastaliq reader with 3 themes, reading progress sync, and anti-piracy watermark.
+- **Writer Studio & Manuscript Ingestion:** `ChapterSplitterWizard` (embedded in chapters page) with `.docx`/`.txt` import, Urdu chapter numbering; autosaving drafts.
+- **Financial Ledger & Platform Fee Engine:** Append-only ledger, 30% default fee, per-writer custom terms, PKR 5,000 threshold, invoice generation.
+- **Administrative Governance:** Moderation queues, dispute desk, taxonomy management, impersonation, announcements, palette settings.
+- **Automated Email Outbox:** GitHub Actions cron triggers `/api/cron/send-emails` every 5 minutes via Resend.
+- **Supabase Keep-Alive:** `/api/health` for UptimeRobot/cron-job.org.
+- **Design System:** 3 switchable WCAG AA palettes with unified semantic tokens.
 
-### 10.2 Partially Built / Requires Production Automation
-- **Background Cron Dispatch:** The routes `/api/cron/send-emails` and `/api/cron/reminders` are fully implemented and tested, but require an external cron scheduler (such as Cloudflare Cron Triggers or an external uptime monitor with Bearer authorization) to trigger them periodically.
-- **Cloudflare Turnstile Bot Protection:** Rate-limiting tables exist in Supabase (`api_rate_limits`), but Cloudflare Turnstile CAPTCHA integration on registration and login forms is currently flagged as a TODO in `docs/MANUAL_SETUP_CHECKLIST.md`.
+### 10.2 Partially Built / Requires Additional Setup
+- **GitHub Actions Cron Secrets:** `secrets.APP_URL` and `secrets.CRON_SECRET` must be configured in GitHub repository settings for automated email dispatch to function.
+- **Cloudflare Turnstile Bot Protection:** Rate-limiting infrastructure exists but Turnstile CAPTCHA integration on auth forms is marked as TODO in `docs/MANUAL_SETUP_CHECKLIST.md`.
 
 ---
 
 ## 11. Known Issues & Technical Debt
 
-1. **React 19 ESLint Hook Warnings (`npm run lint`):**
-   - *Issue:* React 19's ESLint plugin strictly forbids `react-hooks/set-state-in-effect` (syncing initial props into state inside `useEffect`).
-   - *Impact:* Flags 25 errors and 20 warnings across components such as `NovelListClient.tsx`, `ChapterListManager.tsx`, `login-form.tsx`, and `SubmitReviewModal.tsx`.
-   - *Remediation:* Refactor these components to derive state directly or use React keys to reset component instances when props change.
-2. **Terminology Split (DB vs UI):**
-   - *Issue:* The database schema, RPC functions, and TypeScript types use `commission` (`sales_ledger.commission_amount`, `default_commission_rate`, `/writer/commission`), while all UI text strictly uses `Platform fee` (`پلیٹ فارم فیس`).
-   - *Impact:* Developers must remember to never use the word "commission" in user-facing UI copy while continuing to use it for database queries and RPC parameters.
-3. **Migration Sequence Anomaly (`0017` / `0017_a`):**
-   - *Issue:* Two files share the sequence prefix 17: `0017_a_commission_enum_values.sql` and `0017_commission_and_statements.sql`.
-   - *Reason:* PostgreSQL strictly requires new enum values added via `ALTER TYPE ... ADD VALUE` to be committed in an isolated transaction before they can be referenced in views or tables (Error 55P04).
-4. **Next.js CLI Security Advisory Interruption:**
-   - *Issue:* Running `next build` on Next.js 16.4.2 intermittently exits with code 1 on the first attempt displaying a security notice (`next upgrade --agent=security`). Retrying the command immediately succeeds with code 0.
-   - *Impact:* CI scripts may need retry logic or an upgrade to the latest patch release.
+### 11.1 Marketing Copy Conflicts with Actual System Behaviour
+
+> [!CAUTION]
+> The following user-facing copy makes promises that the system **does not automatically fulfill**. Access requires manual author verification which may take minutes to days.
+
+1. **Homepage SEO metadata / OpenGraph description** — file `src/app/(marketplace)/page.tsx:31,38,56`:
+   ```
+   "Buy and read original Urdu novels directly from Pakistani authors.
+   Pay securely via JazzCash, EasyPaisa, or Raast with instant digital access."
+   ```
+   - **"Pay securely"**: The platform does not facilitate, monitor, or secure the actual bank transfer — the reader transfers money directly to the author's private account. The word "securely" implies platform guarantees that do not exist.
+   - **"instant digital access"**: Access is granted only after the author manually verifies receipt. There is no mechanism to guarantee any timeframe. This phrase directly conflicts with the actual flow.
+   - This same string appears in three places (page metadata, OpenGraph, and Twitter card) in the same file.
+
+2. **Homepage UI copy — Step 3 heading** — file `src/app/(marketplace)/page.tsx:203`:
+   ```
+   3. Instant Access Unlocked
+   ```
+   The body text below it correctly says "Once the author confirms receipt..." but the heading "Instant Access Unlocked" implies immediacy that the system cannot guarantee.
+
+3. **`EmailOutboxCard.tsx:192`**:
+   ```html
+   <span>Emails are securely dispatched to recipients.</span>
+   ```
+   This is in the admin UI (not public-facing), but is factually imprecise — the system queues emails and dispatches them asynchronously via a third-party service (Resend). Delivery is not guaranteed by the platform.
+
+### 11.2 React 19 ESLint Hook Warnings
+- **Issue:** `react-hooks/set-state-in-effect` rule (25 errors, 20 warnings in `NovelListClient.tsx`, `ChapterListManager.tsx`, `login-form.tsx`, `SubmitReviewModal.tsx`, and others).
+- **Impact:** `npm run lint` fails. CI does not currently block on lint.
+- **Remediation:** Refactor to derive state directly or use React `key` prop to reset.
+
+### 11.3 Terminology Split (DB vs UI)
+- Database objects, RPC names, URL paths (`/writer/commission`, `/admin/commission`), and TypeScript identifiers all use `commission`.
+- All user-visible copy must use "Platform fee" / "پلیٹ فارم فیس".
+- New developers must remember this distinction at every touchpoint.
+
+### 11.4 Migration Sequence Anomaly (Two `0017` Prefixes)
+- `0017_a_commission_enum_values.sql` and `0017_commission_and_statements.sql` share the `0017` prefix.
+- Required by PostgreSQL 55P04: `ALTER TYPE ... ADD VALUE` must commit before the new value can be referenced.
+
+### 11.5 GitHub Actions Cron Secret Dependency
+- Automated email delivery depends on `secrets.APP_URL` and `secrets.CRON_SECRET` being set in the GitHub repository settings. If either is missing or incorrect, emails are silently not dispatched and the GitHub Actions job fails (but does not block deployments, since the cron is a separate workflow).
+
+### 11.6 Next.js CLI Security Advisory Exit
+- `next build` on Next.js 16.4.2 may exit code 1 on first run with a security advisory. Retrying immediately succeeds.
+
+### 11.7 No Cloudflare Cron Trigger
+- `wrangler.jsonc` does **not** define a Cloudflare Cron Trigger. Email dispatch depends entirely on GitHub Actions. If the GitHub Actions runner is unavailable or the repo is migrated without keeping the workflow, emails will stop.
 
 ---
 
 ## 12. Manual Operational Checklist for the Owner
 
-The repository owner must ensure the following manual steps are executed in the respective external dashboards:
-
 ### 12.1 Supabase PostgreSQL Setup
-1. **Execute Migrations:** In the **Supabase Dashboard -> SQL Editor**, execute all migrations sequentially from `0001` through `0056`.
-2. **Bootstrap Platform Administrator:** After creating an account via the application UI, execute:
+1. Execute migrations `0001` through `0056` sequentially in the Supabase SQL Editor.
+2. Bootstrap platform administrator:
    ```sql
-   UPDATE public.profiles
-   SET role = 'admin'
-   WHERE email = 'your-admin-email@unbpremium.pk';
+   UPDATE public.profiles SET role = 'admin' WHERE email = 'your-admin-email@unbpremium.pk';
    ```
-3. **Verify Storage Buckets:**
-   - `payment-proofs`: Must be **Private**, max size 2 MB, allowed MIME types `image/webp, image/jpeg, image/png`.
-   - `novel-assets`: Must be **Public**, max size 5 MB, allowed MIME types `image/webp, image/jpeg, image/png`.
-4. **Configure Auth Redirect URLs:**
-   - Add `https://premium.urdunovelbanks.com/auth/callback` and `https://premium.urdunovelbanks.com/reset-password` to the Supabase Auth allowlist.
+3. Verify storage buckets: `payment-proofs` (Private, 2 MB), `novel-assets` (Public, 5 MB).
+4. Configure Auth redirect allowlist: `https://premium.urdunovelbanks.com/auth/callback` and `.../reset-password`.
 
-### 12.2 Cloudflare Workers & Bindings Setup
-1. **Provision R2 Bucket:** Create bucket `unb-premium-cache` in Cloudflare R2 and verify binding in `wrangler.jsonc`.
-2. **Provision D1 Database:** Confirm D1 database `unb-premium-tag-cache` (ID `ab3532e1-c979-43ad-999a-bb7bbaa5a34d`) is active.
-3. **Set Worker Secrets:** Run in terminal via Wrangler:
+### 12.2 Cloudflare Workers & Bindings
+1. Provision R2 bucket `unb-premium-cache`.
+2. Confirm D1 database `unb-premium-tag-cache` (ID `ab3532e1-c979-43ad-999a-bb7bbaa5a34d`).
+3. Set secrets:
    ```bash
    wrangler secret put SUPABASE_SERVICE_ROLE_KEY
    wrangler secret put CRON_SECRET
    wrangler secret put RESEND_API_KEY
    ```
 
-### 12.3 Supabase Free Tier Keep-Alive Monitor
-To prevent Supabase from automatically pausing the project after 7 days of inactivity:
-1. Create a free HTTP monitor at [UptimeRobot.com](https://uptimerobot.com) or [cron-job.org](https://cron-job.org).
-2. Set URL to: `https://premium.urdunovelbanks.com/api/health`
-3. Set interval to: **5 minutes** (or 10 minutes).
-4. Set method to: `HEAD` or `GET`.
+### 12.3 GitHub Actions Secrets (Required for Email Dispatch)
+In **GitHub → Repository → Settings → Secrets and variables → Actions**, add:
+- `APP_URL` = `https://premium.urdunovelbanks.com`
+- `CRON_SECRET` = same 32+ character value as the Cloudflare Worker secret
+
+### 12.4 Supabase Keep-Alive Monitor
+Create a free HTTP monitor at [UptimeRobot.com](https://uptimerobot.com) or [cron-job.org](https://cron-job.org):
+- **URL:** `https://premium.urdunovelbanks.com/api/health`
+- **Interval:** 5 minutes
+- **Method:** `HEAD` or `GET`
 
 ---
 
 ## 13. Recommended Next 10 Engineering Tasks
 
-1. **Configure Cloudflare Worker Cron Trigger for Email Outbox:**
-   - *Rationale:* Replace external cron reliance by adding a native `triggers: { crons: ["*/2 * * * *"] }` block to `wrangler.jsonc` that dispatches pending emails in `email_outbox` every 2 minutes.
-2. **Resolve React 19 ESLint `react-hooks/set-state-in-effect` Warnings:**
-   - *Rationale:* Clean up the 25 ESLint errors in client components to restore a clean, zero-warning `npm run lint` CI gate.
-3. **Integrate Cloudflare Turnstile Bot Protection:**
-   - *Rationale:* Protect public registration and login forms against automated credential stuffing and bot registrations.
-4. **Automate Scheduled Platform Fee Reminder Notifications:**
-   - *Rationale:* Schedule `/api/cron/reminders` to alert authors whose unpaid platform fee balance is approaching the PKR 5,000 pause threshold.
-5. **Optimize Chapter Reading Cache Invalidation:**
-   - *Rationale:* Refine Next.js `revalidateTag` calls when an author edits a published chapter so readers see updates instantly without clearing unrelated novel caches.
-6. **Implement Author Payout QR Codes:**
-   - *Rationale:* Allow authors to upload their Raast / JazzCash QR codes in the Writer Studio to streamline the checkout process for mobile readers.
-7. **Add Automated PDF/EPUB Export for Authors:**
-   - *Rationale:* Enable authors to download formatted backups of their own manuscripts directly from the Writer Studio.
-8. **Expand Reader Progress Analytics for Authors:**
-   - *Rationale:* Provide authors with chapter drop-off charts and average reading time metrics based on `reader_progress` data.
-9. **Upgrade Next.js Patch Release:**
-   - *Rationale:* Upgrade Next.js from `16.4.2` to the latest patch version to clear the CLI security advisory notice during builds.
-10. **Implement Multi-Currency Display for Overseas Readers:**
-    - *Rationale:* Display estimated USD/AED/GBP conversions alongside PKR prices to assist the substantial Pakistani diaspora reading Urdu fiction abroad.
+1. **Fix "instant digital access" / "Pay securely" homepage metadata** — Replace with accurate copy: e.g. `"Pay directly via JazzCash, EasyPaisa, or Raast. Access granted after the author verifies your bank transfer."` Affects `src/app/(marketplace)/page.tsx:31,38,56` and the "Instant Access Unlocked" heading at line 203.
+2. **Add Cloudflare Cron Trigger to `wrangler.jsonc`** — Add `"triggers": { "crons": ["*/5 * * * *"] }` with a Worker scheduled handler so email dispatch is not GitHub-Actions-dependent.
+3. **Resolve React 19 ESLint `react-hooks/set-state-in-effect` Warnings** — Refactor affected components to restore a clean `npm run lint` gate.
+4. **Integrate Cloudflare Turnstile Bot Protection** — Add CAPTCHA to `/register` and `/login` forms.
+5. **Automate Scheduled Platform Fee Reminder Notifications** — Ensure `secrets.APP_URL` and `secrets.CRON_SECRET` are configured in GitHub so the hourly reminder job actually runs.
+6. **Optimize Chapter Reading Cache Invalidation** — Refine `revalidateTag` calls on chapter edits.
+7. **Implement Author Payout QR Codes** — Allow authors to upload Raast / JazzCash QR codes to streamline checkout.
+8. **Expand Reader Progress Analytics for Authors** — Chapter drop-off charts and reading time metrics from `reader_progress`.
+9. **Upgrade Next.js Patch Release** — Clear the CLI security advisory intermittent exit-1.
+10. **Implement Multi-Currency Display** — Show estimated USD/AED/GBP alongside PKR prices for diaspora readers.
 
 ---
 
 ## 14. Git Secret Scan Findings
 
-A comprehensive security audit of the repository's git commit history (`267 commits` on `main`) was performed using `git log` and regex pattern scanning for API keys, private credentials, and sensitive tokens.
+Scan of 268 commits on `main` (remote: `https://github.com/theusmandev/urdu-fiction-marketplace.git`):
 
-### 14.1 Scan Results Summary
-- **Accidental Key Leaks:** **ZERO (0)** production secrets, active Supabase service role keys, Resend API tokens, or private certificates were committed to the repository history.
-- **Environment Configuration:** All live API credentials are systematically injected via runtime environment variables or Cloudflare Worker Secrets (`wrangler secret put`).
-- **Committed Files Checked:**
-  - `.env.example`: Contains only sanitized placeholder strings (`your-project-id`, `re_dummy_...`, `32-char-random-secret`).
-  - `wrangler.jsonc`: Exposes only public configuration keys (`EMAIL_PROVIDER="resend"`, public sender header, and resource binding names). No secret keys are stored in version control.
-  - Test suites (`tests/`): Unit test fixtures use mock strings (e.g. `re_dummy_test_key_for_testing_only`) with network calls mocked via Vitest spies.
+- **Accidental Key Leaks: ZERO.** No production API keys, service role keys, or private tokens committed.
+- `.env.example`: Sanitized placeholders only (`your-project-id`, `re_dummy_...`, `32-char-random-secret`).
+- `wrangler.jsonc`: Public configuration only (`EMAIL_PROVIDER`, sender header, binding names).
+- `tests/`: Mock strings (`re_dummy_test_key_for_testing_only`) with Vitest network spies.
+- **Local HEAD is 1 commit ahead of `origin/main`** (the `"docs: add project handoff"` commit plus this correction commit are unpushed). Do not push without owner confirmation.
 
 ---
-*End of Project Handoff Document. Authored by the Lead Engineering Team for UNB Premium.*
+*End of Project Handoff Document — Version 1.1.0, fact-checked 2026-11-18.*
