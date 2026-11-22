@@ -16,14 +16,14 @@ export interface ReaderPreferences {
 }
 
 export const DEFAULT_READER_PREFERENCES: ReaderPreferences = {
-  theme: 'light',
+  theme: 'sepia',
   fontSize: 'lg',
   lineHeight: 'relaxed',
   paragraphSpacing: 'normal',
 };
 
 export const readerPreferencesSchema = z.object({
-  theme: z.enum(['light', 'dark', 'sepia']).default('light'),
+  theme: z.enum(['light', 'dark', 'sepia']).default('sepia'),
   fontSize: z.enum(['sm', 'base', 'lg', 'xl', '2xl']).default('lg'),
   lineHeight: z.enum(['normal', 'relaxed', 'loose']).default('relaxed'),
   paragraphSpacing: z.enum(['compact', 'normal', 'wide']).default('normal'),

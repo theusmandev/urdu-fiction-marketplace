@@ -86,7 +86,7 @@ The system implements three mutually exclusive primary user roles (governed by `
    - Discovers novels via search, genre taxonomy, and curated shelves.
    - Reads free teaser/sample chapters (controlled by author per novel).
    - Purchases access to complete novels by transferring PKR directly to the author's local bank or mobile wallet, uploading the Transaction ID (TID) and payment receipt screenshot.
-   - Reads unlocked chapters inside a distraction-free, customizable Urdu reader (with Light, Sepia, and Dark themes; Nastaliq calligraphy; dynamic reader watermark).
+   - Reads unlocked chapters inside a distraction-free, customizable Urdu reader (Sepia default, with Light and Dark options; Nastaliq calligraphy; dynamic reader watermark; saved preferences override default).
    - Tracks reading progress (last read chapter, scroll position, completion status).
    - Sends direct appreciation **Tips** (0% platform fee) to authors.
    - Raises disputes on unverified or rejected orders within a 30-day window.
@@ -640,7 +640,7 @@ Verified on **2026-11-18**:
 
 ### 10.1 Completed & Production-Ready
 - **End-to-End Direct Payment Marketplace:** Order creation, TID submission, proof screenshot upload, and manual author verification flow.
-- **Content Protection & Reading Experience:** Gulzar Nastaliq reader with 3 themes, reading progress sync, and anti-piracy watermark.
+- **Content Protection & Reading Experience:** Gulzar Nastaliq reader with 3 themes (Sepia default, saved preferences override; separate storage keys `unb_reader_prefs` for paid reader and `unb_reader_theme` for free preview), reading progress sync, and anti-piracy watermark.
 - **Writer Studio & Manuscript Ingestion:** `ChapterSplitterWizard` (embedded in chapters page) with `.docx`/`.txt` import, Urdu chapter numbering; autosaving drafts.
 - **Financial Ledger & Platform Fee Engine:** Append-only ledger, 30% default fee, per-writer custom terms, PKR 5,000 threshold, invoice generation.
 - **Administrative Governance:** Moderation queues, dispute desk, taxonomy management, impersonation, announcements, palette settings.

@@ -30,7 +30,7 @@ The UNB Premium brand identity consists of:
 
 ## 2. Invariants & Isolation
 - **Email Communications**: Keep fixed brand colors (`src/lib/email/*` uses inline email-safe colors independent of the active site palette; `logo-email.png` uses fixed Palette A colors).
-- **Reader Themes**: Independent reader preferences (Light, Sepia, Dark) are isolated within reading routes (`/read/*`) and remain completely unaffected by site palette changes.
+- **Reader Themes**: Independent reader preferences (Light, Sepia, Dark) are isolated within reading routes (`/read/*`) and remain completely unaffected by site palette changes. The default reader theme for all reading surfaces is **Sepia** (`DEFAULT_READER_PREFERENCES.theme = 'sepia'`). Any saved reader preference in localStorage overrides this default. Note that the two readers maintain separate storage keys (`unb_reader_prefs` for the secure paid reader, `unb_reader_theme` for the public free preview reader).
 - **Admin Shell Area**: Uses dedicated role accent tokens (`--accent-admin`) to preserve administrative authority and recognition regardless of which site palette is selected.
 
 ---

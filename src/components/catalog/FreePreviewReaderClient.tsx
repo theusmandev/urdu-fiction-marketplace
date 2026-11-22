@@ -39,7 +39,7 @@ export function FreePreviewReaderClient({
     if (typeof window !== "undefined") {
       try {
         const saved = localStorage.getItem("unb_reader_theme") as ThemeMode | null;
-        if (saved) return saved;
+        if (saved && (saved === "light" || saved === "sepia" || saved === "dark")) return saved;
       } catch {}
     }
     return "sepia";

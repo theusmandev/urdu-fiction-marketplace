@@ -14,6 +14,8 @@ describe('Reader Domain Helpers & Schemas', () => {
     it('validates default preferences when empty object passed', () => {
       const parsed = readerPreferencesSchema.parse({});
       assert.deepEqual(parsed, DEFAULT_READER_PREFERENCES);
+      assert.equal(parsed.theme, 'sepia');
+      assert.equal(DEFAULT_READER_PREFERENCES.theme, 'sepia');
     });
 
     it('accepts valid custom preferences', () => {
