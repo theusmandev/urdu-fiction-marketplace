@@ -62,16 +62,37 @@ export function LoginForm({ searchParams }: LoginFormProps) {
     }
   }, [urlEmail]);
 
-  const getSystemError = () => {
+  const getSystemError = (): { en: string; ur: string } | null => {
     if (verifiedParam) return null;
     if (errorCode === 'account_deactivated') {
-      return 'Your account has been deactivated. Please contact support at support@unbpremium.pk.';
+      return {
+        en: 'Your account has been deactivated. Please contact support at support@unbpremium.pk.',
+        ur: 'آپ کا اکاؤنٹ معطل کر دیا گیا ہے۔ براہ کرم سپورٹ سے رابطہ کریں: support@unbpremium.pk',
+      };
+    }
+    if (errorCode === 'oauth_cancelled') {
+      return {
+        en: 'Google sign-in was cancelled. Please try again.',
+        ur: 'گوگل سائن ان منسوخ کر دیا گیا۔ براہ کرم دوبارہ کوشش کریں۔',
+      };
+    }
+    if (errorCode === 'oauth_failed') {
+      return {
+        en: 'Unable to sign in with Google. Please try again or use your email and password.',
+        ur: 'گوگل کے ذریعے سائن ان کرنے میں مسئلہ پیش آیا۔ براہ کرم دوبارہ کوشش کریں یا ای میل اور پاس ورڈ استعمال کریں۔',
+      };
     }
     if (errorCode === 'auth_callback_failed') {
-      return 'Authentication link expired or invalid. Please request a new link.';
+      return {
+        en: 'Authentication link expired or invalid. Please request a new link.',
+        ur: 'تصدیقی لنک کی میعاد ختم یا غلط ہے۔ براہ کرم نیا لنک حاصل کریں۔',
+      };
     }
     if (errorCode === 'insufficient_permissions') {
-      return 'You do not have administrative privileges to access that section.';
+      return {
+        en: 'You do not have administrative privileges to access that section.',
+        ur: 'اس حصے تک رسائی کے لیے آپ کے پاس انتظامی اختیارات نہیں ہیں۔',
+      };
     }
     return null;
   };
@@ -147,7 +168,12 @@ export function LoginForm({ searchParams }: LoginFormProps) {
         {systemError && (
           <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
             <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
-            <span>{systemError}</span>
+            <div className="space-y-1">
+              <p>{systemError.en}</p>
+              <UrduText as="p" size="sm" className="text-danger-text font-medium leading-[2.1] py-0">
+                {systemError.ur}
+              </UrduText>
+            </div>
           </div>
         )}
 

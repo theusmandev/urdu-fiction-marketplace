@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/getCurrentUser';
 import { getPublicNovelChapters } from '@/lib/supabase/public';
 import { SecureReaderClient } from './SecureReaderClient';
 import { type ChapterReaderPayload } from '@/types/database';
@@ -37,14 +38,17 @@ export default async function SecureReaderPage({ params }: ReaderPageProps) {
     redirect(`/novels/${slug}`);
   }
 
-  const supabase = await createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
+  if (currentUser.isDeactivated) {
+    redirect('/login?error=account_deactivated');
+  }
+
+  if (!currentUser.user) {
     redirect(`/login?next=/read/${encodeURIComponent(slug)}/${chapterNumber}`);
   }
+
+  const supabase = await createServerClient();
 
   // Fetch chapter text and authorization authoritatively via get_chapter_for_reader RPC
   const { data: chapterData, error: chapterError } = await supabase.rpc(
@@ -127,7 +131,7 @@ export default async function SecureReaderPage({ params }: ReaderPageProps) {
   return (
     <SecureReaderClient
       chapter={typedChapter}
-      readerId={user.id}
+      readerId={currentUser.user.id}
       tableOfContents={tableOfContents}
       novelSlug={slug}
     />

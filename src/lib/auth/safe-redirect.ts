@@ -11,6 +11,7 @@ const ALLOWED_REDIRECT_PREFIXES = [
   '/admin',
   '/become-a-writer',
   '/novels',
+  '/read',
   '/reset-password',
   '/checkout',
   '/disputes',
