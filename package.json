@@ -48,5 +48,10 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "4.156.0"
+  },
+  "overrides": {
+    "@opennextjs/aws": {
+      "cookie": "0.7.2"
+    }
   }
 }

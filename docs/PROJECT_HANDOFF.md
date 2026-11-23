@@ -141,14 +141,14 @@ Versions read from `package.json` (semver ranges) and resolved exact versions fr
 
 | Category | Technology | Declared Range | Resolved / Installed |
 | :--- | :--- | :--- | :--- |
-| **Framework** | Next.js (App Router) | `^16.4.5` (security patch, 2026-11-23) | `16.4.5` |
+| **Framework** | Next.js (App Router) | `16.4.5` (exact pin, security release) | `16.4.5` |
 | **UI Library** | React | `19.3.0` (exact) | `19.3.0` |
 | **UI Library** | React DOM | `19.3.0` (exact) | `19.3.0` |
 | **Styling Engine** | Tailwind CSS v4 | `^4` | `4.3.3` |
 | **Styling Compiler** | @tailwindcss/turbopack | `^4` (devDep) | `4.3.3` |
 | **Database & Auth** | @supabase/supabase-js | `^2.118.0` | `2.118.0` |
 | **Database SSR** | @supabase/ssr | `^0.12.7` | `0.12.7` |
-| **Deployment Adapter** | @opennextjs/cloudflare | `^1.20.18` (bumped for 16.4.5 peer-dep, 2026-11-23) | `1.20.18` |
+| **Deployment Adapter** | @opennextjs/cloudflare | `1.20.18` (exact pin, peer-dep for >=16.4.5) | `1.20.18` |
 | **Cloudflare CLI** | wrangler | `4.156.0` (exact, devDep) | `4.156.0` |
 | **Icons** | lucide-react | `^1.61.0` | `1.61.0` |
 | **Document Parser** | mammoth (.docx → HTML) | `^1.13.0` | `1.13.0` |
@@ -719,6 +719,20 @@ Patched in Next.js 16.4.5. Assessment against this repo:
 
 ### 11.7 No Cloudflare Cron Trigger
 - `wrangler.jsonc` does **not** define a Cloudflare Cron Trigger. Email dispatch depends entirely on GitHub Actions. If the GitHub Actions runner is unavailable or the repo is migrated without keeping the workflow, emails will stop.
+
+### 11.9 OpenNext Middleware Cookie Default-Import Crash (Issue #1506) — Mitigated (2026-11-23)
+- **Issue:** On Cloudflare Workers with `@opennextjs/cloudflare@1.20.18` + `@opennextjs/aws@4.2.0`, Node.js middleware (`src/proxy.ts` bundled into `.open-next/middleware/handler.mjs`) crashes on any request containing a `Cookie` header with `TypeError: Cannot read properties of undefined (reading 'parse')` (Cloudflare Error 1101).
+- **Cause:** `@opennextjs/aws`'s edge converter uses default import `import cookieParser from "cookie"`, but `cookie@1.1.1` sets `__esModule: true` without an `exports.default` in CommonJS. When bundled by esbuild for workerd, `__toESM` does not synthesize a default export, resulting in `import_cookie.default` being `undefined`. (See upstream OpenNext Issue #1506).
+- **Temporary Fix:** Added scoped npm override in `package.json`:
+  ```json
+  "overrides": {
+    "@opennextjs/aws": {
+      "cookie": "0.7.2"
+    }
+  }
+  ```
+  `cookie@0.7.2` does not define `__esModule: true`, allowing esbuild's `__toESM` helper to safely synthesize `default` to the module exports. Verified locally with `wrangler dev` across unauthenticated and cookie-authenticated routes.
+- **Action for Owner/Engineers:** This override can be safely removed once `@opennextjs/cloudflare` / `@opennextjs/aws` releases an upstream fix for Issue #1506.
 
 ---
 
