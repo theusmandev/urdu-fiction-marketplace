@@ -1,10 +1,10 @@
 # UNB Premium (`یو این بی پریمیم`) — Comprehensive Project Handoff
 
-> **Document Version:** 1.1.0
+> **Document Version:** 1.2.0
 > **Repository:** `urdu-fiction-marketplace`
 > **Production URL:** `https://premium.urdunovelbanks.com`
 > **Target Audience:** Incoming Lead Engineers, Full-Stack Developers, Database Architects, and Autonomous Coding Agents.
-> **Verification Status:** Fact-checked on 2026-11-18 against the actual repository. Tech stack versions read from `package.json` and `package-lock.json`. Routes rebuilt from the real `src/app` file tree. RPC migration sources verified by grepping `supabase/migrations/*.sql`. Scheduling verified from `.github/workflows/cron.yml` and `wrangler.jsonc`. Test counts taken from actual directory listings and test runner output. Claims that could not be verified against repository evidence are marked UNVERIFIED.
+> **Verification Status:** Fact-checked on 2026-11-18 against the actual repository. Tech stack versions read from `package.json` and `package-lock.json`. Routes rebuilt from the real `src/app` file tree. RPC migration sources verified by grepping `supabase/migrations/*.sql`. Scheduling verified from `.github/workflows/cron.yml` and `wrangler.jsonc`. Test counts taken from actual directory listings and test runner output. Claims that could not be verified against repository evidence are marked UNVERIFIED. v1.2.0 updated 2026-11-23 for Next.js 16.4.5 security upgrade.
 
 ---
 
@@ -141,14 +141,14 @@ Versions read from `package.json` (semver ranges) and resolved exact versions fr
 
 | Category | Technology | Declared Range | Resolved / Installed |
 | :--- | :--- | :--- | :--- |
-| **Framework** | Next.js (App Router) | `16.4.2` (exact) | `16.4.2` |
+| **Framework** | Next.js (App Router) | `^16.4.5` (security patch, 2026-11-23) | `16.4.5` |
 | **UI Library** | React | `19.3.0` (exact) | `19.3.0` |
 | **UI Library** | React DOM | `19.3.0` (exact) | `19.3.0` |
 | **Styling Engine** | Tailwind CSS v4 | `^4` | `4.3.3` |
 | **Styling Compiler** | @tailwindcss/turbopack | `^4` (devDep) | `4.3.3` |
 | **Database & Auth** | @supabase/supabase-js | `^2.118.0` | `2.118.0` |
 | **Database SSR** | @supabase/ssr | `^0.12.7` | `0.12.7` |
-| **Deployment Adapter** | @opennextjs/cloudflare | `1.20.14` (exact, devDep) | `1.20.14` |
+| **Deployment Adapter** | @opennextjs/cloudflare | `^1.20.18` (bumped for 16.4.5 peer-dep, 2026-11-23) | `1.20.18` |
 | **Cloudflare CLI** | wrangler | `4.156.0` (exact, devDep) | `4.156.0` |
 | **Icons** | lucide-react | `^1.61.0` | `1.61.0` |
 | **Document Parser** | mammoth (.docx → HTML) | `^1.13.0` | `1.13.0` |
@@ -546,7 +546,7 @@ Dynamic canvas watermark injected in the reader UI containing the reader's ident
 ## 8. Deployment & Cloudflare OpenNext Architecture
 
 ### 8.1 Cloudflare Worker Architecture
-- **Framework:** `@opennextjs/cloudflare` `1.20.14`
+- **Framework:** `@opennextjs/cloudflare` `1.20.18`
 - **Entry Point:** `.open-next/worker.js`
 - **Compatibility Date:** `2024-12-30` with `nodejs_compat`
 - **Static Assets:** `.open-next/assets` via Workers Assets (`binding = "ASSETS"`)
@@ -699,8 +699,23 @@ Verified on **2026-11-18**:
 ### 11.5 GitHub Actions Cron Secret Dependency
 - Automated email delivery depends on `secrets.APP_URL` and `secrets.CRON_SECRET` being set in the GitHub repository settings. If either is missing or incorrect, emails are silently not dispatched and the GitHub Actions job fails (but does not block deployments, since the cron is a separate workflow).
 
-### 11.6 Next.js CLI Security Advisory Exit
-- `next build` on Next.js 16.4.2 may exit code 1 on first run with a security advisory. Retrying immediately succeeds.
+### 11.6 Next.js CLI Security Advisory Exit — RESOLVED (2026-11-23)
+- ~~`next build` on Next.js 16.4.2 may exit code 1 on first run with a security advisory. Retrying immediately succeeds.~~
+- **Resolved:** Upgraded to Next.js `16.4.5` (security release, 2026-11-23). The CLI advisory exit-code-1 no longer occurs. `@opennextjs/cloudflare` bumped to `1.20.18` (required peer-dep for `>=16.4.5`). See §11.8 for advisory details.
+
+### 11.8 Next.js November 2026 Security Advisory — Exposure Assessment (2026-11-23)
+
+Patched in Next.js 16.4.5. Assessment against this repo:
+
+| Advisory | GHSA | Severity | What it affects | This repo |
+| :--- | :--- | :--- | :--- | :--- |
+| Cross-tenant cache disclosure (`unstable_cache` + `use cache` race) | GHSA-mfr8-8qww-v76h | **High** | Multi-tenant apps mixing `unstable_cache` + Cache Components (`use cache`) with root-param reads | **NOT AFFECTED** — `use cache` directive is not used anywhere. `unstable_cache` is used (`src/lib/settings/site-palette.ts:49`, `src/lib/settings/social.ts:48`) but purely for public singleton data with no root-param/tenant variation. |
+| Cross-root-parameter disclosure in nested `use cache` | GHSA-vc7v-qv4w-wrv8 | Medium | Nested `use cache` functions leaking values across root-parameter values (locale, tenant) | **NOT AFFECTED** — no `use cache` directive in codebase. |
+| Binary `use cache` argument cache identity collision | GHSA-rhh4-g77r-r9qj | Medium | Distinct `Uint8Array`/`Blob` args to `use cache` mapped to same cache key | **NOT AFFECTED** — no `use cache` directive. `Uint8Array`/`ArrayBuffer` usage is in `api/writer/parse-manuscript/route.ts:87` (manuscript upload) and `src/lib/uploads/compress.ts:19–20`, but neither is passed to any caching primitive. |
+| Shared shell cache poisoning (self-hosted, Partial Prefetching disabled) | GHSA-vvgp-ww4w-46vf | Medium | Self-hosted `next start` + Cache Components + crafted URL poisons shared fallback shell | **NOT AFFECTED** — deployed to Cloudflare Workers via OpenNext (not `next start`). No `use cache`. |
+| Stale compressed response framing in Route Handlers | GHSA-pc58-hwjq-p385 | Medium | Route Handlers returning raw fetched `Response` objects unchanged, compressed | **NOT AFFECTED** — no route handler directly returns a forwarded `fetch()` `Response`. All handlers return `NextResponse.json(...)` or build their own `Response`. |
+| HttpOnly cookie exposure via Edge route internal headers | GHSA-f3mh-rxg3-f5g2 | Medium | Edge Route Handlers / Edge Middleware that read `HttpOnly` cookies via internal headers, exploitable by XSS | **LOW EXPOSURE** — The proxy (`src/proxy.ts`, `src/lib/supabase/middleware-or-proxy.ts`) runs on Cloudflare Workers (OpenNext "Node.js middleware" path, not the Next.js Edge runtime; no `export const runtime = 'edge'` anywhere). Explicitly strips `x-user-id`/`x-user-email` on each request (L76–77). Exploitability requires attacker-controlled JS on the same origin. Patched regardless. |
+| SVG rejection bypass in image optimizer | GHSA-7qx7-33qx-rqx2 | Medium | `images.dangerouslyAllowSVG: false` (default) bypass via crafted URLs | **NOT AFFECTED** — `next.config.ts:58` sets `images: { unoptimized: true }`. The built-in image optimizer is entirely bypassed; no SVG sanitization logic runs. |
 
 ### 11.7 No Cloudflare Cron Trigger
 - `wrangler.jsonc` does **not** define a Cloudflare Cron Trigger. Email dispatch depends entirely on GitHub Actions. If the GitHub Actions runner is unavailable or the repo is migrated without keeping the workflow, emails will stop.
