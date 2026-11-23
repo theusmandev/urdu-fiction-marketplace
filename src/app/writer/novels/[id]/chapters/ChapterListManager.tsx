@@ -530,6 +530,8 @@ export function ChapterListManager({
       {/* Import Modal */}
       <ChapterImportModal
         novelId={novel.id}
+        novelTitleUrdu={novel.title_urdu}
+        novelTitleEnglish={novel.title_english}
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         suggestedStartNumber={chapters.length + 1}

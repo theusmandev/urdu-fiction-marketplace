@@ -35,8 +35,8 @@ import {
 
 export interface ChapterSplitterWizardProps {
   novelId: string;
-  novelTitleUrdu?: string;
-  novelTitleEnglish?: string;
+  novelTitleUrdu?: string | null;
+  novelTitleEnglish?: string | null;
   isOpen: boolean;
   onClose: () => void;
   // If splitting an existing chapter from ChapterEditor:
@@ -237,7 +237,7 @@ export function ChapterSplitterWizard({
 
     return buildParts({
       rawParts: rawPartsWithCustomTitles,
-      baseTitle: novelTitleUrdu || novelTitleEnglish || 'باب',
+      baseTitle: novelTitleUrdu?.trim() || 'باب',
       titleStyle,
       startChapterNumber,
       firstPartIsFreePreview: firstPartFree,
@@ -249,7 +249,6 @@ export function ChapterSplitterWizard({
     computedRawParts,
     editedTitles,
     novelTitleUrdu,
-    novelTitleEnglish,
     titleStyle,
     startChapterNumber,
     firstPartFree,

@@ -8,6 +8,7 @@ import {
   derivePatternFromExample,
   splitBySize,
   splitAtMarkers,
+  formatPartTitle,
   buildParts,
   normalizeForPreservation,
   HARD_MAX_CHAPTER_CHARACTERS,
@@ -230,5 +231,99 @@ describe('Writer-Controlled Chapter Splitter Pure Engine', () => {
     const normOrig = normalizeForPreservation(continuous);
     const normParts = normalizeForPreservation(parts.join(' '));
     assert.strictEqual(normOrig, normParts);
+  });
+
+  // ---------------------------------------------------------------------------
+  // 9. Urdu Novel Title in Auto-Generated Chapter Titles & Part Numbering
+  // ---------------------------------------------------------------------------
+  it('formats auto-generated chapter titles with novel Urdu title and correct part numbering', () => {
+    // 1. Base Urdu title with firstNumber = 1
+    assert.strictEqual(
+      formatPartTitle(0, 'آئینہ ذات', 'urdu', 1),
+      'آئینہ ذات - حصہ ۱'
+    );
+
+    // 2. Base Urdu title with offset startChapterNumber = 7
+    assert.strictEqual(
+      formatPartTitle(0, 'آئینہ ذات', 'urdu', 7),
+      'آئینہ ذات - حصہ ۷'
+    );
+    assert.strictEqual(
+      formatPartTitle(1, 'آئینہ ذات', 'urdu', 7),
+      'آئینہ ذات - حصہ ۸'
+    );
+
+    // 3. Empty or whitespace-only base title falls back to bare suffix
+    assert.strictEqual(formatPartTitle(0, '', 'urdu', 1), 'حصہ ۱');
+    assert.strictEqual(formatPartTitle(0, '   ', 'urdu', 1), 'حصہ ۱');
+    assert.strictEqual(formatPartTitle(2, '', 'urdu', 5), 'حصہ ۷');
+
+    // 4. Base 'باب' case
+    assert.strictEqual(formatPartTitle(0, 'باب', 'urdu', 7), 'باب - حصہ ۷');
+
+    // 5. Existing suffix cleaning (hyphen, en-dash, em-dash) without duplication
+    assert.strictEqual(
+      formatPartTitle(0, 'آئینہ ذات — حصہ ۳', 'urdu', 1),
+      'آئینہ ذات - حصہ ۱'
+    );
+    assert.strictEqual(
+      formatPartTitle(0, 'آئینہ ذات - حصہ ۳', 'urdu', 1),
+      'آئینہ ذات - حصہ ۱'
+    );
+    assert.strictEqual(
+      formatPartTitle(0, 'آئینہ ذات – حصہ ۵', 'urdu', 1),
+      'آئینہ ذات - حصہ ۱'
+    );
+    assert.strictEqual(
+      formatPartTitle(1, 'آئینہ ذات - حصہ ۳', 'urdu', 7),
+      'آئینہ ذات - حصہ ۸'
+    );
+
+    // 6. English style
+    assert.strictEqual(
+      formatPartTitle(0, 'Mirror of Self', 'english', 1),
+      'Mirror of Self - (Part 1)'
+    );
+    assert.strictEqual(
+      formatPartTitle(0, 'Mirror of Self', 'english', 7),
+      'Mirror of Self - (Part 7)'
+    );
+    assert.strictEqual(formatPartTitle(0, '', 'english', 1), '(Part 1)');
+  });
+
+  it('aligns buildParts part numbers with title numbering and preserves detected headings', () => {
+    const rawParts = [
+      { content: 'یہ پہلے باب کا متن ہے جو تفصیل سے لکھا گیا ہے۔' },
+      { content: 'یہ دوسرے باب کا متن ہے جس میں کہانی آگے بڑھتی ہے۔', title: 'خاص منظر' },
+      { content: 'یہ تیسرے باب کا متن ہے جو اختتام کی طرف جاتا ہے۔' },
+    ];
+    const originalText = rawParts.map((p) => p.content).join('\n\n');
+
+    const result = buildParts({
+      rawParts,
+      baseTitle: 'آئینہ ذات',
+      titleStyle: 'urdu',
+      startChapterNumber: 7,
+      originalText,
+      frontMatterRemoved: '',
+      endNoteRemoved: '',
+    });
+
+    assert.strictEqual(result.parts.length, 3);
+
+    // Part 0: number is 7, title is auto-generated with حصہ ۷
+    assert.strictEqual(result.parts[0].number, 7);
+    assert.strictEqual(result.parts[0].title, 'آئینہ ذات - حصہ ۷');
+
+    // Part 1: number is 8, but has explicit/detected title 'خاص منظر' which must be preserved
+    assert.strictEqual(result.parts[1].number, 8);
+    assert.strictEqual(result.parts[1].title, 'خاص منظر');
+
+    // Part 2: number is 9, title is auto-generated with حصہ ۹
+    assert.strictEqual(result.parts[2].number, 9);
+    assert.strictEqual(result.parts[2].title, 'آئینہ ذات - حصہ ۹');
+
+    // Text preservation must hold 100%
+    assert.ok(result.textPreserved, 'Reconstructed text must match original');
   });
 });

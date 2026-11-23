@@ -6,8 +6,8 @@ import type { ChapterRow } from '@/types/database';
 
 interface ChapterImportModalProps {
   novelId: string;
-  novelTitleUrdu?: string;
-  novelTitleEnglish?: string;
+  novelTitleUrdu: string | null | undefined;
+  novelTitleEnglish: string | null | undefined;
   isOpen: boolean;
   onClose: () => void;
   suggestedStartNumber?: number;

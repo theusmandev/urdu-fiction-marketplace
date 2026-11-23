@@ -690,17 +690,24 @@ export function splitAtMarkers(text: string, splitLineNumbers: number[]): string
 export function formatPartTitle(
   partIndex: number,
   baseTitle?: string,
-  style: 'urdu' | 'english' = 'urdu'
+  style: 'urdu' | 'english' = 'urdu',
+  firstNumber: number = 1
 ): string {
-  const partNumber = partIndex + 1;
+  const partNumber = firstNumber + partIndex;
   const partSuffix =
     style === 'english'
       ? `(Part ${partNumber})`
       : `حصہ ${toUrduDigits(partNumber)}`;
 
   if (baseTitle && baseTitle.trim().length > 0) {
-    const cleanedBase = baseTitle.trim().replace(/\s*[-–—]\s*حصہ\s*[0-9۰-۹]+$/i, '').trim();
-    return `${cleanedBase} — ${partSuffix}`;
+    const cleanedBase = baseTitle
+      .trim()
+      .replace(/\s*[-–—]\s*حصہ\s*[0-9۰-۹]+$/i, '')
+      .replace(/\s*[-–—]\s*\(Part\s*\d+\)$/i, '')
+      .trim();
+    if (cleanedBase.length > 0) {
+      return `${cleanedBase} - ${partSuffix}`;
+    }
   }
 
   return partSuffix;
@@ -735,7 +742,7 @@ export function buildParts(options: BuildPartsOptions): BuildPartsResult {
     const firstLine = lines.length > 0 ? (lines[0].length > 70 ? `${lines[0].slice(0, 67)}...` : lines[0]) : '';
     const lastLine = lines.length > 0 ? (lines[lines.length - 1].length > 70 ? `${lines[lines.length - 1].slice(0, 67)}...` : lines[lines.length - 1]) : '';
 
-    const defaultTitle = formatPartTitle(i, baseTitle, titleStyle);
+    const defaultTitle = formatPartTitle(i, baseTitle, titleStyle, startChapterNumber);
     const title = raw.title?.trim() || defaultTitle;
 
     // Warnings
