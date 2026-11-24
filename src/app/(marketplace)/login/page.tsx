@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/getCurrentUser';
 import { getRoleDashboard } from '@/lib/auth/getRoleDashboard';
+import { isGoogleAuthEnabled } from '@/lib/auth/google-auth-flag';
 import { LoginForm } from './login-form';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -24,5 +27,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     redirect(dashboard);
   }
 
-  return <LoginForm searchParams={searchParams} />;
+  const googleAuthEnabled = isGoogleAuthEnabled();
+
+  return <LoginForm searchParams={searchParams} googleAuthEnabled={googleAuthEnabled} />;
 }

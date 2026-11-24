@@ -13,9 +13,10 @@ import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 export interface RegisterFormProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  googleAuthEnabled?: boolean;
 }
 
-export function RegisterForm({ searchParams }: RegisterFormProps) {
+export function RegisterForm({ searchParams, googleAuthEnabled = false }: RegisterFormProps) {
   const resolvedParams = use(searchParams);
   const router = useRouter();
   const nextParam = typeof resolvedParams.next === 'string' ? resolvedParams.next : null;
@@ -201,7 +202,7 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
               </div>
             )}
 
-            <GoogleSignInButton nextParam={nextParam} />
+            <GoogleSignInButton enabled={googleAuthEnabled} nextParam={nextParam} />
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Full Name */}

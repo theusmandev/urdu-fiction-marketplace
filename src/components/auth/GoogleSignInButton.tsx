@@ -7,6 +7,7 @@ import { sanitizeRedirectPath } from '@/lib/auth/safe-redirect';
 import { UrduText } from '@/components/urdu/UrduText';
 
 export interface GoogleSignInButtonProps {
+  enabled: boolean;
   nextParam?: string | null;
   className?: string;
 }
@@ -34,9 +35,9 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-export function GoogleSignInButton({ nextParam, className }: GoogleSignInButtonProps) {
-  // Feature flag guard: If unset or false, render NOTHING (zero UI/runtime change)
-  if (process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED !== 'true') {
+export function GoogleSignInButton({ enabled, nextParam, className }: GoogleSignInButtonProps) {
+  // Feature flag guard: If not enabled from server, render NOTHING (zero UI/runtime change)
+  if (!enabled) {
     return null;
   }
 

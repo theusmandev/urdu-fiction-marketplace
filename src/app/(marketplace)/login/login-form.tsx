@@ -17,9 +17,10 @@ function isValidEmail(val: string | null | undefined): boolean {
 
 export interface LoginFormProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  googleAuthEnabled?: boolean;
 }
 
-export function LoginForm({ searchParams }: LoginFormProps) {
+export function LoginForm({ searchParams, googleAuthEnabled = false }: LoginFormProps) {
   const resolvedParams = use(searchParams);
   const router = useRouter();
 
@@ -192,7 +193,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
           </div>
         )}
 
-        <GoogleSignInButton nextParam={nextParam} />
+        <GoogleSignInButton enabled={googleAuthEnabled} nextParam={nextParam} />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
