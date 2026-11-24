@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/browser';
 import { sanitizeRedirectPath } from '@/lib/auth/safe-redirect';
-import { UrduText } from '@/components/urdu/UrduText';
 
 export interface GoogleSignInButtonProps {
   enabled: boolean;
@@ -42,7 +41,7 @@ export function GoogleSignInButton({ enabled, nextParam, className }: GoogleSign
   }
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<{ en: string; ur: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
     if (isLoading) return;
@@ -80,31 +79,20 @@ export function GoogleSignInButton({ enabled, nextParam, className }: GoogleSign
 
       if (signInError) {
         setIsLoading(false);
-        setError({
-          en: 'Unable to initiate Google sign-in. Please try again or use your email and password.',
-          ur: 'گوگل سائن ان شروع کرنے میں مسئلہ پیش آیا۔ براہ کرم دوبارہ کوشش کریں یا ای میل اور پاس ورڈ استعمال کریں۔',
-        });
+        setError('Unable to initiate Google sign-in. Please try again or use email sign-in.');
       }
     } catch {
       setIsLoading(false);
-      setError({
-        en: 'Unable to initiate Google sign-in. Please try again or use your email and password.',
-        ur: 'گوگل سائن ان شروع کرنے میں مسئلہ پیش آیا۔ براہ کرم دوبارہ کوشش کریں یا ای میل اور پاس ورڈ استعمال کریں۔',
-      });
+      setError('Unable to initiate Google sign-in. Please try again or use email sign-in.');
     }
   };
 
   return (
     <div className={`space-y-4 ${className || ''}`}>
       {error && (
-        <div className="rounded-xl bg-danger-soft border border-danger-border p-3.5 flex items-start gap-2.5 text-danger-text text-xs">
-          <AlertCircle className="h-4 w-4 shrink-0 text-danger-text mt-0.5" />
-          <div className="space-y-0.5">
-            <p>{error.en}</p>
-            <UrduText as="p" size="xs" className="text-danger-text font-medium leading-[2.0] py-0">
-              {error.ur}
-            </UrduText>
-          </div>
+        <div className="rounded-xl bg-danger-soft border border-danger-border p-4 flex items-start gap-3 text-danger-text text-sm">
+          <AlertCircle className="h-5 w-5 shrink-0 text-danger-text mt-0.5" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -112,38 +100,27 @@ export function GoogleSignInButton({ enabled, nextParam, className }: GoogleSign
         type="button"
         onClick={handleGoogleSignIn}
         disabled={isLoading}
-        aria-label="Continue with Google / گوگل کے ساتھ جاری رکھیں"
-        className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-surface hover:bg-surface-muted px-4 py-2.5 text-sm font-semibold text-navy shadow-xs transition-colors cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+        aria-label="Continue with Google"
+        className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-surface hover:bg-surface-muted px-4 py-3 text-sm font-semibold text-navy shadow-xs hover:shadow-sm transition-all cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-ring disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
       >
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin text-accent-strong shrink-0" aria-hidden="true" />
-            <span>Connecting to Google...</span>
-            <span className="text-muted text-xs">/</span>
-            <span className="font-urdu text-sm leading-normal">گوگل سے رابطہ ہو رہا ہے...</span>
+            <Loader2 className="w-5 h-5 animate-spin text-accent-strong shrink-0" aria-hidden="true" />
+            <span className="text-sm font-semibold whitespace-nowrap">Connecting to Google...</span>
           </>
         ) : (
           <>
-            <GoogleIcon className="h-4 w-4 shrink-0" />
-            <span>Continue with Google</span>
-            <span className="text-muted text-xs">/</span>
-            <span className="font-urdu text-sm leading-normal">گوگل کے ساتھ جاری رکھیں</span>
+            <GoogleIcon className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-semibold whitespace-nowrap">Continue with Google</span>
           </>
         )}
       </button>
 
-      {/* Subtle Divider ("or" / "یا") */}
-      <div className="relative my-4" aria-hidden="true">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-surface px-3 text-secondary flex items-center gap-1.5 font-medium">
-            <span>or</span>
-            <span className="text-muted text-xs">/</span>
-            <span className="font-urdu text-xs leading-none">یا</span>
-          </span>
-        </div>
+      {/* Crisp Horizontal Flexbox Divider */}
+      <div className="my-5 flex items-center gap-3" aria-hidden="true">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs font-medium uppercase tracking-wider text-text-muted">or</span>
+        <div className="h-px flex-1 bg-border" />
       </div>
     </div>
   );

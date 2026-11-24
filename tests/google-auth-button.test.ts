@@ -106,6 +106,34 @@ describe('Google OAuth Server Flag & Button Hydration Parity', () => {
       assert.match(content, /googleAuthEnabled\?: boolean/);
       assert.match(content, /<GoogleSignInButton\s+enabled=\{googleAuthEnabled\}/);
     });
+
+    test('GoogleSignInButton renders crisp single-line layout, horizontal divider, and semantic tokens', () => {
+      const content = fs.readFileSync(buttonPath, 'utf8');
+
+      // Single-line English label with whitespace-nowrap
+      assert.match(content, /Continue with Google/);
+      assert.match(content, /Connecting to Google\.\.\./);
+      assert.match(content, /whitespace-nowrap/);
+
+      // Ensures no side-by-side Urdu or slash is crammed inside the button
+      assert.doesNotMatch(content, /گوگل کے ساتھ جاری رکھیں/);
+      assert.doesNotMatch(content, /Continue with Google\s*\/\s*گوگل/);
+
+      // Brand-compliant Google "G" SVG icon with fixed dimensions
+      assert.match(content, /<GoogleIcon className="w-5 h-5 shrink-0"/);
+
+      // Crisp horizontal flexbox divider flanking the "or" label
+      assert.match(content, /<div className="my-5 flex items-center gap-3"/);
+      assert.match(content, /<div className="h-px flex-1 bg-border" \/>/);
+      assert.match(content, /<span className="text-xs font-medium uppercase tracking-wider text-text-muted">or<\/span>/);
+
+      // Primary button proportions and semantic tokens
+      assert.match(content, /rounded-xl/);
+      assert.match(content, /min-h-\[44px\]/);
+      assert.match(content, /bg-surface/);
+      assert.match(content, /border-border/);
+      assert.match(content, /text-navy/);
+    });
   });
 
   describe('Redirect URL Construction', () => {
