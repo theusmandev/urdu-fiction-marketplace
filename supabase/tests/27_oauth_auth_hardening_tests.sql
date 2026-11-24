@@ -261,7 +261,7 @@ BEGIN
         (v_order1_id, 'ORD-27-001', v_active_reader_id, v_author_id, v_novel_id, 'ٹیسٹ ناول ستائیس', 150, 30.00, 45.00, 105.00, 'verified'),
         (v_order2_id, 'ORD-27-002', v_inactive_reader_id, v_author_id, v_novel_id, 'ٹیسٹ ناول ستائیس', 150, 30.00, 45.00, 105.00, 'verified');
 
-    INSERT INTO public.purchase_entitlements (id, order_id, reader_id, novel_id, is_revoked, created_at)
+    INSERT INTO public.purchase_entitlements (id, order_id, reader_id, novel_id, is_revoked, granted_at)
     VALUES
         (gen_random_uuid(), v_order1_id, v_active_reader_id, v_novel_id, false, pg_catalog.now()),
         (gen_random_uuid(), v_order2_id, v_inactive_reader_id, v_novel_id, false, pg_catalog.now());
