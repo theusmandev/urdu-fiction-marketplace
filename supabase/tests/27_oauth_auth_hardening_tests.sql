@@ -16,7 +16,9 @@
 --   6. Deactivated user (is_active=false) is denied by get_chapter_for_reader on paid chapters.
 --   7. Active entitled reader successfully reads paid chapter via get_chapter_for_reader.
 --   8. Deactivated reader can still read free-preview chapters.
---   9. get_my_library excludes novels for deactivated readers.
+--   9. get_my_library executes with zero SQL error and returns novel for active reader.
+--   10. get_my_library executes with zero SQL error and returns empty library for deactivated reader.
+--   11. has_novel_entitlement returns true for active reader and false for deactivated reader.
 -- ==============================================================================
 
 BEGIN;
@@ -61,8 +63,10 @@ DECLARE
 
     v_prof               record;
     v_res                jsonb;
+    v_item               jsonb;
     v_err                text;
     v_caught             boolean;
+    v_has_ent            boolean;
     v_username_regex     text := '^[a-z0-9][a-z0-9_]{1,28}[a-z0-9]$';
 BEGIN
     RAISE NOTICE '=== Running Test Suite 27: Auth Hardening & Inactive Reader Access ===';
@@ -330,25 +334,82 @@ BEGIN
     END;
 
     -- -------------------------------------------------------------------------
-    -- TEST 9: get_my_library excludes novels for deactivated readers
+    -- TEST 9: get_my_library executes with zero SQL error and returns entitled novel for active reader
     -- -------------------------------------------------------------------------
-    -- Active reader gets 1 library book
     PERFORM set_config('request.jwt.claims', pg_catalog.json_build_object('sub', v_active_reader_id::text, 'role', 'authenticated')::text, true);
-    v_res := public.get_my_library();
-    IF pg_catalog.jsonb_array_length(v_res) = 1 THEN
-        -- Inactive reader gets 0 library books
-        PERFORM set_config('request.jwt.claims', pg_catalog.json_build_object('sub', v_inactive_reader_id::text, 'role', 'authenticated')::text, true);
+    v_caught := false;
+    v_err := '';
+    BEGIN
         v_res := public.get_my_library();
-        IF pg_catalog.jsonb_array_length(v_res) = 0 THEN
-            INSERT INTO test_27_results VALUES (9, 'get_my_library excludes inactive reader data', 'PASS',
-                'Active reader sees 1 novel; inactive reader sees 0 novels');
-        ELSE
-            INSERT INTO test_27_results VALUES (9, 'get_my_library excludes inactive reader data', 'FAIL',
-                format('Inactive reader saw novels: %s', v_res::text));
-        END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            v_caught := true;
+            v_err := SQLERRM;
+    END;
+
+    IF v_caught THEN
+        INSERT INTO test_27_results VALUES (9, 'Active reader get_my_library succeeds without SQL error', 'FAIL',
+            format('SQL error during get_my_library(): %s', v_err));
+    ELSIF pg_catalog.jsonb_array_length(v_res) <> 1 THEN
+        INSERT INTO test_27_results VALUES (9, 'Active reader get_my_library succeeds without SQL error', 'FAIL',
+            format('Expected 1 novel, got length=%s', pg_catalog.jsonb_array_length(v_res)::text));
     ELSE
-        INSERT INTO test_27_results VALUES (9, 'get_my_library excludes inactive reader data', 'FAIL',
-            format('Active reader failed to see purchased novel: %s', v_res::text));
+        v_item := v_res->0;
+        IF (v_item->>'novel_id')::uuid = v_novel_id
+           AND (v_item->>'novel_slug') = 'test-novel-27'
+           AND (v_item->>'title_urdu') = 'ٹیسٹ ناول ستائیس'
+           AND (v_item ? 'cover_url')
+           AND (v_item ? 'granted_at')
+           AND (v_item ? 'order_number')
+           AND (v_item->>'is_temporarily_unavailable')::boolean = false THEN
+            INSERT INTO test_27_results VALUES (9, 'Active reader get_my_library succeeds without SQL error', 'PASS',
+                format('Returned entitled novel with canonical 0016 columns: slug=%s, granted_at=%s', v_item->>'novel_slug', v_item->>'granted_at'));
+        ELSE
+            INSERT INTO test_27_results VALUES (9, 'Active reader get_my_library succeeds without SQL error', 'FAIL',
+                format('Canonical column verification failed: %s', v_item::text));
+        END IF;
+    END IF;
+
+    -- -------------------------------------------------------------------------
+    -- TEST 10: get_my_library executes with zero SQL error and returns empty library for deactivated reader
+    -- -------------------------------------------------------------------------
+    PERFORM set_config('request.jwt.claims', pg_catalog.json_build_object('sub', v_inactive_reader_id::text, 'role', 'authenticated')::text, true);
+    v_caught := false;
+    v_err := '';
+    BEGIN
+        v_res := public.get_my_library();
+    EXCEPTION
+        WHEN OTHERS THEN
+            v_caught := true;
+            v_err := SQLERRM;
+    END;
+
+    IF v_caught THEN
+        INSERT INTO test_27_results VALUES (10, 'Deactivated reader get_my_library returns empty library', 'FAIL',
+            format('SQL error during get_my_library(): %s', v_err));
+    ELSIF pg_catalog.jsonb_array_length(v_res) = 0 THEN
+        INSERT INTO test_27_results VALUES (10, 'Deactivated reader get_my_library returns empty library', 'PASS',
+            'Zero SQL error; returned exact empty library shape []');
+    ELSE
+        INSERT INTO test_27_results VALUES (10, 'Deactivated reader get_my_library returns empty library', 'FAIL',
+            format('Deactivated reader saw novels: %s', v_res::text));
+    END IF;
+
+    -- -------------------------------------------------------------------------
+    -- TEST 11: has_novel_entitlement returns true for active reader and false for deactivated reader
+    -- -------------------------------------------------------------------------
+    -- 11a: Active reader check
+    PERFORM set_config('request.jwt.claims', pg_catalog.json_build_object('sub', v_active_reader_id::text, 'role', 'authenticated')::text, true);
+    v_has_ent := public.has_novel_entitlement(v_novel_id);
+
+    -- 11b: Deactivated reader check
+    PERFORM set_config('request.jwt.claims', pg_catalog.json_build_object('sub', v_inactive_reader_id::text, 'role', 'authenticated')::text, true);
+    IF v_has_ent = true AND public.has_novel_entitlement(v_novel_id) = false THEN
+        INSERT INTO test_27_results VALUES (11, 'has_novel_entitlement respects active reader status', 'PASS',
+            'Active reader entitlement=true; deactivated reader entitlement=false');
+    ELSE
+        INSERT INTO test_27_results VALUES (11, 'has_novel_entitlement respects active reader status', 'FAIL',
+            format('Active reader entitlement=%s; deactivated reader entitlement=%s', v_has_ent::text, public.has_novel_entitlement(v_novel_id)::text));
     END IF;
 
 END $$;
