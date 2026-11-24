@@ -27,8 +27,8 @@ const connectSrc = isDev
   : `'self' ${prodSupabaseConnect}`;
 
 const imgSrc = isDev
-  ? `'self' blob: data: ${prodSupabaseImg} https://*.supabase.in http://127.0.0.1:* http://localhost:*`
-  : `'self' blob: data: ${prodSupabaseImg}`;
+  ? `'self' blob: data: ${prodSupabaseImg} https://*.supabase.in https://lh3.googleusercontent.com http://127.0.0.1:* http://localhost:*`
+  : `'self' blob: data: ${prodSupabaseImg} https://lh3.googleusercontent.com`;
 
 const upgradeInsecureRequests = isDev ? "" : "upgrade-insecure-requests;";
 
@@ -67,6 +67,10 @@ const nextConfig: NextConfig = {
             hostname: '**.supabase.co',
           },
           {
+            protocol: 'https',
+            hostname: 'lh3.googleusercontent.com',
+          },
+          {
             protocol: 'http',
             hostname: '127.0.0.1',
           },
@@ -83,6 +87,10 @@ const nextConfig: NextConfig = {
           {
             protocol: 'https',
             hostname: '**.supabase.in',
+          },
+          {
+            protocol: 'https',
+            hostname: 'lh3.googleusercontent.com',
           },
           {
             protocol: 'http',

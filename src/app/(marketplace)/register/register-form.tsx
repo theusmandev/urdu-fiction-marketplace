@@ -9,6 +9,7 @@ import { refreshMarketplaceSession } from '@/components/layout/useMarketplaceSes
 import { usernameRegex } from '@/lib/auth/schemas';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { UrduText } from '@/components/urdu/UrduText';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 export interface RegisterFormProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -200,7 +201,9 @@ export function RegisterForm({ searchParams }: RegisterFormProps) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            <GoogleSignInButton nextParam={nextParam} />
+
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Full Name */}
               <div>
                 <label htmlFor="fullName" className="block text-sm font-semibold text-secondary">

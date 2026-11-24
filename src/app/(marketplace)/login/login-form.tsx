@@ -8,6 +8,7 @@ import { loginUser } from '@/app/actions/auth';
 import { refreshMarketplaceSession } from '@/components/layout/useMarketplaceSession';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { UrduText } from '@/components/urdu/UrduText';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 function isValidEmail(val: string | null | undefined): boolean {
   if (!val) return false;
@@ -191,7 +192,9 @@ export function LoginForm({ searchParams }: LoginFormProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <GoogleSignInButton nextParam={nextParam} />
+
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-secondary">
