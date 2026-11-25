@@ -88,7 +88,7 @@ export function ChapterBody({
         dir="rtl"
         lang="ur"
         className={cn(
-          'font-urdu text-center py-12 text-current/50 select-none text-base',
+          'font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base',
           className
         )}
       >
@@ -102,7 +102,7 @@ export function ChapterBody({
       dir="rtl"
       lang="ur"
       className={cn(
-        'font-urdu transition-all duration-150',
+        'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5',
         fontSizeClasses[fontSize],
         lineHeightClasses[lineHeight],
         userSelect === 'none' ? 'select-none' : 'select-text',

@@ -115,7 +115,7 @@ export function renderChapterBodyToHtml(
 ): string {
   const blocks = parseChapterContent(rawText);
   if (blocks.length === 0) {
-    return '<div dir="rtl" lang="ur" class="font-urdu text-center py-12 text-current/50 select-none text-base">کوئی متن موجود نہیں۔</div>';
+    return '<div dir="rtl" lang="ur" class="font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base">کوئی متن موجود نہیں۔</div>';
   }
 
   const fontSize = options?.fontSize ?? 'lg';
@@ -124,7 +124,7 @@ export function renderChapterBodyToHtml(
   const userSelect = options?.userSelect ?? 'text';
 
   const containerClasses = [
-    'font-urdu transition-all duration-150',
+    'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5',
     fontSizeClasses[fontSize],
     lineHeightClasses[lineHeight],
     userSelect === 'none' ? 'select-none' : 'select-text',

@@ -390,7 +390,7 @@ export function SecureReaderClient({
               <span className="text-[10px] uppercase font-bold tracking-wider opacity-60 truncate">
                 Chapter {chapter.chapter_number} of {chapter.total_chapters}
               </span>
-              <span className="text-xs font-semibold truncate leading-tight">
+              <span className="text-xs font-semibold truncate leading-tight px-0.5">
                 {chapter.novel_title_english || chapter.novel_title}
               </span>
             </div>

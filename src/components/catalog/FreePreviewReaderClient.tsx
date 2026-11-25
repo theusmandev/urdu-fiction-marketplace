@@ -327,7 +327,7 @@ export function FreePreviewReaderClient({
             <UrduText
               as="h2"
               size="xs"
-              className="font-bold py-0 leading-tight truncate text-inherit"
+              className="font-bold py-0 leading-tight truncate px-1 text-inherit"
             >
               {chapter.title_urdu}
             </UrduText>

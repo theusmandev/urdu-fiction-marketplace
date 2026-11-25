@@ -190,3 +190,35 @@ describe('End-to-End Pure Functions Chain (Editor -> Cleaner -> Save Payload -> 
     assert.equal(pTags.length, 5); // 5 text paragraphs
   });
 });
+
+describe('ChapterBody Nastaliq (Gulzar) Glyph Overhang & Clipping Protection', () => {
+  test('inner prose container enforces padding-inline in em units to prevent glyph clipping at RTL line-start', () => {
+    const raw = 'گھر کے سامنے خوبصورت باغ تھا۔\nگرم موسم میں ٹھنڈی ہوا چلی۔\nکچھ فاصلے پر نہر بہتی تھی۔';
+    const html = renderChapterBodyToHtml(raw, { fontSize: 'lg' });
+
+    // Must contain em-based padding-inline on container to give overhang breathing room
+    assert.ok(
+      html.includes('[padding-inline:0.5em]'),
+      'Rendered HTML container must include [padding-inline:0.5em] for Gulzar overhang'
+    );
+
+    // Must contain vertical padding to protect top Madd/ascenders and bottom descenders
+    assert.ok(
+      html.includes('py-1.5'),
+      'Rendered HTML container must include py-1.5 vertical breathing room'
+    );
+
+    // Must preserve all initial tall Nastaliq lines starting with گ and ک
+    assert.ok(html.includes('گھر کے سامنے خوبصورت باغ تھا۔'));
+    assert.ok(html.includes('گرم موسم میں ٹھنڈی ہوا چلی۔'));
+    assert.ok(html.includes('کچھ فاصلے پر نہر بہتی تھی۔'));
+  });
+
+  test('empty chapter content fallback also retains safe inline padding', () => {
+    const emptyHtml = renderChapterBodyToHtml('');
+    assert.ok(
+      emptyHtml.includes('[padding-inline:0.5em]'),
+      'Empty state container must retain [padding-inline:0.5em]'
+    );
+  });
+});
