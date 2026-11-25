@@ -61,7 +61,7 @@ export default async function WritersDirectoryPage() {
       <JsonLd data={breadcrumbs} />
       {/* Hero: Writer Recruitment & Mission */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-navy via-navy to-[#18263E] text-white rounded-3xl p-8 md:p-14 border border-white/10 shadow-2xl space-y-6">
+        <div className="bg-gradient-to-r from-navy via-navy to-navy-dark text-white rounded-3xl p-8 md:p-14 border border-white/10 shadow-2xl space-y-6">
           <div className="max-w-3xl space-y-4">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-accent/20 text-accent px-3 py-1 rounded-full border border-accent/30">
               <Sparkles className="w-3.5 h-3.5" />
@@ -76,7 +76,7 @@ export default async function WritersDirectoryPage() {
               اپنے اردو ناولز اور افسانے براہ راست قارئین تک پہنچائیں
             </UrduText>
 
-            <p className="text-text-muted text-sm md:text-base leading-relaxed">
+            <p className="text-white/80 text-sm md:text-base leading-relaxed">
               Publish independently on Pakistan&apos;s dedicated digital literature
               platform. Keep up to 70% of novel sales, receive direct payments into
               your JazzCash, EasyPaisa, or Bank Account, and retain full copyright
@@ -168,7 +168,7 @@ export default async function WritersDirectoryPage() {
               <Link
                 key={writer.id}
                 href={writer.username ? `/writers/${writer.username}` : "#"}
-                className="group bg-surface hover:bg-navy p-6 rounded-2xl border border-border hover:border-navy shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between gap-4"
+                className="group bg-surface hover:bg-surface-muted p-6 rounded-2xl border border-border hover:border-accent-strong/40 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-4"
               >
                 <div className="flex items-start gap-4">
                   {writer.avatar_url ? (
@@ -179,10 +179,10 @@ export default async function WritersDirectoryPage() {
                       width={56}
                       height={56}
                       loading="lazy"
-                      className="w-14 h-14 rounded-full object-cover border border-border group-hover:border-accent shrink-0"
+                      className="w-14 h-14 rounded-full object-cover border border-border group-hover:border-accent-strong/50 shrink-0 transition-colors"
                     />
                   ) : (
-                    <div className="w-14 h-14 rounded-full bg-ivory group-hover:bg-white/10 text-navy group-hover:text-accent font-serif font-bold text-xl flex items-center justify-center border border-border shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-surface-muted text-navy group-hover:text-primary font-serif font-bold text-xl flex items-center justify-center border border-border group-hover:border-accent-strong/50 shrink-0 transition-colors">
                       {writer.pen_name_english.charAt(0)}
                     </div>
                   )}
@@ -191,11 +191,11 @@ export default async function WritersDirectoryPage() {
                     <UrduText
                       as="h3"
                       size="lg"
-                      className="text-navy group-hover:text-accent font-normal py-0 leading-[2.2] truncate"
+                      className="text-navy group-hover:text-primary font-normal py-0 leading-[2.2] truncate transition-colors"
                     >
                       {writer.pen_name_urdu}
                     </UrduText>
-                    <p className="font-serif text-xs text-secondary group-hover:text-text-muted font-medium truncate">
+                    <p className="font-serif text-xs text-text-muted group-hover:text-text font-medium truncate transition-colors">
                       {writer.pen_name_english}
                     </p>
                   </div>
@@ -205,21 +205,21 @@ export default async function WritersDirectoryPage() {
                   <p
                     dir="rtl"
                     lang="ur"
-                    className="font-urdu text-xs text-secondary/90 group-hover:text-text-muted line-clamp-2 leading-[2] text-right"
+                    className="font-urdu text-xs text-text-muted group-hover:text-text line-clamp-2 leading-[2] text-right transition-colors"
                   >
                     {writer.bio_urdu}
                   </p>
                 )}
 
-                <div className="pt-3 border-t border-border group-hover:border-white/15 flex items-center justify-between text-xs text-secondary group-hover:text-text-muted">
+                <div className="pt-3 border-t border-border flex items-center justify-between text-xs text-text-muted group-hover:text-text transition-colors">
                   <div className="flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-accent" />
+                    <BookOpen className="w-3.5 h-3.5 text-accent-strong" />
                     <span>
                       {writer.published_novels_count}{" "}
                       {writer.published_novels_count === 1 ? "novel" : "novels"}
                     </span>
                   </div>
-                  <span className="font-medium text-accent group-hover:text-accent-light">
+                  <span className="font-semibold text-accent-strong group-hover:underline">
                     View Works →
                   </span>
                 </div>

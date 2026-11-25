@@ -81,29 +81,29 @@ export default async function GenresIndexPage() {
           <Link
             key={genre.id}
             href={`/genres/${genre.slug}`}
-            className="group bg-surface hover:bg-navy p-6 rounded-2xl border border-border hover:border-navy shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between gap-4"
+            className="group bg-surface hover:bg-surface-muted p-6 rounded-2xl border border-border hover:border-accent-strong/40 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-4"
           >
             <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-accent/20 group-hover:bg-accent text-navy flex items-center justify-center font-bold transition-colors">
-                <BookOpen className="w-5 h-5 text-accent group-hover:text-navy" />
+              <div className="w-10 h-10 rounded-xl bg-accent-soft text-accent-strong flex items-center justify-center font-bold border border-accent/20 group-hover:border-accent-strong/40 transition-colors">
+                <BookOpen className="w-5 h-5 text-accent-strong" />
               </div>
 
               <UrduText
                 as="h2"
                 size="xl"
-                className="text-navy group-hover:text-accent font-normal py-0 leading-[2.2]"
+                className="text-navy group-hover:text-primary font-normal py-0 leading-[2.2] transition-colors"
               >
                 {genre.name_urdu}
               </UrduText>
 
-              <h3 className="font-serif text-base font-semibold text-secondary group-hover:text-white transition-colors">
+              <h3 className="font-serif text-base font-semibold text-text-muted group-hover:text-text transition-colors">
                 {genre.name_english}
               </h3>
             </div>
 
-            <div className="pt-4 border-t border-border group-hover:border-white/15 flex items-center justify-between text-xs text-secondary group-hover:text-text-muted">
+            <div className="pt-4 border-t border-border flex items-center justify-between text-xs text-text-muted group-hover:text-text transition-colors">
               <span>{genre.published_novels_count} {genre.published_novels_count === 1 ? "novel" : "novels"}</span>
-              <span className="font-medium text-accent group-hover:text-accent-light">
+              <span className="font-semibold text-accent-strong group-hover:underline">
                 Explore →
               </span>
             </div>

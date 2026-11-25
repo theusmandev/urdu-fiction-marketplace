@@ -387,7 +387,7 @@ export default function HowToPayPage() {
           <h2 className="font-serif text-xl sm:text-2xl font-bold">
             Need More Information?
           </h2>
-          <UrduText size="base" className="text-text-muted">
+          <UrduText size="base" className="text-white/80 py-0">
             مزید معلومات اور تفصیلی پالیسیاں دیکھنے کے لیے درج ذیل لنکس وزٹ کریں
           </UrduText>
         </div>
