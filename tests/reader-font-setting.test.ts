@@ -17,6 +17,7 @@ import {
   isNooriFontLoaded,
   _resetInFlightNooriPromiseForTesting,
 } from '../src/lib/reader/useReaderNooriFont.ts';
+import { fontSizeBaseRem } from '../src/lib/reader/chapter-body-model.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -418,6 +419,84 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
       assert.ok(
         content.includes('${prodSupabaseConnect}${fontSrcExtra}'),
         'next.config.ts must include fontSrcExtra in prod connect-src'
+      );
+    });
+  });
+
+  describe('12. Optical Font-Size Scaling for Jameel Noori Nastaleeq', () => {
+    it('globals.css sets optical scale tokens: --reader-font-scale 1 for gulzar and 1.22 for noori', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      assert.ok(fs.existsSync(cssPath), 'globals.css must exist');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      // Gulzar: scale 1 (no magnification)
+      assert.ok(
+        content.includes('--reader-font-scale: 1;'),
+        'globals.css must set --reader-font-scale: 1 for [data-reader-font="gulzar"]'
+      );
+      assert.ok(
+        content.includes('--reader-heading-scale: 1;'),
+        'globals.css must set --reader-heading-scale: 1 for [data-reader-font="gulzar"]'
+      );
+
+      // Noori: optical scale boost ~1.22 to equalize visual em-box ratio with Gulzar
+      assert.ok(
+        content.includes('--reader-font-scale: 1.22;'),
+        'globals.css must set --reader-font-scale: 1.22 for [data-reader-font="noori"]'
+      );
+      assert.ok(
+        content.includes('--reader-heading-scale: 1.18;'),
+        'globals.css must set --reader-heading-scale: 1.18 for [data-reader-font="noori"]'
+      );
+    });
+
+    it('globals.css applies optical calc formula for prose paragraphs and headings', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      assert.ok(
+        content.includes('font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.22));') ||
+        content.includes('font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1));'),
+        'globals.css must apply calc formula with base font size and scale multiplier'
+      );
+
+      assert.ok(
+        content.includes('[data-reader-font="noori"] h1'),
+        'globals.css must target [data-reader-font="noori"] h1 for optical heading scale'
+      );
+    });
+
+    it('fontSizeBaseRem maps all 5 ReaderFontSize presets correctly', () => {
+      assert.equal(fontSizeBaseRem.sm, '0.875rem');
+      assert.equal(fontSizeBaseRem.base, '1rem');
+      assert.equal(fontSizeBaseRem.lg, '1.125rem');
+      assert.equal(fontSizeBaseRem.xl, '1.25rem');
+      assert.equal(fontSizeBaseRem['2xl'], '1.5rem');
+    });
+
+    it('client readers apply optical heading scale without mutating user settings', () => {
+      const secureReaderPath = path.resolve(REPO_ROOT, 'src/app/read/[slug]/[number]/SecureReaderClient.tsx');
+      const secureContent = fs.readFileSync(secureReaderPath, 'utf8');
+
+      assert.ok(
+        secureContent.includes('[font-size:calc(1.5rem*var(--reader-heading-scale,1))]'),
+        'SecureReaderClient must apply optical heading scale formula'
+      );
+      assert.ok(
+        secureContent.includes('leading-[var(--reader-title-leading,2.2)]'),
+        'SecureReaderClient must respect calibrated title line-height token'
+      );
+
+      const freePreviewPath = path.resolve(REPO_ROOT, 'src/components/catalog/FreePreviewReaderClient.tsx');
+      const freeContent = fs.readFileSync(freePreviewPath, 'utf8');
+
+      assert.ok(
+        freeContent.includes('[font-size:calc(1.875rem*var(--reader-heading-scale,1))]'),
+        'FreePreviewReaderClient must apply optical heading scale formula'
+      );
+      assert.ok(
+        freeContent.includes('leading-[var(--reader-title-leading,2.4)]'),
+        'FreePreviewReaderClient must respect calibrated title line-height token'
       );
     });
   });

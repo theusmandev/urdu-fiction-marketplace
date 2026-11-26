@@ -489,7 +489,7 @@ export function FreePreviewReaderClient({
           <UrduText
             as="h1"
             size="3xl"
-            className="font-bold leading-[2.4] py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))]"
+            className="font-bold leading-[var(--reader-title-leading,2.4)] py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))] [font-size:calc(1.875rem*var(--reader-heading-scale,1))]"
           >
             {chapter.title_urdu}
           </UrduText>

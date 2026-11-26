@@ -209,6 +209,8 @@ textarea.font-urdu::placeholder {
   --reader-padding-inline: 0.5em;
   --reader-py: 0.375rem; /* py-1.5 */
   --reader-title-leading: 1.8;
+  --reader-font-scale: 1;
+  --reader-heading-scale: 1;
   font-family: var(--reader-font-family);
 }
 
@@ -218,6 +220,13 @@ textarea.font-urdu::placeholder {
   font-family: var(--reader-font-family);
 }
 
+[data-reader-font="gulzar"] .reader-canvas p,
+[data-reader-font="gulzar"] .font-urdu p,
+.reader-canvas[data-reader-font="gulzar"] p,
+.font-urdu[data-reader-font="gulzar"] p {
+  font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1));
+}
+
 /* 2. Jameel Noori Nastaleeq (Classical Deep-Cascade Nastaliq)
    STARTING VALUES ONLY — visually tune on /dev/fonts with the real subset binary */
 [data-reader-font="noori"] {
@@ -225,6 +234,8 @@ textarea.font-urdu::placeholder {
   --reader-padding-inline: 0.85em;
   --reader-py: 0.625rem; /* py-2.5 */
   --reader-title-leading: 2.2;
+  --reader-font-scale: 1.22;
+  --reader-heading-scale: 1.18;
   font-family: var(--reader-font-family);
 }
 
@@ -235,6 +246,23 @@ textarea.font-urdu::placeholder {
 [data-reader-font="noori"] h2,
 [data-reader-font="noori"] h3 {
   font-family: var(--reader-font-family);
+}
+
+/* Reader Prose Paragraph Optical Font Sizing */
+[data-reader-font="noori"] .reader-canvas p,
+[data-reader-font="noori"] .font-urdu p,
+.reader-canvas[data-reader-font="noori"] p,
+.font-urdu[data-reader-font="noori"] p {
+  font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.22));
+}
+
+/* Reader Chapter Heading Optical Scaling */
+[data-reader-font="noori"] h1 {
+  font-size: calc(1.5rem * var(--reader-heading-scale, 1.18));
+}
+
+[data-reader-font="noori"] h1.text-3xl {
+  font-size: calc(1.875rem * var(--reader-heading-scale, 1.18));
 }
 
 .reader-canvas {

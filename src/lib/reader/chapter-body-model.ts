@@ -69,12 +69,20 @@ export function parseChapterContent(rawText: string | null | undefined): ParsedB
   return blocks;
 }
 
+export const fontSizeBaseRem: Record<ReaderFontSize, string> = {
+  sm: '0.875rem',
+  base: '1rem',
+  lg: '1.125rem',
+  xl: '1.25rem',
+  '2xl': '1.5rem',
+};
+
 export const fontSizeClasses: Record<ReaderFontSize, string> = {
-  sm: 'text-sm',
-  base: 'text-base',
-  lg: 'text-lg',
-  xl: 'text-xl',
-  '2xl': 'text-2xl',
+  sm: '[--reader-base-font-size:0.875rem] text-sm',
+  base: '[--reader-base-font-size:1rem] text-base',
+  lg: '[--reader-base-font-size:1.125rem] text-lg',
+  xl: '[--reader-base-font-size:1.25rem] text-xl',
+  '2xl': '[--reader-base-font-size:1.5rem] text-2xl',
 };
 
 export const lineHeightClasses: Record<ReaderLineHeight, string> = {
@@ -126,6 +134,7 @@ export function renderChapterBodyToHtml(
   }
 
   const fontSize = options?.fontSize ?? 'lg';
+  const baseSize = fontSizeBaseRem[fontSize] || '1.125rem';
   const lineHeight = options?.lineHeight ?? 'relaxed';
   const paragraphSpacing = options?.paragraphSpacing ?? 'normal';
   const userSelect = options?.userSelect ?? 'text';
@@ -144,7 +153,9 @@ export function renderChapterBodyToHtml(
     .filter(Boolean)
     .join(' ');
 
-  const htmlParts: string[] = [`<div dir="rtl" lang="ur" data-reader-font="${readerFont}" class="${containerClasses}">`];
+  const htmlParts: string[] = [
+    `<div dir="rtl" lang="ur" data-reader-font="${readerFont}" style="--reader-base-font-size: ${baseSize};" class="${containerClasses}">`,
+  ];
 
   for (const block of blocks) {
     if (block.type === 'scene-break') {
@@ -155,6 +166,7 @@ export function renderChapterBodyToHtml(
     } else {
       const pClasses = [
         'text-justify antialiased [font-synthesis:none] text-current/90',
+        '[font-size:calc(var(--reader-base-font-size,1.125rem)*var(--reader-font-scale,1))]',
         paragraphSpacingClasses[paragraphSpacing],
         block.hasExtraTopGap ? extraGapClasses[paragraphSpacing] : '',
         options?.paragraphClassName || '',

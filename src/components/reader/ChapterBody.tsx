@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import {
   parseChapterContent,
   fontSizeClasses,
+  fontSizeBaseRem,
   lineHeightClasses,
   paragraphSpacingClasses,
   extraGapClasses,
@@ -96,6 +97,9 @@ export function ChapterBody({
         dir="rtl"
         lang="ur"
         data-reader-font={readerFont}
+        style={{
+          ['--reader-base-font-size' as string]: fontSizeBaseRem[fontSize] || '1.125rem',
+        }}
         className={cn(
           isNoori
             ? 'reader-canvas text-center py-12 [padding-inline:0.85em] py-2.5 text-current/50 select-none text-base'
@@ -113,6 +117,9 @@ export function ChapterBody({
       dir="rtl"
       lang="ur"
       data-reader-font={readerFont}
+      style={{
+        ['--reader-base-font-size' as string]: fontSizeBaseRem[fontSize] || '1.125rem',
+      }}
       className={cn(
         isNoori
           ? 'reader-canvas transition-all duration-150 [padding-inline:0.85em] py-2.5'
@@ -149,6 +156,7 @@ export function ChapterBody({
             lang="ur"
             className={cn(
               'text-justify antialiased [font-synthesis:none] text-current/90',
+              '[font-size:calc(var(--reader-base-font-size,1.125rem)*var(--reader-font-scale,1))]',
               paragraphSpacingClasses[paragraphSpacing],
               block.hasExtraTopGap && extraGapClasses[paragraphSpacing],
               paragraphClassName

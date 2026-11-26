@@ -274,4 +274,33 @@ describe('ChapterBody Nastaliq (Jameel Noori) Calibration & Deep-Cascade Metrics
     assert.ok(htmlGulzar.includes('data-reader-font="gulzar"'), 'Must have data-reader-font="gulzar"');
     assert.ok(htmlGulzar.includes('font-urdu'), 'Gulzar container must include font-urdu class');
   });
+
+  test('prose paragraphs apply optical font scaling calc formula with base font size', () => {
+    const raw = 'منظر کا آغاز ہوا۔';
+    
+    // Default size (lg -> 1.125rem)
+    const htmlLg = renderChapterBodyToHtml(raw, { readerFont: 'noori', fontSize: 'lg' });
+    assert.ok(
+      htmlLg.includes('style="--reader-base-font-size: 1.125rem;"'),
+      'Must inject --reader-base-font-size: 1.125rem for lg preset'
+    );
+    assert.ok(
+      htmlLg.includes('[font-size:calc(var(--reader-base-font-size,1.125rem)*var(--reader-font-scale,1))]'),
+      'Must apply optical font-size calculation to paragraph'
+    );
+
+    // Small size (sm -> 0.875rem)
+    const htmlSm = renderChapterBodyToHtml(raw, { readerFont: 'noori', fontSize: 'sm' });
+    assert.ok(
+      htmlSm.includes('style="--reader-base-font-size: 0.875rem;"'),
+      'Must inject --reader-base-font-size: 0.875rem for sm preset'
+    );
+
+    // Extra large size (2xl -> 1.5rem)
+    const html2Xl = renderChapterBodyToHtml(raw, { readerFont: 'noori', fontSize: '2xl' });
+    assert.ok(
+      html2Xl.includes('style="--reader-base-font-size: 1.5rem;"'),
+      'Must inject --reader-base-font-size: 1.5rem for 2xl preset'
+    );
+  });
 });

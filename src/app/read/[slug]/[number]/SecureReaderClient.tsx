@@ -639,7 +639,7 @@ export function SecureReaderClient({
           <UrduText
             as="h1"
             size="2xl"
-            className="text-center leading-tight py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))]"
+            className="text-center leading-[var(--reader-title-leading,2.2)] py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))] [font-size:calc(1.5rem*var(--reader-heading-scale,1))]"
           >
             {chapter.chapter_title}
           </UrduText>
