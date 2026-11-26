@@ -696,6 +696,33 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
   ```
   Confirm both functions exist with `prosecdef = true`.
 
+### 57. `supabase/migrations/0057_oauth_handle_new_user.sql` [OAUTH SIGNUP HARDENING]
+- **Purpose**: Robust username and full_name resolution during OAuth user registration.
+- **Action**: Run `supabase/migrations/0057_oauth_handle_new_user.sql` in the Supabase SQL Editor.
+
+### 58. `supabase/migrations/0058_harden_paid_content_for_inactive_profiles.sql` [HARDEN INACTIVE PROFILES]
+- **Purpose**: Prevents inactive or suspended accounts from accessing paid chapters or creating transactions.
+- **Action**: Run `supabase/migrations/0058_harden_paid_content_for_inactive_profiles.sql` in the Supabase SQL Editor.
+
+### 59. `supabase/migrations/0059_fix_get_my_library_columns.sql` [LIBRARY VIEW COLUMN FIXES]
+- **Purpose**: Aligns column selection in reader library RPC.
+- **Action**: Run `supabase/migrations/0059_fix_get_my_library_columns.sql` in the Supabase SQL Editor.
+
+### 60. `supabase/migrations/0060_reader_urdu_font_setting.sql` [ADMIN SWITCHABLE READER URDU FONT]
+- **Purpose**: Adds `reader_urdu_font` ('gulzar' | 'noori') to `platform_settings`, admin RPC `set_reader_urdu_font`, and exposes `reader_urdu_font` in `get_public_site_settings()`.
+- **Action**: Run `supabase/migrations/0060_reader_urdu_font_setting.sql` in the Supabase SQL Editor.
+
+### 61. `supabase/migrations/0061_schema_repairs_and_trigger_lockdown.sql` [SCHEMA REPAIRS & TRIGGER LOCKDOWN]
+- **Purpose**:
+  1. Fixes writer balance trigger (`trg_protect_writer_profile_columns`) to permit automated ledger reconciliation via transaction-local setting `app.allow_ledger_reconciliation` while locking down direct client mutations.
+  2. Updates `reconcile_writer_unpaid_commission` to safely set and reset the reconciliation bypass flag.
+  3. Corrects column name in `create_tip` to `reader_message`.
+  4. Corrects platform settings column in `generate_commission_invoice` to `invoice_due_days`.
+  5. Corrects column references in `get_expired_payment_proof_paths` (`created_at`, `screenshot_path`).
+  6. Drops stale overload `approve_novel(uuid)` and canonicalizes `approve_novel(uuid, jsonb)`.
+- **Action**: Paste contents of `supabase/migrations/0061_schema_repairs_and_trigger_lockdown.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `supabase/tests/00_post_migration_verification.sql` and `supabase/tests/12_runtime_smoke.sql`.
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:

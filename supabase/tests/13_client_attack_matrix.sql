@@ -1251,34 +1251,34 @@ BEGIN
     SELECT val_uuid INTO v_writer_a FROM attack_fixtures WHERE key = 'writer_a';
     SELECT val_uuid INTO v_reader_a FROM attack_fixtures WHERE key = 'reader_a';
 
-    -- 6.1 Anon calls get_public_site_settings() and receives only {palette}
+    -- 6.1 Anon calls get_public_site_settings() and receives {palette, reader_urdu_font}
     v_test_id := 601;
     SET LOCAL ROLE anon;
     PERFORM set_config('request.jwt.claims', '{"role":"anon"}', true);
     BEGIN
         v_res_json := public.get_public_site_settings();
-        IF v_res_json ? 'palette' AND (SELECT count(*) FROM jsonb_object_keys(v_res_json)) = 1 THEN
-            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site palette', 'PASS', 'SUCCESS', 'Anon received strictly palette key: ' || v_res_json::text);
+        IF v_res_json ? 'palette' AND v_res_json ? 'reader_urdu_font' AND (SELECT count(*) FROM jsonb_object_keys(v_res_json)) = 2 THEN
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site settings', 'PASS', 'SUCCESS', 'Anon received strictly palette and font keys: ' || v_res_json::text);
         ELSE
-            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site palette', 'FAIL', 'INVALID_KEYS', 'Exposed extra keys or missing palette: ' || v_res_json::text);
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site settings', 'FAIL', 'INVALID_KEYS', 'Exposed extra keys or missing palette/font: ' || v_res_json::text);
         END IF;
     EXCEPTION WHEN OTHERS THEN
-        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site palette', 'FAIL', SQLSTATE, 'Unexpected failure: ' || SQLERRM);
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'anon', 'get_public_site_settings', 'Anon reads public site settings', 'FAIL', SQLSTATE, 'Unexpected failure: ' || SQLERRM);
     END;
 
-    -- 6.2 Authenticated Reader calls get_public_site_settings() and receives only {palette}
+    -- 6.2 Authenticated Reader calls get_public_site_settings() and receives {palette, reader_urdu_font}
     v_test_id := 602;
     SET LOCAL ROLE authenticated;
     PERFORM set_config('request.jwt.claims', json_build_object('sub', v_reader_a::text, 'role', 'authenticated')::text, true);
     BEGIN
         v_res_json := public.get_public_site_settings();
-        IF v_res_json ? 'palette' AND (SELECT count(*) FROM jsonb_object_keys(v_res_json)) = 1 THEN
-            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site palette', 'PASS', 'SUCCESS', 'Authenticated reader received strictly palette: ' || v_res_json::text);
+        IF v_res_json ? 'palette' AND v_res_json ? 'reader_urdu_font' AND (SELECT count(*) FROM jsonb_object_keys(v_res_json)) = 2 THEN
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site settings', 'PASS', 'SUCCESS', 'Authenticated reader received strictly palette and font: ' || v_res_json::text);
         ELSE
-            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site palette', 'FAIL', 'INVALID_KEYS', 'Exposed extra keys or missing palette: ' || v_res_json::text);
+            INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site settings', 'FAIL', 'INVALID_KEYS', 'Exposed extra keys or missing palette/font: ' || v_res_json::text);
         END IF;
     EXCEPTION WHEN OTHERS THEN
-        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site palette', 'FAIL', SQLSTATE, 'Unexpected failure: ' || SQLERRM);
+        INSERT INTO attack_matrix_results VALUES (v_test_id, 'Site Settings Security', 'reader_a', 'get_public_site_settings', 'Reader reads public site settings', 'FAIL', SQLSTATE, 'Unexpected failure: ' || SQLERRM);
     END;
 
     -- 6.3 Anon direct SELECT on public.platform_settings is denied

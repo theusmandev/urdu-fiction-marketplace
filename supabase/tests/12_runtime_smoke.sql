@@ -1604,7 +1604,7 @@ BEGIN
 
     SELECT * INTO v_settings FROM public.platform_settings WHERE id = 1;
 
-    IF coalesce((v_res->>'success')::boolean, false) IS TRUE
+    IF (v_res ? 'id' OR coalesce((v_res->>'success')::boolean, false) IS TRUE)
        AND v_settings.default_commission_rate       = 22.00
        AND v_settings.default_unpaid_commission_limit = 6000.00
        AND v_settings.min_novel_price_pkr           = 75

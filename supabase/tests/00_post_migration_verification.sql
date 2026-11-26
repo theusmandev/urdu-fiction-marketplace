@@ -204,7 +204,10 @@ DECLARE
         'has_novel_entitlement',
         'is_admin',
         'get_tip_options',
-        'get_public_site_settings'
+        'get_public_site_settings',
+        'is_writer_active_and_approved',
+        'is_novel_author',
+        'is_free_preview_accessible'
     ];
 
     -- Authenticated-only workflow RPCs (must exist; must NOT be anon-executable)

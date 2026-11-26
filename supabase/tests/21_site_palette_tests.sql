@@ -83,8 +83,8 @@ BEGIN
         v_res_json := public.get_public_site_settings();
         SELECT count(*) INTO v_key_count FROM jsonb_object_keys(v_res_json);
 
-        IF v_res_json ? 'palette' AND v_key_count = 1 AND (v_res_json->>'palette') = 'ivory_ink' THEN
-            INSERT INTO test_results VALUES (1, 'Anon calls get_public_site_settings', 'PASS', 'Received strictly {"palette":"ivory_ink"}');
+        IF v_res_json ? 'palette' AND v_res_json ? 'reader_urdu_font' AND v_key_count = 2 AND (v_res_json->>'palette') = 'ivory_ink' THEN
+            INSERT INTO test_results VALUES (1, 'Anon calls get_public_site_settings', 'PASS', 'Received {"palette":"ivory_ink","reader_urdu_font":...}');
         ELSE
             INSERT INTO test_results VALUES (1, 'Anon calls get_public_site_settings', 'FAIL', 'Unexpected response payload: ' || v_res_json::text);
         END IF;
@@ -114,8 +114,8 @@ BEGIN
         v_res_json := public.get_public_site_settings();
         SELECT count(*) INTO v_key_count FROM jsonb_object_keys(v_res_json);
 
-        IF v_res_json ? 'palette' AND v_key_count = 1 THEN
-            INSERT INTO test_results VALUES (3, 'Reader calls get_public_site_settings', 'PASS', 'Received palette: ' || (v_res_json->>'palette'));
+        IF v_res_json ? 'palette' AND v_res_json ? 'reader_urdu_font' AND v_key_count = 2 THEN
+            INSERT INTO test_results VALUES (3, 'Reader calls get_public_site_settings', 'PASS', 'Received settings: palette=' || (v_res_json->>'palette') || ', reader_urdu_font=' || (v_res_json->>'reader_urdu_font'));
         ELSE
             INSERT INTO test_results VALUES (3, 'Reader calls get_public_site_settings', 'FAIL', 'Unexpected payload: ' || v_res_json::text);
         END IF;
