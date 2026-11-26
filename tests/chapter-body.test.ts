@@ -260,4 +260,18 @@ describe('ChapterBody Nastaliq (Jameel Noori) Calibration & Deep-Cascade Metrics
       'Empty state container must retain data-reader-font="noori"'
     );
   });
+
+  test('rendered paragraphs are properly enclosed in data-reader-font container with rtl urdu semantics', () => {
+    const raw = 'پہلا پیراگراف۔\nدوسرا پیراگراف۔';
+    const htmlNoori = renderChapterBodyToHtml(raw, { readerFont: 'noori' });
+
+    assert.ok(htmlNoori.includes('data-reader-font="noori"'), 'Must have data-reader-font="noori"');
+    assert.ok(htmlNoori.includes('<p dir="rtl" lang="ur"'), 'All paragraphs must set dir="rtl" and lang="ur"');
+    assert.ok(htmlNoori.includes('پہلا پیراگراف۔'));
+    assert.ok(htmlNoori.includes('دوسرا پیراگراف۔'));
+
+    const htmlGulzar = renderChapterBodyToHtml(raw, { readerFont: 'gulzar' });
+    assert.ok(htmlGulzar.includes('data-reader-font="gulzar"'), 'Must have data-reader-font="gulzar"');
+    assert.ok(htmlGulzar.includes('font-urdu'), 'Gulzar container must include font-urdu class');
+  });
 });

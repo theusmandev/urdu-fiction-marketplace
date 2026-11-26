@@ -13,6 +13,10 @@ import {
   resolveEffectiveReaderFont,
   shouldSkipNooriDownload,
 } from '../src/lib/settings/reader-font-constants.ts';
+import {
+  isNooriFontLoaded,
+  _resetInFlightNooriPromiseForTesting,
+} from '../src/lib/reader/useReaderNooriFont.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -245,6 +249,176 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
       assert.equal(shouldSkipNooriDownload({ effectiveType: '4g' }), false);
       assert.equal(shouldSkipNooriDownload({ effectiveType: '5g' }), false);
       assert.equal(shouldSkipNooriDownload({ effectiveType: 'wifi' }), false);
+    });
+  });
+
+  describe('8. Font Loader State & Cache Detection (isNooriFontLoaded)', () => {
+    const originalDocument = (globalThis as unknown as { document?: unknown }).document;
+
+    it('returns false when document is undefined (SSR environment)', () => {
+      delete (globalThis as unknown as { document?: unknown }).document;
+      assert.equal(isNooriFontLoaded(), false);
+    });
+
+    it('returns false when document has no fonts property', () => {
+      (globalThis as unknown as { document?: unknown }).document = {};
+      assert.equal(isNooriFontLoaded(), false);
+    });
+
+    it('returns false when document.fonts has zero entries', () => {
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set(),
+      };
+      assert.equal(isNooriFontLoaded(), false);
+    });
+
+    it('returns false when document.fonts contains other loaded fonts but not Jameel Noori', () => {
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set([
+          { family: 'Gulzar', status: 'loaded' },
+          { family: 'Plus Jakarta Sans', status: 'loaded' },
+        ]),
+      };
+      assert.equal(isNooriFontLoaded(), false);
+    });
+
+    it('returns false when JameelNooriNastaleeq is present but still in loading or unloaded state', () => {
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set([
+          { family: 'JameelNooriNastaleeq', status: 'loading' },
+        ]),
+      };
+      assert.equal(isNooriFontLoaded(), false);
+
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set([
+          { family: 'JameelNooriNastaleeq', status: 'unloaded' },
+        ]),
+      };
+      assert.equal(isNooriFontLoaded(), false);
+    });
+
+    it('returns true when JameelNooriNastaleeq is registered with status loaded', () => {
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set([
+          { family: 'JameelNooriNastaleeq', status: 'loaded' },
+        ]),
+      };
+      assert.equal(isNooriFontLoaded(), true);
+    });
+
+    it('handles quoted font family names safely (e.g. "JameelNooriNastaleeq")', () => {
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set([
+          { family: '"JameelNooriNastaleeq"', status: 'loaded' },
+        ]),
+      };
+      assert.equal(isNooriFontLoaded(), true);
+
+      (globalThis as unknown as { document?: unknown }).document = {
+        fonts: new Set([
+          { family: "'JameelNooriNastaleeq'", status: 'loaded' },
+        ]),
+      };
+      assert.equal(isNooriFontLoaded(), true);
+    });
+
+    // Cleanup mock document
+    it('restores original document environment', () => {
+      if (originalDocument === undefined) {
+        delete (globalThis as unknown as { document?: unknown }).document;
+      } else {
+        (globalThis as unknown as { document?: unknown }).document = originalDocument;
+      }
+      assert.ok(true);
+    });
+  });
+
+  describe('9. Regression Guard: W3C document.fonts.check() False-Positive Prevention', () => {
+    it('guarantees useReaderNooriFont.ts does NOT call document.fonts.check() for loading decisions', () => {
+      const hookPath = path.resolve(REPO_ROOT, 'src/lib/reader/useReaderNooriFont.ts');
+      assert.ok(fs.existsSync(hookPath), 'useReaderNooriFont.ts must exist');
+      const content = fs.readFileSync(hookPath, 'utf8');
+
+      // Strip comments so docstrings explaining the bug don't trigger false positives
+      const codeWithoutComments = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+
+      // document.fonts.check() returns TRUE for unregistered fonts (W3C CSS Font Loading Level 3),
+      // which previously caused the hook to mistakenly assume the font was loaded before downloading it.
+      assert.ok(
+        !codeWithoutComments.includes('document.fonts.check'),
+        'FORBIDDEN: useReaderNooriFont.ts must never call document.fonts.check() in executable code to detect if Noori is available'
+      );
+      assert.ok(
+        codeWithoutComments.includes('isNooriFontLoaded'),
+        'useReaderNooriFont.ts must use isNooriFontLoaded() to inspect document.fonts entries directly'
+      );
+    });
+  });
+
+  describe('10. CSS Hierarchy & Specificity Invariants in globals.css', () => {
+    it('globals.css applies font-family: var(--reader-font-family) to [data-reader-font="noori"] and paragraphs', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      assert.ok(fs.existsSync(cssPath), 'globals.css must exist');
+      const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+      // Verify noori definition and token assignment
+      assert.ok(
+        cssContent.includes('[data-reader-font="noori"]'),
+        'globals.css must define [data-reader-font="noori"]'
+      );
+      assert.ok(
+        cssContent.includes("--reader-font-family: 'JameelNooriNastaleeq', var(--font-urdu), \"Noto Nastaliq Urdu\", serif;"),
+        'globals.css must set JameelNooriNastaleeq as leading family in --reader-font-family'
+      );
+
+      // Verify direct font-family application on container and descendants
+      assert.ok(
+        cssContent.includes('[data-reader-font="noori"] p'),
+        'globals.css must target [data-reader-font="noori"] p'
+      );
+      assert.ok(
+        cssContent.includes('[data-reader-font="noori"] .font-urdu'),
+        'globals.css must override .font-urdu inside [data-reader-font="noori"] to prevent Gulzar lock-in'
+      );
+      assert.ok(
+        cssContent.includes('[data-reader-font="noori"] .reader-canvas'),
+        'globals.css must apply to .reader-canvas inside [data-reader-font="noori"]'
+      );
+
+      // Verify gulzar definition
+      assert.ok(
+        cssContent.includes('[data-reader-font="gulzar"]'),
+        'globals.css must define [data-reader-font="gulzar"]'
+      );
+      assert.ok(
+        cssContent.includes('[data-reader-font="gulzar"] p'),
+        'globals.css must target [data-reader-font="gulzar"] p'
+      );
+    });
+  });
+
+  describe('11. CSP font-src & connect-src Synchronization in next.config.ts', () => {
+    it('next.config.ts appends fontSrcExtra to BOTH font-src and connect-src', () => {
+      const configPath = path.resolve(REPO_ROOT, 'next.config.ts');
+      assert.ok(fs.existsSync(configPath), 'next.config.ts must exist');
+      const content = fs.readFileSync(configPath, 'utf8');
+
+      // font-src must include fontSrcExtra
+      assert.ok(
+        content.includes('font-src \'self\' https://fonts.gstatic.com data:${fontSrcExtra};'),
+        'next.config.ts must include fontSrcExtra in font-src'
+      );
+
+      // connect-src must include fontSrcExtra
+      assert.ok(
+        content.includes('connect-src ${connectSrc};'),
+        'next.config.ts must use connectSrc in CSP'
+      );
+      assert.ok(
+        content.includes('${prodSupabaseConnect}${fontSrcExtra}'),
+        'next.config.ts must include fontSrcExtra in prod connect-src'
+      );
     });
   });
 });

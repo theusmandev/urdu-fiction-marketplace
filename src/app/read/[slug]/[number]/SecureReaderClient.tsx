@@ -637,6 +637,7 @@ export function SecureReaderClient({
             <span className="font-mono font-semibold">{chapter.chapter_number}</span>
           </div>
           <UrduText
+            as="h1"
             size="2xl"
             className="text-center leading-tight py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))]"
           >

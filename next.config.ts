@@ -40,8 +40,8 @@ const nooriFontOrigin = getNooriFontOrigin();
 const fontSrcExtra = nooriFontOrigin ? ` ${nooriFontOrigin}` : "";
 
 const connectSrc = isDev
-  ? `'self' ${prodSupabaseConnect} https://*.supabase.in wss://*.supabase.in http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* ws: wss:`
-  : `'self' ${prodSupabaseConnect}`;
+  ? `'self' ${prodSupabaseConnect} https://*.supabase.in wss://*.supabase.in http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* ws: wss:${fontSrcExtra}`
+  : `'self' ${prodSupabaseConnect}${fontSrcExtra}`;
 
 const imgSrc = isDev
   ? `'self' blob: data: ${prodSupabaseImg} https://*.supabase.in https://lh3.googleusercontent.com http://127.0.0.1:* http://localhost:*`
