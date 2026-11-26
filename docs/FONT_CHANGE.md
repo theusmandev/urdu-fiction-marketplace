@@ -156,15 +156,18 @@ A dedicated development inspection lab has been provisioned at **`src/app/dev/fo
 ## 8. Admin-Switchable Reader Urdu Font: Jameel Noori Nastaleeq Subset
 
 ### Architectural Invariants & Scope
+- **Deployment Platform**: Deployed strictly as a **Cloudflare Worker** (OpenNext output in `.open-next/worker.js`, configured via `wrangler.jsonc` with `"keep_vars": true`). This project does NOT use Cloudflare Pages.
 - **Global Setting**: Stored in `public.platform_settings.reader_urdu_font` (`'gulzar'` default vs `'noori'`).
 - **Scope Isolation**: When active, **only** the Paid Secure Reader and Free Preview Reader apply Noori (`data-reader-font="noori"`). All other pages (marketplace, author studio, checkout, admin, etc.) strictly use `Gulzar` and **never** download the ~5 MB font.
 - **Zero Public Repo Binaries**: The repository is public. Font binaries (`.woff2`, `.ttf`, `.otf`) are strictly gitignored and must never be committed to git.
-- **Zero Mid-Read Layout Shift**: On slow 3G/4G connections, `useReaderNooriFont` keeps Gulzar active for the entire current chapter if the font takes longer than 150ms to load, streaming Noori in the background. Subsequent chapter reads hit browser disk cache instantly (<20ms).
+- **Zero Mid-Read Layout Shift**: On slow connections, `useReaderNooriFont` keeps Gulzar active for the entire current chapter if the font takes longer than 150ms to load, streaming Noori in the background. Subsequent chapter reads hit browser disk cache instantly (<20ms).
+- **Data-Saver & Slow Network Guard**: Feature-detects `navigator.connection`. If `saveData === true` or `effectiveType` is `'slow-2g' | '2g' | '3g'`, Noori downloading is bypassed entirely to respect user bandwidth and latency, keeping the reader on Gulzar.
 - **Graceful Fallback**: If `NOORI_FONT_URL` is unconfigured, corrupted, or unreachable, readers automatically and safely fall back to Gulzar with zero UI disruption.
 
 ### Cloudflare R2 Hosting & CORS Setup
 The site owner hosts `JameelNooriNastaleeq-subset.v1.woff2` on Cloudflare R2:
 1. **Bucket CORS Configuration**:
+   Allow ONLY the production origin and local development origin:
    ```json
    [
      {
@@ -181,9 +184,15 @@ The site owner hosts `JameelNooriNastaleeq-subset.v1.woff2` on Cloudflare R2:
 2. **Edge Cache Headers**:
    - `Cache-Control: public, max-age=31536000, immutable`
    - `Content-Type: font/woff2`
-3. **Environment Variables**:
-   - **`NOORI_FONT_URL`** (Server Runtime): `https://assets.urdunovelbanks.com/fonts/JameelNooriNastaleeq-subset.v1.woff2`
-   - **`NOORI_FONT_ORIGIN`** (Build-time CSP): `https://assets.urdunovelbanks.com`
+3. **Environment Variables Configuration (Cloudflare Worker)**:
+   - **`NOORI_FONT_URL`** (Worker Runtime Secret / Variable):
+     - Configured in Cloudflare Dashboard: **Workers & Pages -> [Worker: unb-premium] -> Settings -> Variables and Secrets**.
+     - Because `wrangler.jsonc` sets `"keep_vars": true`, dashboard runtime variables are preserved and will NOT be overwritten by subsequent CLI deployments.
+     - Example value: `https://assets.urdunovelbanks.com/fonts/JameelNooriNastaleeq-subset.v1.woff2`
+   - **`NOORI_FONT_ORIGIN`** (Workers Builds Environment Variable):
+     - Configured in Cloudflare Dashboard: **Workers & Pages -> [Worker: unb-premium] -> Builds -> Build variables** (and in local `.env.local`).
+     - **CRITICAL**: `next.config.ts` reads `NOORI_FONT_ORIGIN` during `npm run build` to append the origin to Content-Security-Policy (CSP) `font-src`. If this variable is missing at build time, the generated CSP header will block the browser from fetching the font from the external origin.
+     - Example value: `https://assets.urdunovelbanks.com`
 4. **Font Licensing**:
    - Font licensing, redistribution rights, and commercial permissions remain strictly the legal responsibility of the site owner.
 

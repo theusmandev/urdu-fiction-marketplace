@@ -11,6 +11,7 @@ import {
   parseReaderUrduFont,
   parseValidNooriFontUrl,
   resolveEffectiveReaderFont,
+  shouldSkipNooriDownload,
 } from '../src/lib/settings/reader-font-constants.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -207,6 +208,43 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
       assert.ok(testContent.includes('set_reader_urdu_font'));
       assert.ok(testContent.includes('chk_platform_settings_reader_urdu_font'));
       assert.ok(testContent.includes('SET_READER_URDU_FONT'));
+    });
+  });
+
+  describe('7. Data-Saver and Slow Network Guard (shouldSkipNooriDownload)', () => {
+    it('returns false when connection is null, undefined, or empty', () => {
+      assert.equal(shouldSkipNooriDownload(null), false);
+      assert.equal(shouldSkipNooriDownload(undefined), false);
+      assert.equal(shouldSkipNooriDownload({}), false);
+    });
+
+    it('returns true when saveData is true', () => {
+      assert.equal(shouldSkipNooriDownload({ saveData: true }), true);
+      assert.equal(shouldSkipNooriDownload({ saveData: true, effectiveType: '4g' }), true);
+    });
+
+    it('returns false when saveData is false and connection is fast', () => {
+      assert.equal(shouldSkipNooriDownload({ saveData: false }), false);
+      assert.equal(shouldSkipNooriDownload({ saveData: false, effectiveType: '4g' }), false);
+      assert.equal(shouldSkipNooriDownload({ saveData: false, effectiveType: '5g' }), false);
+    });
+
+    it('returns true on slow connection types (slow-2g, 2g, 3g)', () => {
+      assert.equal(shouldSkipNooriDownload({ effectiveType: 'slow-2g' }), true);
+      assert.equal(shouldSkipNooriDownload({ effectiveType: '2g' }), true);
+      assert.equal(shouldSkipNooriDownload({ effectiveType: '3g' }), true);
+    });
+
+    it('handles case-insensitivity and whitespace in effectiveType', () => {
+      assert.equal(shouldSkipNooriDownload({ effectiveType: '3G' }), true);
+      assert.equal(shouldSkipNooriDownload({ effectiveType: ' 2g ' }), true);
+      assert.equal(shouldSkipNooriDownload({ effectiveType: 'SLOW-2G' }), true);
+    });
+
+    it('returns false on fast connection types (4g, 5g, wifi/unknown)', () => {
+      assert.equal(shouldSkipNooriDownload({ effectiveType: '4g' }), false);
+      assert.equal(shouldSkipNooriDownload({ effectiveType: '5g' }), false);
+      assert.equal(shouldSkipNooriDownload({ effectiveType: 'wifi' }), false);
     });
   });
 });

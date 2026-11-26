@@ -81,3 +81,31 @@ export function resolveEffectiveReaderFont(
 export function getRuntimeNooriFontUrl(): string | null {
   return parseValidNooriFontUrl(process.env.NOORI_FONT_URL);
 }
+
+export interface NetworkInformationLike {
+  saveData?: boolean;
+  effectiveType?: string;
+}
+
+/**
+ * Pure decision helper for network-constrained readers:
+ * Skips downloading the ~5 MB custom Nastaliq font if:
+ * 1. User has enabled Data Saver mode (saveData === true)
+ * 2. Effective network connection is slow ('slow-2g', '2g', '3g')
+ *
+ * If connection is undefined/null (feature not supported by browser), returns false
+ * to allow standard cached/150ms race window behavior.
+ */
+export function shouldSkipNooriDownload(connection?: NetworkInformationLike | null): boolean {
+  if (!connection) {
+    return false;
+  }
+  if (connection.saveData === true) {
+    return true;
+  }
+  const type = connection.effectiveType?.toLowerCase().trim();
+  if (type === 'slow-2g' || type === '2g' || type === '3g') {
+    return true;
+  }
+  return false;
+}

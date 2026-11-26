@@ -2,13 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import type { ReaderUrduFont } from '@/lib/settings/reader-font';
+import {
+  shouldSkipNooriDownload,
+  type NetworkInformationLike,
+} from '@/lib/settings/reader-font-constants';
+
+export { shouldSkipNooriDownload, type NetworkInformationLike };
+
+interface NavigatorWithConnection {
+  connection?: NetworkInformationLike;
+}
 
 /**
  * useReaderNooriFont
  *
  * Implements zero-reflow, zero-metrics-mismatch progressive loading for Jameel Noori Nastaleeq:
  * 1. When setting is 'gulzar' or nooriFontUrl is null: 0 bytes downloaded, instantly returns 'gulzar'.
- * 2. When setting is 'noori' with valid nooriFontUrl:
+ * 2. When user has Data Saver enabled or connection is slow-2g/2g/3g: skips download completely and stays on Gulzar.
+ * 3. When setting is 'noori' with valid nooriFontUrl:
  *    - Checks if font is already cached in document.fonts.
  *    - If already available or loads within 150ms (cached disk hit): immediately activates 'noori'.
  *    - If on slow 3G/4G (takes > 150ms): locks 'gulzar' for the ENTIRE current chapter to prevent mid-read reflow.
@@ -24,6 +35,12 @@ export function useReaderNooriFont(
       return false;
     }
     if (typeof window !== 'undefined' && 'fonts' in document) {
+      if (typeof navigator !== 'undefined') {
+        const nav = navigator as unknown as NavigatorWithConnection;
+        if (shouldSkipNooriDownload(nav.connection)) {
+          return false;
+        }
+      }
       try {
         return document.fonts.check('16px JameelNooriNastaleeq');
       } catch {
@@ -40,6 +57,14 @@ export function useReaderNooriFont(
 
     if (typeof window === 'undefined' || !('fonts' in document)) {
       return;
+    }
+
+    // Skip heavy font download on Data-Saver mode or slow 2G/3G connections
+    if (typeof navigator !== 'undefined') {
+      const nav = navigator as unknown as NavigatorWithConnection;
+      if (shouldSkipNooriDownload(nav.connection)) {
+        return;
+      }
     }
 
     // Check if already loaded in browser font set

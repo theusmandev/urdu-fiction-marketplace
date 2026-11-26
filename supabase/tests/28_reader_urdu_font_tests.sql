@@ -81,7 +81,7 @@ BEGIN
         v_res_json := public.get_public_site_settings();
         SELECT count(*) INTO v_key_count FROM jsonb_object_keys(v_res_json);
 
-        IF v_res_json ? 'palette' AND v_res_json ? 'reader_urdu_font' AND v_key_count = 2 AND (v_res_json->>'reader_urdu_font') = 'gulzar' THEN
+        IF v_res_json ? 'palette' AND v_res_json ? 'reader_urdu_font' AND v_key_count = 2 AND (v_res_json->>'reader_urdu_font') = 'gulzar' AND (v_res_json->>'palette') IN ('ivory_ink', 'paper_teal', 'cream_maroon') THEN
             INSERT INTO test_results VALUES (1, 'Anon calls get_public_site_settings', 'PASS', 'Received strictly {palette, reader_urdu_font=gulzar}');
         ELSE
             INSERT INTO test_results VALUES (1, 'Anon calls get_public_site_settings', 'FAIL', 'Unexpected response payload: ' || v_res_json::text);
@@ -169,10 +169,22 @@ BEGIN
           AND actor_id = v_admin_id
           AND (new_state->>'reader_urdu_font') = 'noori';
 
-        IF v_curr_font = 'noori' AND v_updated_by = v_admin_id AND v_audit_count > 0 THEN
-            INSERT INTO test_results VALUES (5, 'Admin set_reader_urdu_font to noori', 'PASS', 'Settings and audit_log updated cleanly');
+        -- Verify get_public_site_settings() reflects 'noori' while preserving palette
+        v_res_json := public.get_public_site_settings();
+        SELECT count(*) INTO v_key_count FROM jsonb_object_keys(v_res_json);
+
+        IF v_curr_font = 'noori'
+           AND v_updated_by = v_admin_id
+           AND v_audit_count > 0
+           AND v_res_json ? 'palette'
+           AND v_res_json ? 'reader_urdu_font'
+           AND v_key_count = 2
+           AND (v_res_json->>'reader_urdu_font') = 'noori'
+           AND (v_res_json->>'palette') IN ('ivory_ink', 'paper_teal', 'cream_maroon')
+        THEN
+            INSERT INTO test_results VALUES (5, 'Admin set_reader_urdu_font to noori', 'PASS', 'Settings, audit_log, and get_public_site_settings updated cleanly');
         ELSE
-            INSERT INTO test_results VALUES (5, 'Admin set_reader_urdu_font to noori', 'FAIL', 'Font not updated or audit missing. Curr: ' || coalesce(v_curr_font, 'NULL'));
+            INSERT INTO test_results VALUES (5, 'Admin set_reader_urdu_font to noori', 'FAIL', 'Font not updated or get_public_site_settings mismatch. Res: ' || coalesce(v_res_json::text, 'NULL'));
         END IF;
     EXCEPTION WHEN OTHERS THEN
         INSERT INTO test_results VALUES (5, 'Admin set_reader_urdu_font to noori', 'FAIL', 'Exception raised: ' || SQLERRM);
