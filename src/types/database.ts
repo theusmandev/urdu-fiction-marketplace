@@ -98,6 +98,9 @@ export interface PlatformSettingsRow {
   site_palette?: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
   site_palette_updated_at?: string | null;
   site_palette_updated_by?: string | null;
+  reader_urdu_font?: 'gulzar' | 'noori';
+  reader_urdu_font_updated_at?: string | null;
+  reader_urdu_font_updated_by?: string | null;
   social_links?: SocialLinks;
   retention_audit_logs_days: number;
   retention_chapter_reads_days: number;
@@ -2122,6 +2125,7 @@ export interface Database {
         Args: Record<string, never>;
         Returns: {
           palette: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
+          reader_urdu_font: 'gulzar' | 'noori';
         };
       };
       set_site_palette: {
@@ -2131,6 +2135,16 @@ export interface Database {
         };
         Returns: {
           palette: 'ivory_ink' | 'paper_teal' | 'cream_maroon';
+          updated_at: string;
+        };
+      };
+      set_reader_urdu_font: {
+        Args: {
+          p_font: string;
+          p_note?: string | null;
+        };
+        Returns: {
+          reader_urdu_font: 'gulzar' | 'noori';
           updated_at: string;
         };
       };

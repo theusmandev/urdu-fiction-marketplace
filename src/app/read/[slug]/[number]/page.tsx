@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { createServerClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/getCurrentUser';
 import { getPublicNovelChapters } from '@/lib/supabase/public';
+import { getReaderFontConfiguration } from '@/lib/settings/reader-font';
 import { SecureReaderClient } from './SecureReaderClient';
 import { type ChapterReaderPayload } from '@/types/database';
 import { mapReaderError } from '@/lib/reader/schemas';
@@ -59,8 +60,11 @@ export default async function SecureReaderPage({ params }: ReaderPageProps) {
     }
   );
 
-  // Fetch published chapters for table-of-contents drawer
-  const tableOfContents = await getPublicNovelChapters(slug);
+  // Fetch published chapters and reader font configuration in parallel
+  const [tableOfContents, fontConfig] = await Promise.all([
+    getPublicNovelChapters(slug),
+    getReaderFontConfiguration(),
+  ]);
 
   // Handle Errors
   if (chapterError || !chapterData) {
@@ -134,6 +138,8 @@ export default async function SecureReaderPage({ params }: ReaderPageProps) {
       readerId={currentUser.user.id}
       tableOfContents={tableOfContents}
       novelSlug={slug}
+      effectiveReaderFont={fontConfig.effectiveFont}
+      nooriFontUrl={fontConfig.fontUrl}
     />
   );
 }

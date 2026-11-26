@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { FreePreviewReaderClient } from "@/components/catalog/FreePreviewReaderClient";
+import { getReaderFontConfiguration } from "@/lib/settings/reader-font";
 import {
   getPublicNovelBySlug,
   getFreePreviewChapter,
@@ -111,10 +112,11 @@ export default async function FreePreviewReaderPage({
     redirect(`/novels/${slug}`);
   }
 
-  const [novel, chapter, allChapters] = await Promise.all([
+  const [novel, chapter, allChapters, fontConfig] = await Promise.all([
     getPublicNovelBySlug(slug),
     getFreePreviewChapter(slug, chapterNumber),
     getPublicNovelChapters(slug),
+    getReaderFontConfiguration(),
   ]);
 
   // If novel doesn't exist at all -> 404
@@ -166,6 +168,8 @@ export default async function FreePreviewReaderPage({
         novel={novel}
         chapter={chapter}
         allChapters={allChapters}
+        effectiveReaderFont={fontConfig.effectiveFont}
+        nooriFontUrl={fontConfig.fontUrl}
       />
     </>
   );

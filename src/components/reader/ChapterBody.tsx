@@ -49,6 +49,12 @@ export interface ChapterBodyProps {
   userSelect?: 'none' | 'text';
 
   /**
+   * Urdu font engine: 'gulzar' | 'noori'
+   * @default 'gulzar'
+   */
+  readerFont?: 'gulzar' | 'noori';
+
+  /**
    * Optional outer container class name.
    */
   className?: string;
@@ -77,18 +83,23 @@ export function ChapterBody({
   lineHeight = 'relaxed',
   paragraphSpacing = 'normal',
   userSelect = 'text',
+  readerFont = 'gulzar',
   className,
   paragraphClassName,
 }: ChapterBodyProps) {
   const blocks = parseChapterContent(text);
+  const isNoori = readerFont === 'noori';
 
   if (blocks.length === 0) {
     return (
       <div
         dir="rtl"
         lang="ur"
+        data-reader-font={readerFont}
         className={cn(
-          'font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base',
+          isNoori
+            ? 'reader-canvas text-center py-12 [padding-inline:0.85em] py-2.5 text-current/50 select-none text-base'
+            : 'font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base',
           className
         )}
       >
@@ -101,8 +112,11 @@ export function ChapterBody({
     <div
       dir="rtl"
       lang="ur"
+      data-reader-font={readerFont}
       className={cn(
-        'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5',
+        isNoori
+          ? 'reader-canvas transition-all duration-150 [padding-inline:0.85em] py-2.5'
+          : 'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5',
         fontSizeClasses[fontSize],
         lineHeightClasses[lineHeight],
         userSelect === 'none' ? 'select-none' : 'select-text',

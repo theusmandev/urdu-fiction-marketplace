@@ -22,6 +22,23 @@ const prodSupabaseConnect = supabaseHost
   : "https://*.supabase.co wss://*.supabase.co";
 const prodSupabaseImg = supabaseHost ? `https://${supabaseHost}` : "https://*.supabase.co";
 
+function getNooriFontOrigin(): string | null {
+  const raw = process.env.NOORI_FONT_ORIGIN?.trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    if (u.protocol === "https:" && !u.username && !u.password) {
+      return u.origin;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+const nooriFontOrigin = getNooriFontOrigin();
+const fontSrcExtra = nooriFontOrigin ? ` ${nooriFontOrigin}` : "";
+
 const connectSrc = isDev
   ? `'self' ${prodSupabaseConnect} https://*.supabase.in wss://*.supabase.in http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* ws: wss:`
   : `'self' ${prodSupabaseConnect}`;
@@ -37,7 +54,7 @@ const cspHeader = `
     script-src ${scriptSrc};
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src ${imgSrc};
-    font-src 'self' https://fonts.gstatic.com data:;
+    font-src 'self' https://fonts.gstatic.com data:${fontSrcExtra};
     connect-src ${connectSrc};
     object-src 'none';
     base-uri 'self';

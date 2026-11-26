@@ -150,3 +150,40 @@ A dedicated development inspection lab has been provisioned at **`src/app/dev/fo
 | `src/app/reset-password/page.tsx` | Replaced `font-bold text-3xl` with `text-4xl` on brand Urdu logo. |
 | `src/app/become-a-writer/page.tsx` | Removed `font-semibold` on pen name; styled with `font-urdu text-lg text-amber-400`. |
 | `docs/FONT_CHANGE.md` | **NEW FILE**: Detailed typography migration documentation and benchmark audit. |
+
+---
+
+## 8. Admin-Switchable Reader Urdu Font: Jameel Noori Nastaleeq Subset
+
+### Architectural Invariants & Scope
+- **Global Setting**: Stored in `public.platform_settings.reader_urdu_font` (`'gulzar'` default vs `'noori'`).
+- **Scope Isolation**: When active, **only** the Paid Secure Reader and Free Preview Reader apply Noori (`data-reader-font="noori"`). All other pages (marketplace, author studio, checkout, admin, etc.) strictly use `Gulzar` and **never** download the ~5 MB font.
+- **Zero Public Repo Binaries**: The repository is public. Font binaries (`.woff2`, `.ttf`, `.otf`) are strictly gitignored and must never be committed to git.
+- **Zero Mid-Read Layout Shift**: On slow 3G/4G connections, `useReaderNooriFont` keeps Gulzar active for the entire current chapter if the font takes longer than 150ms to load, streaming Noori in the background. Subsequent chapter reads hit browser disk cache instantly (<20ms).
+- **Graceful Fallback**: If `NOORI_FONT_URL` is unconfigured, corrupted, or unreachable, readers automatically and safely fall back to Gulzar with zero UI disruption.
+
+### Cloudflare R2 Hosting & CORS Setup
+The site owner hosts `JameelNooriNastaleeq-subset.v1.woff2` on Cloudflare R2:
+1. **Bucket CORS Configuration**:
+   ```json
+   [
+     {
+       "AllowedOrigins": [
+         "https://premium.urdunovelbanks.com",
+         "http://localhost:3000"
+       ],
+       "AllowedMethods": ["GET", "HEAD"],
+       "AllowedHeaders": ["*"],
+       "MaxAgeSeconds": 86400
+     }
+   ]
+   ```
+2. **Edge Cache Headers**:
+   - `Cache-Control: public, max-age=31536000, immutable`
+   - `Content-Type: font/woff2`
+3. **Environment Variables**:
+   - **`NOORI_FONT_URL`** (Server Runtime): `https://assets.urdunovelbanks.com/fonts/JameelNooriNastaleeq-subset.v1.woff2`
+   - **`NOORI_FONT_ORIGIN`** (Build-time CSP): `https://assets.urdunovelbanks.com`
+4. **Font Licensing**:
+   - Font licensing, redistribution rights, and commercial permissions remain strictly the legal responsibility of the site owner.
+

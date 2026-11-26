@@ -8,7 +8,8 @@ import {
   type PaletteMeta,
 } from '@/lib/settings/palette';
 import { setAdminPreviewCookie, clearAdminPreviewCookie } from './AdminPalettePreview';
-import { adminSetSitePaletteAction } from '@/app/actions/admin';
+import { adminSetSitePaletteAction, adminSetReaderUrduFontAction } from '@/app/actions/admin';
+import { type ReaderUrduFont } from '@/lib/settings/reader-font';
 import { UrduText } from '@/components/urdu/UrduText';
 import {
   Palette,
@@ -19,6 +20,7 @@ import {
   AlertCircle,
   Loader2,
   ShieldCheck,
+  Type,
   X,
 } from 'lucide-react';
 
@@ -29,6 +31,8 @@ interface AdminAppearanceCardProps {
     username?: string | null;
   } | null;
   lastUpdatedAt?: string | null;
+  initialReaderFont?: ReaderUrduFont;
+  isNooriConfigured?: boolean;
 }
 
 function formatDisplayDate(dateStr: string): string {
@@ -51,6 +55,8 @@ export function AdminAppearanceCard({
   currentPalette: initialPalette,
   lastUpdatedBy,
   lastUpdatedAt,
+  initialReaderFont = 'gulzar',
+  isNooriConfigured = false,
 }: AdminAppearanceCardProps) {
   const [activePalette, setActivePalette] = useState<SitePalette>(initialPalette);
   const [selectedPalette, setSelectedPalette] = useState<SitePalette>(initialPalette);
@@ -63,6 +69,30 @@ export function AdminAppearanceCard({
   const [lastChangedActor, setLastChangedActor] = useState<{ name: string; username?: string | null } | null>(
     lastUpdatedBy || null
   );
+
+  // Reader Urdu Font State
+  const [activeReaderFont, setActiveReaderFont] = useState<ReaderUrduFont>(initialReaderFont);
+  const [isFontPending, startFontTransition] = useTransition();
+  const [fontSuccessMessage, setFontSuccessMessage] = useState<string | null>(null);
+  const [fontErrorMessage, setFontErrorMessage] = useState<string | null>(null);
+
+  const handleReaderFontChange = (font: ReaderUrduFont) => {
+    setFontErrorMessage(null);
+    setFontSuccessMessage(null);
+    startFontTransition(async () => {
+      const res = await adminSetReaderUrduFontAction(font, adminNote.trim() || null);
+      if (res.success && res.data) {
+        setActiveReaderFont(res.data.font);
+        setFontSuccessMessage(
+          res.data.font === 'noori'
+            ? 'Reader Urdu font switched to Jameel Noori Nastaleeq for all chapter readers.'
+            : 'Reader Urdu font switched to Gulzar (Default).'
+        );
+      } else {
+        setFontErrorMessage(res.error || 'Failed to update reader Urdu font.');
+      }
+    });
+  };
 
   const selectedMeta = PALETTES_CONFIG[selectedPalette];
 
@@ -342,6 +372,134 @@ export function AdminAppearanceCard({
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* READER URDU TYPOGRAPHY SETTING                                      */}
+      {/* ------------------------------------------------------------------ */}
+      <div className="pt-6 border-t border-border space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Type className="w-4 h-4 text-accent-strong" />
+              <h3 className="text-sm font-bold text-main">Reader Urdu Font / اردو فونٹ برائے مطالعہ</h3>
+            </div>
+            <p className="text-xs text-muted leading-relaxed max-w-xl">
+              Choose the primary Nastaliq font used for chapter body text and titles across the Paid Secure Reader and Free Preview Reader.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <span
+              className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border ${
+                isNooriConfigured
+                  ? 'bg-success-soft text-success border-success-border font-semibold'
+                  : 'bg-warning-soft text-warning border-warning-border font-medium'
+              }`}
+            >
+              {isNooriConfigured
+                ? 'External Font: Configured'
+                : 'Not configured — readers will safely stay on Gulzar until NOORI_FONT_URL is set'}
+            </span>
+          </div>
+        </div>
+
+        {/* Font Segmented Toggle */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <button
+            type="button"
+            disabled={isFontPending}
+            onClick={() => handleReaderFontChange('gulzar')}
+            className={`p-3.5 rounded-xl border text-right transition-all flex flex-col justify-between gap-2 cursor-pointer ${
+              activeReaderFont === 'gulzar'
+                ? 'bg-accent-soft border-accent-strong ring-1 ring-accent-strong'
+                : 'bg-surface border-border hover:border-accent-strong/40'
+            }`}
+          >
+            <div className="flex items-center justify-between w-full">
+              <span className="text-xs font-bold text-main">Gulzar (Default)</span>
+              {activeReaderFont === 'gulzar' && (
+                <span className="w-2 h-2 rounded-full bg-accent-strong" />
+              )}
+            </div>
+            <p className="font-urdu text-lg leading-relaxed text-main py-0.5" dir="rtl" lang="ur">
+              گلزار نستعلیق — تیز رفتار اور متوازن ڈیجیٹل خطاطی
+            </p>
+            <span className="text-[10px] text-muted text-left">
+              Built-in (187 KB), 0 Cumulative Layout Shift, instant load.
+            </span>
+          </button>
+
+          <button
+            type="button"
+            disabled={isFontPending}
+            onClick={() => handleReaderFontChange('noori')}
+            className={`p-3.5 rounded-xl border text-right transition-all flex flex-col justify-between gap-2 cursor-pointer ${
+              activeReaderFont === 'noori'
+                ? 'bg-accent-soft border-accent-strong ring-1 ring-accent-strong'
+                : 'bg-surface border-border hover:border-accent-strong/40'
+            }`}
+          >
+            <div className="flex items-center justify-between w-full">
+              <span className="text-xs font-bold text-main">Jameel Noori Nastaleeq</span>
+              {activeReaderFont === 'noori' && (
+                <span className="w-2 h-2 rounded-full bg-accent-strong" />
+              )}
+            </div>
+            <p className="font-urdu text-lg leading-relaxed text-main py-0.5" dir="rtl" lang="ur">
+              جمیل نوری نستعلیق — روایتی ان پیج کتابی خطاطی
+            </p>
+            <span className="text-[10px] text-muted text-left">
+              Custom subset (~5 MB), classical deep-cascade ligatures.
+            </span>
+          </button>
+        </div>
+
+        {/* Informational Guidance */}
+        <div className="p-3.5 rounded-xl bg-surface-muted border border-border text-[11px] text-muted space-y-1">
+          <p className="flex items-center gap-1.5 font-medium text-main">
+            <Sparkles className="w-3.5 h-3.5 text-accent-strong" />
+            <span>Reader Font Operational Rules:</span>
+          </p>
+          <ul className="list-disc list-inside space-y-0.5 pl-1">
+            <li>Applies only to Paid Secure Reader and Free Preview Reader. Marketplace, catalog, checkout, and writer studio remain Gulzar.</li>
+            <li>Noori requires a ~5 MB first-time download per reader on initial chapter load; subsequent reads load instantly from browser cache.</li>
+            <li>Font licensing, hosting, and redistribution rights remain the site owner&apos;s legal responsibility.</li>
+          </ul>
+        </div>
+
+        {/* Status Messages */}
+        {fontSuccessMessage && (
+          <div className="p-3 rounded-xl border border-success-border bg-success-soft text-success-text text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-success-text" />
+              <span>{fontSuccessMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFontSuccessMessage(null)}
+              className="text-xs hover:opacity-80 p-1"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {fontErrorMessage && (
+          <div className="p-3 rounded-xl border border-danger-border bg-danger-soft text-danger-text text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-danger-text" />
+              <span>{fontErrorMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFontErrorMessage(null)}
+              className="text-xs hover:opacity-80 p-1"
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Confirmation Modal */}

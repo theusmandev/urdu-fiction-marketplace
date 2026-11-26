@@ -17,6 +17,8 @@ import {
   buildWatermarkPattern,
 } from '@/lib/reader/schemas';
 import { ChapterBody } from '@/components/reader/ChapterBody';
+import { useReaderNooriFont } from '@/lib/reader/useReaderNooriFont';
+import type { ReaderUrduFont } from '@/lib/settings/reader-font';
 import { TipCard } from '@/components/tips/TipCard';
 import { saveReadingProgressAction } from '@/app/actions/reader';
 import {
@@ -37,6 +39,8 @@ interface SecureReaderClientProps {
   readerId: string;
   tableOfContents: PublicNovelChapterMeta[];
   novelSlug: string;
+  effectiveReaderFont?: ReaderUrduFont;
+  nooriFontUrl?: string | null;
 }
 
 export function SecureReaderClient({
@@ -44,8 +48,11 @@ export function SecureReaderClient({
   readerId,
   tableOfContents,
   novelSlug,
+  effectiveReaderFont = 'gulzar',
+  nooriFontUrl = null,
 }: SecureReaderClientProps) {
   const router = useRouter();
+  const activeUrduFont = useReaderNooriFont(effectiveReaderFont, nooriFontUrl);
 
   // Reader Preferences State (persisted in localStorage)
   const [theme, setTheme] = useState<ReaderTheme>(DEFAULT_READER_PREFERENCES.theme);
@@ -618,6 +625,7 @@ export function SecureReaderClient({
       {/* 3. CHAPTER MANUSCRIPT READING CANVAS                               */}
       {/* ------------------------------------------------------------------ */}
       <main
+        data-reader-font={activeUrduFont}
         className={`flex-1 w-full max-w-[65ch] mx-auto px-5 sm:px-6 py-8 sm:py-12 relative z-10 print:hidden ${
           isPrivacyShieldActive ? 'blur-2xl select-none pointer-events-none transition-none' : ''
         }`}
@@ -630,7 +638,7 @@ export function SecureReaderClient({
           </div>
           <UrduText
             size="2xl"
-            className="text-center leading-tight py-1 text-inherit"
+            className="text-center leading-tight py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))]"
           >
             {chapter.chapter_title}
           </UrduText>
@@ -677,6 +685,7 @@ export function SecureReaderClient({
             lineHeight={lineHeight}
             paragraphSpacing={paragraphSpacing}
             userSelect="none"
+            readerFont={activeUrduFont}
           />
         </article>
 

@@ -54,4 +54,13 @@ supabase/.temp/
 # local previews
 .preview/
 
+# Private custom fonts (never commit binaries to public repository)
+*Noori*.woff2
+*Noori*.ttf
+*Noori*.otf
+*noori*.woff2
+*noori*.ttf
+*noori*.otf
+public/fonts-private/
+
 

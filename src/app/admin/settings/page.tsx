@@ -10,6 +10,7 @@ import { SocialLinksCard } from '@/components/admin/SocialLinksCard';
 import { DataRetentionSettingsCard } from '@/components/admin/DataRetentionSettingsCard';
 import { WriterAnnouncementSettingsCard } from '@/components/admin/WriterAnnouncementSettingsCard';
 import { isSitePalette, type SitePalette } from '@/lib/settings/palette';
+import { parseReaderUrduFont, type ReaderUrduFont } from '@/lib/settings/reader-font';
 import { Settings, AlertCircle } from 'lucide-react';
 import type {
   PlatformPaymentMethodRow,
@@ -55,6 +56,9 @@ export default async function AdminSettingsPage() {
         site_palette,
         site_palette_updated_at,
         site_palette_updated_by,
+        reader_urdu_font,
+        reader_urdu_font_updated_at,
+        reader_urdu_font_updated_by,
         social_links,
         retention_audit_logs_days,
         retention_chapter_reads_days,
@@ -132,6 +136,9 @@ export default async function AdminSettingsPage() {
     writer_announcement_dismissible?: boolean;
     writer_announcement_updated_at?: string | null;
     watermark_enabled?: boolean;
+    reader_urdu_font?: ReaderUrduFont;
+    reader_urdu_font_updated_at?: string | null;
+    reader_urdu_font_updated_by?: string | null;
     updated_at: string;
   }>(settingsRes, { context: 'AdminSettingsPage.platform_settings' });
 
@@ -316,6 +323,8 @@ export default async function AdminSettingsPage() {
         currentPalette={initialPalette}
         lastUpdatedBy={lastPaletteUpdatedBy}
         lastUpdatedAt={rawSettings?.site_palette_updated_at}
+        initialReaderFont={parseReaderUrduFont(rawSettings?.reader_urdu_font)}
+        isNooriConfigured={Boolean(process.env.NOORI_FONT_URL?.trim())}
       />
 
       {/* Cloudflare Edge Cache Purge Notice */}

@@ -6,6 +6,11 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { dispatchPendingEmails } from '@/lib/email/dispatch-outbox';
 import { isSitePalette, ALLOWED_SITE_PALETTES, type SitePalette } from '@/lib/settings/palette';
 import {
+  isReaderUrduFont,
+  ALLOWED_READER_URDU_FONTS,
+  type ReaderUrduFont,
+} from '@/lib/settings/reader-font';
+import {
   suspendNovelSchema,
   unsuspendNovelSchema,
   setNovelFeaturedSchema,
@@ -851,6 +856,56 @@ export async function adminSetSitePaletteAction(
     success: true,
     data: {
       palette: result.palette,
+      updatedAt: result.updated_at,
+    },
+  };
+}
+
+export async function adminSetReaderUrduFontAction(
+  font: ReaderUrduFont,
+  note?: string | null
+): Promise<ActionResult<{ font: ReaderUrduFont; updatedAt: string }>> {
+  await requireRole('admin', '/admin');
+
+  if (!isReaderUrduFont(font)) {
+    return {
+      success: false,
+      error: `Invalid reader Urdu font. Allowed values: ${ALLOWED_READER_URDU_FONTS.join(', ')}`,
+    };
+  }
+
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc('set_reader_urdu_font', {
+    p_font: font,
+    p_note: note?.trim() || null,
+  });
+
+  if (error) {
+    console.error('[adminSetReaderUrduFontAction] RPC error:', error);
+    return { success: false, error: error.message };
+  }
+
+  const result = data as { reader_urdu_font: ReaderUrduFont; updated_at: string };
+
+  try {
+    revalidateTag('site-settings', 'max');
+  } catch (err) {
+    console.warn('[adminSetReaderUrduFontAction] revalidateTag warning:', err);
+  }
+
+  try {
+    revalidatePath('/', 'layout');
+    revalidatePath('/novels', 'layout');
+    revalidatePath('/read');
+    revalidatePath('/admin/settings', 'page');
+  } catch (err) {
+    console.warn('[adminSetReaderUrduFontAction] revalidatePath warning:', err);
+  }
+
+  return {
+    success: true,
+    data: {
+      font: result.reader_urdu_font,
       updatedAt: result.updated_at,
     },
   };

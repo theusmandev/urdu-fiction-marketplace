@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { UrduText } from "@/components/urdu/UrduText";
 import { ChapterBody } from "@/components/reader/ChapterBody";
+import { useReaderNooriFont } from "@/lib/reader/useReaderNooriFont";
+import type { ReaderUrduFont } from "@/lib/settings/reader-font";
 import { TipCard } from "@/components/tips/TipCard";
 import type { PublicFreePreviewChapter, PublicNovel, PublicNovelChapterMeta } from "@/types/database";
 import {
@@ -23,6 +25,8 @@ interface FreePreviewReaderClientProps {
   novel: PublicNovel;
   chapter: PublicFreePreviewChapter;
   allChapters: PublicNovelChapterMeta[];
+  effectiveReaderFont?: ReaderUrduFont;
+  nooriFontUrl?: string | null;
 }
 
 type ThemeMode = "light" | "sepia" | "dark";
@@ -33,7 +37,10 @@ export function FreePreviewReaderClient({
   novel,
   chapter,
   allChapters,
+  effectiveReaderFont = 'gulzar',
+  nooriFontUrl = null,
 }: FreePreviewReaderClientProps) {
+  const activeUrduFont = useReaderNooriFont(effectiveReaderFont, nooriFontUrl);
   // Lazy state initialization from localStorage avoids cascading re-renders in effects
   const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window !== "undefined") {
@@ -467,6 +474,7 @@ export function FreePreviewReaderClient({
 
       {/* Main Reading Canvas (Comfortable measure for Urdu script) */}
       <main
+        data-reader-font={activeUrduFont}
         className={`max-w-2xl lg:max-w-3xl mx-auto px-5 sm:px-8 pt-10 sm:pt-14 space-y-10 print:hidden ${
           isPrivacyShieldActive ? "blur-2xl select-none pointer-events-none transition-none" : ""
         }`}
@@ -481,7 +489,7 @@ export function FreePreviewReaderClient({
           <UrduText
             as="h1"
             size="3xl"
-            className="font-bold leading-[2.4] py-1 text-inherit"
+            className="font-bold leading-[2.4] py-1 text-inherit [font-family:var(--reader-font-family,var(--font-urdu))]"
           >
             {chapter.title_urdu}
           </UrduText>
@@ -498,6 +506,7 @@ export function FreePreviewReaderClient({
             fontSize={fontSize}
             lineHeight={lineHeight}
             userSelect="none"
+            readerFont={activeUrduFont}
           />
         </article>
 

@@ -222,3 +222,42 @@ describe('ChapterBody Nastaliq (Gulzar) Glyph Overhang & Clipping Protection', (
     );
   });
 });
+
+describe('ChapterBody Nastaliq (Jameel Noori) Calibration & Deep-Cascade Metrics', () => {
+  test('inner prose container enforces increased padding-inline and py when readerFont is noori', () => {
+    const raw = 'گھر کے سامنے خوبصورت باغ تھا۔\nگرم موسم میں ٹھنڈی ہوا چلی۔\nکچھ فاصلے پر نہر بہتی تھی۔';
+    const html = renderChapterBodyToHtml(raw, { fontSize: 'lg', readerFont: 'noori' });
+
+    assert.ok(
+      html.includes('[padding-inline:0.85em]'),
+      'Rendered HTML container must include [padding-inline:0.85em] for Noori overhang'
+    );
+
+    assert.ok(
+      html.includes('py-2.5'),
+      'Rendered HTML container must include py-2.5 vertical breathing room for deep descenders'
+    );
+
+    assert.ok(
+      html.includes('data-reader-font="noori"'),
+      'Rendered HTML container must set data-reader-font="noori"'
+    );
+
+    assert.ok(
+      html.includes('reader-canvas'),
+      'Rendered HTML container must include reader-canvas class'
+    );
+  });
+
+  test('empty chapter content fallback for noori retains calibrated padding', () => {
+    const emptyHtml = renderChapterBodyToHtml('', { readerFont: 'noori' });
+    assert.ok(
+      emptyHtml.includes('[padding-inline:0.85em]'),
+      'Empty state container must retain [padding-inline:0.85em] when noori is selected'
+    );
+    assert.ok(
+      emptyHtml.includes('data-reader-font="noori"'),
+      'Empty state container must retain data-reader-font="noori"'
+    );
+  });
+});

@@ -16,6 +16,7 @@ export interface ChapterBodyRenderOptions {
   lineHeight?: ReaderLineHeight;
   paragraphSpacing?: ReaderParagraphSpacing;
   userSelect?: 'none' | 'text';
+  readerFont?: 'gulzar' | 'noori';
   className?: string;
   paragraphClassName?: string;
 }
@@ -114,8 +115,14 @@ export function renderChapterBodyToHtml(
   options?: ChapterBodyRenderOptions
 ): string {
   const blocks = parseChapterContent(rawText);
+  const readerFont = options?.readerFont ?? 'gulzar';
+  const isNoori = readerFont === 'noori';
+
   if (blocks.length === 0) {
-    return '<div dir="rtl" lang="ur" class="font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base">کوئی متن موجود نہیں۔</div>';
+    const emptyClass = isNoori
+      ? 'reader-canvas text-center py-12 [padding-inline:0.85em] py-2.5 text-current/50 select-none text-base'
+      : 'font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base';
+    return `<div dir="rtl" lang="ur" data-reader-font="${readerFont}" class="${emptyClass}">کوئی متن موجود نہیں۔</div>`;
   }
 
   const fontSize = options?.fontSize ?? 'lg';
@@ -123,8 +130,12 @@ export function renderChapterBodyToHtml(
   const paragraphSpacing = options?.paragraphSpacing ?? 'normal';
   const userSelect = options?.userSelect ?? 'text';
 
+  const fontAndPaddingClass = isNoori
+    ? 'reader-canvas transition-all duration-150 [padding-inline:0.85em] py-2.5'
+    : 'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5';
+
   const containerClasses = [
-    'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5',
+    fontAndPaddingClass,
     fontSizeClasses[fontSize],
     lineHeightClasses[lineHeight],
     userSelect === 'none' ? 'select-none' : 'select-text',
@@ -133,7 +144,7 @@ export function renderChapterBodyToHtml(
     .filter(Boolean)
     .join(' ');
 
-  const htmlParts: string[] = [`<div dir="rtl" lang="ur" class="${containerClasses}">`];
+  const htmlParts: string[] = [`<div dir="rtl" lang="ur" data-reader-font="${readerFont}" class="${containerClasses}">`];
 
   for (const block of blocks) {
     if (block.type === 'scene-break') {
