@@ -308,6 +308,7 @@ DECLARE
     -- Verification probe variables
     v_chk_amt       numeric(10,2);
     v_chk_num       numeric(12,2);
+    v_orig_comm_rate numeric(5,2);
     v_chk_ostatus   public.order_status;
     v_chk_invstatus public.commission_invoice_status;
     v_chk_text      text;
@@ -322,6 +323,9 @@ BEGIN
     SELECT val_uuid INTO v_ent_a    FROM attack_fixtures WHERE key = 'ent_a';
     SELECT val_uuid INTO v_led_a    FROM attack_fixtures WHERE key = 'led_a';
     SELECT val_uuid INTO v_inv_a    FROM attack_fixtures WHERE key = 'inv_a';
+
+    -- Capture original platform settings rate before attacks to keep validation dynamic
+    SELECT default_commission_rate INTO v_orig_comm_rate FROM public.platform_settings WHERE id = 1;
 
     -- =========================================================================
     -- CATEGORY 1: DIRECT DML ON FINANCIAL/PROTECTED TABLES BY READER
@@ -523,7 +527,7 @@ BEGIN
     END IF;
 
     SELECT default_commission_rate INTO v_chk_num FROM public.platform_settings WHERE id = 1;
-    IF v_chk_num != 20.00 THEN
+    IF v_chk_num IS DISTINCT FROM v_orig_comm_rate THEN
         UPDATE attack_matrix_results SET status = 'FAIL', details = 'DB Tamper: platform_settings mutated' WHERE test_id = 107;
     END IF;
 

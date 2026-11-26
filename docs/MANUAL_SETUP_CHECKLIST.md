@@ -723,6 +723,11 @@ Execute the 6 sequential migration files in the **Supabase Dashboard -> SQL Edit
 - **Action**: Paste contents of `supabase/migrations/0061_schema_repairs_and_trigger_lockdown.sql` into the Supabase SQL Editor and click **Run**.
 - **Verification**: Run `supabase/tests/00_post_migration_verification.sql` and `supabase/tests/12_runtime_smoke.sql`.
 
+### 62. `supabase/migrations/0062_drop_generate_commission_invoice_overload.sql` [DROP STALE INVOICE RPC OVERLOAD]
+- **Purpose**: Drops legacy 3-parameter overload `public.generate_commission_invoice(uuid, timestamptz, timestamptz)`, ensuring all invocations unambiguously resolve to the canonical 4-parameter function with default `p_due_date timestamptz DEFAULT NULL`.
+- **Action**: Paste contents of `supabase/migrations/0062_drop_generate_commission_invoice_overload.sql` into the Supabase SQL Editor and click **Run**.
+- **Verification**: Run `supabase/tests/12_runtime_smoke.sql` (Step 8).
+
 ## Stage 2: Initial Platform Administrator Bootstrapping
 
 Due to security hardening in `handle_new_user()`, signups can **never** self-assign the `admin` role. The first platform administrator must be bootstrapped manually via SQL:
