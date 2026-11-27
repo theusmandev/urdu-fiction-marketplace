@@ -139,10 +139,10 @@ export function BuyNovelButton({
       <div className="space-y-2" data-novel-id={novelId}>
         <Link
           href={`/login?next=${encodeURIComponent(`/novels/${novelSlug}`)}`}
-          className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
+          className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-dark text-white font-semibold py-3 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
         >
-          <ShoppingBag className="w-4 h-4 text-accent" />
-          <span>Sign In to Buy ({formatPKR(pricePkr)})</span>
+          <ShoppingBag className="w-4 h-4 text-white/90" />
+          <span>Sign In to Buy (<span className="font-sans font-bold tabular-nums lining-nums">{formatPKR(pricePkr)}</span>)</span>
         </Link>
         <p className="text-[11px] text-center text-secondary">
           You need a reader account to save this novel in your library.
@@ -264,11 +264,11 @@ export function BuyNovelButton({
     <div className="space-y-2" data-novel-id={novelId}>
       <Link
         href={`/checkout/${novelSlug}`}
-        className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
+        className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-dark text-white font-semibold py-3 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
       >
-        <ShoppingBag className="w-4 h-4 text-accent" />
-        <span>Buy Now ({formatPKR(pricePkr)})</span>
-        <ArrowRight className="w-4 h-4 text-accent transition-transform group-hover:translate-x-1" />
+        <ShoppingBag className="w-4 h-4 text-white/90" />
+        <span>Buy Now (<span className="font-sans font-bold tabular-nums lining-nums">{formatPKR(pricePkr)}</span>)</span>
+        <ArrowRight className="w-4 h-4 text-white/90 transition-transform group-hover:translate-x-1" />
       </Link>
       <p className="text-[11px] text-center text-secondary">
         Direct writer bank/wallet transfer with receipt verification.

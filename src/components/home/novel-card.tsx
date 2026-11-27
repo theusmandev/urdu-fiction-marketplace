@@ -132,7 +132,7 @@ export function NovelCard({ novel }: NovelCardProps) {
           </div>
 
           <div className="shrink-0">
-            <span className="font-serif text-xs sm:text-sm font-bold text-navy">
+            <span className="font-sans text-xs sm:text-sm font-bold tracking-tight text-navy tabular-nums lining-nums">
               {formatPKR(novel.pricePKR)}
             </span>
           </div>

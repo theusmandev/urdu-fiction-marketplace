@@ -18,7 +18,7 @@ import {
   searchPublicNovels,
 } from "@/lib/supabase/public";
 import { parseCatalogParams } from "@/lib/catalog/params";
-import { resolveCoverUrl } from "@/lib/utils";
+import { resolveCoverUrl, formatLanguage } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -309,7 +309,7 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               <UrduText
                 as="h1"
                 size="4xl"
-                className="text-navy leading-[2.2] py-1 text-2xl sm:text-4xl font-normal"
+                className="text-navy leading-[2.2] py-1 text-2xl sm:text-4xl font-normal text-center md:text-left"
               >
                 {novel.title_urdu}
               </UrduText>
@@ -321,49 +321,53 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               )}
 
               {/* Author Attribution Byline */}
-              <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-4 text-sm text-secondary pt-1 sm:pt-2">
-                <span>By / مصنف:</span>
+              <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-secondary pt-1 sm:pt-2 flex-wrap">
                 <Link
                   href={
                     novel.writer_username
                       ? `/writers/${novel.writer_username}`
                       : "#"
                   }
-                  className="inline-flex items-center gap-2 text-navy hover:text-accent font-semibold transition-colors"
+                  className="inline-flex items-center gap-1.5 text-navy hover:text-accent font-semibold transition-colors"
                 >
-                  <Feather className="w-4 h-4 text-accent" />
+                  <Feather className="w-4 h-4 text-accent shrink-0" />
                   <span>
                     {novel.writer_pen_name_english || novel.writer_username || "Author"}
                   </span>
-                  <UrduText as="span" size="sm" className="text-accent py-0 font-normal">
-                    ({novel.writer_pen_name_urdu})
-                  </UrduText>
+                  {novel.writer_pen_name_urdu && (
+                    <>
+                      <span className="text-border-subtle select-none" aria-hidden="true">·</span>
+                      <span dir="rtl" className="font-urdu text-accent">
+                        {novel.writer_pen_name_urdu}
+                      </span>
+                    </>
+                  )}
                 </Link>
               </div>
 
               {/* Key Specifications Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-2 sm:pt-3 text-left">
-                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 px-3.5 py-2.5 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <BookOpen className="w-3.5 h-3.5 text-accent" />
                     <span>Chapters</span>
                   </div>
-                  <p className="font-bold text-navy mt-1 text-sm">
+                  <p className="font-bold text-navy mt-1 text-sm font-sans tabular-nums">
                     {novel.total_chapters}
                   </p>
                 </div>
 
-                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 px-3.5 py-2.5 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <Globe className="w-3.5 h-3.5 text-accent" />
                     <span>Language</span>
                   </div>
                   <p className="font-bold text-navy mt-1 text-sm">
-                    {novel.language || "Urdu / اردو"}
+                    {formatLanguage(novel.language)}
                   </p>
                 </div>
 
-                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 px-3.5 py-2.5 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <Calendar className="w-3.5 h-3.5 text-accent" />
                     <span>Published</span>
@@ -373,12 +377,12 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                   </p>
                 </div>
 
-                <div className="bg-ivory/40 p-2.5 sm:p-3 rounded-xl border border-border/80">
+                <div className="bg-ivory/40 px-3.5 py-2.5 rounded-xl border border-border/80">
                   <div className="flex items-center gap-1.5 text-xs text-secondary">
                     <FileText className="w-3.5 h-3.5 text-accent" />
                     <span>Free Preview</span>
                   </div>
-                  <p className="font-bold text-success mt-1 text-sm">
+                  <p className="font-bold text-success mt-1 text-sm font-sans tabular-nums">
                     {freeChapters.length} {freeChapters.length === 1 ? "Chapter" : "Chapters"}
                   </p>
                 </div>

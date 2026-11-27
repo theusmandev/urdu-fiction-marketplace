@@ -171,8 +171,12 @@ export function NovelAccessPanel({
     return (
       <div className="flex items-center justify-between gap-3 w-full">
         <div>
-          <div className="text-[10px] text-secondary font-medium">Price / قیمت</div>
-          <div className="font-serif text-lg font-bold text-navy leading-tight">
+          <div className="text-[10px] text-secondary font-medium flex items-center gap-1">
+            <span>Price</span>
+            <span className="text-border-subtle select-none" aria-hidden="true">•</span>
+            <span dir="rtl" className="font-urdu text-[11px]">قیمت</span>
+          </div>
+          <div className="font-sans text-lg font-bold tracking-tight text-navy tabular-nums lining-nums leading-tight">
             {formatPKR(pricePkr)}
           </div>
         </div>
@@ -182,11 +186,11 @@ export function NovelAccessPanel({
               ? `/checkout/${novelSlug}`
               : `/login?next=${encodeURIComponent(`/novels/${novelSlug}`)}`
           }
-          className="flex-1 max-w-[210px] min-h-[44px] flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-light text-accent font-semibold py-2 px-4 rounded-xl shadow-xs text-xs"
+          className="flex-1 max-w-[210px] min-h-[48px] flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-dark text-white font-semibold py-2 px-4 rounded-xl shadow-xs text-xs"
         >
-          <ShoppingBag className="w-3.5 h-3.5 text-accent" />
+          <ShoppingBag className="w-3.5 h-3.5 text-white/90" />
           <span>{signedIn ? 'Buy Now' : 'Sign In to Buy'}</span>
-          <ArrowRight className="w-3.5 h-3.5 text-accent" />
+          <ArrowRight className="w-3.5 h-3.5 text-white/90" />
         </Link>
       </div>
     );
@@ -389,8 +393,12 @@ export function NovelAccessPanel({
   return (
     <div className="w-full max-w-[280px] mx-auto bg-surface p-5 rounded-2xl border border-border shadow-sm space-y-4">
       <div className="flex items-baseline justify-between">
-        <span className="text-xs text-secondary">Price / قیمت:</span>
-        <span className="font-serif text-2xl font-bold text-navy">
+        <div className="text-xs text-secondary font-medium flex items-center gap-1">
+          <span>Price</span>
+          <span className="text-border-subtle select-none" aria-hidden="true">•</span>
+          <span dir="rtl" className="font-urdu text-xs">قیمت</span>
+        </div>
+        <span className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-navy tabular-nums lining-nums">
           {formatPKR(pricePkr)}
         </span>
       </div>
@@ -401,11 +409,11 @@ export function NovelAccessPanel({
             ? `/checkout/${novelSlug}`
             : `/login?next=${encodeURIComponent(`/novels/${novelSlug}`)}`
         }
-        className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
+        className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-dark text-white font-semibold py-3 px-6 rounded-xl shadow-md transition-all text-sm group cursor-pointer"
       >
-        <ShoppingBag className="w-4 h-4 text-accent" />
+        <ShoppingBag className="w-4 h-4 text-white/90" />
         <span>{signedIn ? 'Buy Now' : 'Sign In to Buy'}</span>
-        <ArrowRight className="w-4 h-4 text-accent transition-transform group-hover:translate-x-1" />
+        <ArrowRight className="w-4 h-4 text-white/90 transition-transform group-hover:translate-x-1" />
       </Link>
 
       {freePreviewChapterNumber != null && (

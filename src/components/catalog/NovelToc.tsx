@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import type { PublicNovelChapterMeta } from '@/types/database';
 import { useNovelAccess } from './NovelAccessContext';
@@ -31,6 +32,11 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
   const { state, signedIn, orderNumber, lastReadChapterNumber } = useNovelAccess();
   const [selectedLockedChapter, setSelectedLockedChapter] =
     useState<PublicNovelChapterMeta | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -50,6 +56,16 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
       triggerRef.current?.focus();
     }, 50);
   }, []);
+
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    if (!selectedLockedChapter) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [selectedLockedChapter]);
 
   // Close on Escape key
   useEffect(() => {
@@ -259,130 +275,133 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
       </details>
 
       {/* Accessible Chapter Unlock Sheet / Popover Modal */}
-      {selectedLockedChapter && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
-          onClick={handleCloseModal}
-          role="presentation"
-        >
+      {selectedLockedChapter && mounted &&
+        createPortal(
           <div
-            ref={modalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="locked-chapter-title"
-            aria-describedby="locked-chapter-desc"
-            className="w-full max-w-sm bg-surface rounded-2xl border border-border shadow-2xl p-5 space-y-4 animate-in zoom-in-95 duration-150"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] bg-navy/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150 reader-ui-chrome"
+            onClick={handleCloseModal}
+            role="presentation"
+            data-reader-ui="true"
           >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-2 border-b border-border">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-accent/20 text-accent-strong flex items-center justify-center font-bold text-xs">
-                  {selectedLockedChapter.chapter_number}
+            <div
+              ref={modalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="locked-chapter-title"
+              aria-describedby="locked-chapter-desc"
+              className="w-full max-w-sm bg-surface rounded-2xl border border-border shadow-2xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 relative text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-border/70">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-accent/20 text-accent-strong flex items-center justify-center font-bold text-xs font-sans tabular-nums">
+                    {selectedLockedChapter.chapter_number}
+                  </div>
+                  <h3
+                    id="locked-chapter-title"
+                    className="font-sans text-sm font-bold text-navy truncate"
+                  >
+                    Chapter {selectedLockedChapter.chapter_number} is Locked
+                  </h3>
                 </div>
-                <h3
-                  id="locked-chapter-title"
-                  className="font-serif text-sm font-bold text-navy truncate"
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-secondary hover:text-navy hover:bg-surface-muted cursor-pointer transition-colors"
+                  aria-label="Close dialog"
                 >
-                  Chapter {selectedLockedChapter.chapter_number} is Locked
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-secondary hover:text-navy hover:bg-ivory cursor-pointer"
-                aria-label="Close dialog"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="space-y-3 text-center py-2">
-              <div className="w-12 h-12 rounded-2xl bg-accent/15 text-navy mx-auto flex items-center justify-center border border-border">
-                <Lock className="w-6 h-6 text-accent-strong" />
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="space-y-1">
-                <UrduText
-                  as="p"
-                  size="base"
-                  className="text-navy font-normal leading-[2.2] py-0"
-                >
-                  {selectedLockedChapter.title_urdu}
-                </UrduText>
-                <p id="locked-chapter-desc" className="text-xs text-secondary leading-relaxed">
-                  This chapter unlocks after you buy the novel with direct writer payment.
-                </p>
-                <UrduText as="p" size="xs" className="text-secondary leading-normal py-0 font-normal">
-                  یہ باب ناول خریدنے کے بعد مکمل طور پر دستیاب ہوگا۔
-                </UrduText>
+              {/* Modal Body */}
+              <div className="space-y-4 text-center py-1">
+                <div className="w-12 h-12 rounded-2xl bg-accent/15 text-navy mx-auto flex items-center justify-center border border-border">
+                  <Lock className="w-6 h-6 text-accent-strong" />
+                </div>
+
+                <div className="space-y-2.5 text-center">
+                  <h4
+                    dir="rtl"
+                    lang="ur"
+                    className="text-xl font-urdu leading-relaxed text-navy text-center font-normal"
+                  >
+                    {selectedLockedChapter.title_urdu}
+                  </h4>
+                  <p id="locked-chapter-desc" className="text-xs sm:text-[13px] text-secondary leading-relaxed text-center">
+                    This chapter unlocks after you buy the novel with direct writer payment.
+                  </p>
+                  <p
+                    dir="rtl"
+                    lang="ur"
+                    className="text-base font-urdu leading-loose text-text text-center font-normal"
+                  >
+                    یہ باب ناول خریدنے کے بعد مکمل طور پر دستیاب ہوگا۔
+                  </p>
+                </div>
+
+                {/* State-Adaptive Actions */}
+                {state === 'pending_verification' ? (
+                  <div className="pt-2 space-y-2">
+                    <div className="p-2.5 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs flex items-center gap-2 text-left">
+                      <Clock className="w-4 h-4 text-warning-text shrink-0" />
+                      <span>Your payment is awaiting author verification.</span>
+                    </div>
+                    <Link
+                      href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
+                      className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-3 px-4 rounded-xl text-sm transition-colors shadow-xs"
+                    >
+                      <span>View your order</span>
+                    </Link>
+                  </div>
+                ) : state === 'rejected' || state === 'disputed' ? (
+                  <div className="pt-2 space-y-2">
+                    <div className="p-2.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2 text-left">
+                      <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
+                      <span>
+                        {state === 'rejected'
+                          ? 'Payment proof was rejected.'
+                          : 'Order is under dispute review.'}
+                      </span>
+                    </div>
+                    <Link
+                      href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
+                      className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-3 px-4 rounded-xl text-sm transition-colors shadow-xs"
+                    >
+                      <span>View your order</span>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="pt-2 space-y-3">
+                    {/* Clear Price Presentation in subtle tinted price pill */}
+                    <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-muted/90 border border-border/80 text-xs text-secondary">
+                      <span>Full Novel Price</span>
+                      <span className="text-border-subtle select-none" aria-hidden="true">•</span>
+                      <span className="font-sans font-bold text-navy text-sm tabular-nums lining-nums">
+                        {formatPKR(pricePkr)}
+                      </span>
+                    </div>
+
+                    {/* High-Contrast Primary CTA */}
+                    <Link
+                      href={
+                        signedIn
+                          ? `/checkout/${novelSlug}`
+                          : `/login?next=${encodeURIComponent(`/novels/${novelSlug}`)}`
+                      }
+                      className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-dark text-white font-semibold py-3 px-5 rounded-xl text-base transition-colors shadow-md cursor-pointer"
+                    >
+                      <ShoppingBag className="w-4 h-4 text-white/90" />
+                      <span>{signedIn ? 'Buy Novel Now' : 'Sign In to Buy'}</span>
+                    </Link>
+                  </div>
+                )}
               </div>
-
-              {/* State-Adaptive Actions */}
-              {state === 'pending_verification' ? (
-                <div className="pt-2 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-warning-soft border border-warning-border text-warning-text text-xs flex items-center gap-2 text-left">
-                    <Clock className="w-4 h-4 text-warning-text shrink-0" />
-                    <span>Your payment is awaiting author verification.</span>
-                  </div>
-                  <Link
-                    href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-xs"
-                  >
-                    <span>View your order</span>
-                  </Link>
-                </div>
-              ) : state === 'rejected' || state === 'disputed' ? (
-                <div className="pt-2 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-danger-soft border border-danger-border text-danger-text text-xs flex items-center gap-2 text-left">
-                    <AlertCircle className="w-4 h-4 text-danger-text shrink-0" />
-                    <span>
-                      {state === 'rejected'
-                        ? 'Payment proof was rejected.'
-                        : 'Order is under dispute review.'}
-                    </span>
-                  </div>
-                  <Link
-                    href={orderNumber ? `/orders/${orderNumber}` : '/orders'}
-                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-navy font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-xs"
-                  >
-                    <span>View your order</span>
-                  </Link>
-                </div>
-              ) : (
-                <div className="pt-2 space-y-2">
-                  <div className="text-xs text-secondary">
-                    Full Novel Price: <span className="font-bold text-navy font-serif text-sm">{formatPKR(pricePkr)}</span>
-                  </div>
-                  <Link
-                    href={
-                      signedIn
-                        ? `/checkout/${novelSlug}`
-                        : `/login?next=${encodeURIComponent(`/novels/${novelSlug}`)}`
-                    }
-                    className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-navy hover:bg-navy-light text-accent font-semibold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-sm"
-                  >
-                    <ShoppingBag className="w-4 h-4 text-accent" />
-                    <span>{signedIn ? 'Buy Novel Now' : 'Sign In to Buy'}</span>
-                  </Link>
-                </div>
-              )}
             </div>
-
-            {/* Modal Footer */}
-            <div className="pt-2 border-t border-border flex justify-end">
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold text-secondary hover:text-navy hover:bg-ivory cursor-pointer transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }

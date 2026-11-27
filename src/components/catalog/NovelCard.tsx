@@ -155,7 +155,7 @@ export function NovelCard({ novel, priority = false }: NovelCardProps) {
                 Unavailable
               </span>
             ) : (
-              <span className="font-serif text-xs sm:text-sm font-bold text-primary">
+              <span className="font-sans text-xs sm:text-sm font-bold tracking-tight text-primary tabular-nums lining-nums">
                 {formatPKR(novel.price_pkr)}
               </span>
             )}

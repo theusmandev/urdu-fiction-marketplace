@@ -12,13 +12,12 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Sun,
-  Moon,
-  Coffee,
   BookOpen,
   Sparkles,
-  AlignJustify,
   Lock,
+  Menu,
+  Settings2,
+  X,
 } from "lucide-react";
 
 interface FreePreviewReaderClientProps {
@@ -71,6 +70,12 @@ export function FreePreviewReaderClient({
     }
     return "normal";
   });
+
+  // Reader UI controls state
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tocOpen, setTocOpen] = useState(false);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const settingsCardRef = useRef<HTMLDivElement>(null);
 
   // Live Reading Progress (0 - 100%)
   const [readingProgress, setReadingProgress] = useState(0);
@@ -313,106 +318,184 @@ export function FreePreviewReaderClient({
     >
       {/* Sticky Reader Controls Header */}
       <header
-        className={`sticky top-0 z-40 backdrop-blur-md border-b relative transition-colors ${toolbarThemeClasses} px-4 sm:px-6 py-3`}
+        className={`sticky top-0 z-40 backdrop-blur-md border-b relative transition-colors ${toolbarThemeClasses} px-3 sm:px-6 py-2.5`}
       >
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          {/* Back to Novel */}
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
+          {/* Left: Back Link */}
           <Link
             href={`/novels/${novel.slug}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold hover:opacity-80 transition-opacity"
+            className="inline-flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0"
+            title="Return to Novel Details"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back to Novel Details</span>
-            <span className="sm:hidden">Back</span>
+            <span className="hidden sm:inline">Back to Novel</span>
           </Link>
 
-          {/* Center Chapter Identifier */}
-          <div className="text-center truncate px-2">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-accent block">
-              Free Preview Chapter {chapter.chapter_number}
-            </span>
-            <UrduText
-              as="h2"
-              size="xs"
-              className="font-bold py-0 leading-tight truncate px-1 text-inherit"
+          {/* Center: Chapter Label + Clean Free Preview Pill (Zero mid-word truncation) */}
+          <div className="min-w-0 flex-1 text-center px-1">
+            <div className="flex items-center justify-center gap-1.5">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent/20 text-accent-strong dark:text-accent font-semibold text-[10px] tracking-wide shrink-0 uppercase">
+                Free Preview
+              </span>
+              <span className="text-[11px] font-bold text-text-muted truncate">
+                Ch {chapter.chapter_number}
+              </span>
+            </div>
+            <p
+              dir="rtl"
+              lang="ur"
+              className="font-urdu text-xs font-semibold truncate leading-tight mt-0.5 text-inherit"
             >
               {chapter.title_urdu}
-            </UrduText>
+            </p>
           </div>
 
-          {/* Reader Preferences (Theme & Typography Controls) */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Theme Toggles */}
-            <div className="flex items-center bg-black/5 rounded-lg p-0.5">
-              <button
-                type="button"
-                onClick={() => handleThemeChange("light")}
-                aria-label="Light theme"
-                className={`p-1.5 rounded-md text-xs transition-colors ${
-                  theme === "light" ? "bg-white shadow-sm text-navy" : "opacity-60 hover:opacity-100"
-                }`}
-              >
-                <Sun className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleThemeChange("sepia")}
-                aria-label="Sepia parchment theme"
-                className={`p-1.5 rounded-md text-xs transition-colors ${
-                  theme === "sepia" ? "bg-[#DFD3BE] text-[#3C2A1E] shadow-sm" : "opacity-60 hover:opacity-100"
-                }`}
-              >
-                <Coffee className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleThemeChange("dark")}
-                aria-label="Dark mode"
-                className={`p-1.5 rounded-md text-xs transition-colors ${
-                  theme === "dark" ? "bg-primary text-white shadow-sm" : "opacity-60 hover:opacity-100"
-                }`}
-              >
-                <Moon className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Font Size Adjuster */}
-            <div className="flex items-center bg-black/5 rounded-lg p-0.5 text-xs font-serif font-bold">
-              <button
-                type="button"
-                onClick={() => handleFontSizeChange("base")}
-                className={`px-1.5 py-0.5 rounded ${fontSize === "base" ? "bg-white/90 text-navy" : "opacity-60"}`}
-                title="Default font size"
-              >
-                A
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFontSizeChange("lg")}
-                className={`px-1.5 py-0.5 rounded text-sm ${fontSize === "lg" ? "bg-white/90 text-navy" : "opacity-60"}`}
-                title="Larger font size"
-              >
-                A+
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFontSizeChange("xl")}
-                className={`px-1.5 py-0.5 rounded text-base ${fontSize === "xl" ? "bg-white/90 text-navy" : "opacity-60"}`}
-                title="Extra large font size"
-              >
-                A++
-              </button>
-            </div>
-
-            {/* Line Height Toggle */}
+          {/* Right Controls: Chapters Drawer & Reader Display Settings */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* Chapters / TOC Trigger */}
             <button
               type="button"
-              onClick={handleLineHeightCycle}
-              className="p-1.5 rounded-lg bg-black/5 hover:bg-black/10 transition-colors"
-              title={`Line spacing: ${lineHeight} (click to toggle)`}
+              onClick={() => {
+                setTocOpen((prev) => !prev);
+                setSettingsOpen(false);
+              }}
+              className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex items-center gap-1 text-xs font-semibold cursor-pointer"
+              title="All Chapters"
+              aria-label="Chapters menu"
             >
-              <AlignJustify className="w-3.5 h-3.5" />
+              <Menu className="w-4 h-4" />
+              <span className="hidden sm:inline font-urdu">ابواب</span>
             </button>
+
+            {/* Display Settings Trigger */}
+            <div className="relative">
+              <button
+                ref={settingsButtonRef}
+                type="button"
+                onClick={() => {
+                  setSettingsOpen((prev) => !prev);
+                  setTocOpen(false);
+                }}
+                className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                title="Reader Display Settings"
+                aria-expanded={settingsOpen}
+                aria-haspopup="true"
+                aria-label="Display settings"
+              >
+                <Settings2 className="w-4 h-4" />
+              </button>
+
+              {/* Invisible Full-Screen Backdrop Overlay for outside click dismissal */}
+              {settingsOpen && (
+                <div
+                  className="fixed inset-0 z-40 bg-transparent cursor-default"
+                  aria-hidden="true"
+                  onClick={() => setSettingsOpen(false)}
+                />
+              )}
+
+              {/* Settings Dropdown Popover */}
+              {settingsOpen && (
+                <div
+                  ref={settingsCardRef}
+                  role="dialog"
+                  aria-label="Reader Display Settings"
+                  onClick={(e) => e.stopPropagation()}
+                  data-reader-ui="true"
+                  className={`absolute right-0 top-full mt-2 w-72 rounded-2xl p-4 shadow-2xl border z-50 animate-in fade-in zoom-in-95 duration-150 reader-ui-chrome ${
+                    theme === 'dark'
+                      ? 'bg-stone-900 border-stone-800 text-stone-100'
+                      : theme === 'sepia'
+                      ? 'bg-[#EFE4CB] border-[#D9CAAA] text-[#4A3B2C]'
+                      : 'bg-white border-border text-text'
+                  }`}
+                >
+                  <div className="flex items-center justify-between border-b pb-2 mb-3 border-current/10">
+                    <h4 className="text-xs font-bold uppercase tracking-wider">Reader Settings</h4>
+                    <button
+                      type="button"
+                      onClick={() => setSettingsOpen(false)}
+                      className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
+                      aria-label="Close settings"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Theme Selector */}
+                  <div className="space-y-1.5 mb-3">
+                    <label className="text-[11px] font-semibold opacity-70 block">Theme</label>
+                    <div className="grid grid-cols-3 gap-1.5 text-xs font-medium">
+                      {(['light', 'sepia', 'dark'] as ThemeMode[]).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => handleThemeChange(t)}
+                          className={`py-1.5 rounded-lg border text-center capitalize transition-all cursor-pointer ${
+                            theme === t
+                              ? 'border-accent-strong font-bold ring-2 ring-ring/20'
+                              : 'border-current/15 opacity-70 hover:opacity-100'
+                          } ${
+                            t === 'light'
+                              ? 'bg-[#FAF8F5] text-text'
+                              : t === 'sepia'
+                              ? 'bg-[#F4ECD8] text-[#4A3B2C]'
+                              : 'bg-[#121214] text-stone-100'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Font Size Selector */}
+                  <div className="space-y-1.5 mb-3">
+                    <label className="text-[11px] font-semibold opacity-70 block">Font Size</label>
+                    <div className="grid grid-cols-5 gap-1 text-xs">
+                      {(['sm', 'base', 'lg', 'xl', '2xl'] as FontSize[]).map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => handleFontSizeChange(s)}
+                          className={`py-1 rounded-lg border text-center transition-all cursor-pointer ${
+                            fontSize === s
+                              ? 'border-accent-strong font-bold bg-accent/15'
+                              : 'border-current/15 opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          {s === 'sm' ? 'A-' : s === '2xl' ? 'A+' : s.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Line Height Selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold opacity-70 block">Line Spacing</label>
+                    <div className="grid grid-cols-3 gap-1.5 text-xs">
+                      {(['normal', 'relaxed', 'loose'] as LineHeight[]).map((lh) => (
+                        <button
+                          key={lh}
+                          type="button"
+                          onClick={() => {
+                            setLineHeight(lh);
+                            try { localStorage.setItem("unb_reader_line_height", lh); } catch {}
+                          }}
+                          className={`py-1.5 rounded-lg border text-center capitalize transition-all cursor-pointer ${
+                            lineHeight === lh
+                              ? 'border-accent-strong font-bold bg-accent/15'
+                              : 'border-current/15 opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          {lh}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -511,13 +594,13 @@ export function FreePreviewReaderClient({
         </article>
 
         {/* Chapter Navigation Footer */}
-        <div className="pt-12 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-4">
+        <div data-reader-ui="true" className="pt-12 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-4 reader-ui-chrome">
           {prevChapter ? (
             <Link
               href={`/novels/${novel.slug}/read/${prevChapter.chapter_number}`}
-              className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-xl border border-black/15 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-urdu font-semibold px-4 py-2.5 rounded-xl border border-border bg-surface text-text hover:bg-surface-muted transition-colors min-h-[44px]"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
               <span>پچھلا مفت باب ({prevChapter.chapter_number})</span>
             </Link>
           ) : (
@@ -527,15 +610,15 @@ export function FreePreviewReaderClient({
           {nextChapter ? (
             <Link
               href={`/novels/${novel.slug}/read/${nextChapter.chapter_number}`}
-              className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-xl bg-accent text-navy hover:bg-accent-light transition-colors shadow-sm ml-auto"
+              className="inline-flex items-center gap-2 text-sm font-urdu font-semibold px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-navy transition-colors shadow-sm min-h-[44px] ml-auto"
             >
+              <ChevronLeft className="w-4 h-4" />
               <span>اگلا مفت باب ({nextChapter.chapter_number})</span>
-              <ChevronRight className="w-4 h-4" />
             </Link>
           ) : (
             <Link
               href={`/novels/${novel.slug}`}
-              className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-xl bg-navy text-accent hover:bg-navy-light transition-colors shadow-sm ml-auto"
+              className="inline-flex items-center gap-2 text-sm font-urdu font-semibold px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-dark text-white transition-colors shadow-sm min-h-[44px] ml-auto"
             >
               <BookOpen className="w-4 h-4" />
               <span>مکمل ناول کی تفصیلات</span>
@@ -543,21 +626,46 @@ export function FreePreviewReaderClient({
           )}
         </div>
 
-        {/* End of Preview Purchase Callout */}
-        <div className="w-full max-w-2xl mx-auto mt-10 p-6 sm:p-8 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center space-y-4">
-          <UrduText as="h3" size="xl" className="py-0 text-inherit">
+        {/* End of Preview Purchase Callout (Upsell Card) */}
+        <div
+          data-reader-ui="true"
+          className="w-full max-w-2xl mx-auto mt-10 p-6 sm:p-8 rounded-2xl bg-surface/85 backdrop-blur-xs border border-border/80 text-center space-y-4 shadow-sm reader-ui-chrome"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-accent/15 text-accent-strong flex items-center justify-center mx-auto">
+            <Lock className="w-6 h-6" />
+          </div>
+
+          <h3 className="text-xl sm:text-2xl font-urdu leading-relaxed text-center text-text py-0">
             کیا آپ مزید پڑھنا چاہتے ہیں؟
-          </UrduText>
-          <p className="text-xs max-w-md mx-auto leading-relaxed opacity-80" dir="rtl">
-            باقی کہانی پڑھنے اور تمام ابواب اَن لاک (unlock) کرنے کے لیے مصنف کو براہِ راست ادائیگی کریں۔ (Bank Transfer, JazzCash, EasyPaisa)
+          </h3>
+
+          <p className="text-base sm:text-lg font-urdu leading-loose text-center text-text max-w-lg mx-auto" dir="rtl">
+            باقی کہانی پڑھنے اور تمام ابواب کھولنے کے لیے مصنف کو براہِ راست ادائیگی کریں۔
           </p>
+
+          {/* Payment Methods */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <span className="px-2.5 py-1 rounded-lg bg-surface-muted border border-border/60 text-xs font-medium text-text-muted">
+              JazzCash
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-muted border border-border/60 text-xs font-medium text-text-muted">
+              EasyPaisa
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-muted border border-border/60 text-xs font-medium text-text-muted">
+              Raast
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-muted border border-border/60 text-xs font-medium text-text-muted">
+              Bank Transfer
+            </span>
+          </div>
+
           <div className="pt-2">
             <Link
               href={`/novels/${novel.slug}`}
-              className="inline-flex items-center gap-2 bg-navy text-accent font-semibold px-6 py-3 rounded-xl text-xs hover:bg-navy-light shadow-md transition-colors"
+              className="inline-flex items-center justify-center gap-2.5 bg-navy hover:bg-navy-dark text-white font-semibold px-6 py-3 rounded-xl text-base font-urdu min-h-[48px] shadow-md transition-colors cursor-pointer"
             >
+              <ArrowLeft className="w-4 h-4 text-white" />
               <span>خریداری اور ادائیگی کی تفصیلات</span>
-              <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -569,6 +677,77 @@ export function FreePreviewReaderClient({
           </div>
         )}
       </main>
+
+      {/* Table of Contents Drawer */}
+      {tocOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200"
+          onClick={() => setTocOpen(false)}
+          role="presentation"
+        >
+          <div
+            className={`w-full max-w-xs h-full p-5 overflow-y-auto space-y-4 shadow-2xl transition-colors ${
+              theme === 'dark'
+                ? 'bg-stone-900 text-stone-100 border-l border-stone-800'
+                : theme === 'sepia'
+                ? 'bg-[#EFE4CB] text-[#4A3B2C] border-l border-[#D9CAAA]'
+                : 'bg-white text-text border-l border-border'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+            data-reader-ui="true"
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-current/15">
+              <h3 className="font-bold text-sm">Table of Contents</h3>
+              <button
+                type="button"
+                onClick={() => setTocOpen(false)}
+                className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-1.5">
+              {allChapters.map((ch) => {
+                const isCurrent = ch.chapter_number === chapter.chapter_number;
+                return (
+                  <Link
+                    key={ch.id}
+                    href={
+                      ch.is_free_preview
+                        ? `/novels/${novel.slug}/read/${ch.chapter_number}`
+                        : `/novels/${novel.slug}`
+                    }
+                    onClick={() => setTocOpen(false)}
+                    className={`flex items-center justify-between p-2.5 rounded-xl text-xs transition-colors ${
+                      isCurrent
+                        ? 'bg-accent/20 font-bold border border-accent/40'
+                        : 'hover:bg-black/5 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-6 h-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center font-bold text-[11px] shrink-0 font-sans tabular-nums">
+                        {ch.chapter_number}
+                      </span>
+                      <span dir="rtl" className="font-urdu truncate text-inherit">
+                        {ch.title_urdu}
+                      </span>
+                    </div>
+                    {ch.is_free_preview ? (
+                      <span className="text-[10px] uppercase font-semibold text-accent-strong shrink-0 ml-2">
+                        Free
+                      </span>
+                    ) : (
+                      <Lock className="w-3.5 h-3.5 opacity-40 shrink-0 ml-2" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

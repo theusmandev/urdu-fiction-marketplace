@@ -20,6 +20,17 @@ export function formatPKR(amount: number): string {
 }
 
 /**
+ * Format language code to human-readable label
+ */
+export function formatLanguage(code?: string | null): string {
+  if (!code) return "Urdu · اردو";
+  const normalized = code.trim().toLowerCase();
+  if (!normalized || normalized === "ur" || normalized === "urdu") return "Urdu · اردو";
+  if (normalized === "en" || normalized === "english") return "English";
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+/**
  * Resolves a novel cover URL from either a full URL or a storage path.
  */
 export function resolveCoverUrl(url: string | null | undefined): string | null {
