@@ -400,7 +400,7 @@ export default async function HomePage() {
                     <p
                       dir="rtl"
                       lang="ur"
-                      className="font-urdu text-xs text-text-muted pt-0.5 leading-relaxed text-left md:text-center"
+                      className="font-urdu text-sm text-text-muted mt-2 pt-0.5 leading-relaxed text-left md:text-center"
                     >
                       {step.urduLabel}
                     </p>
