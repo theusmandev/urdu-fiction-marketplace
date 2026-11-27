@@ -318,7 +318,7 @@ export function FreePreviewReaderClient({
     >
       {/* Sticky Reader Controls Header */}
       <header
-        className={`sticky top-0 z-40 backdrop-blur-md border-b relative transition-colors ${toolbarThemeClasses} px-3 sm:px-6 py-2.5`}
+        className={`sticky top-0 z-40 backdrop-blur-md border-b relative transition-colors ${toolbarThemeClasses} px-3 sm:px-6 py-2 sm:py-2.5`}
       >
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
           {/* Left: Back Link */}
@@ -332,7 +332,7 @@ export function FreePreviewReaderClient({
           </Link>
 
           {/* Center: Chapter Label + Clean Free Preview Pill (Zero mid-word truncation) */}
-          <div className="min-w-0 flex-1 text-center px-1">
+          <div className="min-w-0 flex-1 text-center px-1 py-1 sm:py-0.5">
             <div className="flex items-center justify-center gap-1.5">
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent/20 text-accent-strong dark:text-accent font-semibold text-[10px] tracking-wide shrink-0 uppercase">
                 Free Preview
@@ -344,7 +344,7 @@ export function FreePreviewReaderClient({
             <p
               dir="rtl"
               lang="ur"
-              className="font-urdu text-xs font-semibold truncate leading-tight mt-0.5 text-inherit"
+              className="font-urdu text-xs font-semibold truncate leading-snug mt-1 pb-1 sm:pb-0.5 text-inherit"
             >
               {chapter.title_urdu}
             </p>
@@ -598,9 +598,9 @@ export function FreePreviewReaderClient({
           {prevChapter ? (
             <Link
               href={`/novels/${novel.slug}/read/${prevChapter.chapter_number}`}
-              className="inline-flex items-center gap-2 text-sm font-urdu font-semibold px-4 py-2.5 rounded-xl border border-border bg-surface text-text hover:bg-surface-muted transition-colors min-h-[44px]"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full border border-border bg-surface text-text hover:bg-surface-muted transition-colors text-xs sm:text-sm font-urdu leading-normal min-h-[40px] cursor-pointer"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
               <span>پچھلا مفت باب ({prevChapter.chapter_number})</span>
             </Link>
           ) : (
@@ -610,17 +610,17 @@ export function FreePreviewReaderClient({
           {nextChapter ? (
             <Link
               href={`/novels/${novel.slug}/read/${nextChapter.chapter_number}`}
-              className="inline-flex items-center gap-2 text-sm font-urdu font-semibold px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-navy transition-colors shadow-sm min-h-[44px] ml-auto"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-accent hover:bg-accent-hover text-navy transition-colors shadow-xs text-xs sm:text-sm font-urdu font-semibold leading-normal min-h-[40px] ml-auto cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
               <span>اگلا مفت باب ({nextChapter.chapter_number})</span>
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             </Link>
           ) : (
             <Link
               href={`/novels/${novel.slug}`}
-              className="inline-flex items-center gap-2 text-sm font-urdu font-semibold px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-dark text-white transition-colors shadow-sm min-h-[44px] ml-auto"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-navy hover:bg-navy-dark text-white transition-colors shadow-xs text-xs sm:text-sm font-urdu font-semibold leading-normal min-h-[40px] ml-auto cursor-pointer"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
               <span>مکمل ناول کی تفصیلات</span>
             </Link>
           )}
@@ -662,7 +662,7 @@ export function FreePreviewReaderClient({
           <div className="pt-2">
             <Link
               href={`/novels/${novel.slug}`}
-              className="inline-flex items-center justify-center gap-2.5 bg-navy hover:bg-navy-dark text-white font-semibold px-6 py-3 rounded-xl text-base font-urdu min-h-[48px] shadow-md transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 bg-navy hover:bg-navy-dark text-white font-semibold px-5 py-2.5 rounded-xl text-sm sm:text-base font-urdu min-h-[44px] leading-normal shadow-md transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 text-white" />
               <span>خریداری اور ادائیگی کی تفصیلات</span>

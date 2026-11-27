@@ -169,17 +169,27 @@ describe('Novel UI/UX Polish: Language Formatter, Price Numerals, Locked Modal &
       assert.ok(content.includes('EasyPaisa'));
       assert.ok(content.includes('Raast'));
       assert.ok(content.includes('Bank Transfer'));
-      // High contrast CTA
-      assert.ok(content.includes('bg-navy hover:bg-navy-dark text-white font-semibold px-6 py-3 rounded-xl text-base font-urdu min-h-[48px]'));
+      // High contrast CTA with sleek vertical rhythm
+      assert.ok(content.includes('bg-navy hover:bg-navy-dark text-white font-semibold px-5 py-2.5 rounded-xl text-sm sm:text-base font-urdu min-h-[44px] leading-normal'));
     });
 
-    it('uses proper RTL directional icon (ChevronLeft) for next chapter button', () => {
+    it('matches paid reader sleek navigation pills with outward chevrons', () => {
       const filePath = path.resolve(REPO_ROOT, 'src/components/catalog/FreePreviewReaderClient.tsx');
       const content = fs.readFileSync(filePath, 'utf8');
 
-      // In RTL, "Next" (اگلا مفت باب) points leftwards (<)
-      assert.ok(content.includes('<ChevronLeft className="w-4 h-4" />'));
+      // Rounded-full sleek pill buttons with min-h-[40px]
+      assert.ok(content.includes('rounded-full'));
+      assert.ok(content.includes('min-h-[40px]'));
+      assert.ok(content.includes('leading-normal'));
+
+      // Outward chevron alignment matching paid reader:
+      // Left button (پچھلا مفت باب) has ChevronLeft on the outer left
+      assert.ok(content.includes('<ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />'));
+      assert.ok(content.includes('<span>پچھلا مفت باب ({prevChapter.chapter_number})</span>'));
+
+      // Right button (اگلا مفت باب) has ChevronRight on the outer right
       assert.ok(content.includes('<span>اگلا مفت باب ({nextChapter.chapter_number})</span>'));
+      assert.ok(content.includes('<ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />'));
     });
   });
 });
