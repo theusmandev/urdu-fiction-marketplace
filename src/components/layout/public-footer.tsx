@@ -45,14 +45,14 @@ export async function PublicFooter() {
     }));
 
   return (
-    <footer className="mt-auto bg-surface-muted text-text-muted border-t border-border pt-12 sm:pt-16 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
+    <footer className="mt-auto bg-surface-muted text-text-muted border-t border-border pt-10 sm:pt-14 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main Footer Navigation: 2-col on phones, 3-col on tablets, 5-col on desktop */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 pb-12 border-b border-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 pb-10 sm:pb-12 border-b border-border">
           
           {/* Brand Info & Mission Statement (full width on phones/tablets, 2 cols on desktop) */}
-          <div className="col-span-2 sm:col-span-3 lg:col-span-2 space-y-4">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-2 space-y-3.5 text-left">
             <div>
               <Link href="/" aria-label={`${siteConfig.brandName} — home`} className="inline-block group hover:opacity-95 transition-opacity rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface">
                 <BrandLogo variant="full" size={88} />
@@ -63,19 +63,19 @@ export async function PublicFooter() {
               {siteConfig.description}
             </p>
 
-            <UrduText size="sm" className="text-text-muted max-w-md py-1 font-normal">
+            <UrduText size="sm" className="text-text-muted text-left max-w-md py-0.5 font-normal">
               معیاری اور نایاب اردو ناولز کا مستند مرکز، جہاں قارئین براہ راست اپنے پسندیدہ مصنّفین کی سرپرستی کرتے ہیں۔
             </UrduText>
 
             {/* Direct Payment Trust Banner */}
-            <div className="pt-2 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-text-muted">Direct Pay via:</span>
+            <div className="pt-1 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-semibold text-text-muted mr-0.5 whitespace-nowrap">Direct Pay via:</span>
               {siteConfig.supportedPaymentMethods.map((method) => (
                 <span
                   key={method.id}
-                  className="inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded bg-surface text-text border border-border"
+                  className="inline-flex items-center text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-surface text-text border border-border whitespace-nowrap"
                 >
-                  {method.name}
+                  {method.shortName || method.name}
                 </span>
               ))}
             </div>
@@ -86,7 +86,7 @@ export async function PublicFooter() {
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-strong font-sans">
               For Readers
             </p>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1.5 sm:space-y-2 text-sm">
               {siteConfig.navigation.footer.readers.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -94,7 +94,7 @@ export async function PublicFooter() {
                     className="hover:text-text transition-colors flex items-center gap-1 group py-1"
                   >
                     <span>{item.title}</span>
-                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent-strong" />
+                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent-strong shrink-0" />
                   </Link>
                 </li>
               ))}
@@ -106,7 +106,7 @@ export async function PublicFooter() {
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-strong font-sans">
               For Writers
             </p>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1.5 sm:space-y-2 text-sm">
               {siteConfig.navigation.footer.writers.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -114,19 +114,19 @@ export async function PublicFooter() {
                     className="hover:text-text transition-colors flex items-center gap-1 group py-1"
                   >
                     <span>{item.title}</span>
-                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent-strong" />
+                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent-strong shrink-0" />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column: Platform & Legal */}
+          {/* Column: Trust & Policies */}
           <div className="col-span-2 sm:col-span-1 lg:col-span-1 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-strong font-sans">
-              Trust & Policies
+              Trust &amp; Policies
             </p>
-            <ul className="space-y-2 text-sm">
+            <ul className="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-1.5 sm:gap-y-2 text-sm">
               {siteConfig.navigation.footer.legal.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -134,7 +134,7 @@ export async function PublicFooter() {
                     className="hover:text-text transition-colors flex items-center gap-1 group py-1"
                   >
                     <span>{item.title}</span>
-                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent-strong" />
+                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent-strong shrink-0" />
                   </Link>
                 </li>
               ))}
@@ -145,7 +145,7 @@ export async function PublicFooter() {
 
         {/* Social Media Links Bar */}
         {socialItems.length > 0 && (
-          <div className="py-6 border-b border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="py-5 sm:py-6 border-b border-border flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
             <span className="text-xs font-semibold uppercase tracking-wider text-accent-strong font-sans">
               Connect With Us
             </span>
@@ -172,11 +172,11 @@ export async function PublicFooter() {
         </div>
 
         {/* Bottom Bar: Copyright & Direct Payment Protection Notice */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-text-muted">
-          <div className="flex items-center gap-2 text-center md:text-left">
+        <div className="pt-6 sm:pt-8 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-xs text-text-muted">
+          <div className="inline-flex items-center justify-center gap-1.5 text-center md:text-left">
             <ShieldCheck className="w-4 h-4 text-accent-strong shrink-0" />
             <span>
-              All transactions are direct-to-author with writer receipt verification.
+              Direct-to-author payments with writer receipt verification.
             </span>
           </div>
 

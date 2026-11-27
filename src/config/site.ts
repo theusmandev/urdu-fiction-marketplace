@@ -19,6 +19,7 @@ export interface NavItem {
 export interface PaymentMethodMeta {
   id: "jazzcash" | "easypaisa" | "bank" | "raast" | "nayapay" | "sadapay";
   name: string;
+  shortName?: string;
   nameUrdu: string;
   type: "mobile_wallet" | "direct_bank" | "instant_payment";
   color: string;
@@ -129,24 +130,24 @@ export const siteConfig: SiteConfig = {
       ],
       writers: [
         { title: "Sell Your Novels", href: "/become-a-writer" },
-        { title: "Writer Platform Agreement", href: "/writer-agreement" },
-        { title: "Writer Guidelines & Integrity", href: "/content-policy" },
-        { title: "Platform Fee & Payout Policy", href: "/terms" },
         { title: "Writer Studio", href: "/writer" },
+        { title: "Featured Authors", href: "/writers" },
+        { title: "How Direct Payments Work", href: "/how-it-works" },
       ],
       readers: [
-        { title: "Explore All Urdu Novels", href: "/novels" },
-        { title: "How to Submit Transaction TID", href: "/how-to-pay" },
-        { title: "How Direct Payment Works", href: "/how-it-works" },
-        { title: "Reader FAQ & Support", href: "/faq" },
-        { title: "Reader Library Access", href: "/library" },
+        { title: "Explore Urdu Novels", href: "/novels" },
+        { title: "Browse by Genre", href: "/genres" },
+        { title: "Submit Payment TID", href: "/how-to-pay" },
+        { title: "Reader FAQ", href: "/faq" },
+        { title: "My Library", href: "/library" },
       ],
       legal: [
         { title: "Writer Platform Agreement", href: "/writer-agreement" },
-        { title: "Refund & Dispute Policy", href: "/refund-policy" },
+        { title: "Content & Copyright", href: "/content-policy" },
         { title: "Terms of Service", href: "/terms" },
+        { title: "Refund & Disputes", href: "/refund-policy" },
         { title: "Privacy Policy", href: "/privacy" },
-        { title: "Content & Copyright Policy", href: "/content-policy" },
+        { title: "Contact & Support", href: "/contact" },
       ],
     },
   },
@@ -171,6 +172,7 @@ export const siteConfig: SiteConfig = {
     {
       id: "raast",
       name: "Raast (State Bank of Pakistan)",
+      shortName: "Raast",
       nameUrdu: "راست آئی ڈی",
       type: "instant_payment",
       color: "#1E3A8A",
@@ -179,6 +181,7 @@ export const siteConfig: SiteConfig = {
     {
       id: "bank",
       name: "Direct Bank Transfer",
+      shortName: "Bank Transfer",
       nameUrdu: "براہ راست بینک ٹرانسفر",
       type: "direct_bank",
       color: "#17243A",
