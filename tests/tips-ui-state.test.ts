@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   shouldShowTipCard,
   getTipStatusMeta,
@@ -335,5 +337,46 @@ test('Tip Jar UI State & Visibility Helpers', async (t) => {
     };
     assert.equal(expandedNoteState.isNoteExpanded, true);
     assert.ok(expandedNoteState.readerMessage.length <= 300);
+  });
+
+  await t.test('HowTipsWorkModal portals to body with high z-index and bottom-sheet mobile UX', () => {
+    const modalPath = path.resolve(process.cwd(), 'src/components/tips/HowTipsWorkModal.tsx');
+    const content = fs.readFileSync(modalPath, 'utf8');
+
+    // Portaled outside reader container to break free of sticky header stacking context
+    assert.ok(content.includes('createPortal('));
+    assert.ok(content.includes('document.body'));
+
+    // High z-index well above reader sticky header (z-40) and drawers (z-50)
+    assert.ok(content.includes('z-[100]'));
+
+    // Reader UI isolation attribute
+    assert.ok(content.includes('data-reader-ui="true"'));
+
+    // Responsive bottom sheet on mobile (< sm) and centered dialog on sm+
+    assert.ok(content.includes('items-end sm:items-center'));
+    assert.ok(content.includes('rounded-t-2xl sm:rounded-2xl'));
+    assert.ok(content.includes('max-h-[85dvh] sm:max-h-[90vh]'));
+
+    // Non-scrolling sticky header, independently scrollable body, and action footer
+    assert.ok(content.includes('overflow-y-auto flex-1 min-h-0'));
+    assert.ok(content.includes('I understand'));
+
+    // Locks body scroll while modal is active
+    assert.ok(content.includes("document.body.style.overflow = 'hidden'"));
+  });
+
+  await t.test('TipCard header subtitle and anonymous checkbox meet mobile polish standards', () => {
+    const cardPath = path.resolve(process.cwd(), 'src/components/tips/TipCard.tsx');
+    const content = fs.readFileSync(cardPath, 'utf8');
+
+    // Header subtitle does not truncate with ellipsis
+    assert.ok(content.includes('Support the author directly'));
+    assert.ok(!content.includes('Direct appreciation gift • 100% direct to author'));
+
+    // High-contrast custom checkbox border
+    assert.ok(content.includes('border-2'));
+    assert.ok(content.includes('border-text-muted/70'));
+    assert.ok(content.includes('border-accent-strong bg-accent-strong'));
   });
 });

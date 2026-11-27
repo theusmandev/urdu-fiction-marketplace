@@ -588,7 +588,28 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
       );
 
       // Reverts font-size and line-height on UI chrome paragraphs
-      assert.ok(content.includes('font-size: revert;'));
+      assert.ok(content.includes('font-size: revert !important;'));
+    });
+
+    it('globals.css excludes [data-reader-ui="true"] from Noori prose font and optical scaling', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      // Verifies prose paragraphs and headings do not match inside reader UI chrome
+      assert.ok(
+        content.includes('[data-reader-font="noori"] p:not([data-reader-ui="true"]):not([data-reader-ui="true"] *)')
+      );
+      assert.ok(
+        content.includes('[data-reader-font="noori"] .font-urdu:not([data-reader-ui="true"]):not([data-reader-ui="true"] *)')
+      );
+      assert.ok(
+        content.includes('[data-reader-font="noori"] h1:not([data-reader-ui="true"]):not([data-reader-ui="true"] *)')
+      );
+
+      // Verifies high-specificity overrides on [data-reader-font] [data-reader-ui="true"]
+      assert.ok(content.includes('[data-reader-font] [data-reader-ui="true"]'));
+      assert.ok(content.includes('[data-reader-font="noori"] [data-reader-ui="true"] p'));
+      assert.ok(content.includes('line-height: normal !important;'));
     });
   });
 });

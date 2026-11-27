@@ -264,20 +264,20 @@ textarea.font-urdu::placeholder {
 }
 
 [data-reader-font="noori"] .reader-canvas,
-[data-reader-font="noori"] .font-urdu,
-[data-reader-font="noori"] p,
-[data-reader-font="noori"] h1,
-[data-reader-font="noori"] h2,
-[data-reader-font="noori"] h3 {
+[data-reader-font="noori"] .font-urdu:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *),
+[data-reader-font="noori"] p:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *),
+[data-reader-font="noori"] h1:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *),
+[data-reader-font="noori"] h2:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *),
+[data-reader-font="noori"] h3:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *) {
   font-family: var(--reader-font-family);
   text-rendering: optimizeLegibility;
 }
 
 /* Reader Prose Paragraph Optical Font Sizing & Crisp Rendering */
 [data-reader-font="noori"] .reader-canvas p,
-[data-reader-font="noori"] .font-urdu p,
+[data-reader-font="noori"] .font-urdu:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *) p,
 .reader-canvas[data-reader-font="noori"] p,
-.font-urdu[data-reader-font="noori"] p {
+.font-urdu[data-reader-font="noori"]:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *) p {
   font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.26));
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -285,11 +285,11 @@ textarea.font-urdu::placeholder {
 }
 
 /* Reader Chapter Heading Optical Scaling */
-[data-reader-font="noori"] h1 {
+[data-reader-font="noori"] h1:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *) {
   font-size: calc(1.5rem * var(--reader-heading-scale, 1.20));
 }
 
-[data-reader-font="noori"] h1.text-3xl {
+[data-reader-font="noori"] h1.text-3xl:not([data-reader-ui="true"]):not([data-reader-ui="true"] *):not(.reader-ui-chrome):not(.reader-ui-chrome *) {
   font-size: calc(1.875rem * var(--reader-heading-scale, 1.20));
 }
 
@@ -348,44 +348,89 @@ textarea.font-urdu::placeholder {
    ========================================================================== */
 [data-reader-ui="true"],
 .reader-ui-chrome,
+[data-reader-font] [data-reader-ui="true"],
+[data-reader-font] .reader-ui-chrome,
 [data-reader-font="noori"] [data-reader-ui="true"],
 [data-reader-font="noori"] .reader-ui-chrome {
   --reader-font-scale: 1 !important;
   --reader-heading-scale: 1 !important;
   --reader-font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif !important;
+}
+
+[data-reader-ui="true"] *,
+.reader-ui-chrome *,
+[data-reader-font] [data-reader-ui="true"] *,
+[data-reader-font] .reader-ui-chrome *,
+[data-reader-font="noori"] [data-reader-ui="true"] *,
+[data-reader-font="noori"] .reader-ui-chrome * {
+  --reader-font-scale: 1 !important;
+  --reader-heading-scale: 1 !important;
 }
 
 [data-reader-ui="true"] .font-urdu,
 .reader-ui-chrome .font-urdu,
 [data-reader-ui="true"] [lang="ur"],
 .reader-ui-chrome [lang="ur"],
+[data-reader-font] [data-reader-ui="true"] .font-urdu,
+[data-reader-font] .reader-ui-chrome .font-urdu,
+[data-reader-font] [data-reader-ui="true"] [lang="ur"],
+[data-reader-font] .reader-ui-chrome [lang="ur"],
 [data-reader-font="noori"] [data-reader-ui="true"] .font-urdu,
 [data-reader-font="noori"] .reader-ui-chrome .font-urdu,
 [data-reader-font="noori"] [data-reader-ui="true"] [lang="ur"],
-[data-reader-font="noori"] .reader-ui-chrome [lang="ur"] {
+[data-reader-font="noori"] .reader-ui-chrome [lang="ur"],
+[data-reader-font="noori"] [data-reader-ui="true"] span.font-urdu,
+[data-reader-font="noori"] .reader-ui-chrome span.font-urdu,
+[data-reader-font="noori"] [data-reader-ui="true"] button .font-urdu,
+[data-reader-font="noori"] .reader-ui-chrome button .font-urdu {
   font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;
   font-size: 1em !important;
   font-synthesis: none !important;
-  line-height: normal;
+  line-height: normal !important;
 }
 
 [data-reader-font="noori"] [data-reader-ui="true"] p,
 [data-reader-font="noori"] .reader-ui-chrome p,
 [data-reader-ui="true"] p,
-.reader-ui-chrome p {
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: revert;
-  line-height: normal;
+.reader-ui-chrome p,
+[data-reader-font] [data-reader-ui="true"] p,
+[data-reader-font] .reader-ui-chrome p {
+  font-family: var(--font-sans), system-ui, sans-serif !important;
+  font-size: revert !important;
+  line-height: normal !important;
   margin-bottom: 0;
 }
 
 [data-reader-font="noori"] [data-reader-ui="true"] p.font-urdu,
 [data-reader-font="noori"] .reader-ui-chrome p.font-urdu,
 [data-reader-font="noori"] [data-reader-ui="true"] p[lang="ur"],
-[data-reader-font="noori"] .reader-ui-chrome p[lang="ur"] {
+[data-reader-font="noori"] .reader-ui-chrome p[lang="ur"],
+[data-reader-font] [data-reader-ui="true"] p.font-urdu,
+[data-reader-font] .reader-ui-chrome p.font-urdu {
   font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;
   font-size: 1em !important;
+  line-height: normal !important;
+}
+
+[data-reader-ui="true"] h1,
+[data-reader-ui="true"] h2,
+[data-reader-ui="true"] h3,
+.reader-ui-chrome h1,
+.reader-ui-chrome h2,
+.reader-ui-chrome h3,
+[data-reader-font] [data-reader-ui="true"] h1,
+[data-reader-font] [data-reader-ui="true"] h2,
+[data-reader-font] [data-reader-ui="true"] h3,
+[data-reader-font="noori"] [data-reader-ui="true"] h1,
+[data-reader-font="noori"] [data-reader-ui="true"] h2,
+[data-reader-font="noori"] [data-reader-ui="true"] h3,
+[data-reader-font="noori"] .reader-ui-chrome h1,
+[data-reader-font="noori"] .reader-ui-chrome h2,
+[data-reader-font="noori"] .reader-ui-chrome h3 {
+  font-family: var(--font-sans), system-ui, sans-serif !important;
+  font-size: revert !important;
+  line-height: normal !important;
 }
 
 /* Warm Reader Theme Surface Harmony */

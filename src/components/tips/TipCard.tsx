@@ -498,8 +498,8 @@ export function TipCard({
                   مصنف کو شکریہ کہیں
                 </span>
               </div>
-              <p className="text-[11px] text-text-muted truncate">
-                Direct appreciation gift • 100% direct to author
+              <p className="text-[11px] sm:text-xs text-text-muted leading-tight mt-0.5">
+                Support the author directly
               </p>
             </div>
           </div>
@@ -735,15 +735,15 @@ export function TipCard({
                   className="sr-only"
                 />
                 <span
-                  className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                  className={`w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
                     isAnonymous
                       ? 'border-accent-strong bg-accent-strong text-white'
-                      : 'border-border bg-surface'
+                      : 'border-text-muted/70 hover:border-accent-strong bg-surface'
                   }`}
                 >
                   {isAnonymous && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                 </span>
-                <span>{TIP_CARD_COPY.anonymousOption}</span>
+                <span className="font-medium">{TIP_CARD_COPY.anonymousOption}</span>
               </label>
             </div>
 
