@@ -192,4 +192,78 @@ describe('Novel UI/UX Polish: Language Formatter, Price Numerals, Locked Modal &
       assert.ok(content.includes('<ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />'));
     });
   });
+
+  describe('6. Synopsis Card, Direct Payment Trust Strip, and TOC Layout Polish', () => {
+    it('NovelToc uses font-sans lining-nums for chapter numbers and single-line badge', () => {
+      const filePath = path.resolve(REPO_ROOT, 'src/components/catalog/NovelToc.tsx');
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Chapter count badge is single-line with tabular numbers
+      assert.ok(content.includes('whitespace-nowrap shrink-0 font-sans tabular-nums'));
+
+      // Header isolates Urdu phrase with whitespace-nowrap and dir="rtl"
+      assert.ok(content.includes('whitespace-nowrap'));
+      assert.ok(content.includes('ابواب کی فہرست'));
+      assert.ok(content.includes('dir="rtl"'));
+
+      // Chapter rows use crisp sans lining-nums instead of display serif
+      assert.ok(content.includes('font-sans font-semibold text-xs tabular-nums lining-nums shrink-0'));
+
+      // Preview badge uses BookOpen and single-line pill styling
+      assert.ok(content.includes('<BookOpen className="w-3.5 h-3.5 text-success shrink-0" />'));
+      assert.ok(content.includes('whitespace-nowrap shrink-0'));
+    });
+
+    it('ExpandableSynopsis integrates header and tightens collapsed height with clear pill toggle', () => {
+      const filePath = path.resolve(REPO_ROOT, 'src/components/catalog/ExpandableSynopsis.tsx');
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Integrated header with natural Urdu
+      assert.ok(content.includes('Synopsis'));
+      assert.ok(content.includes('ناول کا خلاصہ'));
+      assert.ok(content.includes('dir="rtl"'));
+
+      // Tightened collapsed height
+      assert.ok(content.includes('max-h-24 overflow-hidden'));
+
+      // Clear interactive pill affordance with bidi middle-dot separation
+      assert.ok(content.includes('bg-accent/10 hover:bg-accent/20 text-accent-strong text-xs font-semibold'));
+      assert.ok(content.includes('Read more'));
+      assert.ok(content.includes('مزید پڑھیں'));
+      assert.ok(content.includes('Show less'));
+      assert.ok(content.includes('کم پڑھیں'));
+    });
+
+    it('NovelPaymentGuarantee renders as a warm trust strip with compliant bilingual reassurance', () => {
+      const filePath = path.resolve(REPO_ROOT, 'src/components/catalog/NovelPaymentGuarantee.tsx');
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Warm trust strip styling
+      assert.ok(content.includes('bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl'));
+
+      // Tightened English copy without dangling orphan word
+      assert.ok(content.includes('Pay the author directly via JazzCash, EasyPaisa, or Raast — zero platform fee.'));
+
+      // Concise 1-line Urdu reassurance
+      assert.ok(content.includes('ادائیگی براہِ راست مصنف کو — کوئی پلیٹ فارم فیس نہیں۔'));
+      assert.ok(content.includes('font-urdu text-xs text-navy/90 leading-normal pt-0.5'));
+
+      // Zero forbidden terminology
+      assert.ok(!content.includes('commission'));
+      assert.ok(!content.includes('کمیشن'));
+    });
+
+    it('page.tsx wraps Synopsis, Trust Strip, and TOC in space-y-4 for tighter mobile vertical rhythm', () => {
+      const filePath = path.resolve(REPO_ROOT, 'src/app/(marketplace)/novels/[slug]/page.tsx');
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Space-y-4 container for Synopsis, Trust Strip, and TOC
+      assert.ok(content.includes('<div className="space-y-4">'));
+      assert.ok(content.includes('<ExpandableSynopsis synopsis={novel.synopsis_urdu} />'));
+      assert.ok(content.includes('<NovelPaymentGuarantee compact />'));
+      assert.ok(content.includes('<NovelToc'));
+      // No outdated loose header
+      assert.ok(!content.includes('Synopsis / خلاصہِ ناول'));
+    });
+  });
 });

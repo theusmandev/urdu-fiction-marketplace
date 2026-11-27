@@ -11,7 +11,6 @@ import { formatPKR } from '@/lib/utils';
 import {
   BookOpen,
   Lock,
-  Sparkles,
   ChevronDown,
   ChevronRight,
   Check,
@@ -97,16 +96,24 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
         className="group bg-surface rounded-2xl border border-border overflow-hidden"
         open
       >
-        <summary className="p-4 sm:p-5 flex items-center justify-between cursor-pointer list-none select-none hover:bg-ivory/40 transition-colors min-h-[44px]">
-          <div className="flex items-center gap-2">
-            <h2 className="font-serif text-lg sm:text-xl font-bold text-navy">
-              Table of Contents / ابواب کی فہرست
+        <summary className="p-4 sm:p-5 flex items-center justify-between gap-3 cursor-pointer list-none select-none hover:bg-ivory/40 transition-colors min-h-[44px]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <h2 className="text-base sm:text-lg font-bold text-navy flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              <span className="font-serif text-base sm:text-lg whitespace-nowrap">Table of Contents</span>
+              <span className="text-secondary/40 hidden sm:inline select-none" aria-hidden="true">/</span>
+              <span
+                dir="rtl"
+                lang="ur"
+                className="font-urdu text-sm sm:text-base font-bold text-navy whitespace-nowrap leading-snug"
+              >
+                ابواب کی فہرست
+              </span>
             </h2>
-            <span className="text-[11px] bg-ivory text-secondary px-2.5 py-0.5 rounded-full font-semibold border border-border">
+            <span className="text-[11px] bg-ivory text-secondary px-2.5 py-0.5 rounded-full font-semibold border border-border whitespace-nowrap shrink-0 font-sans tabular-nums">
               {chapters.length} {chapters.length === 1 ? 'Chapter' : 'Chapters'}
             </span>
           </div>
-          <ChevronDown className="w-4 h-4 text-secondary transition-transform duration-200 group-open:rotate-180" />
+          <ChevronDown className="w-4 h-4 text-secondary shrink-0 transition-transform duration-200 group-open:rotate-180" />
         </summary>
 
         {chapters.length > 0 ? (
@@ -133,7 +140,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <span
-                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-serif text-xs font-semibold shrink-0 ${
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-sans font-semibold text-xs tabular-nums lining-nums shrink-0 ${
                           rowType.isCurrent
                             ? 'bg-accent text-navy shadow-xs font-bold'
                             : 'bg-ivory text-secondary border border-border/80'
@@ -189,7 +196,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                     className="p-3.5 sm:p-4 flex items-center justify-between gap-3 min-h-[44px] hover:bg-ivory/50 transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-ivory text-secondary flex items-center justify-center font-serif text-xs font-semibold shrink-0 border border-border/80">
+                      <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-ivory text-secondary flex items-center justify-center font-sans font-semibold text-xs tabular-nums lining-nums shrink-0 border border-border/80">
                         {ch.chapter_number}
                       </span>
 
@@ -212,9 +219,9 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                     <div className="shrink-0 flex items-center gap-2">
                       <Link
                         href={`/novels/${novelSlug}/read/${ch.chapter_number}`}
-                        className="inline-flex items-center gap-1.5 bg-success-soft hover:bg-success-soft text-success-text border border-success-border px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors min-h-[36px]"
+                        className="inline-flex items-center gap-1.5 bg-success-soft hover:bg-success-soft text-success-text border border-success-border px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors min-h-[36px] whitespace-nowrap shrink-0"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-success" />
+                        <BookOpen className="w-3.5 h-3.5 text-success shrink-0" />
                         <span className="hidden sm:inline">Read Free Preview</span>
                         <span className="sm:hidden">Preview</span>
                       </Link>
@@ -236,7 +243,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
                   className="w-full text-left p-3.5 sm:p-4 flex items-center justify-between gap-3 min-h-[44px] bg-surface-muted hover:bg-surface-muted/70 transition-colors cursor-pointer group/locked"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-surface-muted text-text-muted flex items-center justify-center font-serif text-xs font-semibold shrink-0 border border-border">
+                    <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-surface-muted text-text-muted flex items-center justify-center font-sans font-semibold text-xs tabular-nums lining-nums shrink-0 border border-border">
                       {ch.chapter_number}
                     </span>
 
@@ -295,7 +302,7 @@ export function NovelToc({ novelSlug, pricePkr, chapters }: NovelTocProps) {
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-3 border-b border-border/70">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-accent/20 text-accent-strong flex items-center justify-center font-bold text-xs font-sans tabular-nums">
+                  <div className="w-7 h-7 rounded-lg bg-accent/20 text-accent-strong flex items-center justify-center font-bold text-xs font-sans tabular-nums lining-nums">
                     {selectedLockedChapter.chapter_number}
                   </div>
                   <h3

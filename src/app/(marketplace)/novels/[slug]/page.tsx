@@ -399,26 +399,28 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
               </div>
             </div>
 
-            {/* Synopsis Section (Expandable) */}
-            {novel.synopsis_urdu && (
-              <div className="space-y-2.5">
-                <h2 className="font-serif text-lg font-bold text-navy">
-                  Synopsis / خلاصہِ ناول
-                </h2>
+            {/* Core Content: Synopsis, Trust Strip, and Table of Contents */}
+            <div className="space-y-4">
+              {/* Synopsis Section (Expandable Card with Integrated Header) */}
+              {novel.synopsis_urdu && (
                 <ExpandableSynopsis synopsis={novel.synopsis_urdu} />
-              </div>
-            )}
+              )}
 
-            {/* Mobile Direct Payment Assurance Compact Card (Rendered only for visitors) */}
-            <NovelPaymentGuarantee compact />
+              {/* Mobile Direct Payment Assurance Compact Trust Strip (Rendered only for visitors) */}
+              <NovelPaymentGuarantee compact />
 
-            {/* Extended Description Section (if any) */}
-            {novel.description_urdu && (
-              <div className="space-y-2.5">
-                <h2 className="font-serif text-lg font-bold text-navy">
-                  About this Novel / تفصیلات
-                </h2>
-                <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-border">
+              {/* Extended Description Section (if any) */}
+              {novel.description_urdu && (
+                <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5">
+                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-border/70">
+                    <h2 className="text-base sm:text-lg font-bold text-navy flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                      <span className="font-serif text-base sm:text-lg whitespace-nowrap">About this Novel</span>
+                      <span className="text-secondary/40 hidden sm:inline select-none" aria-hidden="true">/</span>
+                      <span dir="rtl" lang="ur" className="font-urdu text-sm sm:text-base font-bold text-navy whitespace-nowrap leading-snug">
+                        تفصیلات
+                      </span>
+                    </h2>
+                  </div>
                   <p
                     dir="rtl"
                     lang="ur"
@@ -427,11 +429,9 @@ export default async function NovelDetailsPage({ params }: NovelPageProps) {
                     {novel.description_urdu}
                   </p>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Table of Contents: Client-side Access State Overlays */}
-            <div className="pt-2">
+              {/* Table of Contents: Client-side Access State Overlays */}
               <NovelToc
                 novelSlug={novel.slug}
                 pricePkr={novel.price_pkr}
