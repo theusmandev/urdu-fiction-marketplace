@@ -424,7 +424,7 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
   });
 
   describe('12. Optical Font-Size Scaling for Jameel Noori Nastaleeq', () => {
-    it('globals.css sets optical scale tokens: --reader-font-scale 1 for gulzar and 1.22 for noori', () => {
+    it('globals.css sets optical scale tokens: --reader-font-scale 1 for gulzar and 1.26 for noori', () => {
       const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
       assert.ok(fs.existsSync(cssPath), 'globals.css must exist');
       const content = fs.readFileSync(cssPath, 'utf8');
@@ -439,14 +439,14 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
         'globals.css must set --reader-heading-scale: 1 for [data-reader-font="gulzar"]'
       );
 
-      // Noori: optical scale boost ~1.22 to equalize visual em-box ratio with Gulzar
+      // Noori: optical scale boost 1.26 to match Gulzar perceived stroke weight at LG and other sizes
       assert.ok(
-        content.includes('--reader-font-scale: 1.22;'),
-        'globals.css must set --reader-font-scale: 1.22 for [data-reader-font="noori"]'
+        content.includes('--reader-font-scale: 1.26;'),
+        'globals.css must set --reader-font-scale: 1.26 for [data-reader-font="noori"]'
       );
       assert.ok(
-        content.includes('--reader-heading-scale: 1.18;'),
-        'globals.css must set --reader-heading-scale: 1.18 for [data-reader-font="noori"]'
+        content.includes('--reader-heading-scale: 1.20;'),
+        'globals.css must set --reader-heading-scale: 1.20 for [data-reader-font="noori"]'
       );
     });
 
@@ -455,7 +455,7 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
       const content = fs.readFileSync(cssPath, 'utf8');
 
       assert.ok(
-        content.includes('font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.22));') ||
+        content.includes('font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.26));') ||
         content.includes('font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1));'),
         'globals.css must apply calc formula with base font size and scale multiplier'
       );
@@ -498,6 +498,74 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
         freeContent.includes('leading-[var(--reader-title-leading,2.4)]'),
         'FreePreviewReaderClient must respect calibrated title line-height token'
       );
+    });
+  });
+
+  describe('13. Noori Typography Spacing & Default Preferences Calibration', () => {
+    it('DEFAULT_READER_PREFERENCES specifies sepia, lg, normal line spacing, compact paragraph spacing', async () => {
+      const { DEFAULT_READER_PREFERENCES, readerPreferencesSchema } = await import(
+        '../src/lib/reader/schemas.ts'
+      );
+
+      assert.equal(DEFAULT_READER_PREFERENCES.theme, 'sepia');
+      assert.equal(DEFAULT_READER_PREFERENCES.fontSize, 'lg');
+      assert.equal(DEFAULT_READER_PREFERENCES.lineHeight, 'normal');
+      assert.equal(DEFAULT_READER_PREFERENCES.paragraphSpacing, 'compact');
+
+      const parsed = readerPreferencesSchema.parse({});
+      assert.deepEqual(parsed, DEFAULT_READER_PREFERENCES);
+    });
+
+    it('globals.css defines Noori-scoped tighter line-height presets while keeping Gulzar unchanged', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      // Gulzar line heights: normal=2.2, relaxed=2.6, loose=3.0
+      assert.ok(content.includes('--reader-line-height-normal: 2.2;'));
+      assert.ok(content.includes('--reader-line-height-relaxed: 2.6;'));
+      assert.ok(content.includes('--reader-line-height-loose: 3.0;'));
+
+      // Noori line heights: noticeably tighter: normal=1.95, relaxed=2.2, loose=2.45
+      assert.ok(content.includes('--reader-line-height-normal: 1.95;'));
+      assert.ok(content.includes('--reader-line-height-relaxed: 2.2;'));
+      assert.ok(content.includes('--reader-line-height-loose: 2.45;'));
+
+      // Scoped line-height rules for Noori
+      assert.ok(content.includes('[data-reader-font="noori"].leading-\\[2\\.2\\]'));
+      assert.ok(content.includes('[data-reader-font="noori"].leading-\\[2\\.6\\]'));
+      assert.ok(content.includes('[data-reader-font="noori"].leading-\\[3\\.0\\]'));
+    });
+
+    it('globals.css defines Noori-scoped tighter paragraph-spacing presets while keeping Gulzar unchanged', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      // Gulzar paragraph gaps: compact=0.875rem, normal=1.5rem, wide=2.25rem
+      assert.ok(content.includes('--reader-para-gap-compact: 0.875rem;'));
+      assert.ok(content.includes('--reader-para-gap-normal: 1.5rem;'));
+      assert.ok(content.includes('--reader-para-gap-wide: 2.25rem;'));
+
+      // Noori paragraph gaps: ~65-75% of Gulzar: compact=0.55rem, normal=1rem, wide=1.45rem
+      assert.ok(content.includes('--reader-para-gap-compact: 0.55rem;'));
+      assert.ok(content.includes('--reader-para-gap-normal: 1rem;'));
+      assert.ok(content.includes('--reader-para-gap-wide: 1.45rem;'));
+
+      // Scoped paragraph spacing rules for Noori
+      assert.ok(content.includes('[data-reader-font="noori"] p.mb-3\\.5'));
+      assert.ok(content.includes('[data-reader-font="noori"] p.mb-6'));
+      assert.ok(content.includes('[data-reader-font="noori"] p.mb-9'));
+    });
+
+    it('globals.css configures mobile inline padding and crisp text-rendering for Noori', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      // Mobile side padding: 0.6em (safe breathing room without excessive wrap)
+      assert.ok(content.includes('--reader-padding-inline: 0.6em;'));
+      assert.ok(content.includes('--reader-padding-inline: 0.75em;'));
+
+      // Crisp rendering
+      assert.ok(content.includes('text-rendering: optimizeLegibility;'));
     });
   });
 });

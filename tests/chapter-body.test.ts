@@ -224,13 +224,13 @@ describe('ChapterBody Nastaliq (Gulzar) Glyph Overhang & Clipping Protection', (
 });
 
 describe('ChapterBody Nastaliq (Jameel Noori) Calibration & Deep-Cascade Metrics', () => {
-  test('inner prose container enforces increased padding-inline and py when readerFont is noori', () => {
+  test('inner prose container enforces calibrated padding-inline and py when readerFont is noori', () => {
     const raw = 'گھر کے سامنے خوبصورت باغ تھا۔\nگرم موسم میں ٹھنڈی ہوا چلی۔\nکچھ فاصلے پر نہر بہتی تھی۔';
     const html = renderChapterBodyToHtml(raw, { fontSize: 'lg', readerFont: 'noori' });
 
     assert.ok(
-      html.includes('[padding-inline:0.85em]'),
-      'Rendered HTML container must include [padding-inline:0.85em] for Noori overhang'
+      html.includes('[padding-inline:var(--reader-padding-inline,0.6em)]'),
+      'Rendered HTML container must include [padding-inline:var(--reader-padding-inline,0.6em)] for calibrated Noori overhang'
     );
 
     assert.ok(
@@ -252,13 +252,24 @@ describe('ChapterBody Nastaliq (Jameel Noori) Calibration & Deep-Cascade Metrics
   test('empty chapter content fallback for noori retains calibrated padding', () => {
     const emptyHtml = renderChapterBodyToHtml('', { readerFont: 'noori' });
     assert.ok(
-      emptyHtml.includes('[padding-inline:0.85em]'),
-      'Empty state container must retain [padding-inline:0.85em] when noori is selected'
+      emptyHtml.includes('[padding-inline:var(--reader-padding-inline,0.6em)]'),
+      'Empty state container must retain [padding-inline:var(--reader-padding-inline,0.6em)] when noori is selected'
     );
     assert.ok(
       emptyHtml.includes('data-reader-font="noori"'),
       'Empty state container must retain data-reader-font="noori"'
     );
+  });
+
+  test('default renderChapterBodyToHtml uses normal line-height and compact paragraph spacing', () => {
+    const raw = 'پہلا پیراگراف۔\nدوسرا پیراگراف۔';
+    const defaultHtml = renderChapterBodyToHtml(raw);
+
+    // Default line-height is normal ('leading-[2.2]')
+    assert.ok(defaultHtml.includes('leading-[2.2]'), 'Default line height should be normal (leading-[2.2])');
+
+    // Default paragraph spacing is compact ('mb-3.5')
+    assert.ok(defaultHtml.includes('mb-3.5'), 'Default paragraph spacing should be compact (mb-3.5)');
   });
 
   test('rendered paragraphs are properly enclosed in data-reader-font container with rtl urdu semantics', () => {

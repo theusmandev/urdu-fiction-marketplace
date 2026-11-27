@@ -211,6 +211,15 @@ textarea.font-urdu::placeholder {
   --reader-title-leading: 1.8;
   --reader-font-scale: 1;
   --reader-heading-scale: 1;
+  --reader-line-height-normal: 2.2;
+  --reader-line-height-relaxed: 2.6;
+  --reader-line-height-loose: 3.0;
+  --reader-para-gap-compact: 0.875rem; /* mb-3.5 */
+  --reader-para-gap-normal: 1.5rem;    /* mb-6 */
+  --reader-para-gap-wide: 2.25rem;     /* mb-9 */
+  --reader-extra-gap-compact: 0.75rem; /* pt-3 */
+  --reader-extra-gap-normal: 1.25rem;  /* pt-5 */
+  --reader-extra-gap-wide: 2rem;       /* pt-8 */
   font-family: var(--reader-font-family);
 }
 
@@ -228,15 +237,30 @@ textarea.font-urdu::placeholder {
 }
 
 /* 2. Jameel Noori Nastaleeq (Classical Deep-Cascade Nastaliq)
-   STARTING VALUES ONLY — visually tune on /dev/fonts with the real subset binary */
+   Calibrated typography tokens scoped strictly to [data-reader-font="noori"] */
 [data-reader-font="noori"] {
   --reader-font-family: 'JameelNooriNastaleeq', var(--font-urdu), "Noto Nastaliq Urdu", serif;
-  --reader-padding-inline: 0.85em;
+  --reader-padding-inline: 0.6em;
   --reader-py: 0.625rem; /* py-2.5 */
   --reader-title-leading: 2.2;
-  --reader-font-scale: 1.22;
-  --reader-heading-scale: 1.18;
+  --reader-font-scale: 1.26;
+  --reader-heading-scale: 1.20;
+  --reader-line-height-normal: 1.95;
+  --reader-line-height-relaxed: 2.2;
+  --reader-line-height-loose: 2.45;
+  --reader-para-gap-compact: 0.55rem;
+  --reader-para-gap-normal: 1rem;
+  --reader-para-gap-wide: 1.45rem;
+  --reader-extra-gap-compact: 0.5rem;
+  --reader-extra-gap-normal: 0.85rem;
+  --reader-extra-gap-wide: 1.35rem;
   font-family: var(--reader-font-family);
+}
+
+@media (min-width: 640px) {
+  [data-reader-font="noori"] {
+    --reader-padding-inline: 0.75em;
+  }
 }
 
 [data-reader-font="noori"] .reader-canvas,
@@ -246,23 +270,74 @@ textarea.font-urdu::placeholder {
 [data-reader-font="noori"] h2,
 [data-reader-font="noori"] h3 {
   font-family: var(--reader-font-family);
+  text-rendering: optimizeLegibility;
 }
 
-/* Reader Prose Paragraph Optical Font Sizing */
+/* Reader Prose Paragraph Optical Font Sizing & Crisp Rendering */
 [data-reader-font="noori"] .reader-canvas p,
 [data-reader-font="noori"] .font-urdu p,
 .reader-canvas[data-reader-font="noori"] p,
 .font-urdu[data-reader-font="noori"] p {
-  font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.22));
+  font-size: calc(var(--reader-base-font-size, 1.125rem) * var(--reader-font-scale, 1.26));
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Reader Chapter Heading Optical Scaling */
 [data-reader-font="noori"] h1 {
-  font-size: calc(1.5rem * var(--reader-heading-scale, 1.18));
+  font-size: calc(1.5rem * var(--reader-heading-scale, 1.20));
 }
 
 [data-reader-font="noori"] h1.text-3xl {
-  font-size: calc(1.875rem * var(--reader-heading-scale, 1.18));
+  font-size: calc(1.875rem * var(--reader-heading-scale, 1.20));
+}
+
+/* Scoped Tightened Line-Height for Jameel Noori Nastaleeq */
+[data-reader-font="noori"].leading-\[2\.2\],
+[data-reader-font="noori"] .leading-\[2\.2\],
+[data-reader-font="noori"] p.leading-\[2\.2\] {
+  line-height: var(--reader-line-height-normal, 1.95);
+}
+
+[data-reader-font="noori"].leading-\[2\.6\],
+[data-reader-font="noori"] .leading-\[2\.6\],
+[data-reader-font="noori"] p.leading-\[2\.6\] {
+  line-height: var(--reader-line-height-relaxed, 2.2);
+}
+
+[data-reader-font="noori"].leading-\[3\.0\],
+[data-reader-font="noori"].leading-\[3\],
+[data-reader-font="noori"] .leading-\[3\.0\],
+[data-reader-font="noori"] .leading-\[3\],
+[data-reader-font="noori"] p.leading-\[3\.0\],
+[data-reader-font="noori"] p.leading-\[3\] {
+  line-height: var(--reader-line-height-loose, 2.45);
+}
+
+/* Scoped Tightened Paragraph Spacing for Jameel Noori Nastaleeq */
+[data-reader-font="noori"] p.mb-3\.5 {
+  margin-bottom: var(--reader-para-gap-compact, 0.55rem);
+}
+[data-reader-font="noori"] p.mb-6 {
+  margin-bottom: var(--reader-para-gap-normal, 1rem);
+}
+[data-reader-font="noori"] p.mb-9 {
+  margin-bottom: var(--reader-para-gap-wide, 1.45rem);
+}
+
+/* Scoped Extra Blank-Line Gap for Jameel Noori Nastaleeq */
+[data-reader-font="noori"] p.pt-3,
+[data-reader-font="noori"] div.pt-3 {
+  padding-top: var(--reader-extra-gap-compact, 0.5rem);
+}
+[data-reader-font="noori"] p.pt-5,
+[data-reader-font="noori"] div.pt-5 {
+  padding-top: var(--reader-extra-gap-normal, 0.85rem);
+}
+[data-reader-font="noori"] p.pt-8,
+[data-reader-font="noori"] div.pt-8 {
+  padding-top: var(--reader-extra-gap-wide, 1.35rem);
 }
 
 .reader-canvas {

@@ -128,19 +128,19 @@ export function renderChapterBodyToHtml(
 
   if (blocks.length === 0) {
     const emptyClass = isNoori
-      ? 'reader-canvas text-center py-12 [padding-inline:0.85em] py-2.5 text-current/50 select-none text-base'
+      ? 'reader-canvas text-center py-12 [padding-inline:var(--reader-padding-inline,0.6em)] py-2.5 text-current/50 select-none text-base'
       : 'font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base';
     return `<div dir="rtl" lang="ur" data-reader-font="${readerFont}" class="${emptyClass}">کوئی متن موجود نہیں۔</div>`;
   }
 
   const fontSize = options?.fontSize ?? 'lg';
   const baseSize = fontSizeBaseRem[fontSize] || '1.125rem';
-  const lineHeight = options?.lineHeight ?? 'relaxed';
-  const paragraphSpacing = options?.paragraphSpacing ?? 'normal';
+  const lineHeight = options?.lineHeight ?? 'normal';
+  const paragraphSpacing = options?.paragraphSpacing ?? 'compact';
   const userSelect = options?.userSelect ?? 'text';
 
   const fontAndPaddingClass = isNoori
-    ? 'reader-canvas transition-all duration-150 [padding-inline:0.85em] py-2.5'
+    ? 'reader-canvas transition-all duration-150 [padding-inline:var(--reader-padding-inline,0.6em)] py-2.5'
     : 'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5';
 
   const containerClasses = [

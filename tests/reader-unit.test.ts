@@ -15,7 +15,13 @@ describe('Reader Domain Helpers & Schemas', () => {
       const parsed = readerPreferencesSchema.parse({});
       assert.deepEqual(parsed, DEFAULT_READER_PREFERENCES);
       assert.equal(parsed.theme, 'sepia');
+      assert.equal(parsed.fontSize, 'lg');
+      assert.equal(parsed.lineHeight, 'normal');
+      assert.equal(parsed.paragraphSpacing, 'compact');
       assert.equal(DEFAULT_READER_PREFERENCES.theme, 'sepia');
+      assert.equal(DEFAULT_READER_PREFERENCES.fontSize, 'lg');
+      assert.equal(DEFAULT_READER_PREFERENCES.lineHeight, 'normal');
+      assert.equal(DEFAULT_READER_PREFERENCES.paragraphSpacing, 'compact');
     });
 
     it('accepts valid custom preferences', () => {

@@ -417,7 +417,7 @@ export default async function AdminNovelReviewPage({ params }: PageProps) {
                     <ChapterBody
                       text={chapter.content_urdu}
                       fontSize="lg"
-                      lineHeight="relaxed"
+                      lineHeight="normal"
                       userSelect="text"
                     />
                   </div>

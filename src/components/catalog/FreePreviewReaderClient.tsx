@@ -69,7 +69,7 @@ export function FreePreviewReaderClient({
         if (saved) return saved;
       } catch {}
     }
-    return "relaxed";
+    return "normal";
   });
 
   // Live Reading Progress (0 - 100%)

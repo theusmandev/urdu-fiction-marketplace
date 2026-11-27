@@ -18,15 +18,15 @@ export interface ReaderPreferences {
 export const DEFAULT_READER_PREFERENCES: ReaderPreferences = {
   theme: 'sepia',
   fontSize: 'lg',
-  lineHeight: 'relaxed',
-  paragraphSpacing: 'normal',
+  lineHeight: 'normal',
+  paragraphSpacing: 'compact',
 };
 
 export const readerPreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'sepia']).default('sepia'),
   fontSize: z.enum(['sm', 'base', 'lg', 'xl', '2xl']).default('lg'),
-  lineHeight: z.enum(['normal', 'relaxed', 'loose']).default('relaxed'),
-  paragraphSpacing: z.enum(['compact', 'normal', 'wide']).default('normal'),
+  lineHeight: z.enum(['normal', 'relaxed', 'loose']).default('normal'),
+  paragraphSpacing: z.enum(['compact', 'normal', 'wide']).default('compact'),
 });
 
 /**

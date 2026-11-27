@@ -32,14 +32,14 @@ export interface ChapterBodyProps {
 
   /**
    * Line height corresponding to reader preference: 'normal' | 'relaxed' | 'loose'
-   * Safe line-heights calibrated for Gulzar Nastaliq calligraphy ascenders and descenders.
-   * @default 'relaxed'
+   * Safe line-heights calibrated for Gulzar Nastaliq and Jameel Noori Nastaleeq calligraphy ascenders and descenders.
+   * @default 'normal'
    */
   lineHeight?: ReaderLineHeight;
 
   /**
    * Reader paragraph spacing preference: 'compact' | 'normal' | 'wide'
-   * @default 'normal'
+   * @default 'compact'
    */
   paragraphSpacing?: ReaderParagraphSpacing;
 
@@ -81,8 +81,8 @@ export interface ChapterBodyProps {
 export function ChapterBody({
   text,
   fontSize = 'lg',
-  lineHeight = 'relaxed',
-  paragraphSpacing = 'normal',
+  lineHeight = 'normal',
+  paragraphSpacing = 'compact',
   userSelect = 'text',
   readerFont = 'gulzar',
   className,
@@ -102,7 +102,7 @@ export function ChapterBody({
         }}
         className={cn(
           isNoori
-            ? 'reader-canvas text-center py-12 [padding-inline:0.85em] py-2.5 text-current/50 select-none text-base'
+            ? 'reader-canvas text-center py-12 [padding-inline:var(--reader-padding-inline,0.6em)] py-2.5 text-current/50 select-none text-base'
             : 'font-urdu text-center py-12 [padding-inline:0.5em] text-current/50 select-none text-base',
           className
         )}
@@ -122,7 +122,7 @@ export function ChapterBody({
       }}
       className={cn(
         isNoori
-          ? 'reader-canvas transition-all duration-150 [padding-inline:0.85em] py-2.5'
+          ? 'reader-canvas transition-all duration-150 [padding-inline:var(--reader-padding-inline,0.6em)] py-2.5'
           : 'font-urdu transition-all duration-150 [padding-inline:0.5em] py-1.5',
         fontSizeClasses[fontSize],
         lineHeightClasses[lineHeight],

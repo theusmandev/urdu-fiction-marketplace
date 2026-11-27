@@ -851,7 +851,7 @@ export function ChapterEditor({
                           <ChapterBody
                             text={formData.content_urdu.slice(0, 1200) || 'کوئی متن موجود نہیں۔'}
                             fontSize="sm"
-                            lineHeight="relaxed"
+                            lineHeight="normal"
                             paragraphSpacing="compact"
                             userSelect="text"
                           />
@@ -872,7 +872,7 @@ export function ChapterEditor({
                           <ChapterBody
                             text={transformed.slice(0, 1200) || 'کوئی متن موجود نہیں۔'}
                             fontSize="sm"
-                            lineHeight="relaxed"
+                            lineHeight="normal"
                             paragraphSpacing="compact"
                             userSelect="text"
                           />
