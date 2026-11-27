@@ -340,6 +340,61 @@ textarea.font-urdu::placeholder {
   padding-top: var(--reader-extra-gap-wide, 1.35rem);
 }
 
+/* ==========================================================================
+   Reader UI Chrome Isolation Boundary
+   Guarantees that Reader UI (Tip Card, settings drawers, toolbar controls)
+   is strictly protected from Noori prose font overrides and optical scaling.
+   All Urdu labels in reader UI chrome render in crisp Gulzar at scale 1.
+   ========================================================================== */
+[data-reader-ui="true"],
+.reader-ui-chrome,
+[data-reader-font="noori"] [data-reader-ui="true"],
+[data-reader-font="noori"] .reader-ui-chrome {
+  --reader-font-scale: 1 !important;
+  --reader-heading-scale: 1 !important;
+  --reader-font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+[data-reader-ui="true"] .font-urdu,
+.reader-ui-chrome .font-urdu,
+[data-reader-ui="true"] [lang="ur"],
+.reader-ui-chrome [lang="ur"],
+[data-reader-font="noori"] [data-reader-ui="true"] .font-urdu,
+[data-reader-font="noori"] .reader-ui-chrome .font-urdu,
+[data-reader-font="noori"] [data-reader-ui="true"] [lang="ur"],
+[data-reader-font="noori"] .reader-ui-chrome [lang="ur"] {
+  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;
+  font-size: 1em !important;
+  font-synthesis: none !important;
+  line-height: normal;
+}
+
+[data-reader-font="noori"] [data-reader-ui="true"] p,
+[data-reader-font="noori"] .reader-ui-chrome p,
+[data-reader-ui="true"] p,
+.reader-ui-chrome p {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: revert;
+  line-height: normal;
+  margin-bottom: 0;
+}
+
+[data-reader-font="noori"] [data-reader-ui="true"] p.font-urdu,
+[data-reader-font="noori"] .reader-ui-chrome p.font-urdu,
+[data-reader-font="noori"] [data-reader-ui="true"] p[lang="ur"],
+[data-reader-font="noori"] .reader-ui-chrome p[lang="ur"] {
+  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;
+  font-size: 1em !important;
+}
+
+/* Warm Reader Theme Surface Harmony */
+[data-reader-ui="true"] #tip-card,
+.reader-ui-chrome#tip-card {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
 .reader-canvas {
   font-family: var(--reader-font-family, var(--font-urdu), "Noto Nastaliq Urdu", serif);
   font-synthesis: none;

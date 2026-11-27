@@ -690,8 +690,8 @@ export function SecureReaderClient({
           />
         </article>
 
-        {/* Reader Appreciation (Tip Jar) — Guaranteed isolation from watermark */}
-        <div className="mt-12 mb-6 relative z-20">
+        {/* Reader Appreciation (Tip Jar) — Guaranteed isolation from watermark & prose styling */}
+        <div data-reader-ui="true" className="mt-12 mb-6 relative z-20">
           <TipCard novelId={chapter.novel_id} />
         </div>
 

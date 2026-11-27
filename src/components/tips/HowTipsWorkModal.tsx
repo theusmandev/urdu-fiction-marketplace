@@ -31,13 +31,14 @@ export function HowTipsWorkModal({ isOpen, onClose }: HowTipsWorkModalProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="how-tips-work-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-navy/60 backdrop-blur-xs animate-in fade-in duration-200"
+      data-reader-ui="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-navy/60 backdrop-blur-xs animate-in fade-in duration-200 reader-ui-chrome"
     >
       {/* Backdrop click */}
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg bg-surface border border-gold-200/60 dark:border-gold-900/40 rounded-2xl shadow-xl overflow-hidden z-10">
+      <div className="relative w-full max-w-lg bg-surface border border-border/80 rounded-2xl shadow-xl overflow-hidden z-10">
         {/* Header */}
         <div className="px-6 py-5 border-b border-border/40 flex items-center justify-between bg-warning-soft/40">
           <div className="flex items-center gap-2.5">

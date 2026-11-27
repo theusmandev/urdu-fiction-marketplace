@@ -564,7 +564,7 @@ export function FreePreviewReaderClient({
 
         {/* Reader Appreciation (Tip Jar) at end of free preview */}
         {!nextChapter && (
-          <div className="pt-4 pb-8">
+          <div className="pt-4 pb-8" data-reader-ui="true">
             <TipCard writerId={novel.writer_id} novelId={novel.id} />
           </div>
         )}

@@ -235,3 +235,50 @@ export function resolveTipCardState({
     options: payload,
   };
 }
+
+export interface FormattedPaymentMethod {
+  provider: string;
+  mask: string;
+  combined: string;
+}
+
+/**
+ * Pure formatter for author payout methods in appreciation card.
+ * Deduplicates the provider name when the masked_label already contains it
+ * (e.g. "Easypaisa (•••• 8292)" -> "Easypaisa · •••• 8292", NEVER "Easypaisa easypaisa").
+ */
+export function formatPaymentMethodLabel(pm: {
+  method_type: string;
+  bank_name?: string | null;
+  masked_label?: string | null;
+}): FormattedPaymentMethod {
+  let provider = (pm.bank_name || pm.method_type.replace(/_/g, ' ')).trim();
+  if (provider.toLowerCase() === 'easypaisa') provider = 'Easypaisa';
+  else if (provider.toLowerCase() === 'jazzcash') provider = 'JazzCash';
+  else if (provider.toLowerCase() === 'raast') provider = 'Raast';
+  else if (provider.toLowerCase() === 'bank') provider = 'Bank Transfer';
+
+  const rawMask = (pm.masked_label || '').trim();
+  let mask = rawMask;
+
+  if (mask) {
+    // Strip duplicate provider prefix (e.g. "Easypaisa (•••• 8292)" or "easypaisa (•••• 8292)")
+    const escapedProvider = provider.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const duplicateRegex = new RegExp(`^${escapedProvider}[\\s:(-]*`, 'i');
+    if (duplicateRegex.test(mask)) {
+      mask = mask.replace(duplicateRegex, '').replace(/[)\]]$/, '').trim();
+    } else {
+      const methodTypeRegex = new RegExp(`^${pm.method_type}[\\s:(-]*`, 'i');
+      if (methodTypeRegex.test(mask)) {
+        mask = mask.replace(methodTypeRegex, '').replace(/[)\]]$/, '').trim();
+      }
+    }
+
+    if (!mask) {
+      mask = rawMask;
+    }
+  }
+
+  const combined = mask ? `${provider} · ${mask}` : provider;
+  return { provider, mask, combined };
+}

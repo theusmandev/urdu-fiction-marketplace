@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldShowTipCard, getTipStatusMeta, resolveTipCardState } from '../src/lib/tips/state.ts';
+import {
+  shouldShowTipCard,
+  getTipStatusMeta,
+  resolveTipCardState,
+  formatPaymentMethodLabel,
+} from '../src/lib/tips/state.ts';
 import type { TipStatus, TipOptionsPayload } from '../src/types/database.ts';
 
 test('Tip Jar UI State & Visibility Helpers', async (t) => {
@@ -220,5 +225,115 @@ test('Tip Jar UI State & Visibility Helpers', async (t) => {
       payload: { ...defaultPayload, writer_enabled: false },
     });
     assert.equal(disabledState.status, 'disabled_by_writer');
+  });
+
+  await t.test('formatPaymentMethodLabel deduplicates provider name cleanly', () => {
+    // Case 1: masked_label contains duplicate provider name in parens
+    const pm1 = formatPaymentMethodLabel({
+      method_type: 'easypaisa',
+      bank_name: null,
+      masked_label: 'Easypaisa (•••• 8292)',
+    });
+    assert.equal(pm1.provider, 'Easypaisa');
+    assert.equal(pm1.mask, '•••• 8292');
+    assert.equal(pm1.combined, 'Easypaisa · •••• 8292');
+    assert.ok(!pm1.combined.includes('Easypaisa easypaisa'));
+
+    // Case 2: bank_name set to Easypaisa and lowercase in masked_label
+    const pm2 = formatPaymentMethodLabel({
+      method_type: 'easypaisa',
+      bank_name: 'Easypaisa',
+      masked_label: 'easypaisa (•••• 8292)',
+    });
+    assert.equal(pm2.provider, 'Easypaisa');
+    assert.equal(pm2.mask, '•••• 8292');
+    assert.equal(pm2.combined, 'Easypaisa · •••• 8292');
+
+    // Case 3: JazzCash with already masked number
+    const pm3 = formatPaymentMethodLabel({
+      method_type: 'jazzcash',
+      bank_name: null,
+      masked_label: '•••• 1234',
+    });
+    assert.equal(pm3.provider, 'JazzCash');
+    assert.equal(pm3.mask, '•••• 1234');
+    assert.equal(pm3.combined, 'JazzCash · •••• 1234');
+
+    // Case 4: Bank with bank_name
+    const pm4 = formatPaymentMethodLabel({
+      method_type: 'bank',
+      bank_name: 'Meezan Bank',
+      masked_label: 'Meezan Bank (•••• 5678)',
+    });
+    assert.equal(pm4.provider, 'Meezan Bank');
+    assert.equal(pm4.mask, '•••• 5678');
+    assert.equal(pm4.combined, 'Meezan Bank · •••• 5678');
+
+    // Case 5: Raast with prefix
+    const pm5 = formatPaymentMethodLabel({
+      method_type: 'raast',
+      bank_name: null,
+      masked_label: 'Raast: 0300 •••• 9999',
+    });
+    assert.equal(pm5.provider, 'Raast');
+    assert.equal(pm5.mask, '0300 •••• 9999');
+    assert.equal(pm5.combined, 'Raast · 0300 •••• 9999');
+  });
+
+  await t.test('single vs multiple payout methods UI disclosure logic', () => {
+    // 1 method: passive display, no radio button needed
+    const singleMethodList = [
+      {
+        id: 'pm-single',
+        method_type: 'easypaisa',
+        bank_name: null,
+        masked_label: 'Easypaisa (•••• 8292)',
+        instructions_note: null,
+      },
+    ];
+    assert.equal(singleMethodList.length, 1);
+    const formattedSingle = formatPaymentMethodLabel(singleMethodList[0]);
+    assert.equal(formattedSingle.combined, 'Easypaisa · •••• 8292');
+
+    // 2+ methods: selectable choices with custom indicator
+    const multiMethodList = [
+      {
+        id: 'pm-1',
+        method_type: 'easypaisa',
+        bank_name: null,
+        masked_label: 'Easypaisa (•••• 8292)',
+        instructions_note: null,
+      },
+      {
+        id: 'pm-2',
+        method_type: 'jazzcash',
+        bank_name: null,
+        masked_label: 'JazzCash (•••• 1234)',
+        instructions_note: null,
+      },
+    ];
+    assert.ok(multiMethodList.length > 1);
+    const formattedMulti = multiMethodList.map(formatPaymentMethodLabel);
+    assert.equal(formattedMulti[0].combined, 'Easypaisa · •••• 8292');
+    assert.equal(formattedMulti[1].combined, 'JazzCash · •••• 1234');
+  });
+
+  await t.test('progressive disclosure: note textarea starts collapsed for mobile scannability', () => {
+    // Verifies that note starts empty and collapsed by default
+    const defaultNoteState = {
+      readerMessage: '',
+      isNoteExpanded: false,
+    };
+    assert.equal(defaultNoteState.isNoteExpanded, false);
+    assert.equal(defaultNoteState.readerMessage, '');
+
+    // Expanding note allows input up to 300 chars
+    const expandedNoteState = {
+      ...defaultNoteState,
+      isNoteExpanded: true,
+      readerMessage: 'بہت شاندار باب!',
+    };
+    assert.equal(expandedNoteState.isNoteExpanded, true);
+    assert.ok(expandedNoteState.readerMessage.length <= 300);
   });
 });

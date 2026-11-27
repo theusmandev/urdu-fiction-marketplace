@@ -568,4 +568,27 @@ describe('Admin-Switchable Reader Urdu Font Suite', () => {
       assert.ok(content.includes('text-rendering: optimizeLegibility;'));
     });
   });
+
+  describe('14. Reader UI Chrome Font & Scaling Isolation Boundary', () => {
+    it('globals.css defines [data-reader-ui="true"] and .reader-ui-chrome isolation boundary', () => {
+      const cssPath = path.resolve(REPO_ROOT, 'src/app/globals.css');
+      const content = fs.readFileSync(cssPath, 'utf8');
+
+      // Boundary definitions exist
+      assert.ok(content.includes('[data-reader-ui="true"]'));
+      assert.ok(content.includes('.reader-ui-chrome'));
+
+      // Resets font-scale to 1 inside UI chrome (prevents Noori 1.26x prose blowup)
+      assert.ok(content.includes('--reader-font-scale: 1 !important;'));
+      assert.ok(content.includes('--reader-heading-scale: 1 !important;'));
+
+      // Forces Urdu labels in UI chrome to render in crisp Gulzar (var(--font-urdu))
+      assert.ok(
+        content.includes('font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif !important;')
+      );
+
+      // Reverts font-size and line-height on UI chrome paragraphs
+      assert.ok(content.includes('font-size: revert;'));
+    });
+  });
 });
